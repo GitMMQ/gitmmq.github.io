@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="description" content="又称为 上采样  下采样 数据不平衡问题默认阈值(比如二分类正反例中0.5)导致模型输出倾向于数据多的类别 解决办法 调整分类阈值，偏向数据少的类别 选择ROC或F1作为评估标准 过采样、欠采样  过采样将样本数量少的类别生成的样本数量和数量多的类别一样多，合成新的样本来缓解类不平衡 注：随机过采样采用简单复制样本增加少数类样本，导致模型不够泛化 欠采样从数量多的类别中抽取与等量的样本数据，抛弃一">
 <meta name="keywords" content="Tech;Data;Vision">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式-单例模式">
-<meta property="og:url" content="https://www.fastolf.com/2018/12/06/设计模式-单例模式/index.html">
+<meta property="og:title" content="欠采样undersampling，过采样oversampling">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/10/模型-欠采样过采样/index.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta property="og:description" content="又称为 上采样  下采样 数据不平衡问题默认阈值(比如二分类正反例中0.5)导致模型输出倾向于数据多的类别 解决办法 调整分类阈值，偏向数据少的类别 选择ROC或F1作为评估标准 过采样、欠采样  过采样将样本数量少的类别生成的样本数量和数量多的类别一样多，合成新的样本来缓解类不平衡 注：随机过采样采用简单复制样本增加少数类样本，导致模型不够泛化 欠采样从数量多的类别中抽取与等量的样本数据，抛弃一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-06T03:11:24.991Z">
+<meta property="og:updated_time" content="2018-12-11T02:13:58.759Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式-单例模式">
-<meta name="twitter:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="twitter:title" content="欠采样undersampling，过采样oversampling">
+<meta name="twitter:description" content="又称为 上采样  下采样 数据不平衡问题默认阈值(比如二分类正反例中0.5)导致模型输出倾向于数据多的类别 解决办法 调整分类阈值，偏向数据少的类别 选择ROC或F1作为评估标准 过采样、欠采样  过采样将样本数量少的类别生成的样本数量和数量多的类别一样多，合成新的样本来缓解类不平衡 注：随机过采样采用简单复制样本增加少数类样本，导致模型不够泛化 欠采样从数量多的类别中抽取与等量的样本数据，抛弃一">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/10/模型-欠采样过采样/">
 
 
 
 
 
-  <title>设计模式-单例模式 | Qi</title>
+  <title>欠采样undersampling，过采样oversampling | Qi</title>
   
 
 
@@ -233,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/10/模型-欠采样过采样/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Meng Qi">
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">设计模式-单例模式</h1>
+          <h1 class="post-title" itemprop="name headline">欠采样undersampling，过采样oversampling</h1>
         
 
         <div class="post-meta">
@@ -262,8 +262,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T10:35:11+08:00">
-                2018-12-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-10T19:41:37+08:00">
+                2018-12-10
               </time>
             
 
@@ -300,30 +300,26 @@
       
 
       
-        <h2 id="线程安全问题"><a href="#线程安全问题" class="headerlink" title="线程安全问题"></a>线程安全问题</h2><p>volatile：保证多线程下的可见性</p>
-<blockquote>
-<p>读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份<br>写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去</p>
-</blockquote>
-<p>synchronized：对象锁、类锁、方法锁（其它篇有介绍）</p>
-<pre><code>public class Singleton {
+        <p>又称为 上采样  下采样</p>
+<h2 id="数据不平衡问题"><a href="#数据不平衡问题" class="headerlink" title="数据不平衡问题"></a>数据不平衡问题</h2><p>默认阈值(比如二分类正反例中0.5)导致模型输出倾向于数据多的类别</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><ol>
+<li>调整分类阈值，偏向数据少的类别</li>
+<li>选择ROC或F1作为评估标准</li>
+<li>过采样、欠采样</li>
+</ol>
+<h3 id="过采样"><a href="#过采样" class="headerlink" title="过采样"></a>过采样</h3><p>将样本数量少的类别生成的样本数量和数量多的类别一样多，合成新的样本来缓解类不平衡</p>
+<p>注：随机过采样采用简单复制样本增加少数类样本，导致模型不够泛化</p>
+<h3 id="欠采样"><a href="#欠采样" class="headerlink" title="欠采样"></a>欠采样</h3><p>从数量多的类别中抽取与等量的样本数据，抛弃一些样本来缓解类不平衡</p>
+<h3 id="SMOTE"><a href="#SMOTE" class="headerlink" title="SMOTE"></a>SMOTE</h3><p>经典过采样</p>
+<p>人工合成数据（Synthetic Minority Over-sampling Technique）</p>
+<p>分析数量较少类别的样本数据，基于“插值”来为少数类合成新样本，并添加到数据集</p>
+<ol>
+<li>确定采样倍率 N（N为整数，N&gt;=1）</li>
+<li>计算少数类 样本x(i)到本样本欧式距离，得到x(i)的k个近邻</li>
+<li>随机选择近邻x^, xnew = x + rand(0,1)*(x^-x),重复N次，得到N个新样本</li>
+<li>对所有少数类样本x(i)执行1，2操作，合成NT个新样本</li>
+</ol>
 
-    private static volatile Singleton instance;
-
-    private Singleton(){
-    }
-
-    public static Singleton getInstance(){
-        if(instance == null){
-            synchronized(Singleton.class){
-                if(instance == null){
-                    instance = new Singleton();
-                }
-            }
-        }
-        return instance;
-    }
-}
-</code></pre>
       
     </div>
     
@@ -347,8 +343,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/06/设计模式-委派模式/" rel="next" title="设计模式-委派模式">
-                <i class="fa fa-chevron-left"></i> 设计模式-委派模式
+              <a href="/2018/12/07/数据结构-常用的树/" rel="next" title="树">
+                <i class="fa fa-chevron-left"></i> 树
               </a>
             
           </div>
@@ -357,8 +353,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/12/06/synchronized/" rel="prev" title="同步锁-synchronized">
-                同步锁-synchronized <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/redis统计信息/" rel="prev" title="redis统计信息--INFO">
+                redis统计信息--INFO <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -473,7 +469,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全问题"><span class="nav-number">1.</span> <span class="nav-text">线程安全问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据不平衡问题"><span class="nav-number">1.</span> <span class="nav-text">数据不平衡问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决办法"><span class="nav-number">2.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#过采样"><span class="nav-number">2.1.</span> <span class="nav-text">过采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#欠采样"><span class="nav-number">2.2.</span> <span class="nav-text">欠采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMOTE"><span class="nav-number">2.3.</span> <span class="nav-text">SMOTE</span></a></li></ol></li></ol></div>
             
 
           </div>
