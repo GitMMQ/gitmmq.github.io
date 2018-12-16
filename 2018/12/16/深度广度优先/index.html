@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="description" content="深度优先深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：  首先将A节点压入栈中，stack（A）;  将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；  将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；  将D节点弹出，没有子节点压入,此时E在栈的顶部，s">
 <meta name="keywords" content="Tech;Data;Vision">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式-单例模式">
-<meta property="og:url" content="https://www.fastolf.com/2018/12/06/设计模式-单例模式/index.html">
+<meta property="og:title" content="深度优先广度优先">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/16/深度广度优先/index.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta property="og:description" content="深度优先深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：  首先将A节点压入栈中，stack（A）;  将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；  将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；  将D节点弹出，没有子节点压入,此时E在栈的顶部，s">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-06T03:11:24.991Z">
+<meta property="og:updated_time" content="2018-12-16T14:15:43.137Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式-单例模式">
-<meta name="twitter:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="twitter:title" content="深度优先广度优先">
+<meta name="twitter:description" content="深度优先深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：  首先将A节点压入栈中，stack（A）;  将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；  将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；  将D节点弹出，没有子节点压入,此时E在栈的顶部，s">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/16/深度广度优先/">
 
 
 
 
 
-  <title>设计模式-单例模式 | Qi</title>
+  <title>深度优先广度优先 | Qi</title>
   
 
 
@@ -233,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/16/深度广度优先/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Meng Qi">
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">设计模式-单例模式</h1>
+          <h1 class="post-title" itemprop="name headline">深度优先广度优先</h1>
         
 
         <div class="post-meta">
@@ -262,8 +262,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T10:35:11+08:00">
-                2018-12-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:12:33+08:00">
+                2018-12-16
               </time>
             
 
@@ -300,28 +300,95 @@
       
 
       
-        <h2 id="线程安全问题"><a href="#线程安全问题" class="headerlink" title="线程安全问题"></a>线程安全问题</h2><p>volatile：保证多线程下的可见性</p>
-<blockquote>
-<p>读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份<br>写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去</p>
-</blockquote>
-<p>synchronized：对象锁、类锁、方法锁（其它篇有介绍）</p>
-<pre><code>public class Singleton {
+        <h2 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h2><p>深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点压入栈中，stack（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；</p>
+</li>
+<li><p>将D节点弹出，没有子节点压入,此时E在栈的顶部，stack（E，C）；</p>
+</li>
+<li><p>将E节点弹出，同时将E的子节点I压入，stack（I,C）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void depthFirst() {
 
-    private static volatile Singleton instance;
+    Stack&lt;Map&lt;String, Object&gt;&gt; nodeStack = new Stack&lt;Map&lt;String, Object&gt;&gt;();
 
-    private Singleton(){
-    }
+    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
 
-    public static Singleton getInstance(){
-        if(instance == null){
-            synchronized(Singleton.class){
-                if(instance == null){
-                    instance = new Singleton();
-                }
+    nodeStack.add(node);
+
+    while (!nodeStack.isEmpty()) {
+
+        node = nodeStack.pop();
+
+        System.out.println(node);
+
+        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
+
+        if (children != null &amp;&amp; !children.isEmpty()) {
+
+            for (Map child : children) {
+
+                nodeStack.push(child);
+
             }
+
         }
-        return instance;
+
     }
+
+}
+</code></pre><h2 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h2><p> 广度优先遍历各个节点，需要使用到队列（Queue）这种数据结构，queue的特点是先进先出，其实也可以使用双端队列，区别就是双端队列首尾都可以插入和弹出节点。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点插入队列中，queue（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点B，C插入队列中，此时B在队列首，C在队列尾部，queue（B，C）；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点D，E插入队列中，此时C在队列首，E在队列尾部，queue（C，D，E）;</p>
+</li>
+<li><p>将C节点弹出，同时将C的子节点F，G，H插入队列中，此时D在队列首，H在队列尾部，queue（D，E，F，G，H）；</p>
+</li>
+<li><p>将D节点弹出，D没有子节点，此时E在队列首，H在队列尾部，queue（E，F，G，H）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void breadthFirst() {
+
+    Deque&lt;Map&lt;String, Object&gt;&gt; nodeDeque = new ArrayDeque&lt;Map&lt;String, Object&gt;&gt;();
+
+    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
+
+    nodeDeque.add(node);
+
+    while (!nodeDeque.isEmpty()) {
+
+        node = nodeDeque.peekFirst();
+
+        System.out.println(node);
+
+        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
+
+        if (children != null &amp;&amp; !children.isEmpty()) {
+
+            for (Map child : children) {
+
+                nodeDeque.add(child);
+
+            }
+
+        }
+
+    }
+
 }
 </code></pre>
       
@@ -347,8 +414,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/06/设计模式-委派模式/" rel="next" title="设计模式-委派模式">
-                <i class="fa fa-chevron-left"></i> 设计模式-委派模式
+              <a href="/2018/12/16/234树/" rel="next" title="234树">
+                <i class="fa fa-chevron-left"></i> 234树
               </a>
             
           </div>
@@ -357,8 +424,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/12/06/synchronized/" rel="prev" title="同步锁-synchronized">
-                同步锁-synchronized <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/16/红黑树/" rel="prev" title="红黑树">
+                红黑树 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -473,7 +540,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全问题"><span class="nav-number">1.</span> <span class="nav-text">线程安全问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#深度优先"><span class="nav-number">1.</span> <span class="nav-text">深度优先</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#广度优先"><span class="nav-number">2.</span> <span class="nav-text">广度优先</span></a></li></ol></div>
             
 
           </div>

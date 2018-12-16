@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="红黑树是特殊的二叉查找树 特点 每个节点或者是黑色，或者是红色。 根节点是黑色。 每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！） 如果一个节点是红色的，则它的子节点必须是黑色的。 从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。  注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。 代码实现public class RBTree&amp;lt;T">
+<meta name="keywords" content="Tech;Data;Vision">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红黑树">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/16/红黑树/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="红黑树是特殊的二叉查找树 特点 每个节点或者是黑色，或者是红色。 根节点是黑色。 每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！） 如果一个节点是红色的，则它的子节点必须是黑色的。 从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。  注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。 代码实现public class RBTree&amp;lt;T">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-16T14:20:52.555Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="红黑树">
+<meta name="twitter:description" content="红黑树是特殊的二叉查找树 特点 每个节点或者是黑色，或者是红色。 根节点是黑色。 每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！） 如果一个节点是红色的，则它的子节点必须是黑色的。 从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。  注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。 代码实现public class RBTree&amp;lt;T">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/16/红黑树/">
+
+
+
+
+
+  <title>红黑树 | Qi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Qi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">to learn</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/16/红黑树/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">红黑树</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:16:48+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>红黑树是特殊的二叉查找树</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li>每个节点或者是黑色，或者是红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！）</li>
+<li>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
+<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
+</ul>
+<p>注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; {
+
+    private RBTNode&lt;T&gt; mRoot;    // 根结点
+
+    private static final boolean RED   = false;
+    private static final boolean BLACK = true;
+
+    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; {
+        boolean color;        // 颜色
+        T key;                // 关键字(键值)
+        RBTNode&lt;T&gt; left;    // 左孩子
+        RBTNode&lt;T&gt; right;    // 右孩子
+        RBTNode&lt;T&gt; parent;    // 父结点
+
+        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) {
+            this.key = key;
+            this.color = color;
+            this.parent = parent;
+            this.left = left;
+            this.right = right;
+        }
+
+    }
+
+    ...
+}
+
+public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; {
+
+    private RBTNode&lt;T&gt; mRoot;    // 根结点
+
+    private static final boolean RED   = false;
+    private static final boolean BLACK = true;
+
+    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; {
+        boolean color;        // 颜色
+        T key;                // 关键字(键值)
+        RBTNode&lt;T&gt; left;    // 左孩子
+        RBTNode&lt;T&gt; right;    // 右孩子
+        RBTNode&lt;T&gt; parent;    // 父结点
+
+        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) {
+            this.key = key;
+            this.color = color;
+            this.parent = parent;
+            this.left = left;
+            this.right = right;
+        }
+
+    }
+
+    ...
+}
+
+/* 
+ * 对红黑树的节点(x)进行左旋转
+ *
+ * 左旋示意图(对节点x进行左旋)：
+ *      px                              px
+ *     /                               /
+ *    x                               y                
+ *   /  \      --(左旋)-.           / \                #
+ *  lx   y                          x  ry     
+ *     /   \                       /  \
+ *    ly   ry                     lx  ly  
+ *
+ *
+ */
+private void leftRotate(RBTNode&lt;T&gt; x) {
+    // 设置x的右孩子为y
+    RBTNode&lt;T&gt; y = x.right;
+
+    // 将 “y的左孩子” 设为 “x的右孩子”；
+    // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
+    x.right = y.left;
+    if (y.left != null)
+        y.left.parent = x;
+
+    // 将 “x的父亲” 设为 “y的父亲”
+    y.parent = x.parent;
+
+    if (x.parent == null) {
+        this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
+    } else {
+        if (x.parent.left == x)
+            x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
+        else
+            x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
+    }
+
+    // 将 “x” 设为 “y的左孩子”
+    y.left = x;
+    // 将 “x的父节点” 设为 “y”
+    x.parent = y;
+}
+
+/* 
+ * 对红黑树的节点(y)进行右旋转
+ *
+ * 右旋示意图(对节点y进行左旋)：
+ *            py                               py
+ *           /                                /
+ *          y                                x                  
+ *         /  \      --(右旋)-.            /  \                     #
+ *        x   ry                           lx   y  
+ *       / \                                   / \                   #
+ *      lx  rx                                rx  ry
+ * 
+ */
+private void rightRotate(RBTNode&lt;T&gt; y) {
+    // 设置x是当前节点的左孩子。
+    RBTNode&lt;T&gt; x = y.left;
+
+    // 将 “x的右孩子” 设为 “y的左孩子”；
+    // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
+    y.left = x.right;
+    if (x.right != null)
+        x.right.parent = y;
+
+    // 将 “y的父亲” 设为 “x的父亲”
+    x.parent = y.parent;
+
+    if (y.parent == null) {
+        this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
+    } else {
+        if (y == y.parent.right)
+            y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
+        else
+            y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
+    }
+
+    // 将 “y” 设为 “x的右孩子”
+    x.right = y;
+
+    // 将 “y的父节点” 设为 “x”
+    y.parent = x;
+}
+
+/* 
+ * 将结点插入到红黑树中
+ *
+ * 参数说明：
+ *     node 插入的结点        // 对应《算法导论》中的node
+ */
+private void insert(RBTNode&lt;T&gt; node) {
+    int cmp;
+    RBTNode&lt;T&gt; y = null;
+    RBTNode&lt;T&gt; x = this.mRoot;
+
+    // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
+    while (x != null) {
+        y = x;
+        cmp = node.key.compareTo(x.key);
+        if (cmp &lt; 0)
+            x = x.left;
+        else
+            x = x.right;
+    }
+
+    node.parent = y;
+    if (y!=null) {
+        cmp = node.key.compareTo(y.key);
+        if (cmp &lt; 0)
+            y.left = node;
+        else
+            y.right = node;
+    } else {
+        this.mRoot = node;
+    }
+
+    // 2. 设置节点的颜色为红色
+    node.color = RED;
+
+    // 3. 将它重新修正为一颗二叉查找树
+    insertFixUp(node);
+}
+
+/* 
+ * 新建结点(key)，并将其插入到红黑树中
+ *
+ * 参数说明：
+ *     key 插入结点的键值
+ */
+public void insert(T key) {
+    RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
+
+    // 如果新建结点失败，则返回。
+    if (node != null)
+        insert(node);
+}
+
+
+/*
+ * 红黑树插入修正函数
+ *
+ * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
+ * 目的是将它重新塑造成一颗红黑树。
+ *
+ * 参数说明：
+ *     node 插入的结点        // 对应《算法导论》中的z
+ */
+private void insertFixUp(RBTNode&lt;T&gt; node) {
+    RBTNode&lt;T&gt; parent, gparent;
+
+    // 若“父节点存在，并且父节点的颜色是红色”
+    while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) {
+        gparent = parentOf(parent);
+
+        //若“父节点”是“祖父节点的左孩子”
+        if (parent == gparent.left) {
+            // Case 1条件：叔叔节点是红色
+            RBTNode&lt;T&gt; uncle = gparent.right;
+            if ((uncle!=null) &amp;&amp; isRed(uncle)) {
+                setBlack(uncle);
+                setBlack(parent);
+                setRed(gparent);
+                node = gparent;
+                continue;
+            }
+
+            // Case 2条件：叔叔是黑色，且当前节点是右孩子
+            if (parent.right == node) {
+                RBTNode&lt;T&gt; tmp;
+                leftRotate(parent);
+                tmp = parent;
+                parent = node;
+                node = tmp;
+            }
+
+            // Case 3条件：叔叔是黑色，且当前节点是左孩子。
+            setBlack(parent);
+            setRed(gparent);
+            rightRotate(gparent);
+        } else {    //若“z的父节点”是“z的祖父节点的右孩子”
+            // Case 1条件：叔叔节点是红色
+            RBTNode&lt;T&gt; uncle = gparent.left;
+            if ((uncle!=null) &amp;&amp; isRed(uncle)) {
+                setBlack(uncle);
+                setBlack(parent);
+                setRed(gparent);
+                node = gparent;
+                continue;
+            }
+
+            // Case 2条件：叔叔是黑色，且当前节点是左孩子
+            if (parent.left == node) {
+                RBTNode&lt;T&gt; tmp;
+                rightRotate(parent);
+                tmp = parent;
+                parent = node;
+                node = tmp;
+            }
+
+            // Case 3条件：叔叔是黑色，且当前节点是右孩子。
+            setBlack(parent);
+            setRed(gparent);
+            leftRotate(gparent);
+        }
+    }
+
+    // 将根节点设为黑色
+    setBlack(this.mRoot);
+}
+
+
+/* 
+ * 删除结点(node)，并返回被删除的结点
+ *
+ * 参数说明：
+ *     node 删除的结点
+ */
+private void remove(RBTNode&lt;T&gt; node) {
+    RBTNode&lt;T&gt; child, parent;
+    boolean color;
+
+    // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
+    if ( (node.left!=null) &amp;&amp; (node.right!=null) ) {
+        // 被删节点的后继节点。(称为&quot;取代节点&quot;)
+        // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
+        RBTNode&lt;T&gt; replace = node;
+
+        // 获取后继节点
+        replace = replace.right;
+        while (replace.left != null)
+            replace = replace.left;
+
+        // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
+        if (parentOf(node)!=null) {
+            if (parentOf(node).left == node)
+                parentOf(node).left = replace;
+            else
+                parentOf(node).right = replace;
+        } else {
+            // &quot;node节点&quot;是根节点，更新根节点。
+            this.mRoot = replace;
+        }
+
+        // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
+        // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
+        child = replace.right;
+        parent = parentOf(replace);
+        // 保存&quot;取代节点&quot;的颜色
+        color = colorOf(replace);
+
+        // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
+        if (parent == node) {
+            parent = replace;
+        } else {
+            // child不为空
+            if (child!=null)
+                setParent(child, parent);
+            parent.left = child;
+
+            replace.right = node.right;
+            setParent(node.right, replace);
+        }
+
+        replace.parent = node.parent;
+        replace.color = node.color;
+        replace.left = node.left;
+        node.left.parent = replace;
+
+        if (color == BLACK)
+            removeFixUp(child, parent);
+
+        node = null;
+        return ;
+    }
+
+    if (node.left !=null) {
+        child = node.left;
+    } else {
+        child = node.right;
+    }
+
+    parent = node.parent;
+    // 保存&quot;取代节点&quot;的颜色
+    color = node.color;
+
+    if (child!=null)
+        child.parent = parent;
+
+    // &quot;node节点&quot;不是根节点
+    if (parent!=null) {
+        if (parent.left == node)
+            parent.left = child;
+        else
+            parent.right = child;
+    } else {
+        this.mRoot = child;
+    }
+
+    if (color == BLACK)
+        removeFixUp(child, parent);
+    node = null;
+}
+
+/* 
+ * 删除结点(z)，并返回被删除的结点
+ *
+ * 参数说明：
+ *     tree 红黑树的根结点
+ *     z 删除的结点
+ */
+public void remove(T key) {
+    RBTNode&lt;T&gt; node; 
+
+    if ((node = search(mRoot, key)) != null)
+        remove(node);
+}
+
+
+
+/*
+ * 红黑树删除修正函数
+ *
+ * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
+ * 目的是将它重新塑造成一颗红黑树。
+ *
+ * 参数说明：
+ *     node 待修正的节点
+ */
+private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) {
+    RBTNode&lt;T&gt; other;
+
+    while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) {
+        if (parent.left == node) {
+            other = parent.right;
+            if (isRed(other)) {
+                // Case 1: x的兄弟w是红色的  
+                setBlack(other);
+                setRed(parent);
+                leftRotate(parent);
+                other = parent.right;
+            }
+
+            if ((other.left==null || isBlack(other.left)) &amp;&amp;
+                (other.right==null || isBlack(other.right))) {
+                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
+                setRed(other);
+                node = parent;
+                parent = parentOf(node);
+            } else {
+
+                if (other.right==null || isBlack(other.right)) {
+                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
+                    setBlack(other.left);
+                    setRed(other);
+                    rightRotate(other);
+                    other = parent.right;
+                }
+                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
+                setColor(other, colorOf(parent));
+                setBlack(parent);
+                setBlack(other.right);
+                leftRotate(parent);
+                node = this.mRoot;
+                break;
+            }
+        } else {
+
+            other = parent.left;
+            if (isRed(other)) {
+                // Case 1: x的兄弟w是红色的  
+                setBlack(other);
+                setRed(parent);
+                rightRotate(parent);
+                other = parent.left;
+            }
+
+            if ((other.left==null || isBlack(other.left)) &amp;&amp;
+                (other.right==null || isBlack(other.right))) {
+                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
+                setRed(other);
+                node = parent;
+                parent = parentOf(node);
+            } else {
+
+                if (other.left==null || isBlack(other.left)) {
+                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
+                    setBlack(other.right);
+                    setRed(other);
+                    leftRotate(other);
+                    other = parent.left;
+                }
+
+                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
+                setColor(other, colorOf(parent));
+                setBlack(parent);
+                setBlack(other.left);
+                rightRotate(parent);
+                node = this.mRoot;
+                break;
+            }
+        }
+    }
+
+    if (node!=null)
+        setBlack(node);
+}
+</code></pre><h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><pre><code>/**
+ * Java 语言: 红黑树
+ *
+ * @author skywang
+ * @date 2013/11/07
+ */
+
+public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; {
+
+    private RBTNode&lt;T&gt; mRoot;    // 根结点
+
+    private static final boolean RED   = false;
+    private static final boolean BLACK = true;
+
+    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; {
+        boolean color;        // 颜色
+        T key;                // 关键字(键值)
+        RBTNode&lt;T&gt; left;    // 左孩子
+        RBTNode&lt;T&gt; right;    // 右孩子
+        RBTNode&lt;T&gt; parent;    // 父结点
+
+        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) {
+            this.key = key;
+            this.color = color;
+            this.parent = parent;
+            this.left = left;
+            this.right = right;
+        }
+
+        public T getKey() {
+            return key;
+        }
+
+        public String toString() {
+            return &quot;&quot;+key+(this.color==RED?&quot;(R)&quot;:&quot;B&quot;);
+        }
+    }
+
+    public RBTree() {
+        mRoot=null;
+    }
+
+    private RBTNode&lt;T&gt; parentOf(RBTNode&lt;T&gt; node) {
+        return node!=null ? node.parent : null;
+    }
+    private boolean colorOf(RBTNode&lt;T&gt; node) {
+        return node!=null ? node.color : BLACK;
+    }
+    private boolean isRed(RBTNode&lt;T&gt; node) {
+        return ((node!=null)&amp;&amp;(node.color==RED)) ? true : false;
+    }
+    private boolean isBlack(RBTNode&lt;T&gt; node) {
+        return !isRed(node);
+    }
+    private void setBlack(RBTNode&lt;T&gt; node) {
+        if (node!=null)
+            node.color = BLACK;
+    }
+    private void setRed(RBTNode&lt;T&gt; node) {
+        if (node!=null)
+            node.color = RED;
+    }
+    private void setParent(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) {
+        if (node!=null)
+            node.parent = parent;
+    }
+    private void setColor(RBTNode&lt;T&gt; node, boolean color) {
+        if (node!=null)
+            node.color = color;
+    }
+
+    /*
+     * 前序遍历&quot;红黑树&quot;
+     */
+    private void preOrder(RBTNode&lt;T&gt; tree) {
+        if(tree != null) {
+            System.out.print(tree.key+&quot; &quot;);
+            preOrder(tree.left);
+            preOrder(tree.right);
+        }
+    }
+
+    public void preOrder() {
+        preOrder(mRoot);
+    }
+
+    /*
+     * 中序遍历&quot;红黑树&quot;
+     */
+    private void inOrder(RBTNode&lt;T&gt; tree) {
+        if(tree != null) {
+            inOrder(tree.left);
+            System.out.print(tree.key+&quot; &quot;);
+            inOrder(tree.right);
+        }
+    }
+
+    public void inOrder() {
+        inOrder(mRoot);
+    }
+
+
+    /*
+     * 后序遍历&quot;红黑树&quot;
+     */
+    private void postOrder(RBTNode&lt;T&gt; tree) {
+        if(tree != null)
+        {
+            postOrder(tree.left);
+            postOrder(tree.right);
+            System.out.print(tree.key+&quot; &quot;);
+        }
+    }
+
+    public void postOrder() {
+        postOrder(mRoot);
+    }
+
+
+    /*
+     * (递归实现)查找&quot;红黑树x&quot;中键值为key的节点
+     */
+    private RBTNode&lt;T&gt; search(RBTNode&lt;T&gt; x, T key) {
+        if (x==null)
+            return x;
+
+        int cmp = key.compareTo(x.key);
+        if (cmp &lt; 0)
+            return search(x.left, key);
+        else if (cmp &gt; 0)
+            return search(x.right, key);
+        else
+            return x;
+    }
+
+    public RBTNode&lt;T&gt; search(T key) {
+        return search(mRoot, key);
+    }
+
+    /*
+     * (非递归实现)查找&quot;红黑树x&quot;中键值为key的节点
+     */
+    private RBTNode&lt;T&gt; iterativeSearch(RBTNode&lt;T&gt; x, T key) {
+        while (x!=null) {
+            int cmp = key.compareTo(x.key);
+
+            if (cmp &lt; 0) 
+                x = x.left;
+            else if (cmp &gt; 0) 
+                x = x.right;
+            else
+                return x;
+        }
+
+        return x;
+    }
+
+    public RBTNode&lt;T&gt; iterativeSearch(T key) {
+        return iterativeSearch(mRoot, key);
+    }
+
+    /* 
+     * 查找最小结点：返回tree为根结点的红黑树的最小结点。
+     */
+    private RBTNode&lt;T&gt; minimum(RBTNode&lt;T&gt; tree) {
+        if (tree == null)
+            return null;
+
+        while(tree.left != null)
+            tree = tree.left;
+        return tree;
+    }
+
+    public T minimum() {
+        RBTNode&lt;T&gt; p = minimum(mRoot);
+        if (p != null)
+            return p.key;
+
+        return null;
+    }
+
+    /* 
+     * 查找最大结点：返回tree为根结点的红黑树的最大结点。
+     */
+    private RBTNode&lt;T&gt; maximum(RBTNode&lt;T&gt; tree) {
+        if (tree == null)
+            return null;
+
+        while(tree.right != null)
+            tree = tree.right;
+        return tree;
+    }
+
+    public T maximum() {
+        RBTNode&lt;T&gt; p = maximum(mRoot);
+        if (p != null)
+            return p.key;
+
+        return null;
+    }
+
+    /* 
+     * 找结点(x)的后继结点。即，查找&quot;红黑树中数据值大于该结点&quot;的&quot;最小结点&quot;。
+     */
+    public RBTNode&lt;T&gt; successor(RBTNode&lt;T&gt; x) {
+        // 如果x存在右孩子，则&quot;x的后继结点&quot;为 &quot;以其右孩子为根的子树的最小结点&quot;。
+        if (x.right != null)
+            return minimum(x.right);
+
+        // 如果x没有右孩子。则x有以下两种可能：
+        // (01) x是&quot;一个左孩子&quot;，则&quot;x的后继结点&quot;为 &quot;它的父结点&quot;。
+        // (02) x是&quot;一个右孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有左孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的后继结点&quot;。
+        RBTNode&lt;T&gt; y = x.parent;
+        while ((y!=null) &amp;&amp; (x==y.right)) {
+            x = y;
+            y = y.parent;
+        }
+
+        return y;
+    }
+
+    /* 
+     * 找结点(x)的前驱结点。即，查找&quot;红黑树中数据值小于该结点&quot;的&quot;最大结点&quot;。
+     */
+    public RBTNode&lt;T&gt; predecessor(RBTNode&lt;T&gt; x) {
+        // 如果x存在左孩子，则&quot;x的前驱结点&quot;为 &quot;以其左孩子为根的子树的最大结点&quot;。
+        if (x.left != null)
+            return maximum(x.left);
+
+        // 如果x没有左孩子。则x有以下两种可能：
+        // (01) x是&quot;一个右孩子&quot;，则&quot;x的前驱结点&quot;为 &quot;它的父结点&quot;。
+        // (01) x是&quot;一个左孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有右孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的前驱结点&quot;。
+        RBTNode&lt;T&gt; y = x.parent;
+        while ((y!=null) &amp;&amp; (x==y.left)) {
+            x = y;
+            y = y.parent;
+        }
+
+        return y;
+    }
+
+    /* 
+     * 对红黑树的节点(x)进行左旋转
+     *
+     * 左旋示意图(对节点x进行左旋)：
+     *      px                              px
+     *     /                               /
+     *    x                               y                
+     *   /  \      --(左旋)-.           / \                #
+     *  lx   y                          x  ry     
+     *     /   \                       /  \
+     *    ly   ry                     lx  ly  
+     *
+     *
+     */
+    private void leftRotate(RBTNode&lt;T&gt; x) {
+        // 设置x的右孩子为y
+        RBTNode&lt;T&gt; y = x.right;
+
+        // 将 “y的左孩子” 设为 “x的右孩子”；
+        // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
+        x.right = y.left;
+        if (y.left != null)
+            y.left.parent = x;
+
+        // 将 “x的父亲” 设为 “y的父亲”
+        y.parent = x.parent;
+
+        if (x.parent == null) {
+            this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
+        } else {
+            if (x.parent.left == x)
+                x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
+            else
+                x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
+        }
+
+        // 将 “x” 设为 “y的左孩子”
+        y.left = x;
+        // 将 “x的父节点” 设为 “y”
+        x.parent = y;
+    }
+
+    /* 
+     * 对红黑树的节点(y)进行右旋转
+     *
+     * 右旋示意图(对节点y进行左旋)：
+     *            py                               py
+     *           /                                /
+     *          y                                x                  
+     *         /  \      --(右旋)-.            /  \                     #
+     *        x   ry                           lx   y  
+     *       / \                                   / \                   #
+     *      lx  rx                                rx  ry
+     * 
+     */
+    private void rightRotate(RBTNode&lt;T&gt; y) {
+        // 设置x是当前节点的左孩子。
+        RBTNode&lt;T&gt; x = y.left;
+
+        // 将 “x的右孩子” 设为 “y的左孩子”；
+        // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
+        y.left = x.right;
+        if (x.right != null)
+            x.right.parent = y;
+
+        // 将 “y的父亲” 设为 “x的父亲”
+        x.parent = y.parent;
+
+        if (y.parent == null) {
+            this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
+        } else {
+            if (y == y.parent.right)
+                y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
+            else
+                y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
+        }
+
+        // 将 “y” 设为 “x的右孩子”
+        x.right = y;
+
+        // 将 “y的父节点” 设为 “x”
+        y.parent = x;
+    }
+
+    /*
+     * 红黑树插入修正函数
+     *
+     * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
+     * 目的是将它重新塑造成一颗红黑树。
+     *
+     * 参数说明：
+     *     node 插入的结点        // 对应《算法导论》中的z
+     */
+    private void insertFixUp(RBTNode&lt;T&gt; node) {
+        RBTNode&lt;T&gt; parent, gparent;
+
+        // 若“父节点存在，并且父节点的颜色是红色”
+        while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) {
+            gparent = parentOf(parent);
+
+            //若“父节点”是“祖父节点的左孩子”
+            if (parent == gparent.left) {
+                // Case 1条件：叔叔节点是红色
+                RBTNode&lt;T&gt; uncle = gparent.right;
+                if ((uncle!=null) &amp;&amp; isRed(uncle)) {
+                    setBlack(uncle);
+                    setBlack(parent);
+                    setRed(gparent);
+                    node = gparent;
+                    continue;
+                }
+
+                // Case 2条件：叔叔是黑色，且当前节点是右孩子
+                if (parent.right == node) {
+                    RBTNode&lt;T&gt; tmp;
+                    leftRotate(parent);
+                    tmp = parent;
+                    parent = node;
+                    node = tmp;
+                }
+
+                // Case 3条件：叔叔是黑色，且当前节点是左孩子。
+                setBlack(parent);
+                setRed(gparent);
+                rightRotate(gparent);
+            } else {    //若“z的父节点”是“z的祖父节点的右孩子”
+                // Case 1条件：叔叔节点是红色
+                RBTNode&lt;T&gt; uncle = gparent.left;
+                if ((uncle!=null) &amp;&amp; isRed(uncle)) {
+                    setBlack(uncle);
+                    setBlack(parent);
+                    setRed(gparent);
+                    node = gparent;
+                    continue;
+                }
+
+                // Case 2条件：叔叔是黑色，且当前节点是左孩子
+                if (parent.left == node) {
+                    RBTNode&lt;T&gt; tmp;
+                    rightRotate(parent);
+                    tmp = parent;
+                    parent = node;
+                    node = tmp;
+                }
+
+                // Case 3条件：叔叔是黑色，且当前节点是右孩子。
+                setBlack(parent);
+                setRed(gparent);
+                leftRotate(gparent);
+            }
+        }
+
+        // 将根节点设为黑色
+        setBlack(this.mRoot);
+    }
+
+    /* 
+     * 将结点插入到红黑树中
+     *
+     * 参数说明：
+     *     node 插入的结点        // 对应《算法导论》中的node
+     */
+    private void insert(RBTNode&lt;T&gt; node) {
+        int cmp;
+        RBTNode&lt;T&gt; y = null;
+        RBTNode&lt;T&gt; x = this.mRoot;
+
+        // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
+        while (x != null) {
+            y = x;
+            cmp = node.key.compareTo(x.key);
+            if (cmp &lt; 0)
+                x = x.left;
+            else
+                x = x.right;
+        }
+
+        node.parent = y;
+        if (y!=null) {
+            cmp = node.key.compareTo(y.key);
+            if (cmp &lt; 0)
+                y.left = node;
+            else
+                y.right = node;
+        } else {
+            this.mRoot = node;
+        }
+
+        // 2. 设置节点的颜色为红色
+        node.color = RED;
+
+        // 3. 将它重新修正为一颗二叉查找树
+        insertFixUp(node);
+    }
+
+    /* 
+     * 新建结点(key)，并将其插入到红黑树中
+     *
+     * 参数说明：
+     *     key 插入结点的键值
+     */
+    public void insert(T key) {
+        RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
+
+        // 如果新建结点失败，则返回。
+        if (node != null)
+            insert(node);
+    }
+
+
+    /*
+     * 红黑树删除修正函数
+     *
+     * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
+     * 目的是将它重新塑造成一颗红黑树。
+     *
+     * 参数说明：
+     *     node 待修正的节点
+     */
+    private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) {
+        RBTNode&lt;T&gt; other;
+
+        while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) {
+            if (parent.left == node) {
+                other = parent.right;
+                if (isRed(other)) {
+                    // Case 1: x的兄弟w是红色的  
+                    setBlack(other);
+                    setRed(parent);
+                    leftRotate(parent);
+                    other = parent.right;
+                }
+
+                if ((other.left==null || isBlack(other.left)) &amp;&amp;
+                    (other.right==null || isBlack(other.right))) {
+                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
+                    setRed(other);
+                    node = parent;
+                    parent = parentOf(node);
+                } else {
+
+                    if (other.right==null || isBlack(other.right)) {
+                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
+                        setBlack(other.left);
+                        setRed(other);
+                        rightRotate(other);
+                        other = parent.right;
+                    }
+                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
+                    setColor(other, colorOf(parent));
+                    setBlack(parent);
+                    setBlack(other.right);
+                    leftRotate(parent);
+                    node = this.mRoot;
+                    break;
+                }
+            } else {
+
+                other = parent.left;
+                if (isRed(other)) {
+                    // Case 1: x的兄弟w是红色的  
+                    setBlack(other);
+                    setRed(parent);
+                    rightRotate(parent);
+                    other = parent.left;
+                }
+
+                if ((other.left==null || isBlack(other.left)) &amp;&amp;
+                    (other.right==null || isBlack(other.right))) {
+                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
+                    setRed(other);
+                    node = parent;
+                    parent = parentOf(node);
+                } else {
+
+                    if (other.left==null || isBlack(other.left)) {
+                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
+                        setBlack(other.right);
+                        setRed(other);
+                        leftRotate(other);
+                        other = parent.left;
+                    }
+
+                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
+                    setColor(other, colorOf(parent));
+                    setBlack(parent);
+                    setBlack(other.left);
+                    rightRotate(parent);
+                    node = this.mRoot;
+                    break;
+                }
+            }
+        }
+
+        if (node!=null)
+            setBlack(node);
+    }
+
+    /* 
+     * 删除结点(node)，并返回被删除的结点
+     *
+     * 参数说明：
+     *     node 删除的结点
+     */
+    private void remove(RBTNode&lt;T&gt; node) {
+        RBTNode&lt;T&gt; child, parent;
+        boolean color;
+
+        // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
+        if ( (node.left!=null) &amp;&amp; (node.right!=null) ) {
+            // 被删节点的后继节点。(称为&quot;取代节点&quot;)
+            // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
+            RBTNode&lt;T&gt; replace = node;
+
+            // 获取后继节点
+            replace = replace.right;
+            while (replace.left != null)
+                replace = replace.left;
+
+            // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
+            if (parentOf(node)!=null) {
+                if (parentOf(node).left == node)
+                    parentOf(node).left = replace;
+                else
+                    parentOf(node).right = replace;
+            } else {
+                // &quot;node节点&quot;是根节点，更新根节点。
+                this.mRoot = replace;
+            }
+
+            // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
+            // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
+            child = replace.right;
+            parent = parentOf(replace);
+            // 保存&quot;取代节点&quot;的颜色
+            color = colorOf(replace);
+
+            // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
+            if (parent == node) {
+                parent = replace;
+            } else {
+                // child不为空
+                if (child!=null)
+                    setParent(child, parent);
+                parent.left = child;
+
+                replace.right = node.right;
+                setParent(node.right, replace);
+            }
+
+            replace.parent = node.parent;
+            replace.color = node.color;
+            replace.left = node.left;
+            node.left.parent = replace;
+
+            if (color == BLACK)
+                removeFixUp(child, parent);
+
+            node = null;
+            return ;
+        }
+
+        if (node.left !=null) {
+            child = node.left;
+        } else {
+            child = node.right;
+        }
+
+        parent = node.parent;
+        // 保存&quot;取代节点&quot;的颜色
+        color = node.color;
+
+        if (child!=null)
+            child.parent = parent;
+
+        // &quot;node节点&quot;不是根节点
+        if (parent!=null) {
+            if (parent.left == node)
+                parent.left = child;
+            else
+                parent.right = child;
+        } else {
+            this.mRoot = child;
+        }
+
+        if (color == BLACK)
+            removeFixUp(child, parent);
+        node = null;
+    }
+
+    /* 
+     * 删除结点(z)，并返回被删除的结点
+     *
+     * 参数说明：
+     *     tree 红黑树的根结点
+     *     z 删除的结点
+     */
+    public void remove(T key) {
+        RBTNode&lt;T&gt; node; 
+
+        if ((node = search(mRoot, key)) != null)
+            remove(node);
+    }
+
+    /*
+     * 销毁红黑树
+     */
+    private void destroy(RBTNode&lt;T&gt; tree) {
+        if (tree==null)
+            return ;
+
+        if (tree.left != null)
+            destroy(tree.left);
+        if (tree.right != null)
+            destroy(tree.right);
+
+        tree=null;
+    }
+
+    public void clear() {
+        destroy(mRoot);
+        mRoot = null;
+    }
+
+    /*
+     * 打印&quot;红黑树&quot;
+     *
+     * key        -- 节点的键值 
+     * direction  --  0，表示该节点是根节点;
+     *               -1，表示该节点是它的父结点的左孩子;
+     *                1，表示该节点是它的父结点的右孩子。
+     */
+    private void print(RBTNode&lt;T&gt; tree, T key, int direction) {
+
+        if(tree != null) {
+
+            if(direction==0)    // tree是根节点
+                System.out.printf(&quot;%2d(B) is root\n&quot;, tree.key);
+            else                // tree是分支节点
+                System.out.printf(&quot;%2d(%s) is %2d&apos;s %6s child\n&quot;, tree.key, isRed(tree)?&quot;R&quot;:&quot;B&quot;, key, direction==1?&quot;right&quot; : &quot;left&quot;);
+
+            print(tree.left, tree.key, -1);
+            print(tree.right,tree.key,  1);
+        }
+    }
+
+    public void print() {
+        if (mRoot != null)
+            print(mRoot, mRoot.key, 0);
+    }
+}
+
+/**
+ * Java 语言: 二叉查找树
+ *
+ * @author skywang
+ * @date 2013/11/07
+ */
+public class RBTreeTest {
+
+    private static final int a[] = {10, 40, 30, 60, 90, 70, 20, 50, 80};
+    private static final boolean mDebugInsert = false;    // &quot;插入&quot;动作的检测开关(false，关闭；true，打开)
+    private static final boolean mDebugDelete = false;    // &quot;删除&quot;动作的检测开关(false，关闭；true，打开)
+
+    public static void main(String[] args) {
+        int i, ilen = a.length;
+        RBTree&lt;Integer&gt; tree=new RBTree&lt;Integer&gt;();
+
+        System.out.printf(&quot;== 原始数据: &quot;);
+        for(i=0; i&lt;ilen; i++)
+            System.out.printf(&quot;%d &quot;, a[i]);
+        System.out.printf(&quot;\n&quot;);
+
+        for(i=0; i&lt;ilen; i++) {
+            tree.insert(a[i]);
+            // 设置mDebugInsert=true,测试&quot;添加函数&quot;
+            if (mDebugInsert) {
+                System.out.printf(&quot;== 添加节点: %d\n&quot;, a[i]);
+                System.out.printf(&quot;== 树的详细信息: \n&quot;);
+                tree.print();
+                System.out.printf(&quot;\n&quot;);
+            }
+        }
+
+        System.out.printf(&quot;== 前序遍历: &quot;);
+        tree.preOrder();
+
+        System.out.printf(&quot;\n== 中序遍历: &quot;);
+        tree.inOrder();
+
+        System.out.printf(&quot;\n== 后序遍历: &quot;);
+        tree.postOrder();
+        System.out.printf(&quot;\n&quot;);
+
+        System.out.printf(&quot;== 最小值: %s\n&quot;, tree.minimum());
+        System.out.printf(&quot;== 最大值: %s\n&quot;, tree.maximum());
+        System.out.printf(&quot;== 树的详细信息: \n&quot;);
+        tree.print();
+        System.out.printf(&quot;\n&quot;);
+
+        // 设置mDebugDelete=true,测试&quot;删除函数&quot;
+        if (mDebugDelete) {
+            for(i=0; i&lt;ilen; i++)
+            {
+                tree.remove(a[i]);
+
+                System.out.printf(&quot;== 删除节点: %d\n&quot;, a[i]);
+                System.out.printf(&quot;== 树的详细信息: \n&quot;);
+                tree.print();
+                System.out.printf(&quot;\n&quot;);
+            }
+        }
+
+        // 销毁二叉树
+        tree.clear();
+    }
+}
+</code></pre>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/16/深度广度优先/" rel="next" title="深度优先广度优先">
+                <i class="fa fa-chevron-left"></i> 深度优先广度优先
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Meng Qi</p>
+              <p class="site-description motion-element" itemprop="description">recording</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#特点"><span class="nav-number">1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实现"><span class="nav-number">2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">3.</span> <span class="nav-text">实例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
