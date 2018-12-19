@@ -233,6 +233,317 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/06/设计模式-单例模式/" itemprop="url">设计模式-单例模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T10:35:11+08:00">
+                2018-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="线程安全问题"><a href="#线程安全问题" class="headerlink" title="线程安全问题"></a>线程安全问题</h2><p>volatile：保证多线程下的可见性</p>
+<blockquote>
+<p>读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份<br>写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去</p>
+</blockquote>
+<p>synchronized：对象锁、类锁、方法锁（其它篇有介绍）</p>
+<pre><code>public class Singleton {
+
+    private static volatile Singleton instance;
+
+    private Singleton(){
+    }
+
+    public static Singleton getInstance(){
+        if(instance == null){
+            synchronized(Singleton.class){
+                if(instance == null){
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/06/设计模式-委派模式/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/06/设计模式-委派模式/" itemprop="url">设计模式-委派模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T09:46:55+08:00">
+                2018-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>代理模式+策略模式，典型 Spring 中的 DispatcherServlet</p>
+<p>用户将任务全权委派给代理负责，代理负责根据策略任务调度具体的执行单元</p>
+<h2 id="执行单元"><a href="#执行单元" class="headerlink" title="执行单元"></a>执行单元</h2><pre><code>/**
+ * 执行单元实现的接口
+ */
+public interface ITarget {
+
+    void doSomething(String command);
+
+}
+
+/**
+ * 执行单元A
+ */
+public class TargetA implements ITarget {
+    @Override
+    public void doSomething(String command) {
+
+    }
+}
+
+/**
+ * 执行单元B
+ */
+public class TargetB implements ITarget {
+    @Override
+    public void doSomething(String command) {
+
+    }
+}
+</code></pre><h2 id="执行单元调度者"><a href="#执行单元调度者" class="headerlink" title="执行单元调度者"></a>执行单元调度者</h2><pre><code>public class Manager {
+    private Map&lt;String ,ITarget&gt; targets = new HashMap&lt;String ,ITarget&gt;();
+
+    public Manager(){
+        targets.put(&quot;commandA&quot;,new TargetA());
+        targets.put(&quot;commandB&quot;,new TargetB());
+    }
+
+    public void dispatch(String command){
+        targets.get(command).doSomething(command);
+    }
+}
+</code></pre><h2 id="使用者"><a href="#使用者" class="headerlink" title="使用者"></a>使用者</h2><pre><code>public class Boss {
+
+    public static void main(String[] args) {
+        Manager manager = new Manager();
+        manager.dispatch(&quot;Command1&quot;);
+    }
+
+}
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/05/决策树/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1232,7 +1543,7 @@ public static void main(String[] args) {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
