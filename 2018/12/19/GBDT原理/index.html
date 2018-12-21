@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于[搜索排序][1] Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个f">
+<meta name="description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于搜索排序 Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个featur">
 <meta name="keywords" content="Tech;Data;Vision">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GBDT原理">
 <meta property="og:url" content="https://www.fastolf.com/2018/12/19/GBDT原理/index.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于[搜索排序][1] Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个f">
+<meta property="og:description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于搜索排序 Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个featur">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-19T02:11:34.331Z">
+<meta property="og:updated_time" content="2018-12-19T06:38:56.481Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GBDT原理">
-<meta name="twitter:description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于[搜索排序][1] Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个f">
+<meta name="twitter:description" content="Gradient Boosting Decision Tree 迭代决策树，泛化能力较强 几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。可用于搜索排序 Regression Decistion Tree分类树C4.5分类树:在每次分枝时，是穷举每一个featur">
 
 
 
@@ -301,7 +301,7 @@
 
       
         <p>Gradient Boosting Decision Tree 迭代决策树，泛化能力较强</p>
-<p>几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。<br>可用于[搜索排序][1]</p>
+<p>几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。<br>可用于<a href="http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf" title="搜索排序" target="_blank" rel="noopener">搜索排序</a></p>
 <h2 id="Regression-Decistion-Tree"><a href="#Regression-Decistion-Tree" class="headerlink" title="Regression Decistion Tree"></a>Regression Decistion Tree</h2><h3 id="分类树"><a href="#分类树" class="headerlink" title="分类树"></a>分类树</h3><p>C4.5分类树:在每次分枝时，是穷举每一个feature的每一个阈值，找到使得按照feature&lt;=阈值，和feature&gt;阈值分成的两个分枝的熵最大的feature和阈值（熵最大的概念可理解成尽可能每个分枝的男女比例都远离1:1），按照该标准分枝得到两个新节点，用同样方法继续分枝直到所有人都被分入性别唯一的叶子节点，或达到预设的终止条件，若最终叶子节点中的性别不唯一，则以多数人的性别作为该叶子节点的性别。</p>
 <h3 id="回归树"><a href="#回归树" class="headerlink" title="回归树"></a>回归树</h3><p>在每个节点（不一定是叶子节点）都会得一个预测值，以年龄为例，该预测值等于属于这个节点的所有人年龄的平均值。分枝时穷举每一个feature的每个阈值找最好的分割点，但衡量最好的标准不再是最大熵，而是最小化均方差–即（每个人的年龄-预测年龄）^2 的总和 / N，或者说是每个人的预测误差平方和 除以 N。这很好理解，被预测出错的人数越多，错的越离谱，均方差就越大，通过最小化均方差能够找到最靠谱的分枝依据。分枝直到每个叶子节点上人的年龄都唯一（这太难了）或者达到预设的终止条件（如叶子个数上限），若最终叶子节点上人的年龄不唯一，则以该节点上所有人的平均年龄做为该叶子节点的预测年龄。</p>
 <p>参考：<a href="http://www.schonlau.net/publication/05stata_boosting.pdf" target="_blank" rel="noopener">http://www.schonlau.net/publication/05stata_boosting.pdf</a></p>
@@ -321,7 +321,7 @@
 <p>就像所有的机器学习一样，搜索排序的学习也需要训练集，这里一般是用人工标注实现，即对每一个(query,doc) pair给定一个分值（如1,2,3,4）,分值越高表示越相关，越应该排到前面。然而这些绝对的分值本身意义不大，例如你很难说1分和2分文档的相关程度差异是1分和3分文档差距的一半。相关度本身就是一个很主观的评判，标注人员无法做到这种定量标注，这种标准也无法制定。但标注人员很容易做到的是”AB都不错，但文档A比文档B更相关，所以A是4分，B是3分“。RankNet就是基于此制定了一个学习误差衡量方法，即cost function。具体而言，RankNet对任意两个文档A,B，通过它们的人工标注分差，用sigmoid函数估计两者顺序和逆序的概率P1。然后同理用机器学习到的分差计算概率P2（sigmoid的好处在于它允许机器学习得到的分值是任意实数值，只要它们的分差和标准分的分差一致，P2就趋近于P1）。这时利用P1和P2求的两者的交叉熵，该交叉熵就是cost function。它越低说明机器学得的当前排序越趋近于标注排序。为了体现NDCG的作用（NDCG是搜索排序业界最常用的评判标准），RankNet还在cost function中乘以了NDCG。</p>
 <p>好，现在我们有了cost function，而且它是和各个文档的当前分值yi相关的，那么虽然我们不知道它的全局最优方向，但可以求导求Gradient，Gradient即每个文档得分的一个下降方向组成的N维向量，N为文档个数（应该说是query-doc pair个数）。这里仅仅是把”求残差“的逻辑替换为”求梯度“，可以这样想：梯度方向为每一步最优方向，累加的步数多了，总能走到局部最优点，若该点恰好为全局最优点，那和用残差的效果是一样的。这时套到之前讲的逻辑，GDBT就已经可以上了。那么最终排序怎么产生呢？很简单，每个样本通过Shrinkage累加都会得到一个最终得分，直接按分数从大到小排序就可以了（因为机器学习产生的是实数域的预测分，极少会出现在人工标注中常见的两文档分数相等的情况，几乎不同考虑同分文档的排序方式）</p>
 <p>另外，如果feature个数太多，每一棵回归树都要耗费大量时间，这时每个分支时可以随机抽一部分feature来遍历求最优（ELF源码实现方式）。</p>
-<p>##<br>[1]:<a href="http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf" target="_blank" rel="noopener">http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf</a> “搜索排序”</p>
+<p>参考：<a href="https://www.cnblogs.com/pinard/p/6140514.html" target="_blank" rel="noopener">https://www.cnblogs.com/pinard/p/6140514.html</a></p>
 
       
     </div>
@@ -355,6 +355,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/19/rbac权限管理/" rel="prev" title="rbac权限管理">
+                rbac权限管理 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -431,7 +435,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
