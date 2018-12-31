@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="description" content="兔子数列自然界现象抽象化得到的数列模型——斐波那契数列  初始状态：一对刚出生的兔子 下一步：生长 一对刚出生的兔子-&amp;gt; 第1步```123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263总结： 当月的兔子数=上月兔子">
 <meta name="keywords" content="Tech;Data;Vision">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式-单例模式">
-<meta property="og:url" content="https://www.fastolf.com/2018/12/06/设计模式-单例模式/index.html">
+<meta property="og:title" content="Qi">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/31/兔子数列/index.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta property="og:description" content="兔子数列自然界现象抽象化得到的数列模型——斐波那契数列  初始状态：一对刚出生的兔子 下一步：生长 一对刚出生的兔子-&amp;gt; 第1步```123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263总结： 当月的兔子数=上月兔子">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-06T03:11:24.991Z">
+<meta property="og:updated_time" content="2018-12-31T05:50:32.437Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式-单例模式">
-<meta name="twitter:description" content="线程安全问题volatile：保证多线程下的可见性  读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去  synchronized：对象锁、类锁、方法锁（其它篇有介绍） public class Singleton {      private static volatile S">
+<meta name="twitter:title" content="Qi">
+<meta name="twitter:description" content="兔子数列自然界现象抽象化得到的数列模型——斐波那契数列  初始状态：一对刚出生的兔子 下一步：生长 一对刚出生的兔子-&amp;gt; 第1步```123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263总结： 当月的兔子数=上月兔子">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/31/兔子数列/">
 
 
 
 
 
-  <title>设计模式-单例模式 | Qi</title>
+  <title> | Qi</title>
   
 
 
@@ -233,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/06/设计模式-单例模式/">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/31/兔子数列/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Meng Qi">
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">设计模式-单例模式</h1>
+          <h1 class="post-title" itemprop="name headline"></h1>
         
 
         <div class="post-meta">
@@ -262,8 +262,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T10:35:11+08:00">
-                2018-12-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-31T11:53:36+08:00">
+                2018-12-31
               </time>
             
 
@@ -300,30 +300,51 @@
       
 
       
-        <h2 id="线程安全问题"><a href="#线程安全问题" class="headerlink" title="线程安全问题"></a>线程安全问题</h2><p>volatile：保证多线程下的可见性</p>
-<blockquote>
-<p>读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份<br>写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去</p>
-</blockquote>
-<p>synchronized：对象锁、类锁、方法锁（其它篇有介绍）</p>
-<pre><code>public class Singleton {
-
-    private static volatile Singleton instance;
-
-    private Singleton(){
+        <hr>
+<h2 id="兔子数列"><a href="#兔子数列" class="headerlink" title="兔子数列"></a>兔子数列</h2><p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
+<ol>
+<li>初始状态：一对刚出生的兔子</li>
+<li>下一步：生长</li>
+<li><figure class="highlight plain"><figcaption><span>一对刚出生的兔子-> 第1步```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">总结： 当月的兔子数=上月兔子数+当月新生兔子  数列的当前列=前两列之和</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 递归算法</span><br><span class="line"></span><br><span class="line">指数阶算法，效率较低，时间复杂度爆炸增量</span><br><span class="line"></span><br><span class="line">        Fib1(int n)</span><br><span class="line">        </span><br><span class="line">        &#123; if(n&lt;1)</span><br><span class="line">        </span><br><span class="line">               return -1;</span><br><span class="line">        </span><br><span class="line">          if(n==1||n==2)</span><br><span class="line">        </span><br><span class="line">                return 1;</span><br><span class="line">        </span><br><span class="line">           return Fib1(n-1)+Fib1(n-2);</span><br><span class="line">        </span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">## 数组记录先两项值</span><br><span class="line"></span><br><span class="line">时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</span><br><span class="line"></span><br><span class="line">    Fib2(intn)</span><br><span class="line">    &#123;</span><br><span class="line">        if(n&lt;1)</span><br><span class="line">            return-1;</span><br><span class="line">        int[] a=new int[n];</span><br><span class="line">        a[1]=1;</span><br><span class="line">        a[2]=1;</span><br><span class="line">        for(int i=3;i&lt;=n;i++)</span><br><span class="line">            a[i]=a[i-1]+a[i-2];</span><br><span class="line">            return a[n];</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">             </span><br><span class="line">        </span><br><span class="line">## 迭代法</span><br><span class="line"></span><br><span class="line">不记录中间结果，只记录中间项，空间复杂度降到O(1)</span><br><span class="line"></span><br><span class="line">    Fib3(intn)</span><br><span class="line">    &#123;</span><br><span class="line">        inti,s1,s2;</span><br><span class="line">        if(n&lt;1)</span><br><span class="line">            return-1;</span><br><span class="line">        if(n==1||n==2)</span><br><span class="line">            return1;</span><br><span class="line">        s1=1;s2=1;</span><br><span class="line">        for(i=3;i&lt;=n;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            s2=s1+s2;//辗转相加法</span><br><span class="line">            s1=s2-s1;//记录前一项</span><br><span class="line">        &#125;</span><br><span class="line">        return s2;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">## 矩阵乘法</span><br><span class="line"></span><br><span class="line">```斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</span><br></pre></td></tr></table></figure>
+<pre><code>public static int ValueN(int n){
+      if(n&lt;1){
+          return 0;
+      }
+      if(n==1 || n==2){
+          return 1;
+      }
+       int [][] base={{1,1},{1,0}};
+       int [][] res=matrixPower(base,n-2);
+       return res[0][0]+res[1][0];
     }
-
-    public static Singleton getInstance(){
-        if(instance == null){
-            synchronized(Singleton.class){
-                if(instance == null){
-                    instance = new Singleton();
+    public static int[][] matrixPower(int[][] m,int p){
+        if(p==0)
+            return null;
+        if(p==1)
+            return m;
+        int[][] res=matrixPower(m,p&gt;&gt;1);
+        res=muliMatrix(res,res);
+        if((p&amp;1)==1){
+            res=muliMatrix(res,m);
+        }
+        return res;
+    }
+    //求两个矩阵相乘得到一个新的矩阵
+    public static int[][] muliMatrix(int[][] m1,int[][] m2){
+        int [][] res=new int[m1.length][m2[0].length];
+        for(int i=0;i&lt;m1.length;i++){
+            for(int j=0;j&lt;m2[0].length;j++){
+                for(int k=0;k&lt;m2.length;k++){
+                    res[i][j]+=m1[i][k]*m2[k][j];
                 }
             }
         }
-        return instance;
+        return res;
     }
 }
-</code></pre>
+</code></pre></li>
+</ol>
+
       
     </div>
     
@@ -347,8 +368,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/06/设计模式-委派模式/" rel="next" title="设计模式-委派模式">
-                <i class="fa fa-chevron-left"></i> 设计模式-委派模式
+              <a href="/2018/12/22/遗传算法/" rel="next" title="遗传算法">
+                <i class="fa fa-chevron-left"></i> 遗传算法
               </a>
             
           </div>
@@ -357,8 +378,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/12/06/synchronized/" rel="prev" title="同步锁-synchronized">
-                同步锁-synchronized <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/31/数据结构-线性表/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -473,7 +494,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全问题"><span class="nav-number">1.</span> <span class="nav-text">线程安全问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#兔子数列"><span class="nav-number">1.</span> <span class="nav-text">兔子数列</span></a></li></ol></div>
             
 
           </div>

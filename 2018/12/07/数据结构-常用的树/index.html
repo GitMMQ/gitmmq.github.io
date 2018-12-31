@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://thyrsi.com/t6/626/1544146169x2890211738.jpg">
 <meta property="og:image" content="http://thyrsi.com/t6/626/1544146212x2890211738.jpg">
-<meta property="og:updated_time" content="2018-12-21T01:01:06.101Z">
+<meta property="og:updated_time" content="2018-12-31T05:11:20.856Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="树">
 <meta name="twitter:description" content="树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。 相关术语节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点 树的度 : 树中的节点的度最大值为树的度 节点的层次 : 根为第一层，往下依次递增 树的深度 : 节点层次最大值为树的深度 森林 : n棵不相交的树的集合为森林 二叉树常用于实现二叉查找树、二叉堆  每个节点至多有两颗">
@@ -326,6 +326,10 @@
 <li>左右子树深度差不超过1</li>
 <li>左右子树都是二叉平衡树</li>
 </ul>
+<h2 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h2><p>最优二叉树</p>
+<p><a href="#hafman">代码实现</a></p>
+<h3 id="哈夫曼编码"><a href="#哈夫曼编码" class="headerlink" title="哈夫曼编码"></a>哈夫曼编码</h3><p>解决报文编码的问题，将字符串转换为唯一的二进制码，且二进制码的长度最小</p>
+<p>每个字符在字符串中出现频率为W，其编码长度为L，编码字符n个，则编码后二进制码的总长度为W1L1+W2L2+…+WnLn，利用哈夫曼树特性求总长最小编码</p>
 <h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>平衡的多路查找树</p>
 <p>B树的阶：所有孩子节点树的最大值（m叉树：每个节点最多m棵子树）</p>
 <p>分支节点最少有两颗子树</p>
@@ -357,7 +361,167 @@
 <h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S=S1S2..Si..Sn，和整数i，1 &lt;= i &lt;= n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S=XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
 <h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L = b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
 <h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
+<p><span id="hafman">哈夫曼树代码实现</span></p>
+<pre><code>import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
+public class HuffmanTree {
+
+    public static class Node&lt;E&gt; {
+        E data;
+        double weight;
+        Node leftChild;
+        Node rightChild;
+
+        public Node(E data, double weight) {
+            super();
+            this.data = data;
+            this.weight = weight;
+        }
+
+        public String toString() {
+            return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
+        }
+    }
+
+    public static void main(String[] args) {
+        List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
+
+        nodes.add(new Node(&quot;A&quot;, 40.0));
+        nodes.add(new Node(&quot;B&quot;, 8.0));
+        nodes.add(new Node(&quot;C&quot;, 10.0));
+        nodes.add(new Node(&quot;D&quot;, 30.0));
+        nodes.add(new Node(&quot;E&quot;, 10.0));
+        nodes.add(new Node(&quot;F&quot;, 2.0));
+
+        Node root = HuffmanTree.createTree(nodes);
+
+        System.out.println(breadthFirst(root));
+
+    }
+
+    /**
+     * 构造哈夫曼树
+     * 
+     * @param nodes
+     *            节点集合
+     * @return 构造出来的哈夫曼树的根节点
+     */
+    private static Node createTree(List&lt;Node&gt; nodes) {
+        // 只要nodes数组中还有2个以上的节点
+        while (nodes.size() &gt; 1) {
+            quickSort(nodes);
+            //获取权值最小的两个节点
+            Node left = nodes.get(nodes.size()-1);
+            Node right = nodes.get(nodes.size()-2);
+
+            //生成新节点，新节点的权值为两个子节点的权值之和
+            Node parent = new Node(null, left.weight + right.weight);
+
+            //让新节点作为两个权值最小节点的父节点
+            parent.leftChild = left;
+            parent.rightChild = right;
+
+            //删除权值最小的两个节点
+            nodes.remove(nodes.size()-1);
+            nodes.remove(nodes.size()-1);
+
+            //将新节点加入到集合中
+            nodes.add(parent);
+        }
+
+        return nodes.get(0);
+    }
+
+    /**
+     * 将指定集合中的i和j索引处的元素交换
+     * 
+     * @param nodes
+     * @param i
+     * @param j
+     */
+    private static void swap(List&lt;Node&gt; nodes, int i, int j) {
+        Node tmp;
+        tmp = nodes.get(i);
+        nodes.set(i, nodes.get(j));
+        nodes.set(j, tmp);
+    }
+
+    /**
+     * 实现快速排序算法，用于对节点进行排序
+     * 
+     * @param nodes
+     * @param start
+     * @param end
+     */
+    private static void subSort(List&lt;Node&gt; nodes, int start, int end) {
+        if (start &lt; end) {
+            // 以第一个元素作为分界值
+            Node base = nodes.get(start);
+            // i从左边搜索，搜索大于分界值的元素的索引
+            int i = start;
+            // j从右边开始搜索，搜索小于分界值的元素的索引
+            int j = end + 1;
+            while (true) {
+                // 找到大于分界值的元素的索引，或者i已经到了end处
+                while (i &lt; end &amp;&amp; nodes.get(++i).weight &gt;= base.weight)
+                    ;
+                // 找到小于分界值的元素的索引，或者j已经到了start处
+                while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
+                    ;
+
+                if (i &lt; j) {
+                    swap(nodes, i, j);
+                } else {
+                    break;
+                }
+            }
+
+            swap(nodes, start, j);
+
+            //递归左边子序列
+            subSort(nodes, start, j - 1);
+            //递归右边子序列
+            subSort(nodes, j + 1, end);
+        }
+    }
+
+    public static void quickSort(List&lt;Node&gt; nodes){
+        subSort(nodes, 0, nodes.size()-1);
+    }
+
+    //广度优先遍历
+    public static List&lt;Node&gt; breadthFirst(Node root){
+        Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
+        List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
+
+        if(root!=null){
+            //将根元素加入“队列”
+            queue.offer(root);
+        }
+
+        while(!queue.isEmpty()){
+            //将该队列的“队尾”元素加入到list中
+            list.add(queue.peek());
+            Node p = queue.poll();
+
+            //如果左子节点不为null，将它加入到队列
+            if(p.leftChild != null){
+                queue.offer(p.leftChild);
+            }
+
+            //如果右子节点不为null，将它加入到队列
+            if(p.rightChild != null){
+                queue.offer(p.rightChild);
+            }
+        }
+
+        return list;
+    }
+}
+</code></pre>
       
     </div>
     
@@ -470,7 +634,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">26</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -507,7 +671,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关术语"><span class="nav-number">1.</span> <span class="nav-text">相关术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉树"><span class="nav-number">2.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉排序树"><span class="nav-number">3.</span> <span class="nav-text">二叉排序树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉平衡树-AVL"><span class="nav-number">4.</span> <span class="nav-text">二叉平衡树 AVL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B树"><span class="nav-number">5.</span> <span class="nav-text">B树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-树"><span class="nav-number">6.</span> <span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树"><span class="nav-number">7.</span> <span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#性质"><span class="nav-number">7.1.</span> <span class="nav-text">性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#键树"><span class="nav-number">8.</span> <span class="nav-text">键树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典树"><span class="nav-number">9.</span> <span class="nav-text">字典树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后缀树"><span class="nav-number">10.</span> <span class="nav-text">后缀树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区间树与线段树"><span class="nav-number">11.</span> <span class="nav-text">区间树与线段树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#败者树与胜者树"><span class="nav-number">12.</span> <span class="nav-text">败者树与胜者树</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关术语"><span class="nav-number">1.</span> <span class="nav-text">相关术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉树"><span class="nav-number">2.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉排序树"><span class="nav-number">3.</span> <span class="nav-text">二叉排序树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二叉平衡树-AVL"><span class="nav-number">4.</span> <span class="nav-text">二叉平衡树 AVL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哈夫曼树"><span class="nav-number">5.</span> <span class="nav-text">哈夫曼树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#哈夫曼编码"><span class="nav-number">5.1.</span> <span class="nav-text">哈夫曼编码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B树"><span class="nav-number">6.</span> <span class="nav-text">B树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-树"><span class="nav-number">7.</span> <span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树"><span class="nav-number">8.</span> <span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#性质"><span class="nav-number">8.1.</span> <span class="nav-text">性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#键树"><span class="nav-number">9.</span> <span class="nav-text">键树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典树"><span class="nav-number">10.</span> <span class="nav-text">字典树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后缀树"><span class="nav-number">11.</span> <span class="nav-text">后缀树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区间树与线段树"><span class="nav-number">12.</span> <span class="nav-text">区间树与线段树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#败者树与胜者树"><span class="nav-number">13.</span> <span class="nav-text">败者树与胜者树</span></a></li></ol></div>
             
 
           </div>
