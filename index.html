@@ -233,6 +233,455 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/31/图的遍历/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/31/图的遍历/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-31T14:04:44+08:00">
+                2018-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <hr>
+<h2 id="title-图的遍历"><a href="#title-图的遍历" class="headerlink" title="title:图的遍历"></a>title:图的遍历</h2><h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>/**
+ * 无向图
+ */
+public class NoDirectionGraph {
+
+    private int mMaxSize; //图中包含的最大顶点数
+    private GraphVertex[] vertexList; //顶点数组
+    private int[][] indicatorMat; //指示顶点之间的连通关系的邻接矩阵
+    private int nVertex; //当前实际保存的顶点数目
+
+
+    public NoDirectionGraph(int maxSize) {
+        mMaxSize = maxSize;
+        vertexList = new GraphVertex[mMaxSize];
+        indicatorMat = new int[mMaxSize][mMaxSize];
+        nVertex = 0;
+        //初始化邻接矩阵元素为0
+        for(int j=0;j&lt;mMaxSize;j++) {
+            for(int k=0;k&lt;mMaxSize;k++) {
+                indicatorMat[j][k] = 0;
+            }
+        }
+    }
+
+
+    public void addVertex(GraphVertex v) {
+        if(nVertex &lt; mMaxSize) {
+            vertexList[nVertex++] = v;
+
+        } else {
+            System.out.println(&quot;---插入失败，顶点数量已达上限!&quot;);
+        }
+    }
+
+    /**
+     * 修改邻接矩阵，添加新的边
+     * @param start
+     * @param end
+     */
+    public void addEdge(int start,int end) {
+        indicatorMat[start][end] = 1;
+        indicatorMat[end][start] = 1;
+    }
+
+    /**
+     * 打印邻接矩阵
+     */
+    public void printIndicatorMat() {
+
+        for(int[] line:indicatorMat) {
+            for(int i:line) {
+                System.out.print(i + &quot; &quot;);
+            }
+            System.out.println();
+        }
+    }
+
+    /**
+     * 深度优先遍历
+     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
+     */
+    public void DFS(int vertexIndex) {
+        ArrayStack stack = new ArrayStack();
+        //1.添加检索元素到栈中
+        vertexList[vertexIndex].setVisited(true);
+        stack.push(vertexIndex);
+        int nextVertexIndex = getNextVertexIndex(vertexIndex);
+        while(!stack.isEmpty()) { //不断地压栈、出栈，直到栈为空(检索元素也没弹出了栈)为止
+            if(nextVertexIndex != -1) {
+                vertexList[nextVertexIndex].setVisited(true);
+                stack.push(nextVertexIndex);
+                stack.printElems();
+            } else {
+                stack.pop();
+            }
+            //检索当前栈顶元素是否包含其他未遍历过的节点
+            if(!stack.isEmpty()) {
+                nextVertexIndex = getNextVertexIndex(stack.peek()); 
+            }
+        }
+    }
+
+    /**
+     * 得到当前顶点的下一个顶点所在行
+     * @param column
+     * @return
+     */
+    public int getNextVertexIndex(int column) {
+        for(int i=0;i&lt;indicatorMat[column].length;i++) {
+            if(indicatorMat[column][i] == 1 &amp;&amp; !vertexList[i].isVisited()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 广度优先遍历
+     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
+     */
+    public void BFS(int vertexIndex) {
+        ChainQueue queue = new ChainQueue();
+        vertexList[vertexIndex].setVisited(true);
+        queue.insert(new QueueNode(vertexIndex));
+        int nextVertexIndex = getNextVertexIndex(vertexIndex);
+        while(!queue.isEmpty()) {
+            if(nextVertexIndex != -1) {
+                vertexList[nextVertexIndex].setVisited(true);
+                queue.insert(new QueueNode(nextVertexIndex));
+            } else {
+                queue.remove();
+            }
+            if(!queue.isEmpty()) {
+                nextVertexIndex = getNextVertexIndex(queue.peek().data);
+                queue.printElems();
+            }
+        }
+    }
+}
+
+
+
+
+/**
+ * 使用数组实现栈结构
+ */
+public class ArrayStack {
+
+    private int[] tArray; 
+    private int topIndex = -1; //表示当前栈顶元素的索引位置
+    private int CAPACITY_STEP = 12; //数组容量扩展步长
+
+
+    public ArrayStack() {
+        /***创建泛型数组的一种方法***/
+        tArray = new int[CAPACITY_STEP]; 
+    }
+
+    /**
+     * 弹出栈顶元素方法
+     * @return
+     */
+    public int pop() {
+        if(isEmpty()) {
+            System.out.println(&quot;错误，栈中元素为空，不能pop&quot;);
+            return -1;
+        } else {
+            int i = tArray[topIndex];
+            tArray[topIndex--] = -1; //擦除pop元素
+            return i;
+        }
+    }
+
+    /**
+     * 向栈中插入一个元素
+     * @param t
+     */
+    public void push(int t) {
+        //检查栈是否已满
+        if(topIndex == (tArray.length-1)) {
+            //扩展容量
+            int[] tempArray = new int[tArray.length + CAPACITY_STEP];
+            for(int i=0;i&lt;tArray.length;i++) {
+                tempArray[i] = tArray[i];
+            }
+            tArray = tempArray;
+            tempArray = null;
+        } else {
+            topIndex ++;
+            tArray[topIndex] = t;
+        }
+    }
+
+    /**
+     * 得到栈顶元素，但不弹出
+     * @return
+     */
+    public int peek() {
+        if(isEmpty()) {
+            System.out.println(&quot;错误，栈中元素为空，不能peek&quot;);
+            return -1;
+        } else {
+            return tArray[topIndex];
+        }
+    }
+
+    /**
+     * 判断当前栈是否为空
+     * @return
+     */
+    public boolean isEmpty() {
+        return (topIndex &lt; 0);
+    }
+
+    /**
+     * 打印栈中元素
+     */
+    public void printElems() {
+        for(int i=0;i&lt;=topIndex;i++) {
+            System.out.print(tArray[i] + &quot; &quot;);
+        }
+        System.out.println();
+    }
+}
+
+
+/**
+ * 使用链表实现队列
+ */
+public class ChainQueue {
+    private QueueNode head; // 指向队列头节点
+    private QueueNode tail; // 指向队列尾节点
+    private int size = 0; // 队列尺寸
+
+    public ChainQueue() {
+
+    }
+
+    /**
+     * 插入新节点到队列尾
+     */
+    public void insert(QueueNode node) {
+
+        // 当然也可以这么写,添加tail.prev = node
+        if (head == null) {
+            head = node;
+            tail = head;
+        } else {
+            node.next = tail;
+            tail.prev = node; // 双向连接，确保head.prev不为空
+            tail = node;
+        }
+        size++;
+    }
+
+    /**
+     * 移除队列首节点
+     */
+    public QueueNode remove() {
+        if (!isEmpty()) {
+            QueueNode temp = head;
+            head = head.prev;
+            size--;
+            return temp;
+        } else {
+            System.out.println(&quot;异常操作，当前队列为空!&quot;);
+            return null;
+        }
+    }
+
+    /**
+     * 队列是否为空
+     * 
+     * @return
+     */
+    public boolean isEmpty() {
+        if (size &gt; 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 返回队列首节点，但不移除
+     */
+    public QueueNode peek() {
+        if (!isEmpty()) {
+            return head;
+        } else {
+            System.out.println();
+            System.out.println(&quot;异常操作，当前队列为空!&quot;);
+            return null;
+        }
+    }
+
+    /**
+     * 返回队列大小
+     * 
+     * @return
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * 打印队列中的元素
+     */
+    public void printElems() {
+        QueueNode tempNode = head;
+        while(tempNode != null) {
+            System.out.print(tempNode.data + &quot; &quot;);
+            tempNode = tempNode.prev;
+        }
+        System.out.println();
+    }
+}
+
+/**
+ * 节点类
+ * 
+ * @author wly
+ * 
+ */
+class QueueNode {
+    QueueNode prev;
+    QueueNode next;
+
+    int data;
+
+    public QueueNode(int data) {
+        this.data = data;
+    }
+
+    public int getData() {
+        return data;
+    }
+
+    public void setData(int data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        super.toString();
+        return data + &quot;&quot;;
+    }
+}
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/31/数据结构-图/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -252,7 +701,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/31/数据结构-图/" itemprop="url">未命名</a></h1>
+                <a class="post-title-link" href="/2018/12/31/数据结构-图/" itemprop="url">数据结构-图</a></h1>
         
 
         <div class="post-meta">
@@ -304,8 +753,7 @@
       
         
           
-            <hr>
-<h2 id="数据结构-图"><a href="#数据结构-图" class="headerlink" title="数据结构-图"></a>数据结构-图</h2><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图</p>
+            <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图</p>
 <h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><ol>
 <li>邻接点-在一个无向图中，若存在一条边<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">2. 出/入边-在一个有向图张，若存在一条边```&lt;Vi,Vj&gt;```，则称此边为顶点Vi的出边，顶点Vj的一条入边</span><br><span class="line">3. 度/入度/出度-无向图中的度定义为以该顶点为一个端点的边的数目，记为D(V)。有向图的入度定为多少边指向该顶点，出度是该顶点出边的个数</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 邻接矩阵</span><br><span class="line"></span><br><span class="line">```邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。对于无向图 如果顶点b1和b2是连接的，那么在二维矩阵中matrix[b1,b2]和matrix[b2,b1]位置的值置为1，如果是有向图b1指向b2，那么 matrix[b1,b2]=1,matrix[b2,b1]=0；下面用一个例子表示无向图和有向图的邻接矩阵；</span><br></pre></td></tr></table></figure></li>
 </ol>
@@ -820,7 +1268,7 @@ public int[][] getAdjacencyMatrix(){
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/31/数据结构-矩阵压缩/" itemprop="url">未命名</a></h1>
+                <a class="post-title-link" href="/2018/12/31/数据结构-矩阵压缩/" itemprop="url">数据结构-矩阵压缩</a></h1>
         
 
         <div class="post-meta">
@@ -872,8 +1320,7 @@ public int[][] getAdjacencyMatrix(){
       
         
           
-            <hr>
-<h2 id="数据结构-矩阵压缩"><a href="#数据结构-矩阵压缩" class="headerlink" title="数据结构-矩阵压缩"></a>数据结构-矩阵压缩</h2><h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    //对称矩阵的压缩算法</span><br><span class="line">    public class SymeMatric &#123;</span><br><span class="line">    </span><br><span class="line">        double[] a;// 矩阵元素</span><br><span class="line">        int n; // 矩阵的阶数</span><br><span class="line">        int m;// 一维数组的元素的个数--长度</span><br><span class="line">    </span><br><span class="line">        public SymeMatric(int n) &#123;</span><br><span class="line">            // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度</span><br><span class="line">            // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，</span><br><span class="line">            // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，</span><br><span class="line">            // 所以一维数组的长度m的值为1,2,3...n的前n项和</span><br><span class="line">            m = n * (n + 1) / 2; </span><br><span class="line">            a = new double[m];</span><br><span class="line">            this.n = n;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 通过一个二维数组来初始化</span><br><span class="line">        public void evalute(double[][] b) &#123;</span><br><span class="line">            int k = 0;</span><br><span class="line">            for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">                for (int j = 0; j &lt; n; j++) &#123;</span><br><span class="line">                    // i &gt;= j表示只保存下三角元素</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        a[k++] = b[i][j];</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本</span><br><span class="line">        public void evalute(double[] b) &#123;</span><br><span class="line">            for (int k = 0; k &lt; m; k++) &#123;</span><br><span class="line">                a[k] = b[k];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 对称矩阵相加</span><br><span class="line">        public SymeMatric add(SymeMatric b) &#123;</span><br><span class="line">            SymeMatric t = new SymeMatric(n);</span><br><span class="line">            int k;</span><br><span class="line">            for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">                for (int j = 1; j &lt;= n; j++) &#123;</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        k = i * (i - 1) / 2 + j - 1;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        k = j * (j - 1) / 2 + i - 1;</span><br><span class="line">                    &#125;</span><br><span class="line">                    // 求和</span><br><span class="line">                    t.a[k] = a[k] + b.a[k];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            return t;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 打印对称矩阵，这个才是关键！！</span><br><span class="line">        public void print() &#123;</span><br><span class="line">            int k;</span><br><span class="line">            for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">                for (int j = 1; j &lt;= n; j++) &#123;</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        k = i * (i - 1) / 2 + j - 1;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        k = j * (j - 1) / 2 + i - 1;</span><br><span class="line">                    &#125;</span><br><span class="line">                    System.out.print(&quot; &quot; + a[k]);</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 三角矩阵的压缩</span><br><span class="line"></span><br><span class="line">```m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</span><br></pre></td></tr></table></figure>
+            <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    //对称矩阵的压缩算法</span><br><span class="line">    public class SymeMatric &#123;</span><br><span class="line">    </span><br><span class="line">        double[] a;// 矩阵元素</span><br><span class="line">        int n; // 矩阵的阶数</span><br><span class="line">        int m;// 一维数组的元素的个数--长度</span><br><span class="line">    </span><br><span class="line">        public SymeMatric(int n) &#123;</span><br><span class="line">            // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度</span><br><span class="line">            // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，</span><br><span class="line">            // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，</span><br><span class="line">            // 所以一维数组的长度m的值为1,2,3...n的前n项和</span><br><span class="line">            m = n * (n + 1) / 2; </span><br><span class="line">            a = new double[m];</span><br><span class="line">            this.n = n;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 通过一个二维数组来初始化</span><br><span class="line">        public void evalute(double[][] b) &#123;</span><br><span class="line">            int k = 0;</span><br><span class="line">            for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">                for (int j = 0; j &lt; n; j++) &#123;</span><br><span class="line">                    // i &gt;= j表示只保存下三角元素</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        a[k++] = b[i][j];</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本</span><br><span class="line">        public void evalute(double[] b) &#123;</span><br><span class="line">            for (int k = 0; k &lt; m; k++) &#123;</span><br><span class="line">                a[k] = b[k];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 对称矩阵相加</span><br><span class="line">        public SymeMatric add(SymeMatric b) &#123;</span><br><span class="line">            SymeMatric t = new SymeMatric(n);</span><br><span class="line">            int k;</span><br><span class="line">            for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">                for (int j = 1; j &lt;= n; j++) &#123;</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        k = i * (i - 1) / 2 + j - 1;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        k = j * (j - 1) / 2 + i - 1;</span><br><span class="line">                    &#125;</span><br><span class="line">                    // 求和</span><br><span class="line">                    t.a[k] = a[k] + b.a[k];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            return t;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        // 打印对称矩阵，这个才是关键！！</span><br><span class="line">        public void print() &#123;</span><br><span class="line">            int k;</span><br><span class="line">            for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">                for (int j = 1; j &lt;= n; j++) &#123;</span><br><span class="line">                    if (i &gt;= j) &#123;</span><br><span class="line">                        k = i * (i - 1) / 2 + j - 1;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        k = j * (j - 1) / 2 + i - 1;</span><br><span class="line">                    &#125;</span><br><span class="line">                    System.out.print(&quot; &quot; + a[k]);</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 三角矩阵的压缩</span><br><span class="line"></span><br><span class="line">```m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</span><br></pre></td></tr></table></figure>
 <h2 id="稀疏矩阵的压缩"><a href="#稀疏矩阵的压缩" class="headerlink" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
 <p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
 <pre><code>inal int _ROWS=5;        //定义行数
@@ -981,7 +1428,7 @@ for(i=0;i&lt;_ROWS;i++) {
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/31/数据结构-栈、队列/" itemprop="url">未命名</a></h1>
+                <a class="post-title-link" href="/2018/12/31/数据结构-栈、队列/" itemprop="url">数据结构-栈、队列</a></h1>
         
 
         <div class="post-meta">
@@ -1033,8 +1480,7 @@ for(i=0;i&lt;_ROWS;i++) {
       
         
           
-            <hr>
-<h2 id="数据结构-栈、队列"><a href="#数据结构-栈、队列" class="headerlink" title="数据结构-栈、队列"></a>数据结构-栈、队列</h2><h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出(LIFO, Last In First Out)</p>
+            <h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出(LIFO, Last In First Out)</p>
 <h3 id="静态栈"><a href="#静态栈" class="headerlink" title="静态栈"></a>静态栈</h3><p>数组 栈大小固定</p>
 <h3 id="动态栈"><a href="#动态栈" class="headerlink" title="动态栈"></a>动态栈</h3><p>链表 栈大小不固定</p>
 <pre><code>public class Node {
@@ -1336,7 +1782,7 @@ public static void traverseQueue(Queue queue) {
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/31/数据结构-线性表/" itemprop="url">未命名</a></h1>
+                <a class="post-title-link" href="/2018/12/31/数据结构-线性表/" itemprop="url">数据结构-线性表</a></h1>
         
 
         <div class="post-meta">
@@ -1388,8 +1834,7 @@ public static void traverseQueue(Queue queue) {
       
         
           
-            <hr>
-<h2 id="数据结构-线性表"><a href="#数据结构-线性表" class="headerlink" title="数据结构-线性表"></a>数据结构-线性表</h2><h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
+            <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
 <h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>clear、isEmpty、length、get、insert、remove、indexOf</p>
 <pre><code>public interface IList {
     // 线性表置空操作
@@ -1632,7 +2077,7 @@ public static void traverseQueue(Queue queue) {
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/31/兔子数列/" itemprop="url">未命名</a></h1>
+                <a class="post-title-link" href="/2018/12/31/兔子数列/" itemprop="url">兔子数列</a></h1>
         
 
         <div class="post-meta">
@@ -1684,8 +2129,7 @@ public static void traverseQueue(Queue queue) {
       
         
           
-            <hr>
-<h2 id="兔子数列"><a href="#兔子数列" class="headerlink" title="兔子数列"></a>兔子数列</h2><p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
+            <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
 <ol>
 <li>初始状态：一对刚出生的兔子</li>
 <li>下一步：生长</li>
@@ -3106,131 +3550,6 @@ public class Client {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/19/rbac权限管理/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/19/rbac权限管理/" itemprop="url">rbac权限管理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-19T14:30:37+08:00">
-                2018-12-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>RBAC : 基于角色的权限访问控制（Role-Based Access Control）通过角色绑定权限，然后给用户划分角色。在web应用中，可以将权限理解为url，一个权限对应一个url。</p>
-<h2 id="表设计"><a href="#表设计" class="headerlink" title="表设计"></a>表设计</h2><p>用户，角色，权限，权限组，菜单</p>
-<p>用户和角色，多对多<br>角色和权限，多对多<br>权限和权限组，多对一<br>权限组和菜单，多对一<br>菜单和菜单，自引用</p>
-<h2 id="系统"><a href="#系统" class="headerlink" title="系统"></a>系统</h2><p>用户登录后，取出其权限及所属菜单信息，写入session中</p>
-<p>自定义中间件，检查用户权限，进行访问控制</p>
-<p>参考：<a href="https://www.jianshu.com/p/f45b54768aa9" target="_blank" rel="noopener">https://www.jianshu.com/p/f45b54768aa9</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -3281,7 +3600,7 @@ public class Client {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
