@@ -233,6 +233,374 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/中文分词/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/13/中文分词/" itemprop="url">中文分词</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:38:02+08:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>基于字典、词库匹配</li>
+<li>基于词频度统计</li>
+<li>基于知识理解</li>
+</ul>
+<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
+<ol>
+<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
+<li>机械分词法</li>
+</ol>
+<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
+<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
+<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
+<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
+<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
+<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
+<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
+<p>问题：</p>
+<ol>
+<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
+</li>
+<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
+</li>
+</ol>
+<p>解决方案：</p>
+<p>基于词的频度统计的分词方法：</p>
+<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
+<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
+<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/redis统计信息/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/13/redis统计信息/" itemprop="url">redis统计信息--INFO</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:14:50+08:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>显示关于redis服务器的状态报告和统计数值</p>
+<pre><code>redis&gt; INFO
+# Server
+redis_version:2.9.11 //服务器版本
+redis_git_sha1:937384d0
+redis_git_dirty:0
+redis_build_id:8e9509442863f22
+redis_mode:standalone  //mode
+os:Linux 3.13.0-35-generic x86_64
+arch_bits:64
+multiplexing_api:epoll //事件处理机制
+gcc_version:4.8.2
+process_id:4716 //进程ID
+run_id:26186aac3f2380aaee9eef21cc50aecd542d97dc  //随机标识符（用于 Sentinel 和集群）
+tcp_port:6379   //监听端口号
+uptime_in_seconds:362  //启动以来，经过的秒数
+uptime_in_days:0  //启动以来，经过的天数
+hz:10  //serverCron运行频率，此值越大表示redis对&quot;间歇性task&quot;的执行次数越频繁(次数/秒)
+lru_clock:1725349  //以分钟为单位进行自增的时钟，用于 LRU 管理
+config_file:
+
+# Clients
+connected_clients:1  //已连接客户端的数量（不包括通过从属服务器连接的客户端）
+client_longest_output_list:0  //当前连接的客户端当中，最长的输出列表
+client_biggest_input_buf:0  //当前连接的客户端当中，最大输入缓存
+blocked_clients:0 //正在等待阻塞命令（BLPOP、BRPOP、BRPOPLPUSH）的客户端的数量
+
+# Memory
+used_memory:508536  //由 Redis 分配器分配的内存总量，以字节（byte）为单位
+used_memory_human:496.62K  //以人类可读的格式返回 Redis 分配的内存总量
+used_memory_rss:7974912  //从操作系统的角度，返回 Redis 已分配的内存总量（俗称常驻集大小）。这个值和 top 、 ps 等命令的输出一致。
+//理想情况下， used_memory_rss 的值应该只比 used_memory 稍微高一点儿  
+//当 rss &gt; used ，且两者的值相差较大时，表示存在（内部或外部的）内存碎片
+//当 used &gt; rss 时，表示 Redis 的部分内存被操作系统换出到交换空间了，在这种情况下，操作可能会产生明显的延迟。
+used_memory_peak:508536 //Redis 的内存消耗峰值（以字节为单位）
+used_memory_peak_human:496.62K //以人类可读的格式返回 Redis 的内存消耗峰值
+used_memory_lua:33792  // Lua 引擎所使用的内存大小（以字节为单位）
+mem_fragmentation_ratio:15.68  //used_memory_rss 和 used_memory 之间的比率
+mem_allocator:jemalloc-3.2.0  //在编译时指定的， Redis 所使用的内存分配器。可以是 libc 、 jemalloc 或者 tcmalloc
+
+# Persistence
+loading:0  //一个标志值，记录了服务器是否正在载入持久化文件  
+rdb_changes_since_last_save:6 //距离最近一次成功创建持久化文件之后，经过了多少秒
+rdb_bgsave_in_progress:0 //一个标志值，记录了服务器是否正在创建 RDB 文件
+rdb_last_save_time:1411011131 //最近一次成功创建 RDB 文件的 UNIX 时间戳
+rdb_last_bgsave_status:ok //一个标志值，记录了最近一次创建 RDB 文件的结果是成功还是失败
+rdb_last_bgsave_time_sec:-1 //记录了最近一次创建 RDB 文件耗费的秒数
+rdb_current_bgsave_time_sec:-1 // 如果服务器正在创建 RDB 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
+aof_enabled:0 //标志值，记录了 AOF 是否处于打开状态。
+  //如果 AOF 持久化功能处于开启状态，那么这个部分还会加上以下域：    
+  // aof_current_size : AOF 文件目前的大小。
+  // aof_base_size : 服务器启动时或者 AOF 重写最近一次执行之后，AOF 文件的大小。
+  // aof_pending_rewrite : 一个标志值，记录了是否有 AOF 重写操作在等待 RDB 文件创建完毕之后执行。
+  // aof_buffer_length : AOF 缓冲区的大小。
+  // aof_rewrite_buffer_length : AOF 重写缓冲区的大小。
+  // aof_pending_bio_fsync : 后台 I/O 队列里面，等待执行的 fsync 调用数量。
+  // aof_delayed_fsync : 被延迟的 fsync 调用数量。
+aof_rewrite_in_progress:0 //一个标志值，记录了服务器是否正在创建 AOF 文件。
+aof_rewrite_scheduled:0 //一个标志值，记录了在 RDB 文件创建完毕之后，是否需要执行预约的 AOF 重写操作
+aof_last_rewrite_time_sec:-1 //最近一次创建 AOF 文件耗费的时长。
+aof_current_rewrite_time_sec:-1 //如果服务器正在创建 AOF 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
+aof_last_bgrewrite_status:ok //一个标志值，记录了最近一次创建 AOF 文件的结果是成功还是失败。
+aof_last_write_status:ok //
+
+# Stats
+total_connections_received:2 //服务器已接受的连接请求数量
+total_commands_processed:4 //服务器已执行的命令数量
+instantaneous_ops_per_sec:0 //服务器每秒钟执行的命令数量
+rejected_connections:0 //因为最大客户端数量限制而被拒绝的连接请求数量
+sync_full:0 
+sync_partial_ok:0 
+sync_partial_err:0
+expired_keys:0 //因为过期而被自动删除的数据库键数量
+evicted_keys:0 //因为最大内存容量限制而被驱逐（evict）的键数量。
+keyspace_hits:0 //查找数据库键成功的次数。
+keyspace_misses:0 //查找数据库键失败的次数。
+pubsub_channels:0 //目前被订阅的频道数量。
+pubsub_patterns:0 //目前被订阅的模式数量。
+latest_fork_usec:0 //最近一次 fork() 操作耗费的毫秒数。
+migrate_cached_sockets:0
+
+# Replication
+role:master //如果当前服务器没有在复制任何其他服务器，那么这个域的值就是 master ；否则的话，这个域的值就是 slave 。注意，在创建复制链的时候，一个从服务器也可能是另一个服务器的主服务器。
+connected_slaves:0
+master_repl_offset:0
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+# CPU
+used_cpu_sys:0.21  // Redis 服务器耗费的系统 CPU 。
+used_cpu_user:0.17  // Redis 服务器耗费的用户 CPU 。
+used_cpu_sys_children:0.00 //后台进程耗费的系统 CPU 。
+used_cpu_user_children:0.00 //后台进程耗费的用户 CPU 。
+
+# Cluster
+cluster_enabled:0  //一个标志值，记录集群功能是否已经开启
+
+# Keyspace
+db0:keys=2,expires=0,avg_ttl=0 //部分记录了数据库相关的统计信息，比如数据库的键数量、数据库已经被删除的过期键数量等。
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/10/模型-欠采样过采样/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1982,176 +2350,11 @@ OR: [1]:&lt;https://www.baidu.com/&gt; &quot;title&quot;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/03/设计模式-策略模式/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/03/设计模式-策略模式/" itemprop="url">设计模式-策略模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-03T08:45:44+08:00">
-                2018-12-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>开发过程中，需要根据不同场景选择不同算法和策略。</p>
-<p>将需要经常改变的部分抽象提取为接口，通过引用该接口，就可以调用该接口实现类的行为，即具体策略。实现了策略具体实现和调用者的隔离。</p>
-<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
-<li>可以动态改变对象行为</li>
-</ol>
-<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
-<li>使用哪种策略需要调用者自己决定</li>
-<li>产生很多策略类</li>
-</ol>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><pre><code>public interface IStrategy {
-    public void doSomething();
-}
-
-public class Strategy1 implements IStrategy {
-    @Override
-    public void doSomething() {
-
-    }
-}
-
-public class Strategy2 implements IStrategy {
-    @Override
-    public void doSomething() {
-
-    }
-}
-
-public class Context implements IStrategy {
-
-    private IStrategy strategy;
-
-    public Context(IStrategy strategy){
-        this.strategy = strategy;
-    }
-
-    @Override
-    public void doSomething() {
-        strategy.doSomething();
-    }
-}
-
-public static void main(String[] args) {
-    IStrategy strategy = new Strategy1();
-    Context context = new Context(strategy);
-    context.doSomething();
-}
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2197,7 +2400,7 @@ public static void main(String[] args) {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

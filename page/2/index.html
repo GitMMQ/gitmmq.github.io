@@ -233,6 +233,1012 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/22/遗传算法/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/22/遗传算法/" itemprop="url">遗传算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-22T11:25:04+08:00">
+                2018-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>遗传算法（Genetic Algorithms ）是基于生物进化理论的原理发展起来的一种广为应用的、高效的随机搜索与优化的方法。其主要特点是群体搜索策略和群体中个体之间的信息交换，搜索不依赖于梯度信息。</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>初始化 t←0进化代数计数器；T是最大进化代数；随机生成M个个体作为初始群体P（t）</li>
+<li>个体评价 计算P（t）中各个个体的适应度；</li>
+<li>选择运算 将选择算子作用于群体；</li>
+<li>交叉运算 将交叉算子作用于群体；</li>
+<li>变异运算 将变异算子作用于群体，并通过以上运算得到下一代群体P（t + 1）;</li>
+<li>终止条件判断  t≦T：t← t+1 转到步骤2；t&gt;T：终止 输出解。</li>
+</ol>
+<h2 id="模型构成"><a href="#模型构成" class="headerlink" title="模型构成"></a>模型构成</h2><ol>
+<li>决策变量及各种约束条件，即个体的表现型X和问题的解空间</li>
+<li>目标函数最大OR 最小， 数学描述形式 量化方法</li>
+<li>染色体编码方法 （二进制、整数、浮点数）</li>
+<li>解码方法</li>
+<li>个体适应度的量化评价方法 F(x)  （旅行商问题及最短路径）</li>
+<li>设计遗传算子</li>
+<li>有关运行参数</li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>局部收敛</li>
+<li>全局搜索能力不够强</li>
+</ul>
+<h2 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h2><ul>
+<li>交叉算子</li>
+<li>变异算子</li>
+<li>选择策略</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;  
+
+import java.io.BufferedReader;  
+import java.io.FileInputStream;  
+import java.io.IOException;  
+import java.io.InputStreamReader;  
+import java.util.Random;  
+
+public class GA {  
+
+    private int scale;// 种群规模  
+    private int cityNum; // 城市数量，染色体长度  
+    private int MAX_GEN; // 运行代数  
+    private int[][] distance; // 距离矩阵  
+    private int bestT;// 最佳出现代数  
+    private int bestLength; // 最佳长度  
+    private int[] bestTour; // 最佳路径  
+
+    // 初始种群，父代种群，行数表示种群规模，一行代表一个个体，即染色体，列表示染色体基因片段  
+    private int[][] oldPopulation;  
+    private int[][] newPopulation;// 新的种群，子代种群  
+    private int[] fitness;// 种群适应度，表示种群中各个个体的适应度  
+
+    private float[] Pi;// 种群中各个个体的累计概率  
+    private float Pc;// 交叉概率  
+    private float Pm;// 变异概率  
+    private int t;// 当前代数  
+
+    private Random random;  
+
+    public GA() {  
+
+    }  
+
+    /** 
+     * constructor of GA 
+     *  
+     * @param s 
+     *            种群规模 
+     * @param n 
+     *            城市数量 
+     * @param g 
+     *            运行代数 
+     * @param c 
+     *            交叉率 
+     * @param m 
+     *            变异率 
+     *  
+     **/  
+    public GA(int s, int n, int g, float c, float m) {  
+        scale = s;  
+        cityNum = n;  
+        MAX_GEN = g;  
+        Pc = c;  
+        Pm = m;  
+    }  
+
+    // 给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默  
+    @SuppressWarnings(&quot;resource&quot;)  
+    /** 
+     * 初始化GA算法类 
+     * @param filename 数据文件名，该文件存储所有城市节点坐标数据 
+     * @throws IOException 
+     */  
+    private void init(String filename) throws IOException {  
+        // 读取数据  
+        int[] x;  
+        int[] y;  
+        String strbuff;  
+        BufferedReader data = new BufferedReader(new InputStreamReader(  
+                new FileInputStream(filename)));  
+        distance = new int[cityNum][cityNum];  
+        x = new int[cityNum];  
+        y = new int[cityNum];  
+        for (int i = 0; i &lt; cityNum; i++) {  
+            // 读取一行数据，数据格式1 6734 1453  
+            strbuff = data.readLine();  
+            // 字符分割  
+            String[] strcol = strbuff.split(&quot; &quot;);  
+            x[i] = Integer.valueOf(strcol[1]);// x坐标  
+            y[i] = Integer.valueOf(strcol[2]);// y坐标  
+        }  
+        // 计算距离矩阵  
+        // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628  
+        for (int i = 0; i &lt; cityNum - 1; i++) {  
+            distance[i][i] = 0; // 对角线为0  
+            for (int j = i + 1; j &lt; cityNum; j++) {  
+                double rij = Math  
+                        .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])  
+                                * (y[i] - y[j])) / 10.0);  
+                // 四舍五入，取整  
+                int tij = (int) Math.round(rij);  
+                if (tij &lt; rij) {  
+                    distance[i][j] = tij + 1;  
+                    distance[j][i] = distance[i][j];  
+                } else {  
+                    distance[i][j] = tij;  
+                    distance[j][i] = distance[i][j];  
+                }  
+            }  
+        }  
+        distance[cityNum - 1][cityNum - 1] = 0;  
+
+        bestLength = Integer.MAX_VALUE;  
+        bestTour = new int[cityNum + 1];  
+        bestT = 0;  
+        t = 0;  
+
+        newPopulation = new int[scale][cityNum];  
+        oldPopulation = new int[scale][cityNum];  
+        fitness = new int[scale];  
+        Pi = new float[scale];  
+
+        random = new Random(System.currentTimeMillis());  
+        /* 
+         * for(int i=0;i&lt;cityNum;i++) { for(int j=0;j&lt;cityNum;j++) { 
+         * System.out.print(distance[i][j]+&quot;,&quot;); } System.out.println(); } 
+         */  
+        // 初始化种群  
+
+    }  
+
+    // 初始化种群  
+    void initGroup() {  
+        int i, j, k;  
+        // Random random = new Random(System.currentTimeMillis());  
+        for (k = 0; k &lt; scale; k++)// 种群数  
+        {  
+            oldPopulation[k][0] = random.nextInt(65535) % cityNum;  
+            for (i = 1; i &lt; cityNum;)// 染色体长度  
+            {  
+                oldPopulation[k][i] = random.nextInt(65535) % cityNum;  
+                for (j = 0; j &lt; i; j++) {  
+                    if (oldPopulation[k][i] == oldPopulation[k][j]) {  
+                        break;  
+                    }  
+                }  
+                if (j == i) {  
+                    i++;  
+                }  
+            }  
+        }  
+
+        /* 
+         * for(i=0;i&lt;scale;i++) { for(j=0;j&lt;cityNum;j++) { 
+         * System.out.print(oldPopulation[i][j]+&quot;,&quot;); } System.out.println(); } 
+         */  
+    }  
+
+    public int evaluate(int[] chromosome) {  
+        // 0123  
+        int len = 0;  
+        // 染色体，起始城市,城市1,城市2...城市n  
+        for (int i = 1; i &lt; cityNum; i++) {  
+            len += distance[chromosome[i - 1]][chromosome[i]];  
+        }  
+        // 城市n,起始城市  
+        len += distance[chromosome[cityNum - 1]][chromosome[0]];  
+        return len;  
+    }  
+
+    // 计算种群中各个个体的累积概率，前提是已经计算出各个个体的适应度fitness[max]，作为赌轮选择策略一部分，Pi[max]  
+    void countRate() {  
+        int k;  
+        double sumFitness = 0;// 适应度总和  
+
+        double[] tempf = new double[scale];  
+
+        for (k = 0; k &lt; scale; k++) {  
+            tempf[k] = 10.0 / fitness[k];  
+            sumFitness += tempf[k];  
+        }  
+
+        Pi[0] = (float) (tempf[0] / sumFitness);  
+        for (k = 1; k &lt; scale; k++) {  
+            Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);  
+        }  
+
+        /* 
+         * for(k=0;k&lt;scale;k++) { System.out.println(fitness[k]+&quot; &quot;+Pi[k]); } 
+         */  
+    }  
+
+    // 挑选某代种群中适应度最高的个体，直接复制到子代中  
+    // 前提是已经计算出各个个体的适应度Fitness[max]  
+    public void selectBestGh() {  
+        int k, i, maxid;  
+        int maxevaluation;  
+
+        maxid = 0;  
+        maxevaluation = fitness[0];  
+        for (k = 1; k &lt; scale; k++) {  
+            if (maxevaluation &gt; fitness[k]) {  
+                maxevaluation = fitness[k];  
+                maxid = k;  
+            }  
+        }  
+
+        if (bestLength &gt; maxevaluation) {  
+            bestLength = maxevaluation;  
+            bestT = t;// 最好的染色体出现的代数;  
+            for (i = 0; i &lt; cityNum; i++) {  
+                bestTour[i] = oldPopulation[maxid][i];  
+            }  
+        }  
+
+        // System.out.println(&quot;代数 &quot; + t + &quot; &quot; + maxevaluation);  
+        // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
+        copyGh(0, maxid);// 将当代种群中适应度最高的染色体k复制到新种群中，排在第一位0  
+    }  
+
+    // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
+    public void copyGh(int k, int kk) {  
+        int i;  
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k][i] = oldPopulation[kk][i];  
+        }  
+    }  
+
+    // 赌轮选择策略挑选  
+    public void select() {  
+        int k, i, selectId;  
+        float ran1;  
+        // Random random = new Random(System.currentTimeMillis());  
+        for (k = 1; k &lt; scale; k++) {  
+            ran1 = (float) (random.nextInt(65535) % 1000 / 1000.0);  
+            // System.out.println(&quot;概率&quot;+ran1);  
+            // 产生方式  
+            for (i = 0; i &lt; scale; i++) {  
+                if (ran1 &lt;= Pi[i]) {  
+                    break;  
+                }  
+            }  
+            selectId = i;  
+            // System.out.println(&quot;选中&quot; + selectId);  
+            copyGh(k, selectId);  
+        }  
+    }  
+
+    //进化函数，正常交叉变异  
+    public void evolution() {  
+        int k;  
+        // 挑选某代种群中适应度最高的个体  
+        selectBestGh();  
+
+        // 赌轮选择策略挑选scale-1个下一代个体  
+        select();  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        float r;  
+
+        // 交叉方法  
+        for (k = 0; k &lt; scale; k = k + 2) {  
+            r = random.nextFloat();// /产生概率  
+            // System.out.println(&quot;交叉率...&quot; + r);  
+            if (r &lt; Pc) {  
+                // System.out.println(k + &quot;与&quot; + k + 1 + &quot;进行交叉...&quot;);  
+                //OXCross(k, k + 1);// 进行交叉  
+                OXCross1(k, k + 1);  
+            } else {  
+                r = random.nextFloat();// /产生概率  
+                // System.out.println(&quot;变异率1...&quot; + r);  
+                // 变异  
+                if (r &lt; Pm) {  
+                    // System.out.println(k + &quot;变异...&quot;);  
+                    OnCVariation(k);  
+                }  
+                r = random.nextFloat();// /产生概率  
+                // System.out.println(&quot;变异率2...&quot; + r);  
+                // 变异  
+                if (r &lt; Pm) {  
+                    // System.out.println(k + 1 + &quot;变异...&quot;);  
+                    OnCVariation(k + 1);  
+                }  
+            }  
+
+        }  
+    }  
+
+    //进化函数，保留最好染色体不进行交叉变异  
+    public void evolution1() {  
+        int k;  
+        // 挑选某代种群中适应度最高的个体  
+        selectBestGh();  
+
+        // 赌轮选择策略挑选scale-1个下一代个体  
+        select();  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        float r;  
+
+        for (k = 1; k + 1 &lt; scale / 2; k = k + 2) {  
+            r = random.nextFloat();// /产生概率  
+            if (r &lt; Pc) {  
+                OXCross1(k, k + 1);// 进行交叉  
+                //OXCross(k,k+1);//进行交叉  
+            } else {  
+                r = random.nextFloat();// /产生概率  
+                // 变异  
+                if (r &lt; Pm) {  
+                    OnCVariation(k);  
+                }  
+                r = random.nextFloat();// /产生概率  
+                // 变异  
+                if (r &lt; Pm) {  
+                    OnCVariation(k + 1);  
+                }  
+            }  
+        }  
+        if (k == scale / 2 - 1)// 剩最后一个染色体没有交叉L-1  
+        {  
+            r = random.nextFloat();// /产生概率  
+            if (r &lt; Pm) {  
+                OnCVariation(k);  
+            }  
+        }  
+
+    }  
+
+    // 类OX交叉算子  
+    void OXCross(int k1, int k2) {  
+        int i, j, k, flag;  
+        int ran1, ran2, temp;  
+        int[] Gh1 = new int[cityNum];  
+        int[] Gh2 = new int[cityNum];  
+        // Random random = new Random(System.currentTimeMillis());  
+
+        ran1 = random.nextInt(65535) % cityNum;  
+        ran2 = random.nextInt(65535) % cityNum;  
+        // System.out.println();  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+
+        while (ran1 == ran2) {  
+            ran2 = random.nextInt(65535) % cityNum;  
+        }  
+
+        if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
+        {  
+            temp = ran1;  
+            ran1 = ran2;  
+            ran2 = temp;  
+        }  
+        // System.out.println();  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println();  
+        flag = ran2 - ran1 + 1;// 删除重复基因前染色体长度  
+        for (i = 0, j = ran1; i &lt; flag; i++, j++) {  
+            Gh1[i] = newPopulation[k2][j];  
+            Gh2[i] = newPopulation[k1][j];  
+        }  
+        // 已近赋值i=ran2-ran1个基因  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh1[j] = newPopulation[k1][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh1[i] == Gh1[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh2[j] = newPopulation[k2][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh2[i] == Gh2[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+            newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+        }  
+
+        // System.out.println(&quot;进行交叉--------------------------&quot;);  
+        // System.out.println(k1+&quot;交叉后...&quot;);  
+        // for (i = 0; i &lt; cityNum; i++) {  
+        // System.out.print(newPopulation[k1][i] + &quot;-&quot;);  
+        // }  
+        // System.out.println();  
+        // System.out.println(k2+&quot;交叉后...&quot;);  
+        // for (i = 0; i &lt; cityNum; i++) {  
+        // System.out.print(newPopulation[k2][i] + &quot;-&quot;);  
+        // }  
+        // System.out.println();  
+        // System.out.println(&quot;交叉完毕--------------------------&quot;);  
+    }  
+
+    // 交叉算子,相同染色体交叉产生不同子代染色体  
+    public void OXCross1(int k1, int k2) {  
+        int i, j, k, flag;  
+        int ran1, ran2, temp;  
+        int[] Gh1 = new int[cityNum];  
+        int[] Gh2 = new int[cityNum];  
+        // Random random = new Random(System.currentTimeMillis());  
+
+        ran1 = random.nextInt(65535) % cityNum;  
+        ran2 = random.nextInt(65535) % cityNum;  
+        while (ran1 == ran2) {  
+            ran2 = random.nextInt(65535) % cityNum;  
+        }  
+
+        if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
+        {  
+            temp = ran1;  
+            ran1 = ran2;  
+            ran2 = temp;  
+        }  
+
+        // 将染色体1中的第三部分移到染色体2的首部  
+        for (i = 0, j = ran2; j &lt; cityNum; i++, j++) {  
+            Gh2[i] = newPopulation[k1][j];  
+        }  
+
+        flag = i;// 染色体2原基因开始位置  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh2[j] = newPopulation[k2][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh2[i] == Gh2[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        flag = ran1;  
+        for (k = 0, j = 0; k &lt; cityNum;)// 染色体长度  
+        {  
+            Gh1[j] = newPopulation[k1][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (newPopulation[k2][i] == Gh1[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        flag = cityNum - ran1;  
+
+        for (i = 0, j = flag; j &lt; cityNum; j++, i++) {  
+            Gh1[j] = newPopulation[k2][i];  
+        }  
+
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+            newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+        }  
+    }  
+
+    // 多次对换变异算子  
+    public void OnCVariation(int k) {  
+        int ran1, ran2, temp;  
+        int count;// 对换次数  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        count = random.nextInt(65535) % cityNum;  
+
+        for (int i = 0; i &lt; count; i++) {  
+
+            ran1 = random.nextInt(65535) % cityNum;  
+            ran2 = random.nextInt(65535) % cityNum;  
+            while (ran1 == ran2) {  
+                ran2 = random.nextInt(65535) % cityNum;  
+            }  
+            temp = newPopulation[k][ran1];  
+            newPopulation[k][ran1] = newPopulation[k][ran2];  
+            newPopulation[k][ran2] = temp;  
+        }  
+
+        /* 
+         * for(i=0;i&lt;L;i++) { printf(&quot;%d &quot;,newGroup[k][i]); } printf(&quot;\n&quot;); 
+         */  
+    }  
+
+    public void solve() {  
+        int i;  
+        int k;  
+
+        // 初始化种群  
+        initGroup();  
+        // 计算初始化种群适应度，Fitness[max]  
+        for (k = 0; k &lt; scale; k++) {  
+            fitness[k] = evaluate(oldPopulation[k]);  
+            // System.out.println(fitness[k]);  
+        }  
+        // 计算初始化种群中各个个体的累积概率，Pi[max]  
+        countRate();  
+        System.out.println(&quot;初始种群...&quot;);  
+        for (k = 0; k &lt; scale; k++) {  
+            for (i = 0; i &lt; cityNum; i++) {  
+                System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+            }  
+            System.out.println();  
+            System.out.println(&quot;----&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+        }  
+
+        for (t = 0; t &lt; MAX_GEN; t++) {  
+            //evolution1();  
+            evolution();  
+            // 将新种群newGroup复制到旧种群oldGroup中，准备下一代进化  
+            for (k = 0; k &lt; scale; k++) {  
+                for (i = 0; i &lt; cityNum; i++) {  
+                    oldPopulation[k][i] = newPopulation[k][i];  
+                }  
+            }  
+            // 计算种群适应度  
+            for (k = 0; k &lt; scale; k++) {  
+                fitness[k] = evaluate(oldPopulation[k]);  
+            }  
+            // 计算种群中各个个体的累积概率  
+            countRate();  
+        }  
+
+        System.out.println(&quot;最后种群...&quot;);  
+        for (k = 0; k &lt; scale; k++) {  
+            for (i = 0; i &lt; cityNum; i++) {  
+                System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+            }  
+            System.out.println();  
+            System.out.println(&quot;---&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+        }  
+
+        System.out.println(&quot;最佳长度出现代数：&quot;);  
+        System.out.println(bestT);  
+        System.out.println(&quot;最佳长度&quot;);  
+        System.out.println(bestLength);  
+        System.out.println(&quot;最佳路径：&quot;);  
+        for (i = 0; i &lt; cityNum; i++) {  
+            System.out.print(bestTour[i] + &quot;,&quot;);  
+        }  
+
+    }  
+
+
+    /** 
+     * @param args 
+     * @throws IOException 
+     */  
+    public static void main(String[] args) throws IOException {  
+        System.out.println(&quot;Start....&quot;);  
+        GA ga = new GA(30, 48, 1000, 0.8f, 0.9f);  
+        ga.init(&quot;c://data.txt&quot;);  
+        ga.solve();  
+    }  
+
+}
+</code></pre><p>参考：<a href="https://blog.csdn.net/tyhj_sf/article/details/53321527" target="_blank" rel="noopener">https://blog.csdn.net/tyhj_sf/article/details/53321527</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/22/贪心算法/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/22/贪心算法/" itemprop="url">贪心算法-旅行商问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-22T11:06:00+08:00">
+                2018-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>有若干个城市，任何两个城市之间的距离都是确定的，现要求一旅行商从某城市出发必须经过每一个城市且只在一个城市逗留一次，最后回到出发的城市，问如何事先确定一条最短的线路已保证其旅行的费用最少？</p>
+<p>还有 背包、装箱 问题</p>
+<p>注： 递归，时间复杂度为n!</p>
+<h2 id="贪心算法"><a href="#贪心算法" class="headerlink" title="贪心算法"></a>贪心算法</h2><p>在对问题求解时，总是做出当前情况下的最好选择，否则将来可能会后悔，故名“贪心”。这是一种算法策略，每次选择得到的都是局部最优解。选择的策略必须具备无后效性，即某个状态以前的过程不会影响以后的状态，只与当前状态有关。 </p>
+<p>求解的问题分成若干个子问题，每一个子问题求解，得到子问题的局部最优解，子问题的局部最优解合成原问题的一个解</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>从某一个城市开始，每次选择一个城市，直到所有的城市被走完。 </li>
+<li><p>每次在选择下一个城市的时候，只考虑当前情况，保证迄今为止经过的路径总距离最小。</p>
+<pre><code>从问题的某一初始解出发；
+    while （能朝给定总目标前进一步）
+    { 
+          利用可行的决策，求出可行解的一个解元素；
+    }
+由所有解元素组合成问题的一个可行解
+</code></pre></li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>不能保证最终为最优解</li>
+<li>不能用来求最大最小解问题</li>
+<li>无后效性</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class TxTsp {
+
+    private int cityNum; // 城市数量
+    private int[][] distance; // 距离矩阵
+
+    private int[] colable;//代表列，也表示是否走过，走过置0
+    private int[] row;//代表行，选过置0
+
+    public TxTsp(int n) {
+        cityNum = n;
+    }
+
+    private void init(String filename) throws IOException {
+        // 读取数据
+        int[] x;
+        int[] y;
+        String strbuff;
+        BufferedReader data = new BufferedReader(new InputStreamReader(
+                new FileInputStream(filename)));
+        distance = new int[cityNum][cityNum];
+        x = new int[cityNum];
+        y = new int[cityNum];
+        for (int i = 0; i &lt; cityNum; i++) {
+            // 读取一行数据，数据格式1 6734 1453
+            strbuff = data.readLine();
+            // 字符分割
+            String[] strcol = strbuff.split(&quot; &quot;);
+            x[i] = Integer.valueOf(strcol[1]);// x坐标
+            y[i] = Integer.valueOf(strcol[2]);// y坐标
+        }
+        data.close();
+
+        // 计算距离矩阵
+        // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628
+        for (int i = 0; i &lt; cityNum - 1; i++) {
+            distance[i][i] = 0; // 对角线为0
+            for (int j = i + 1; j &lt; cityNum; j++) {
+                double rij = Math
+                        .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])
+                                * (y[i] - y[j])) / 10.0);
+                // 四舍五入，取整
+                int tij = (int) Math.round(rij);
+                if (tij &lt; rij) {
+                    distance[i][j] = tij + 1;
+                    distance[j][i] = distance[i][j];
+                } else {
+                    distance[i][j] = tij;
+                    distance[j][i] = distance[i][j];
+                }
+            }
+        }
+
+        distance[cityNum - 1][cityNum - 1] = 0;
+
+        colable = new int[cityNum];
+        colable[0] = 0;
+        for (int i = 1; i &lt; cityNum; i++) {
+            colable[i] = 1;
+        }
+
+        row = new int[cityNum];
+        for (int i = 0; i &lt; cityNum; i++) {
+            row[i] = 1;
+        }
+
+    }
+
+    public void solve(){
+
+        int[] temp = new int[cityNum];
+        String path=&quot;0&quot;;
+
+        int s=0;//计算距离
+        int i=0;//当前节点
+        int j=0;//下一个节点
+        //默认从0开始
+        while(row[i]==1){
+            //复制一行
+            for (int k = 0; k &lt; cityNum; k++) {
+                temp[k] = distance[i][k];
+                //System.out.print(temp[k]+&quot; &quot;);
+            }
+            //System.out.println();
+            //选择下一个节点，要求不是已经走过，并且与i不同
+            j = selectmin(temp);
+            //找出下一节点
+            row[i] = 0;//行置0，表示已经选过
+            colable[j] = 0;//列0，表示已经走过
+
+            path+=&quot;--&gt;&quot; + j;
+            //System.out.println(i + &quot;--&gt;&quot; + j);
+            //System.out.println(distance[i][j]);
+            s = s + distance[i][j];
+            i = j;//当前节点指向下一节点
+        }
+        System.out.println(&quot;路径:&quot; + path);
+        System.out.println(&quot;总距离为:&quot; + s);
+
+    }
+
+    public int selectmin(int[] p){
+        int j = 0, m = p[0], k = 0;
+        //寻找第一个可用节点，注意最后一次寻找，没有可用节点
+        while (colable[j] == 0) {
+            j++;
+            //System.out.print(j+&quot; &quot;);
+            if(j&gt;=cityNum){
+                //没有可用节点，说明已结束，最后一次为 *--&gt;0
+                m = p[0];
+                break;
+                //或者直接return 0;
+            }
+            else{
+                m = p[j];
+            }
+        }
+        //从可用节点J开始往后扫描，找出距离最小节点
+        for (; j &lt; cityNum; j++) {
+            if (colable[j] == 1) {
+                if (m &gt;= p[j]) {
+                    m = p[j];
+                    k = j;
+                }
+            }
+        }
+        return k;
+    }
+
+
+    public void printinit() {
+        System.out.println(&quot;print begin....&quot;);
+        for (int i = 0; i &lt; cityNum; i++) {
+            for (int j = 0; j &lt; cityNum; j++) {
+                System.out.print(distance[i][j] + &quot; &quot;);
+            }
+            System.out.println();
+        }
+        System.out.println(&quot;print end....&quot;);
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println(&quot;Start....&quot;);
+        TxTsp ts = new TxTsp(48);
+        ts.init(&quot;c://data.txt&quot;);
+        //ts.printinit();
+        ts.solve();
+    }
+}
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/21/设计模式-原型模式/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -2943,379 +3949,11 @@ public static int getInt() throws IOException
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/中文分词/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/13/中文分词/" itemprop="url">中文分词</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:38:02+08:00">
-                2018-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
-<li>基于字典、词库匹配</li>
-<li>基于词频度统计</li>
-<li>基于知识理解</li>
-</ul>
-<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
-<ol>
-<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
-<li>机械分词法</li>
-</ol>
-<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
-<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
-<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
-<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
-<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
-<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
-<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
-<p>问题：</p>
-<ol>
-<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
-</li>
-<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
-</li>
-</ol>
-<p>解决方案：</p>
-<p>基于词的频度统计的分词方法：</p>
-<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
-<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
-<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/redis统计信息/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/13/redis统计信息/" itemprop="url">redis统计信息--INFO</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:14:50+08:00">
-                2018-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>显示关于redis服务器的状态报告和统计数值</p>
-<pre><code>redis&gt; INFO
-# Server
-redis_version:2.9.11 //服务器版本
-redis_git_sha1:937384d0
-redis_git_dirty:0
-redis_build_id:8e9509442863f22
-redis_mode:standalone  //mode
-os:Linux 3.13.0-35-generic x86_64
-arch_bits:64
-multiplexing_api:epoll //事件处理机制
-gcc_version:4.8.2
-process_id:4716 //进程ID
-run_id:26186aac3f2380aaee9eef21cc50aecd542d97dc  //随机标识符（用于 Sentinel 和集群）
-tcp_port:6379   //监听端口号
-uptime_in_seconds:362  //启动以来，经过的秒数
-uptime_in_days:0  //启动以来，经过的天数
-hz:10  //serverCron运行频率，此值越大表示redis对&quot;间歇性task&quot;的执行次数越频繁(次数/秒)
-lru_clock:1725349  //以分钟为单位进行自增的时钟，用于 LRU 管理
-config_file:
-
-# Clients
-connected_clients:1  //已连接客户端的数量（不包括通过从属服务器连接的客户端）
-client_longest_output_list:0  //当前连接的客户端当中，最长的输出列表
-client_biggest_input_buf:0  //当前连接的客户端当中，最大输入缓存
-blocked_clients:0 //正在等待阻塞命令（BLPOP、BRPOP、BRPOPLPUSH）的客户端的数量
-
-# Memory
-used_memory:508536  //由 Redis 分配器分配的内存总量，以字节（byte）为单位
-used_memory_human:496.62K  //以人类可读的格式返回 Redis 分配的内存总量
-used_memory_rss:7974912  //从操作系统的角度，返回 Redis 已分配的内存总量（俗称常驻集大小）。这个值和 top 、 ps 等命令的输出一致。
-//理想情况下， used_memory_rss 的值应该只比 used_memory 稍微高一点儿  
-//当 rss &gt; used ，且两者的值相差较大时，表示存在（内部或外部的）内存碎片
-//当 used &gt; rss 时，表示 Redis 的部分内存被操作系统换出到交换空间了，在这种情况下，操作可能会产生明显的延迟。
-used_memory_peak:508536 //Redis 的内存消耗峰值（以字节为单位）
-used_memory_peak_human:496.62K //以人类可读的格式返回 Redis 的内存消耗峰值
-used_memory_lua:33792  // Lua 引擎所使用的内存大小（以字节为单位）
-mem_fragmentation_ratio:15.68  //used_memory_rss 和 used_memory 之间的比率
-mem_allocator:jemalloc-3.2.0  //在编译时指定的， Redis 所使用的内存分配器。可以是 libc 、 jemalloc 或者 tcmalloc
-
-# Persistence
-loading:0  //一个标志值，记录了服务器是否正在载入持久化文件  
-rdb_changes_since_last_save:6 //距离最近一次成功创建持久化文件之后，经过了多少秒
-rdb_bgsave_in_progress:0 //一个标志值，记录了服务器是否正在创建 RDB 文件
-rdb_last_save_time:1411011131 //最近一次成功创建 RDB 文件的 UNIX 时间戳
-rdb_last_bgsave_status:ok //一个标志值，记录了最近一次创建 RDB 文件的结果是成功还是失败
-rdb_last_bgsave_time_sec:-1 //记录了最近一次创建 RDB 文件耗费的秒数
-rdb_current_bgsave_time_sec:-1 // 如果服务器正在创建 RDB 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
-aof_enabled:0 //标志值，记录了 AOF 是否处于打开状态。
-  //如果 AOF 持久化功能处于开启状态，那么这个部分还会加上以下域：    
-  // aof_current_size : AOF 文件目前的大小。
-  // aof_base_size : 服务器启动时或者 AOF 重写最近一次执行之后，AOF 文件的大小。
-  // aof_pending_rewrite : 一个标志值，记录了是否有 AOF 重写操作在等待 RDB 文件创建完毕之后执行。
-  // aof_buffer_length : AOF 缓冲区的大小。
-  // aof_rewrite_buffer_length : AOF 重写缓冲区的大小。
-  // aof_pending_bio_fsync : 后台 I/O 队列里面，等待执行的 fsync 调用数量。
-  // aof_delayed_fsync : 被延迟的 fsync 调用数量。
-aof_rewrite_in_progress:0 //一个标志值，记录了服务器是否正在创建 AOF 文件。
-aof_rewrite_scheduled:0 //一个标志值，记录了在 RDB 文件创建完毕之后，是否需要执行预约的 AOF 重写操作
-aof_last_rewrite_time_sec:-1 //最近一次创建 AOF 文件耗费的时长。
-aof_current_rewrite_time_sec:-1 //如果服务器正在创建 AOF 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
-aof_last_bgrewrite_status:ok //一个标志值，记录了最近一次创建 AOF 文件的结果是成功还是失败。
-aof_last_write_status:ok //
-
-# Stats
-total_connections_received:2 //服务器已接受的连接请求数量
-total_commands_processed:4 //服务器已执行的命令数量
-instantaneous_ops_per_sec:0 //服务器每秒钟执行的命令数量
-rejected_connections:0 //因为最大客户端数量限制而被拒绝的连接请求数量
-sync_full:0 
-sync_partial_ok:0 
-sync_partial_err:0
-expired_keys:0 //因为过期而被自动删除的数据库键数量
-evicted_keys:0 //因为最大内存容量限制而被驱逐（evict）的键数量。
-keyspace_hits:0 //查找数据库键成功的次数。
-keyspace_misses:0 //查找数据库键失败的次数。
-pubsub_channels:0 //目前被订阅的频道数量。
-pubsub_patterns:0 //目前被订阅的模式数量。
-latest_fork_usec:0 //最近一次 fork() 操作耗费的毫秒数。
-migrate_cached_sockets:0
-
-# Replication
-role:master //如果当前服务器没有在复制任何其他服务器，那么这个域的值就是 master ；否则的话，这个域的值就是 slave 。注意，在创建复制链的时候，一个从服务器也可能是另一个服务器的主服务器。
-connected_slaves:0
-master_repl_offset:0
-repl_backlog_active:0
-repl_backlog_size:1048576
-repl_backlog_first_byte_offset:0
-repl_backlog_histlen:0
-
-# CPU
-used_cpu_sys:0.21  // Redis 服务器耗费的系统 CPU 。
-used_cpu_user:0.17  // Redis 服务器耗费的用户 CPU 。
-used_cpu_sys_children:0.00 //后台进程耗费的系统 CPU 。
-used_cpu_user_children:0.00 //后台进程耗费的用户 CPU 。
-
-# Cluster
-cluster_enabled:0  //一个标志值，记录集群功能是否已经开启
-
-# Keyspace
-db0:keys=2,expires=0,avg_ttl=0 //部分记录了数据库相关的统计信息，比如数据库的键数量、数据库已经被删除的过期键数量等。
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -3361,7 +3999,7 @@ db0:keys=2,expires=0,avg_ttl=0 //部分记录了数据库相关的统计信息�
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
