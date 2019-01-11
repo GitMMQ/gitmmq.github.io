@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分类 基于字典、词库匹配 基于词频度统计 基于知识理解  字典、词库匹配中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理  逐词遍历法：全字典遍历一遍，效率低，不适用于大系统 机械分词法  最大正向匹配法假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成 逆向最大匹配法文档逆序处理，">
+<meta name="keywords" content="Tech;Data;Vision">
+<meta property="og:type" content="article">
+<meta property="og:title" content="中文分词">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/13/机器学习-中文分词/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="分类 基于字典、词库匹配 基于词频度统计 基于知识理解  字典、词库匹配中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理  逐词遍历法：全字典遍历一遍，效率低，不适用于大系统 机械分词法  最大正向匹配法假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成 逆向最大匹配法文档逆序处理，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-14T02:31:55.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="中文分词">
+<meta name="twitter:description" content="分类 基于字典、词库匹配 基于词频度统计 基于知识理解  字典、词库匹配中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理  逐词遍历法：全字典遍历一遍，效率低，不适用于大系统 机械分词法  最大正向匹配法假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成 逆向最大匹配法文档逆序处理，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/13/机器学习-中文分词/">
+
+
+
+
+
+  <title>中文分词 | Qi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Qi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">to learn</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/机器学习-中文分词/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">中文分词</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:38:02+08:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>基于字典、词库匹配</li>
+<li>基于词频度统计</li>
+<li>基于知识理解</li>
+</ul>
+<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
+<ol>
+<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
+<li>机械分词法</li>
+</ol>
+<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
+<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
+<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
+<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
+<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
+<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
+<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
+<p>问题：</p>
+<ol>
+<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
+</li>
+<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
+</li>
+</ol>
+<p>解决方案：</p>
+<p>基于词的频度统计的分词方法：</p>
+<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
+<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
+<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/13/redis统计信息/" rel="next" title="redis统计信息--INFO">
+                <i class="fa fa-chevron-left"></i> redis统计信息--INFO
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/16/数据结构-234树/" rel="prev" title="234树">
+                234树 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Meng Qi</p>
+              <p class="site-description motion-element" itemprop="description">recording</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">90</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分类"><span class="nav-number">1.</span> <span class="nav-text">分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典、词库匹配"><span class="nav-number">2.</span> <span class="nav-text">字典、词库匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#最大正向匹配法"><span class="nav-number">2.1.</span> <span class="nav-text">最大正向匹配法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向最大匹配法"><span class="nav-number">2.2.</span> <span class="nav-text">逆向最大匹配法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最少切分法"><span class="nav-number">2.3.</span> <span class="nav-text">最少切分法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双向匹配法"><span class="nav-number">2.4.</span> <span class="nav-text">双向匹配法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#词频统计"><span class="nav-number">3.</span> <span class="nav-text">词频统计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全切分和基于词的频度统计的分词方法"><span class="nav-number">3.1.</span> <span class="nav-text">全切分和基于词的频度统计的分词方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于知识理解"><span class="nav-number">4.</span> <span class="nav-text">基于知识理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并行分词方法"><span class="nav-number">5.</span> <span class="nav-text">并行分词方法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

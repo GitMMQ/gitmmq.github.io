@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标 优缺点 思想简单，可视乎表达，易理解，可以处理多分类问题 可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度 基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树 过于复杂的概念，无法表达  决策树 CARTCART: classifcation and regressio">
+<meta name="keywords" content="Tech;Data;Vision">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树">
+<meta property="og:url" content="https://www.fastolf.com/2018/12/05/机器学习-决策树/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标 优缺点 思想简单，可视乎表达，易理解，可以处理多分类问题 可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度 基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树 过于复杂的概念，无法表达  决策树 CARTCART: classifcation and regressio">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://thyrsi.com/t6/625/1543991582x2890174459.jpg">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_iris_0011.png">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_001.png">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_multioutput_001.png">
+<meta property="og:updated_time" content="2019-01-09T01:26:58.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树">
+<meta name="twitter:description" content="用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标 优缺点 思想简单，可视乎表达，易理解，可以处理多分类问题 可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度 基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树 过于复杂的概念，无法表达  决策树 CARTCART: classifcation and regressio">
+<meta name="twitter:image" content="http://thyrsi.com/t6/625/1543991582x2890174459.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.fastolf.com/2018/12/05/机器学习-决策树/">
+
+
+
+
+
+  <title>决策树 | Qi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Qi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">to learn</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/05/机器学习-决策树/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">决策树</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-05T13:00:34+08:00">
+                2018-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><ul>
+<li>思想简单，可视乎表达，易理解，可以处理多分类问题</li>
+<li>可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度</li>
+<li>基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树</li>
+<li>过于复杂的概念，无法表达</li>
+</ul>
+<h2 id="决策树-CART"><a href="#决策树-CART" class="headerlink" title="决策树 CART"></a>决策树 CART</h2><p>CART: classifcation and regression tree</p>
+<h2 id="irsi数据集构建分类决策树"><a href="#irsi数据集构建分类决策树" class="headerlink" title="irsi数据集构建分类决策树"></a>irsi数据集构建分类决策树</h2><pre><code>from sklearn.datasets import load_iris
+from sklearn import tree
+
+#加载iris数据集
+iris = load_iris()
+
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(iris.data, iris.target)
+
+import pydotplus
+dot_data = tree.export_graphviz(clf, out_file=None)
+#dot_data = tree.export_graphviz(clf, out_file=None, 
+                              feature_names=iris.feature_names,  
+                              class_names=iris.target_names,  
+                              filled=True, rounded=True,  
+                              special_characters=True)
+graph = pydotplus.graph_from_dot_data(dot_data)
+#导出决策树
+graph.write_pdf(&quot;iris.pdf&quot;) 
+#Image(graph.create_png())
+</code></pre><p><img src="http://thyrsi.com/t6/625/1543991582x2890174459.jpg" alt="iris树"></p>
+<h2 id="sklearn-example"><a href="#sklearn-example" class="headerlink" title="sklearn example"></a>sklearn example</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+
+# Parameters
+n_classes = 3
+plot_colors = &quot;ryb&quot;
+plot_step = 0.02
+
+# Load data
+iris = load_iris()
+
+for pairidx, pair in enumerate([[0, 1], [0, 2], [0, 3],
+                                [1, 2], [1, 3], [2, 3]]):
+    # We only take the two corresponding features
+    X = iris.data[:, pair]
+    y = iris.target
+
+    # Train
+    clf = DecisionTreeClassifier().fit(X, y)
+
+    # Plot the decision boundary
+    plt.subplot(2, 3, pairidx + 1)
+
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step),
+                         np.arange(y_min, y_max, plot_step))
+    plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
+
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    cs = plt.contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+
+    plt.xlabel(iris.feature_names[pair[0]])
+    plt.ylabel(iris.feature_names[pair[1]])
+
+    # Plot the training points
+    for i, color in zip(range(n_classes), plot_colors):
+        idx = np.where(y == i)
+        plt.scatter(X[idx, 0], X[idx, 1], c=color, label=iris.target_names[i],
+                    cmap=plt.cm.RdYlBu, edgecolor=&apos;black&apos;, s=15)
+
+plt.suptitle(&quot;Decision surface of a decision tree using paired features&quot;)
+plt.legend(loc=&apos;lower right&apos;, borderpad=0, handletextpad=0)
+plt.axis(&quot;tight&quot;)
+plt.show()
+</code></pre><p>   <img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_iris_0011.png" alt="iris树"></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py" target="_blank" rel="noopener">https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py</a></p>
+<h2 id="决策树回归"><a href="#决策树回归" class="headerlink" title="决策树回归"></a>决策树回归</h2><p>max_depth：图的深度，值太大会导致过拟合</p>
+<pre><code># Import the necessary modules and libraries
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+import matplotlib.pyplot as plt
+
+# Create a random dataset
+rng = np.random.RandomState(1)
+X = np.sort(5 * rng.rand(80, 1), axis=0)
+y = np.sin(X).ravel() #学习sin曲线
+y[::5] += 3 * (0.5 - rng.rand(16)) #干扰值
+
+# Fit regression model
+regr_1 = DecisionTreeRegressor(max_depth=2)
+regr_2 = DecisionTreeRegressor(max_depth=5)
+regr_1.fit(X, y)
+regr_2.fit(X, y)
+
+# Predict
+X_test = np.arange(0.0, 5.0, 0.01)[:, np.newaxis]
+y_1 = regr_1.predict(X_test)
+y_2 = regr_2.predict(X_test)
+
+# Plot the results
+plt.figure()
+plt.scatter(X, y, s=20, edgecolor=&quot;black&quot;,
+            c=&quot;darkorange&quot;, label=&quot;data&quot;)
+plt.plot(X_test, y_1, color=&quot;cornflowerblue&quot;,
+         label=&quot;max_depth=2&quot;, linewidth=2)
+plt.plot(X_test, y_2, color=&quot;yellowgreen&quot;, label=&quot;max_depth=5&quot;, linewidth=2)
+plt.xlabel(&quot;data&quot;)
+plt.ylabel(&quot;target&quot;)
+plt.title(&quot;Decision Tree Regression&quot;)
+plt.legend()
+plt.show()
+</code></pre><p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_001.png" alt="iris树"></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py" target="_blank" rel="noopener">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py</a></p>
+<h2 id="多输出问题"><a href="#多输出问题" class="headerlink" title="多输出问题"></a>多输出问题</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeRegressor
+
+# Create a random dataset
+rng = np.random.RandomState(1)
+X = np.sort(200 * rng.rand(100, 1) - 100, axis=0)
+y = np.array([np.pi * np.sin(X).ravel(), np.pi * np.cos(X).ravel()]).T #输出X正弦 余弦
+y[::5, :] += (0.5 - rng.rand(20, 2)) #干扰
+
+# Fit regression model
+regr_1 = DecisionTreeRegressor(max_depth=2)
+regr_2 = DecisionTreeRegressor(max_depth=5)
+regr_3 = DecisionTreeRegressor(max_depth=8)
+regr_1.fit(X, y)
+regr_2.fit(X, y)
+regr_3.fit(X, y)
+
+# Predict
+X_test = np.arange(-100.0, 100.0, 0.01)[:, np.newaxis]
+y_1 = regr_1.predict(X_test)
+y_2 = regr_2.predict(X_test)
+y_3 = regr_3.predict(X_test)
+
+# Plot the results
+plt.figure()
+s = 25
+plt.scatter(y[:, 0], y[:, 1], c=&quot;navy&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;data&quot;)
+plt.scatter(y_1[:, 0], y_1[:, 1], c=&quot;cornflowerblue&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=2&quot;)
+plt.scatter(y_2[:, 0], y_2[:, 1], c=&quot;red&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=5&quot;)
+plt.scatter(y_3[:, 0], y_3[:, 1], c=&quot;orange&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=8&quot;)
+plt.xlim([-6, 6])
+plt.ylim([-6, 6])
+plt.xlabel(&quot;target 1&quot;)
+plt.ylabel(&quot;target 2&quot;)
+plt.title(&quot;Multi-output Decision Tree Regression&quot;)
+plt.legend(loc=&quot;best&quot;)
+plt.show()
+</code></pre><p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_multioutput_001.png" alt="iris树"></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py" target="_blank" rel="noopener">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/04/算法-KMP算法/" rel="next" title="KMP算法">
+                <i class="fa fa-chevron-left"></i> KMP算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/06/设计模式-委派模式/" rel="prev" title="设计模式-委派模式">
+                设计模式-委派模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Meng Qi</p>
+              <p class="site-description motion-element" itemprop="description">recording</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">90</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#优缺点"><span class="nav-number">1.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#决策树-CART"><span class="nav-number">2.</span> <span class="nav-text">决策树 CART</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#irsi数据集构建分类决策树"><span class="nav-number">3.</span> <span class="nav-text">irsi数据集构建分类决策树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sklearn-example"><span class="nav-number">4.</span> <span class="nav-text">sklearn example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#决策树回归"><span class="nav-number">5.</span> <span class="nav-text">决策树回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多输出问题"><span class="nav-number">6.</span> <span class="nav-text">多输出问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
