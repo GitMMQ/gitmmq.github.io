@@ -233,6 +233,1174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/31/数据结构-线性表/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/31/数据结构-线性表/" itemprop="url">数据结构-线性表</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-31T12:18:54+08:00">
+                2018-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>clear、isEmpty、length、get、insert、remove、indexOf</p>
+<pre><code>public interface IList {
+    // 线性表置空操作
+    public void clear();
+
+    // 判断线性表是否为空操作
+    public boolean isEmpty();
+
+    // 获取线性表中元素的长度操作
+    public int length();
+
+    // 获取指定位置上面的元素操作
+    public Object get(int i);
+
+    // 在指定位置上面插入元素的操作
+    public void insert(int i, Object x);
+
+    // 删除指定位置上面的元素的操作
+    public void remove(int i);
+
+    // 查找指定元素的位置首次出现的位置操作
+    public int indexOf(Object x);
+
+    // 显示线性表中的内容操作
+    public void display();
+}
+</code></pre><h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><h3 id="顺序表"><a href="#顺序表" class="headerlink" title="顺序表"></a>顺序表</h3><p>顺序存储， 逻辑上相邻的数据元素，在物理存储上也是相邻的。 不便于插入和删除</p>
+<pre><code>public class SqList implements IList {
+    // 线性表存储空间
+    private Object[] listElem;
+    // 线性表的当前长度
+    private int curLen;
+
+    // 顺序表类的构造函数，构造一个存储空间容量为maxSize的线性表
+    public SqList(int maxSize) {
+        // TODO Auto-generated constructor stub
+        curLen = 0;
+        listElem = new Object[maxSize];
+    }
+
+    // 将一个已经存在的线性表置成空表
+    public void clear() {
+        // TODO Auto-generated method stub
+        // 置顺序表的当前长度为0
+        curLen = 0;
+    }
+
+    // 判断线性表中的数据元素的个数是否为0，若为0则返回true，否则返回false
+    public boolean isEmpty() {
+        // TODO Auto-generated method stub
+        return curLen == 0;
+    }
+
+    // 求线性表中的数据元素的个数并返回其值
+    public int length() {
+        // TODO Auto-generated method stub
+        // 返回顺序表的当前长度
+        return curLen;
+    }
+
+    // 读取到线性表中的第i个数据元素并由函数返回其值，其中i的取值范围为0≤i≤length()-1，若i不在此范围则抛出异常
+    public Object get(int i) {
+        // TODO Auto-generated method stub
+        if (i &lt; 0 || i &gt;= curLen) {
+            throw new RuntimeException(&quot;第&quot; + i + &quot;个元素不存在&quot;);
+        }
+        return listElem[i];
+    }
+
+    // 在线性表的第i个数据元素之前插入一个值位x的数据元素
+    public void insert(int i, Object x) {
+        // TODO Auto-generated method stub
+        // 判断表是否满了
+        if (curLen == listElem.length) {
+            throw new RuntimeException(&quot;存储空间已经满了，无法插入新的元素&quot;);
+        }
+        // 插入的位置不合法
+        if (i &lt; 0 || i &gt; curLen) {
+            throw new RuntimeException(&quot;插入的位置不合法&quot;);
+        }
+        // 必须要从最后一个元素开始依次逐个后移动，直到第i个数据元素移动完毕为止。
+        for (int j = curLen; j &gt; i; j--) {
+            listElem[j] = listElem[j - 1];
+        }
+        listElem[i] = x;
+        curLen++;
+    }
+
+    public void remove(int i) {
+        // TODO Auto-generated method stub
+        if (i &lt; 0 || i &gt; curLen - 1) {
+            throw new RuntimeException(&quot;删除的位置不合法&quot;);
+        }
+        for (int j = i; j &lt; curLen; j++) {
+            listElem[j] = listElem[j+1];
+        }
+        curLen--;
+    }
+
+    // 返回线性表中首次出现指定的数据元素的位序号，若线性表中不包含此数据元素，则返回-1
+    public int indexOf(Object x) {
+        // TODO Auto-generated method stub
+        for (int i = 0; i &lt; curLen; i++) {
+            if (listElem[i].equals(x)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // 输出线性表中的数据元素
+    public void display() {
+        // TODO Auto-generated method stub
+        for (int i = 0; i &lt; curLen; i++) {
+            System.out.print(listElem[i] + &quot; &quot;);
+        }
+        System.out.println();
+    }
+
+    // 测试
+    public static void main(String[] args) {
+        SqList sqList = new SqList(10);
+        sqList.insert(0, &quot;a&quot;);
+        sqList.insert(1, &quot;z&quot;);
+        sqList.insert(2, &quot;d&quot;);
+        sqList.insert(3, &quot;m&quot;);
+        sqList.insert(4, &quot;z&quot;);
+        int order = sqList.indexOf(&quot;z&quot;);
+        if (order!=-1) {
+            System.out.println(&quot;顺序表中第一次出现的值为z的数据元素的位置为：&quot;+order);
+        }else {
+            System.out.println(&quot;顺序表中不包括z元素&quot;);
+        }
+    }
+}
+</code></pre><h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p>链式存储，单向链表，节点保存下一个节点的引用，便于插入和删除</p>
+<pre><code>public class Node {
+    // 存放结点的值
+    private Object data;
+    // 后继结点的引用
+    private Node next;
+
+    // 无参数时的构造函数
+    public Node() {
+        // TODO Auto-generated constructor stub
+        this(null, null);
+    }
+
+    // 带有一个参数时的构造函数
+    public Node(Object data) {
+        this(data, null);
+    }
+
+    // 带有两个参数时的构造函数
+    public Node(Object data, Node next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
+}
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/31/算法-兔子数列/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/31/算法-兔子数列/" itemprop="url">兔子数列</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-31T11:53:36+08:00">
+                2018-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
+<ol>
+<li>初始状态：一对刚出生的兔子</li>
+<li>下一步：生长</li>
+<li><figure class="highlight plain"><figcaption><span>一对刚出生的兔子-> 第1步```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">总结： 当月的兔子数=上月兔子数+当月新生兔子  数列的当前列=前两列之和</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 递归算法</span><br><span class="line"></span><br><span class="line">指数阶算法，效率较低，时间复杂度爆炸增量</span><br><span class="line"></span><br><span class="line">        Fib1(int n)</span><br><span class="line">        </span><br><span class="line">        &#123; if(n&lt;1)</span><br><span class="line">        </span><br><span class="line">               return -1;</span><br><span class="line">        </span><br><span class="line">          if(n==1||n==2)</span><br><span class="line">        </span><br><span class="line">                return 1;</span><br><span class="line">        </span><br><span class="line">           return Fib1(n-1)+Fib1(n-2);</span><br><span class="line">        </span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">## 数组记录先两项值</span><br><span class="line"></span><br><span class="line">时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</span><br><span class="line"></span><br><span class="line">    Fib2(intn)</span><br><span class="line">    &#123;</span><br><span class="line">        if(n&lt;1)</span><br><span class="line">            return-1;</span><br><span class="line">        int[] a=new int[n];</span><br><span class="line">        a[1]=1;</span><br><span class="line">        a[2]=1;</span><br><span class="line">        for(int i=3;i&lt;=n;i++)</span><br><span class="line">            a[i]=a[i-1]+a[i-2];</span><br><span class="line">            return a[n];</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">             </span><br><span class="line">        </span><br><span class="line">## 迭代法</span><br><span class="line"></span><br><span class="line">不记录中间结果，只记录中间项，空间复杂度降到O(1)</span><br><span class="line"></span><br><span class="line">    Fib3(intn)</span><br><span class="line">    &#123;</span><br><span class="line">        inti,s1,s2;</span><br><span class="line">        if(n&lt;1)</span><br><span class="line">            return-1;</span><br><span class="line">        if(n==1||n==2)</span><br><span class="line">            return1;</span><br><span class="line">        s1=1;s2=1;</span><br><span class="line">        for(i=3;i&lt;=n;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            s2=s1+s2;//辗转相加法</span><br><span class="line">            s1=s2-s1;//记录前一项</span><br><span class="line">        &#125;</span><br><span class="line">        return s2;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">## 矩阵乘法</span><br><span class="line"></span><br><span class="line">```斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</span><br></pre></td></tr></table></figure>
+<pre><code>public static int ValueN(int n){
+      if(n&lt;1){
+          return 0;
+      }
+      if(n==1 || n==2){
+          return 1;
+      }
+       int [][] base={{1,1},{1,0}};
+       int [][] res=matrixPower(base,n-2);
+       return res[0][0]+res[1][0];
+    }
+    public static int[][] matrixPower(int[][] m,int p){
+        if(p==0)
+            return null;
+        if(p==1)
+            return m;
+        int[][] res=matrixPower(m,p&gt;&gt;1);
+        res=muliMatrix(res,res);
+        if((p&amp;1)==1){
+            res=muliMatrix(res,m);
+        }
+        return res;
+    }
+    //求两个矩阵相乘得到一个新的矩阵
+    public static int[][] muliMatrix(int[][] m1,int[][] m2){
+        int [][] res=new int[m1.length][m2[0].length];
+        for(int i=0;i&lt;m1.length;i++){
+            for(int j=0;j&lt;m2[0].length;j++){
+                for(int k=0;k&lt;m2.length;k++){
+                    res[i][j]+=m1[i][k]*m2[k][j];
+                }
+            }
+        }
+        return res;
+    }
+}
+</code></pre></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/22/算法-遗传算法/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/22/算法-遗传算法/" itemprop="url">遗传算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-22T11:25:04+08:00">
+                2018-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>遗传算法（Genetic Algorithms ）是基于生物进化理论的原理发展起来的一种广为应用的、高效的随机搜索与优化的方法。其主要特点是群体搜索策略和群体中个体之间的信息交换，搜索不依赖于梯度信息。</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>初始化 t←0进化代数计数器；T是最大进化代数；随机生成M个个体作为初始群体P（t）</li>
+<li>个体评价 计算P（t）中各个个体的适应度；</li>
+<li>选择运算 将选择算子作用于群体；</li>
+<li>交叉运算 将交叉算子作用于群体；</li>
+<li>变异运算 将变异算子作用于群体，并通过以上运算得到下一代群体P（t + 1）;</li>
+<li>终止条件判断  t≦T：t← t+1 转到步骤2；t&gt;T：终止 输出解。</li>
+</ol>
+<h2 id="模型构成"><a href="#模型构成" class="headerlink" title="模型构成"></a>模型构成</h2><ol>
+<li>决策变量及各种约束条件，即个体的表现型X和问题的解空间</li>
+<li>目标函数最大OR 最小， 数学描述形式 量化方法</li>
+<li>染色体编码方法 （二进制、整数、浮点数）</li>
+<li>解码方法</li>
+<li>个体适应度的量化评价方法 F(x)  （旅行商问题及最短路径）</li>
+<li>设计遗传算子</li>
+<li>有关运行参数</li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>局部收敛</li>
+<li>全局搜索能力不够强</li>
+</ul>
+<h2 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h2><ul>
+<li>交叉算子</li>
+<li>变异算子</li>
+<li>选择策略</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;  
+
+import java.io.BufferedReader;  
+import java.io.FileInputStream;  
+import java.io.IOException;  
+import java.io.InputStreamReader;  
+import java.util.Random;  
+
+public class GA {  
+
+    private int scale;// 种群规模  
+    private int cityNum; // 城市数量，染色体长度  
+    private int MAX_GEN; // 运行代数  
+    private int[][] distance; // 距离矩阵  
+    private int bestT;// 最佳出现代数  
+    private int bestLength; // 最佳长度  
+    private int[] bestTour; // 最佳路径  
+
+    // 初始种群，父代种群，行数表示种群规模，一行代表一个个体，即染色体，列表示染色体基因片段  
+    private int[][] oldPopulation;  
+    private int[][] newPopulation;// 新的种群，子代种群  
+    private int[] fitness;// 种群适应度，表示种群中各个个体的适应度  
+
+    private float[] Pi;// 种群中各个个体的累计概率  
+    private float Pc;// 交叉概率  
+    private float Pm;// 变异概率  
+    private int t;// 当前代数  
+
+    private Random random;  
+
+    public GA() {  
+
+    }  
+
+    /** 
+     * constructor of GA 
+     *  
+     * @param s 
+     *            种群规模 
+     * @param n 
+     *            城市数量 
+     * @param g 
+     *            运行代数 
+     * @param c 
+     *            交叉率 
+     * @param m 
+     *            变异率 
+     *  
+     **/  
+    public GA(int s, int n, int g, float c, float m) {  
+        scale = s;  
+        cityNum = n;  
+        MAX_GEN = g;  
+        Pc = c;  
+        Pm = m;  
+    }  
+
+    // 给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默  
+    @SuppressWarnings(&quot;resource&quot;)  
+    /** 
+     * 初始化GA算法类 
+     * @param filename 数据文件名，该文件存储所有城市节点坐标数据 
+     * @throws IOException 
+     */  
+    private void init(String filename) throws IOException {  
+        // 读取数据  
+        int[] x;  
+        int[] y;  
+        String strbuff;  
+        BufferedReader data = new BufferedReader(new InputStreamReader(  
+                new FileInputStream(filename)));  
+        distance = new int[cityNum][cityNum];  
+        x = new int[cityNum];  
+        y = new int[cityNum];  
+        for (int i = 0; i &lt; cityNum; i++) {  
+            // 读取一行数据，数据格式1 6734 1453  
+            strbuff = data.readLine();  
+            // 字符分割  
+            String[] strcol = strbuff.split(&quot; &quot;);  
+            x[i] = Integer.valueOf(strcol[1]);// x坐标  
+            y[i] = Integer.valueOf(strcol[2]);// y坐标  
+        }  
+        // 计算距离矩阵  
+        // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628  
+        for (int i = 0; i &lt; cityNum - 1; i++) {  
+            distance[i][i] = 0; // 对角线为0  
+            for (int j = i + 1; j &lt; cityNum; j++) {  
+                double rij = Math  
+                        .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])  
+                                * (y[i] - y[j])) / 10.0);  
+                // 四舍五入，取整  
+                int tij = (int) Math.round(rij);  
+                if (tij &lt; rij) {  
+                    distance[i][j] = tij + 1;  
+                    distance[j][i] = distance[i][j];  
+                } else {  
+                    distance[i][j] = tij;  
+                    distance[j][i] = distance[i][j];  
+                }  
+            }  
+        }  
+        distance[cityNum - 1][cityNum - 1] = 0;  
+
+        bestLength = Integer.MAX_VALUE;  
+        bestTour = new int[cityNum + 1];  
+        bestT = 0;  
+        t = 0;  
+
+        newPopulation = new int[scale][cityNum];  
+        oldPopulation = new int[scale][cityNum];  
+        fitness = new int[scale];  
+        Pi = new float[scale];  
+
+        random = new Random(System.currentTimeMillis());  
+        /* 
+         * for(int i=0;i&lt;cityNum;i++) { for(int j=0;j&lt;cityNum;j++) { 
+         * System.out.print(distance[i][j]+&quot;,&quot;); } System.out.println(); } 
+         */  
+        // 初始化种群  
+
+    }  
+
+    // 初始化种群  
+    void initGroup() {  
+        int i, j, k;  
+        // Random random = new Random(System.currentTimeMillis());  
+        for (k = 0; k &lt; scale; k++)// 种群数  
+        {  
+            oldPopulation[k][0] = random.nextInt(65535) % cityNum;  
+            for (i = 1; i &lt; cityNum;)// 染色体长度  
+            {  
+                oldPopulation[k][i] = random.nextInt(65535) % cityNum;  
+                for (j = 0; j &lt; i; j++) {  
+                    if (oldPopulation[k][i] == oldPopulation[k][j]) {  
+                        break;  
+                    }  
+                }  
+                if (j == i) {  
+                    i++;  
+                }  
+            }  
+        }  
+
+        /* 
+         * for(i=0;i&lt;scale;i++) { for(j=0;j&lt;cityNum;j++) { 
+         * System.out.print(oldPopulation[i][j]+&quot;,&quot;); } System.out.println(); } 
+         */  
+    }  
+
+    public int evaluate(int[] chromosome) {  
+        // 0123  
+        int len = 0;  
+        // 染色体，起始城市,城市1,城市2...城市n  
+        for (int i = 1; i &lt; cityNum; i++) {  
+            len += distance[chromosome[i - 1]][chromosome[i]];  
+        }  
+        // 城市n,起始城市  
+        len += distance[chromosome[cityNum - 1]][chromosome[0]];  
+        return len;  
+    }  
+
+    // 计算种群中各个个体的累积概率，前提是已经计算出各个个体的适应度fitness[max]，作为赌轮选择策略一部分，Pi[max]  
+    void countRate() {  
+        int k;  
+        double sumFitness = 0;// 适应度总和  
+
+        double[] tempf = new double[scale];  
+
+        for (k = 0; k &lt; scale; k++) {  
+            tempf[k] = 10.0 / fitness[k];  
+            sumFitness += tempf[k];  
+        }  
+
+        Pi[0] = (float) (tempf[0] / sumFitness);  
+        for (k = 1; k &lt; scale; k++) {  
+            Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);  
+        }  
+
+        /* 
+         * for(k=0;k&lt;scale;k++) { System.out.println(fitness[k]+&quot; &quot;+Pi[k]); } 
+         */  
+    }  
+
+    // 挑选某代种群中适应度最高的个体，直接复制到子代中  
+    // 前提是已经计算出各个个体的适应度Fitness[max]  
+    public void selectBestGh() {  
+        int k, i, maxid;  
+        int maxevaluation;  
+
+        maxid = 0;  
+        maxevaluation = fitness[0];  
+        for (k = 1; k &lt; scale; k++) {  
+            if (maxevaluation &gt; fitness[k]) {  
+                maxevaluation = fitness[k];  
+                maxid = k;  
+            }  
+        }  
+
+        if (bestLength &gt; maxevaluation) {  
+            bestLength = maxevaluation;  
+            bestT = t;// 最好的染色体出现的代数;  
+            for (i = 0; i &lt; cityNum; i++) {  
+                bestTour[i] = oldPopulation[maxid][i];  
+            }  
+        }  
+
+        // System.out.println(&quot;代数 &quot; + t + &quot; &quot; + maxevaluation);  
+        // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
+        copyGh(0, maxid);// 将当代种群中适应度最高的染色体k复制到新种群中，排在第一位0  
+    }  
+
+    // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
+    public void copyGh(int k, int kk) {  
+        int i;  
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k][i] = oldPopulation[kk][i];  
+        }  
+    }  
+
+    // 赌轮选择策略挑选  
+    public void select() {  
+        int k, i, selectId;  
+        float ran1;  
+        // Random random = new Random(System.currentTimeMillis());  
+        for (k = 1; k &lt; scale; k++) {  
+            ran1 = (float) (random.nextInt(65535) % 1000 / 1000.0);  
+            // System.out.println(&quot;概率&quot;+ran1);  
+            // 产生方式  
+            for (i = 0; i &lt; scale; i++) {  
+                if (ran1 &lt;= Pi[i]) {  
+                    break;  
+                }  
+            }  
+            selectId = i;  
+            // System.out.println(&quot;选中&quot; + selectId);  
+            copyGh(k, selectId);  
+        }  
+    }  
+
+    //进化函数，正常交叉变异  
+    public void evolution() {  
+        int k;  
+        // 挑选某代种群中适应度最高的个体  
+        selectBestGh();  
+
+        // 赌轮选择策略挑选scale-1个下一代个体  
+        select();  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        float r;  
+
+        // 交叉方法  
+        for (k = 0; k &lt; scale; k = k + 2) {  
+            r = random.nextFloat();// /产生概率  
+            // System.out.println(&quot;交叉率...&quot; + r);  
+            if (r &lt; Pc) {  
+                // System.out.println(k + &quot;与&quot; + k + 1 + &quot;进行交叉...&quot;);  
+                //OXCross(k, k + 1);// 进行交叉  
+                OXCross1(k, k + 1);  
+            } else {  
+                r = random.nextFloat();// /产生概率  
+                // System.out.println(&quot;变异率1...&quot; + r);  
+                // 变异  
+                if (r &lt; Pm) {  
+                    // System.out.println(k + &quot;变异...&quot;);  
+                    OnCVariation(k);  
+                }  
+                r = random.nextFloat();// /产生概率  
+                // System.out.println(&quot;变异率2...&quot; + r);  
+                // 变异  
+                if (r &lt; Pm) {  
+                    // System.out.println(k + 1 + &quot;变异...&quot;);  
+                    OnCVariation(k + 1);  
+                }  
+            }  
+
+        }  
+    }  
+
+    //进化函数，保留最好染色体不进行交叉变异  
+    public void evolution1() {  
+        int k;  
+        // 挑选某代种群中适应度最高的个体  
+        selectBestGh();  
+
+        // 赌轮选择策略挑选scale-1个下一代个体  
+        select();  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        float r;  
+
+        for (k = 1; k + 1 &lt; scale / 2; k = k + 2) {  
+            r = random.nextFloat();// /产生概率  
+            if (r &lt; Pc) {  
+                OXCross1(k, k + 1);// 进行交叉  
+                //OXCross(k,k+1);//进行交叉  
+            } else {  
+                r = random.nextFloat();// /产生概率  
+                // 变异  
+                if (r &lt; Pm) {  
+                    OnCVariation(k);  
+                }  
+                r = random.nextFloat();// /产生概率  
+                // 变异  
+                if (r &lt; Pm) {  
+                    OnCVariation(k + 1);  
+                }  
+            }  
+        }  
+        if (k == scale / 2 - 1)// 剩最后一个染色体没有交叉L-1  
+        {  
+            r = random.nextFloat();// /产生概率  
+            if (r &lt; Pm) {  
+                OnCVariation(k);  
+            }  
+        }  
+
+    }  
+
+    // 类OX交叉算子  
+    void OXCross(int k1, int k2) {  
+        int i, j, k, flag;  
+        int ran1, ran2, temp;  
+        int[] Gh1 = new int[cityNum];  
+        int[] Gh2 = new int[cityNum];  
+        // Random random = new Random(System.currentTimeMillis());  
+
+        ran1 = random.nextInt(65535) % cityNum;  
+        ran2 = random.nextInt(65535) % cityNum;  
+        // System.out.println();  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+
+        while (ran1 == ran2) {  
+            ran2 = random.nextInt(65535) % cityNum;  
+        }  
+
+        if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
+        {  
+            temp = ran1;  
+            ran1 = ran2;  
+            ran2 = temp;  
+        }  
+        // System.out.println();  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+        // System.out.println(&quot;-----------------------&quot;);  
+        // System.out.println();  
+        flag = ran2 - ran1 + 1;// 删除重复基因前染色体长度  
+        for (i = 0, j = ran1; i &lt; flag; i++, j++) {  
+            Gh1[i] = newPopulation[k2][j];  
+            Gh2[i] = newPopulation[k1][j];  
+        }  
+        // 已近赋值i=ran2-ran1个基因  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh1[j] = newPopulation[k1][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh1[i] == Gh1[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh2[j] = newPopulation[k2][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh2[i] == Gh2[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+            newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+        }  
+
+        // System.out.println(&quot;进行交叉--------------------------&quot;);  
+        // System.out.println(k1+&quot;交叉后...&quot;);  
+        // for (i = 0; i &lt; cityNum; i++) {  
+        // System.out.print(newPopulation[k1][i] + &quot;-&quot;);  
+        // }  
+        // System.out.println();  
+        // System.out.println(k2+&quot;交叉后...&quot;);  
+        // for (i = 0; i &lt; cityNum; i++) {  
+        // System.out.print(newPopulation[k2][i] + &quot;-&quot;);  
+        // }  
+        // System.out.println();  
+        // System.out.println(&quot;交叉完毕--------------------------&quot;);  
+    }  
+
+    // 交叉算子,相同染色体交叉产生不同子代染色体  
+    public void OXCross1(int k1, int k2) {  
+        int i, j, k, flag;  
+        int ran1, ran2, temp;  
+        int[] Gh1 = new int[cityNum];  
+        int[] Gh2 = new int[cityNum];  
+        // Random random = new Random(System.currentTimeMillis());  
+
+        ran1 = random.nextInt(65535) % cityNum;  
+        ran2 = random.nextInt(65535) % cityNum;  
+        while (ran1 == ran2) {  
+            ran2 = random.nextInt(65535) % cityNum;  
+        }  
+
+        if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
+        {  
+            temp = ran1;  
+            ran1 = ran2;  
+            ran2 = temp;  
+        }  
+
+        // 将染色体1中的第三部分移到染色体2的首部  
+        for (i = 0, j = ran2; j &lt; cityNum; i++, j++) {  
+            Gh2[i] = newPopulation[k1][j];  
+        }  
+
+        flag = i;// 染色体2原基因开始位置  
+
+        for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
+        {  
+            Gh2[j] = newPopulation[k2][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (Gh2[i] == Gh2[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        flag = ran1;  
+        for (k = 0, j = 0; k &lt; cityNum;)// 染色体长度  
+        {  
+            Gh1[j] = newPopulation[k1][k++];  
+            for (i = 0; i &lt; flag; i++) {  
+                if (newPopulation[k2][i] == Gh1[j]) {  
+                    break;  
+                }  
+            }  
+            if (i == flag) {  
+                j++;  
+            }  
+        }  
+
+        flag = cityNum - ran1;  
+
+        for (i = 0, j = flag; j &lt; cityNum; j++, i++) {  
+            Gh1[j] = newPopulation[k2][i];  
+        }  
+
+        for (i = 0; i &lt; cityNum; i++) {  
+            newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+            newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+        }  
+    }  
+
+    // 多次对换变异算子  
+    public void OnCVariation(int k) {  
+        int ran1, ran2, temp;  
+        int count;// 对换次数  
+
+        // Random random = new Random(System.currentTimeMillis());  
+        count = random.nextInt(65535) % cityNum;  
+
+        for (int i = 0; i &lt; count; i++) {  
+
+            ran1 = random.nextInt(65535) % cityNum;  
+            ran2 = random.nextInt(65535) % cityNum;  
+            while (ran1 == ran2) {  
+                ran2 = random.nextInt(65535) % cityNum;  
+            }  
+            temp = newPopulation[k][ran1];  
+            newPopulation[k][ran1] = newPopulation[k][ran2];  
+            newPopulation[k][ran2] = temp;  
+        }  
+
+        /* 
+         * for(i=0;i&lt;L;i++) { printf(&quot;%d &quot;,newGroup[k][i]); } printf(&quot;\n&quot;); 
+         */  
+    }  
+
+    public void solve() {  
+        int i;  
+        int k;  
+
+        // 初始化种群  
+        initGroup();  
+        // 计算初始化种群适应度，Fitness[max]  
+        for (k = 0; k &lt; scale; k++) {  
+            fitness[k] = evaluate(oldPopulation[k]);  
+            // System.out.println(fitness[k]);  
+        }  
+        // 计算初始化种群中各个个体的累积概率，Pi[max]  
+        countRate();  
+        System.out.println(&quot;初始种群...&quot;);  
+        for (k = 0; k &lt; scale; k++) {  
+            for (i = 0; i &lt; cityNum; i++) {  
+                System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+            }  
+            System.out.println();  
+            System.out.println(&quot;----&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+        }  
+
+        for (t = 0; t &lt; MAX_GEN; t++) {  
+            //evolution1();  
+            evolution();  
+            // 将新种群newGroup复制到旧种群oldGroup中，准备下一代进化  
+            for (k = 0; k &lt; scale; k++) {  
+                for (i = 0; i &lt; cityNum; i++) {  
+                    oldPopulation[k][i] = newPopulation[k][i];  
+                }  
+            }  
+            // 计算种群适应度  
+            for (k = 0; k &lt; scale; k++) {  
+                fitness[k] = evaluate(oldPopulation[k]);  
+            }  
+            // 计算种群中各个个体的累积概率  
+            countRate();  
+        }  
+
+        System.out.println(&quot;最后种群...&quot;);  
+        for (k = 0; k &lt; scale; k++) {  
+            for (i = 0; i &lt; cityNum; i++) {  
+                System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+            }  
+            System.out.println();  
+            System.out.println(&quot;---&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+        }  
+
+        System.out.println(&quot;最佳长度出现代数：&quot;);  
+        System.out.println(bestT);  
+        System.out.println(&quot;最佳长度&quot;);  
+        System.out.println(bestLength);  
+        System.out.println(&quot;最佳路径：&quot;);  
+        for (i = 0; i &lt; cityNum; i++) {  
+            System.out.print(bestTour[i] + &quot;,&quot;);  
+        }  
+
+    }  
+
+
+    /** 
+     * @param args 
+     * @throws IOException 
+     */  
+    public static void main(String[] args) throws IOException {  
+        System.out.println(&quot;Start....&quot;);  
+        GA ga = new GA(30, 48, 1000, 0.8f, 0.9f);  
+        ga.init(&quot;c://data.txt&quot;);  
+        ga.solve();  
+    }  
+
+}
+</code></pre><p>参考：<a href="https://blog.csdn.net/tyhj_sf/article/details/53321527" target="_blank" rel="noopener">https://blog.csdn.net/tyhj_sf/article/details/53321527</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/22/算法-贪心算法/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -2597,800 +3765,11 @@ public class RBTreeTest {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/16/算法-深度广度优先/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/16/算法-深度广度优先/" itemprop="url">深度优先广度优先</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:12:33+08:00">
-                2018-12-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h2><p>深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：</p>
-<ol>
-<li><p>首先将A节点压入栈中，stack（A）;</p>
-</li>
-<li><p>将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；</p>
-</li>
-<li><p>将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；</p>
-</li>
-<li><p>将D节点弹出，没有子节点压入,此时E在栈的顶部，stack（E，C）；</p>
-</li>
-<li><p>将E节点弹出，同时将E的子节点I压入，stack（I,C）；</p>
-</li>
-</ol>
-<p>…依次往下，最终遍历完成</p>
-<pre><code>public void depthFirst() {
-
-    Stack&lt;Map&lt;String, Object&gt;&gt; nodeStack = new Stack&lt;Map&lt;String, Object&gt;&gt;();
-
-    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
-
-    nodeStack.add(node);
-
-    while (!nodeStack.isEmpty()) {
-
-        node = nodeStack.pop();
-
-        System.out.println(node);
-
-        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
-
-        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
-
-        if (children != null &amp;&amp; !children.isEmpty()) {
-
-            for (Map child : children) {
-
-                nodeStack.push(child);
-
-            }
-
-        }
-
-    }
-
-}
-</code></pre><h2 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h2><p> 广度优先遍历各个节点，需要使用到队列（Queue）这种数据结构，queue的特点是先进先出，其实也可以使用双端队列，区别就是双端队列首尾都可以插入和弹出节点。整个遍历过程如下：</p>
-<ol>
-<li><p>首先将A节点插入队列中，queue（A）;</p>
-</li>
-<li><p>将A节点弹出，同时将A的子节点B，C插入队列中，此时B在队列首，C在队列尾部，queue（B，C）；</p>
-</li>
-<li><p>将B节点弹出，同时将B的子节点D，E插入队列中，此时C在队列首，E在队列尾部，queue（C，D，E）;</p>
-</li>
-<li><p>将C节点弹出，同时将C的子节点F，G，H插入队列中，此时D在队列首，H在队列尾部，queue（D，E，F，G，H）；</p>
-</li>
-<li><p>将D节点弹出，D没有子节点，此时E在队列首，H在队列尾部，queue（E，F，G，H）；</p>
-</li>
-</ol>
-<p>…依次往下，最终遍历完成</p>
-<pre><code>public void breadthFirst() {
-
-    Deque&lt;Map&lt;String, Object&gt;&gt; nodeDeque = new ArrayDeque&lt;Map&lt;String, Object&gt;&gt;();
-
-    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
-
-    nodeDeque.add(node);
-
-    while (!nodeDeque.isEmpty()) {
-
-        node = nodeDeque.peekFirst();
-
-        System.out.println(node);
-
-        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
-
-        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
-
-        if (children != null &amp;&amp; !children.isEmpty()) {
-
-            for (Map child : children) {
-
-                nodeDeque.add(child);
-
-            }
-
-        }
-
-    }
-
-}
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/16/数据结构-234树/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/16/数据结构-234树/" itemprop="url">234树</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T21:57:12+08:00">
-                2018-12-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>平衡树，子节点数目可以达到4个</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ol>
-<li><p>若父节点中存有1个数据项，则必有2个子节点。</p>
-</li>
-<li><p>若父节点中存有2个数据项，则必有3个子节点。</p>
-</li>
-<li><p>若父节点中存有3个数据项，则必有4个子节点。</p>
-</li>
-</ol>
-<h2 id="构造"><a href="#构造" class="headerlink" title="构造"></a>构造</h2><p>插入数据：</p>
-<ul>
-<li><p>未满节点直接插入</p>
-</li>
-<li><p>满节点 ABC 分裂 A不变 B到父节点 C到右侧</p>
-</li>
-</ul>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>class Node
-{
-private static final int ORDER = 4;
-private int numItems;//节点中实际存储的数据项数目，其值一定不大于3
-private Node parent;
-private Node childArray[] = new Node[ORDER];//子节点数组
-private DataItem itemArray[] = new DataItem[ORDER-1];//存储数据项数组
-//-------------------------------------------------------------
-// 把参数中的节点作为子节点，与当前节点进行连接
-public void connectChild(int childNum, Node child)
-   {
-   childArray[childNum] = child;
-   if(child != null)
-      child.parent = this;//当前节点作为父节点
-   }
-//-------------------------------------------------------------
-// 断开参数确定的节点与当前节点的连接，这个节点一定是当前节点的子节点。
-public Node disconnectChild(int childNum)
-   {
-   Node tempNode = childArray[childNum];
-   childArray[childNum] = null; //断开连接
-   return tempNode;//返回要这个子节点
-   }
-//-------------------------------------------------------------
-public Node getChild(int childNum)//获取相应的子节点
-   { return childArray[childNum]; }
-//-------------------------------------------------------------
-public Node getParent()//获取父节点
-   { return parent; }
-//-------------------------------------------------------------
-public boolean isLeaf()//是否是叶结点
-   { return (childArray[0]==null) ? true : false; }//叶结点没有子节点
-//-------------------------------------------------------------
-public int getNumItems()//获取实际存储的数据项数目
-  { return numItems; }
-//-------------------------------------------------------------
-public DataItem getItem(int index)   // 获取具体的数据项
-   { return itemArray[index]; }
-//-------------------------------------------------------------
-public boolean isFull()//该节点是否已满
-   { return (numItems==ORDER-1) ? true : false; }
-//-------------------------------------------------------------
-public int findItem(long key)       // 查找
-   {                                    
-   for(int j=0; j&lt;ORDER-1; j++)         // 遍历数组
-      {                                 
-      if(itemArray[j] == null)          // 数组未满，未找到
-         break;
-      else if(itemArray[j].dData == key)
-         return j;
-      }
-   return -1;
-   }  // end findItem
-//-------------------------------------------------------------
-public int insertItem(DataItem newItem)//节点未满的插入
-   {
-   numItems++;                          
-   long newKey = newItem.dData;         // 获得关键字
-
-   for(int j=ORDER-2; j&gt;=0; j--)        // 因为节点未满，所以从倒数第二项向前查找
-      {                              
-      if(itemArray[j] == null)          // 没存数据
-         continue;                      
-      else                              
-         {                              
-         long itsKey = itemArray[j].dData;//获得关键字
-         if(newKey &lt; itsKey)            //插入位置在其前面，但未必相邻
-            itemArray[j+1] = itemArray[j]; //当前数据项后移
-         else
-            {
-            itemArray[j+1] = newItem;   // 在其后位置插入
-            return j+1;                 // 返回插入的位置下标
-            }                           //    new item
-         }  // end else (not null)
-      }  // end for                     // shifted all items,
-   //若上述代码没有执行返回操作，那么这是空节点（只有初始时根是这个情况）
-   itemArray[0] = newItem;              // insert new item
-   return 0;
-   }  // end insertItem()
-//-------------------------------------------------------------
-public DataItem removeItem()        // 移除数据项，从后向前移除
-   {
-   // 假设节点非空
-   DataItem temp = itemArray[numItems-1];  // 要移除的数据项
-   itemArray[numItems-1] = null;           // 移除
-   numItems--;                             // 数据项数目减一
-   return temp;                            // 返回要移除的数据项
-   }
-//-------------------------------------------------------------
-public void displayNode()           // format &quot;/24/56/74/&quot;
-   {
-   for(int j=0; j&lt;numItems; j++)
-      itemArray[j].displayItem();   // &quot;/56&quot;
-   System.out.println(&quot;/&quot;);         // final &quot;/&quot;
-   }
-//-------------------------------------------------------------
-}  // end class Node
-////////////////////////////////////////////////////////////////
-
-
-class Tree234
-{
-private Node root = new Node();            // 创建树的根
-//-------------------------------------------------------------
-//获取查找的下一个节点
-public Node getNextChild(Node theNode, long theValue)
-{
-int j;
-// 假设这个节点不是叶结点
-int numItems = theNode.getNumItems();//获得当前节点的数据项数目
-for(j=0; j&lt;numItems; j++)          
-   {                             
-   if( theValue &lt; theNode.getItem(j).dData )
-      return theNode.getChild(j);  // 返回相应的节点
-   }  // end for                   
-return theNode.getChild(j);        // 此时j=numItems
-}
-//-------------------------------------------------------------
-public int find(long key)
-   {
-   Node curNode = root;
-   int childNumber;
-   while(true)
-      {
-      if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行
-         return childNumber;               // found it
-      else if( curNode.isLeaf() )//叶结点上也没找到
-         return -1;                        // can&apos;t find it
-      else                                 // 不是叶结点，则继续向下查找
-         curNode = getNextChild(curNode, key);
-      }  // end while
-   }
-//-------------------------------------------------------------
-// 插入数据项
-public void insert(long dValue)
-   {
-   Node curNode = root;//当前节点标志
-   DataItem tempItem = new DataItem(dValue);//插入数据项封装
-
-   while(true)
-      {
-      if( curNode.isFull() )               // 是满节点
-         {
-         split(curNode);                   // 分裂
-         curNode = curNode.getParent();    // 回到分裂出的父节点上
-                                           // 继续向下查找
-         curNode = getNextChild(curNode, dValue);
-         }  // end if(node is full)
-//后面的操作中节点都未满，否则先执行上面的代码
-      else if( curNode.isLeaf() )          // 是叶结点，非满
-         break;                            // 跳出，直接插入
-
-      else
-         curNode = getNextChild(curNode, dValue);//向下查找
-      }  // end while
-
-   curNode.insertItem(tempItem);       // 此时节点一定不满，直接插入数据项，
-   }  // end insert()
-//-------------------------------------------------------------
-public void split(Node thisNode)     // 分裂
-   {
-   // 操作中节点一定是满节点，否则不会执行该操作
-   DataItem itemB, itemC;
-   Node parent, child2, child3;
-   int itemIndex;
-
-   itemC = thisNode.removeItem();    // 移除最右边的两个数据项，并保存为B和C
-   itemB = thisNode.removeItem();    // 
-   child2 = thisNode.disconnectChild(2); // //断开最右边两个子节点的链接
-   child3 = thisNode.disconnectChild(3); // 
-
-   Node newRight = new Node();       //新建一个节点，作为当前节点的兄弟节点
-
-   if(thisNode==root)                // 是根
-      {
-      root = new Node();                // 新建一个根
-      parent = root;                    // 把新根设为父节点
-      root.connectChild(0, thisNode);   // 连接父节点和子节点
-      }
-   else                              // 不是根
-      parent = thisNode.getParent();    // 获取父节点
-
-
-   itemIndex = parent.insertItem(itemB); // 把B插入父节点中，返回插入位置
-   int n = parent.getNumItems();         // 获得总数据项数目
-
-   for(int j=n-1; j&gt;itemIndex; j--)          //从后向前移除
-      {                                    
-      Node temp = parent.disconnectChild(j); // 断开连接
-      parent.connectChild(j+1, temp);        // 连接到新的位置
-      }
-
-   parent.connectChild(itemIndex+1, newRight);//连接到新位置
-
-   // 处理兄弟节点
-   newRight.insertItem(itemC);       // 将C放入兄弟节点中
-   newRight.connectChild(0, child2); // 把子节点中最右边的两个连接到兄弟节点上
-   newRight.connectChild(1, child3); //
-   }  // end split()
-//-------------------------------------------------------------
-// gets appropriate child of node during search for value
-
-public void displayTree()
-   {
-   recDisplayTree(root, 0, 0);
-   }
-//-------------------------------------------------------------
-private void recDisplayTree(Node thisNode, int level,
-                                           int childNumber)
-   {
-   System.out.print(&quot;level=&quot;+level+&quot; child=&quot;+childNumber+&quot; &quot;);
-   thisNode.displayNode();               // display this node
-
-   // call ourselves for each child of this node
-   int numItems = thisNode.getNumItems();
-   for(int j=0; j&lt;numItems+1; j++)
-      {
-      Node nextNode = thisNode.getChild(j);
-      if(nextNode != null)
-         recDisplayTree(nextNode, level+1, j);
-      else
-         return;
-      }
-   }  // end recDisplayTree()
-//-------------------------------------------------------------\
-}  // end class Tree234
-////////////////////////////////////////////////////////////////
-
-
-import java.io.*;
-
-class Tree234App
-{
-public static void main(String[] args) throws IOException
-   {
-   long value;
-   Tree234 theTree = new Tree234();
-
-   theTree.insert(50);
-   theTree.insert(40);
-   theTree.insert(60);
-   theTree.insert(30);
-   theTree.insert(70);
-
-   while(true)
-      {
-      System.out.print(&quot;Enter first letter of &quot;);
-      System.out.print(&quot;show, insert, or find: &quot;);
-      char choice = getChar();
-      switch(choice)
-         {
-         case &apos;s&apos;:
-            theTree.displayTree();
-            break;
-         case &apos;i&apos;:
-            System.out.print(&quot;Enter value to insert: &quot;);
-            value = getInt();
-            theTree.insert(value);
-            break;
-         case &apos;f&apos;:
-            System.out.print(&quot;Enter value to find: &quot;);
-            value = getInt();
-            int found = theTree.find(value);
-            if(found != -1)
-               System.out.println(&quot;Found &quot;+value);
-            else
-               System.out.println(&quot;Could not find &quot;+value);
-            break;
-         default:
-            System.out.print(&quot;Invalid entry\n&quot;);
-         }  // end switch
-      }  // end while
-   }  // end main()
-//--------------------------------------------------------------
-public static String getString() throws IOException
-   {
-   InputStreamReader isr = new InputStreamReader(System.in);
-   BufferedReader br = new BufferedReader(isr);
-   String s = br.readLine();
-   return s;
-   }
-//--------------------------------------------------------------
-public static char getChar() throws IOException
-   {
-   String s = getString();
-   return s.charAt(0);
-   }
-
-//-------------------------------------------------------------
-public static int getInt() throws IOException
-   {
-   String s = getString();
-   return Integer.parseInt(s);
-   }
-//-------------------------------------------------------------
-}  // end class Tree234App
-////////////////////////////////////////////////////////////////
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2018/12/13/机器学习-中文分词/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/13/机器学习-中文分词/" itemprop="url">中文分词</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T10:38:02+08:00">
-                2018-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
-<li>基于字典、词库匹配</li>
-<li>基于词频度统计</li>
-<li>基于知识理解</li>
-</ul>
-<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
-<ol>
-<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
-<li>机械分词法</li>
-</ol>
-<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
-<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
-<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
-<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
-<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
-<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
-<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
-<p>问题：</p>
-<ol>
-<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
-</li>
-<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
-</li>
-</ol>
-<p>解决方案：</p>
-<p>基于词的频度统计的分词方法：</p>
-<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
-<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
-<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -3436,7 +3815,7 @@ public static int getInt() throws IOException
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">90</span>
+                  <span class="site-state-item-count">93</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
