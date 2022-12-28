@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。 相关术语节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点 树的度 : 树中的节点的度最大值为树的度 节点的层次 : 根为第一层，往下依次递增 树的深度 : 节点层次最大值为树的深度 森林 : n棵不相交的树的集合为森林 二叉树常用于实现二叉查找树、二叉堆  每个节点至多有两颗">
+<meta property="og:type" content="article">
+<meta property="og:title" content="树">
+<meta property="og:url" content="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A0%91/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。 相关术语节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点 树的度 : 树中的节点的度最大值为树的度 节点的层次 : 根为第一层，往下依次递增 树的深度 : 节点层次最大值为树的深度 森林 : n棵不相交的树的集合为森林 二叉树常用于实现二叉查找树、二叉堆  每个节点至多有两颗">
+<meta property="og:locale">
+<meta property="og:image" content="http://thyrsi.com/t6/626/1544146169x2890211738.jpg">
+<meta property="og:image" content="http://thyrsi.com/t6/626/1544146212x2890211738.jpg">
+<meta property="article:published_time" content="2022-12-27T09:31:26.976Z">
+<meta property="article:modified_time" content="2022-12-28T02:12:58.234Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Tech;Data;Vision">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://thyrsi.com/t6/626/1544146169x2890211738.jpg">
+
+<link rel="canonical" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A0%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>树 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          树
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 10:12:58" itemprop="dateModified" datetime="2022-12-28T10:12:58+08:00">2022-12-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。</p>
+<h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><p>节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点</p>
+<p>树的度 : 树中的节点的度最大值为树的度</p>
+<p>节点的层次 : 根为第一层，往下依次递增</p>
+<p>树的深度 : 节点层次最大值为树的深度</p>
+<p>森林 : n棵不相交的树的集合为森林</p>
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>常用于实现二叉查找树、二叉堆</p>
+<ul>
+<li><p>每个节点至多有两颗子树（树的度&lt;=2）,子树分左右</p>
+</li>
+<li><p>第i层至多有2i-1个节点，深度为k的二叉树，最多节点数2^k-1个节点（具有最多节点的称作满二叉树），其中每个节点都与深度k满二叉树中1-n节点对应，则为完全二叉树</p>
+</li>
+</ul>
+<p><img src="http://thyrsi.com/t6/626/1544146169x2890211738.jpg" alt="满二叉树"></p>
+<p><img src="http://thyrsi.com/t6/626/1544146212x2890211738.jpg" alt="完全二叉树"></p>
+<h2 id="二叉排序树"><a href="#二叉排序树" class="headerlink" title="二叉排序树"></a>二叉排序树</h2><ul>
+<li>左子树所有节点值小于根节点，右子树所有节点值大于根节点值</li>
+<li>左右子树都是二叉排序树</li>
+</ul>
+<h2 id="二叉平衡树-AVL"><a href="#二叉平衡树-AVL" class="headerlink" title="二叉平衡树 AVL"></a>二叉平衡树 AVL</h2><ul>
+<li>左右子树深度差不超过1</li>
+<li>左右子树都是二叉平衡树</li>
+</ul>
+<h2 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h2><p>最优二叉树</p>
+<p><a href="#hafman">代码实现</a></p>
+<h3 id="哈夫曼编码"><a href="#哈夫曼编码" class="headerlink" title="哈夫曼编码"></a>哈夫曼编码</h3><p>解决报文编码的问题，将字符串转换为唯一的二进制码，且二进制码的长度最小</p>
+<p>每个字符在字符串中出现频率为W，其编码长度为L，编码字符n个，则编码后二进制码的总长度为W1L1+W2L2+…+WnLn，利用哈夫曼树特性求总长最小编码</p>
+<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>平衡的多路查找树</p>
+<p>B树的阶：所有孩子节点树的最大值（m叉树：每个节点最多m棵子树）</p>
+<p>分支节点最少有两颗子树</p>
+<p>分支节点包含信息（n，A0，K1，A1，K2，A2，…，Kn，An），其中，n为结点中的关键字树，A为指向子树根结点的指针，K为关键字，且Ai-1所指子树中所有结点的关键字均小于Ki，An所指子树中所有结点的关键字均大于Kn；</p>
+<p>所有的叶子结点都出现在同一层次上，并且不带信息（可以看作是外部结点或查找失败的结点，实际上这些结点不存在，指向这些结点的指针为空</p>
+<h2 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h2><p>B+树是应文件系统所需而出的一种B-树的变型树。一棵m阶B+树和m阶的B-树的差异在于</p>
+<ol>
+<li><p>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点；</p>
+</li>
+<li><p>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</p>
+</li>
+</ol>
+<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><p>红黑树，一种二叉查找树，但在每个结点上增加一个存储位表示结点的颜色，可以是Red或Black。通过对任何一条从根到叶子的简单路径上各个结点的颜色进行约束，红黑树确保没有一条路径会比其他路径长出2倍，因而是近似于平衡的。树中每个结点包含5个属性：color、key、left、right和p。如果一个结点没有子节点或父节点，则该结点相应的指针属性值为NIL，我们可以把这些NIL视为指向二叉搜索树的叶节点（外部结点）的指针，而把带关键字的结点视为树的内部结点。</p>
+<h3 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h3><ol>
+<li>每个结点或是红色的，或是黑色的</li>
+<li>根结点是黑色的</li>
+<li>每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的</li>
+<li>如果一个结点是红色的，则它的两个子结点都是黑色的</li>
+<li>对每个结点，从该结点到其所有后代叶结点的简单路径上，均包含相同数目的黑色结点</li>
+<li>虽然本质上是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)</li>
+</ol>
+<h2 id="键树"><a href="#键树" class="headerlink" title="键树"></a>键树</h2><p>如果一个关键字可以表示成字符的序号，即字符串，那么可以用键树（keyword tree），又称数字搜索树或字符树，来表示这样的字符串的集合。键树的结构受启发于一部大型字典的“书边标目”。字典中标出首字母是 A，B，C，…，Z的单词所在页，再对各部分标出第二字母为A，B，C，…，Z的单词所在的页等等。<br>键树是一种特殊的查找树，它是一棵度大于等于2的树，树中的每个节点不是包含一个或几个关键字，而是只含有组成关键字的符号。<br>比如：如果关键字是数值，则节点中只包含一个数位；如果关键字是单词，则节点中只包含一个字母字符。根结点不代表任何字符，根以下第一层的结点对应于字符串的第一个字符，第二层的结点对应于字符串的第二个字符……每个字符串可由一个特殊的字符如“$”等作为字符串的结束符，用一个叶子结点来表示该特殊字符。把从根到叶子的路径上，所有结点（除根以外）对应的字符连接起来，就得到一个字符串。因此，每个叶子结点对应一个关键字。在叶子结点还可以包含一个指针，指向该关键字所对应的元素。整个字符串集合中的字符串的数目等于叶子结点的数目。如果一个集合中的关键字都具有这样的字符串特性，那么，该关键字集合就可采用这样一棵键树来表示。 </p>
+<p>键树的存储通常有两种方式： </p>
+<ol>
+<li>用树的孩子兄弟链来表示键树，称为双链树；每个Node有三个域：symbol域：存储关键字的一个字符；son域：存储指向第一棵子树的根的指针；brother域：存储指向右兄弟的指针。 </li>
+<li>用多重链表来表示键树，称为Trie树或字典树。</li>
+</ol>
+<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d=26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质：<br>1) 根节点不包含字符，除根节点外每一个节点都只包含一个字符；<br>2) 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串；<br>3) 每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用：<br>1) 串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。<br>2) “串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。<br>3) 最长公共前缀 </p>
+<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S=S1S2..Si..Sn，和整数i，1 &lt;= i &lt;= n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S=XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
+<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L = b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
+<h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
+<p><span id="hafman">哈夫曼树代码实现</span></p>
+<pre><code>import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+
+public class HuffmanTree &#123;
+
+    public static class Node&lt;E&gt; &#123;
+        E data;
+        double weight;
+        Node leftChild;
+        Node rightChild;
+
+        public Node(E data, double weight) &#123;
+            super();
+            this.data = data;
+            this.weight = weight;
+        &#125;
+
+        public String toString() &#123;
+            return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
+        &#125;
+    &#125;
+
+    public static void main(String[] args) &#123;
+        List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
+
+        nodes.add(new Node(&quot;A&quot;, 40.0));
+        nodes.add(new Node(&quot;B&quot;, 8.0));
+        nodes.add(new Node(&quot;C&quot;, 10.0));
+        nodes.add(new Node(&quot;D&quot;, 30.0));
+        nodes.add(new Node(&quot;E&quot;, 10.0));
+        nodes.add(new Node(&quot;F&quot;, 2.0));
+
+        Node root = HuffmanTree.createTree(nodes);
+
+        System.out.println(breadthFirst(root));
+
+    &#125;
+
+    /**
+     * 构造哈夫曼树
+     * 
+     * @param nodes
+     *            节点集合
+     * @return 构造出来的哈夫曼树的根节点
+     */
+    private static Node createTree(List&lt;Node&gt; nodes) &#123;
+        // 只要nodes数组中还有2个以上的节点
+        while (nodes.size() &gt; 1) &#123;
+            quickSort(nodes);
+            //获取权值最小的两个节点
+            Node left = nodes.get(nodes.size()-1);
+            Node right = nodes.get(nodes.size()-2);
+
+            //生成新节点，新节点的权值为两个子节点的权值之和
+            Node parent = new Node(null, left.weight + right.weight);
+
+            //让新节点作为两个权值最小节点的父节点
+            parent.leftChild = left;
+            parent.rightChild = right;
+
+            //删除权值最小的两个节点
+            nodes.remove(nodes.size()-1);
+            nodes.remove(nodes.size()-1);
+
+            //将新节点加入到集合中
+            nodes.add(parent);
+        &#125;
+
+        return nodes.get(0);
+    &#125;
+
+    /**
+     * 将指定集合中的i和j索引处的元素交换
+     * 
+     * @param nodes
+     * @param i
+     * @param j
+     */
+    private static void swap(List&lt;Node&gt; nodes, int i, int j) &#123;
+        Node tmp;
+        tmp = nodes.get(i);
+        nodes.set(i, nodes.get(j));
+        nodes.set(j, tmp);
+    &#125;
+
+    /**
+     * 实现快速排序算法，用于对节点进行排序
+     * 
+     * @param nodes
+     * @param start
+     * @param end
+     */
+    private static void subSort(List&lt;Node&gt; nodes, int start, int end) &#123;
+        if (start &lt; end) &#123;
+            // 以第一个元素作为分界值
+            Node base = nodes.get(start);
+            // i从左边搜索，搜索大于分界值的元素的索引
+            int i = start;
+            // j从右边开始搜索，搜索小于分界值的元素的索引
+            int j = end + 1;
+            while (true) &#123;
+                // 找到大于分界值的元素的索引，或者i已经到了end处
+                while (i &lt; end &amp;&amp; nodes.get(++i).weight &gt;= base.weight)
+                    ;
+                // 找到小于分界值的元素的索引，或者j已经到了start处
+                while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
+                    ;
+
+                if (i &lt; j) &#123;
+                    swap(nodes, i, j);
+                &#125; else &#123;
+                    break;
+                &#125;
+            &#125;
+
+            swap(nodes, start, j);
+
+            //递归左边子序列
+            subSort(nodes, start, j - 1);
+            //递归右边子序列
+            subSort(nodes, j + 1, end);
+        &#125;
+    &#125;
+
+    public static void quickSort(List&lt;Node&gt; nodes)&#123;
+        subSort(nodes, 0, nodes.size()-1);
+    &#125;
+
+    //广度优先遍历
+    public static List&lt;Node&gt; breadthFirst(Node root)&#123;
+        Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
+        List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
+
+        if(root!=null)&#123;
+            //将根元素加入“队列”
+            queue.offer(root);
+        &#125;
+
+        while(!queue.isEmpty())&#123;
+            //将该队列的“队尾”元素加入到list中
+            list.add(queue.peek());
+            Node p = queue.poll();
+
+            //如果左子节点不为null，将它加入到队列
+            if(p.leftChild != null)&#123;
+                queue.offer(p.leftChild);
+            &#125;
+
+            //如果右子节点不为null，将它加入到队列
+            if(p.rightChild != null)&#123;
+                queue.offer(p.rightChild);
+            &#125;
+        &#125;
+
+        return list;
+    &#125;
+&#125;
+</code></pre>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%9B%BE/" rel="prev" title="数据结构-图">
+      <i class="fa fa-chevron-left"></i> 数据结构-图
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%88%E3%80%81%E9%98%9F%E5%88%97/" rel="next" title="数据结构-栈、队列">
+      数据结构-栈、队列 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%9C%AF%E8%AF%AD"><span class="nav-number">1.</span> <span class="nav-text">相关术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">二叉排序树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E5%B9%B3%E8%A1%A1%E6%A0%91-AVL"><span class="nav-number">4.</span> <span class="nav-text">二叉平衡树 AVL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%A4%AB%E6%9B%BC%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">哈夫曼树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81"><span class="nav-number">5.1.</span> <span class="nav-text">哈夫曼编码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B%E6%A0%91"><span class="nav-number">6.</span> <span class="nav-text">B树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-%E6%A0%91"><span class="nav-number">7.</span> <span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">8.</span> <span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%B4%A8"><span class="nav-number">8.1.</span> <span class="nav-text">性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%AE%E6%A0%91"><span class="nav-number">9.</span> <span class="nav-text">键树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91"><span class="nav-number">10.</span> <span class="nav-text">字典树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BC%80%E6%A0%91"><span class="nav-number">11.</span> <span class="nav-text">后缀树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BA%E9%97%B4%E6%A0%91%E4%B8%8E%E7%BA%BF%E6%AE%B5%E6%A0%91"><span class="nav-number">12.</span> <span class="nav-text">区间树与线段树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%A5%E8%80%85%E6%A0%91%E4%B8%8E%E8%83%9C%E8%80%85%E6%A0%91"><span class="nav-number">13.</span> <span class="nav-text">败者树与胜者树</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

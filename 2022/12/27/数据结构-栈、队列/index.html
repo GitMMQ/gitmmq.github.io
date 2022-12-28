@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="栈先进后出(LIFO, Last In First Out) 静态栈数组 栈大小固定 动态栈链表 栈大小不固定 public class Node &amp;#123;      &#x2F;&#x2F;数据域     public int data;      &#x2F;&#x2F;指针域，指向下一个节点     public Node next;      public Node() &amp;#123;     &amp;#125;      publ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构-栈、队列">
+<meta property="og:url" content="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%88%E3%80%81%E9%98%9F%E5%88%97/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="栈先进后出(LIFO, Last In First Out) 静态栈数组 栈大小固定 动态栈链表 栈大小不固定 public class Node &amp;#123;      &#x2F;&#x2F;数据域     public int data;      &#x2F;&#x2F;指针域，指向下一个节点     public Node next;      public Node() &amp;#123;     &amp;#125;      publ">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-12-27T09:31:26.985Z">
+<meta property="article:modified_time" content="2022-12-28T02:12:58.236Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Tech;Data;Vision">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%88%E3%80%81%E9%98%9F%E5%88%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>数据结构-栈、队列 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%88%E3%80%81%E9%98%9F%E5%88%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构-栈、队列
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 10:12:58" itemprop="dateModified" datetime="2022-12-28T10:12:58+08:00">2022-12-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出(LIFO, Last In First Out)</p>
+<h3 id="静态栈"><a href="#静态栈" class="headerlink" title="静态栈"></a>静态栈</h3><p>数组 栈大小固定</p>
+<h3 id="动态栈"><a href="#动态栈" class="headerlink" title="动态栈"></a>动态栈</h3><p>链表 栈大小不固定</p>
+<pre><code>public class Node &#123;
+
+    //数据域
+    public int data;
+
+    //指针域，指向下一个节点
+    public Node next;
+
+    public Node() &#123;
+    &#125;
+
+    public Node(int data) &#123;
+        this.data = data;
+    &#125;
+
+    public Node(int data, Node next) &#123;
+        this.data = data;
+        this.next = next;
+    &#125;
+
+&#125;
+
+public class Stack &#123;
+
+    public Node stackTop;//栈顶
+    public Node stackBottom;//栈底
+
+    public Stack(Node stackTop, Node stackBottom) &#123;
+        this.stackTop = stackTop;
+        this.stackBottom = stackBottom;
+    &#125;
+
+    public Stack() &#123;
+    &#125;
+
+
+&#125;
+
+/**
+ * 进栈
+ *
+ * @param stack 栈
+ * @param value 要进栈的元素
+ */
+public static void pushStack(Stack stack, int value) &#123;
+
+    // 封装数据成节点
+    Node newNode = new Node(value);
+
+
+    // 栈顶本来指向的节点交由新节点来指向
+    newNode.next = stack.stackTop;
+
+    // 栈顶指针指向新节点
+    stack.stackTop = newNode;
+
+&#125;
+
+
+/**
+ * 遍历栈(只要栈顶指针不指向栈底指针，就一直输出)
+ *
+ * @param stack
+ */
+public static void traverse(Stack stack) &#123;
+    Node stackTop = stack.stackTop;
+
+    while (stackTop != stack.stackBottom) &#123;
+
+        System.out.println(&quot;关注公众号：Java3y：&quot; + stackTop.data);
+
+        stackTop = stackTop.next;
+    &#125;
+
+
+&#125;
+
+/**
+ * 判断该栈是否为空
+ *
+ * @param stack
+ */
+public static void isEmpty(Stack stack) &#123;
+    if (stack.stackTop == stack.stackBottom) &#123;
+
+        System.out.println(&quot;关注公众号：Java3y----&gt;该栈为空&quot;);
+    &#125; else &#123;
+
+        System.out.println(&quot;关注公众号：Java3y----&gt;该栈不为空&quot;);
+
+    &#125;
+
+&#125;
+
+/**
+ * 出栈(将栈顶的指针指向下一个节点)
+ * @param stack
+ */
+public static void popStack(Stack stack) &#123;
+
+    // 栈不为空才能出栈
+    if (!isEmpty(stack)) &#123;
+
+        //栈顶元素
+        Node top = stack.stackTop;
+
+        // 栈顶指针指向下一个节点
+        stack.stackTop = top.next;
+
+        System.out.println(&quot;关注公众号：Java3y----&gt;出栈的元素是：&quot; + top.data);
+
+    &#125;
+&#125;
+
+/**
+ * 清空栈
+ * @param stack
+ */
+public static void clearStack(Stack stack) &#123;
+
+    stack.stackTop = null;
+    stack.stackBottom = stack.stackTop;
+&#125;
+</code></pre><h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出(LILO, Last In Last Out)</p>
+<h3 id="静态队列"><a href="#静态队列" class="headerlink" title="静态队列"></a>静态队列</h3><p>数组实现循环队列，节省内存资源</p>
+<pre><code>public class Queue &#123;
+
+
+    //数组
+    public int [] arrays;
+
+    //指向第一个有效的元素
+    public int front = 0;
+
+    //指向有效数据的下一个元素(即指向无效的数据)
+    public int rear = 0;
+
+&#125;
+
+
+/**
+ * 入队
+ *
+ * @param queue
+ */
+public static void enQueue(Queue queue,int value) &#123;
+
+    // 不是满的队列才能入队
+    if (!isFull(queue)) &#123;
+
+        // 将新的元素插入到队尾中
+        queue.arrays[queue.rear] = value;
+
+        // rear节点移动到新的无效元素位置上
+        queue.rear = (queue.rear + 1) % queue.arrays.length;
+    &#125;
+&#125;
+
+/**
+ * 出队
+ *
+ * @param queue
+ */
+public static void outQueue(Queue queue) &#123;
+
+    //判断该队列是否为null
+    if (!isEmpty(queue)) &#123;
+
+
+        //不为空才出队
+        int value = queue.arrays[queue.front];
+        System.out.println(&quot;关注公众号：Java3y---&gt;出队的元素是：&quot; + value);
+
+        // front指针往后面移
+        queue.front = (queue.front + 1) % queue.arrays.length;
+
+    &#125;
+
+
+&#125;
+
+/**
+ * 判断队列是否空，front和rear指针相等，就是空了
+ * @param queue
+ * @return
+ */
+public static boolean isEmpty(Queue queue) &#123;
+    if (queue.rear  == queue.front) &#123;
+        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列空的！&quot;);
+        return true;
+    &#125; else &#123;
+        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列非空！&quot;);
+        return false;
+    &#125;
+&#125;
+
+/**
+ * 判断队列是否满了，front和rear指针紧挨着，就是满了
+ * @param queue
+ * @return
+ */
+public static boolean isFull(Queue queue) &#123;
+    if ((queue.rear + 1) % queue.arrays.length == queue.front) &#123;
+
+        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列满了！&quot;);
+        return true;
+    &#125; else &#123;
+        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列没满了！&quot;);
+        return false;
+    &#125;
+&#125;
+
+/**
+ * 遍历队列
+ * @param queue
+ *
+ */
+public static void traverseQueue(Queue queue) &#123;
+
+    // front的位置
+    int i = queue.front;
+
+    while (i != queue.rear) &#123;
+
+        System.out.println(&quot;关注公众号：Java3y---&gt;&quot; + queue.arrays[i]);
+
+        //移动front
+        i = (i + 1) % queue.arrays.length;
+    &#125;
+
+&#125;
+</code></pre><h3 id="动态队列"><a href="#动态队列" class="headerlink" title="动态队列"></a>动态队列</h3><p>链表实现</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A0%91/" rel="prev" title="树">
+      <i class="fa fa-chevron-left"></i> 树
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%91%E5%A0%86/" rel="next" title="树链">
+      树链 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%88"><span class="nav-number">1.</span> <span class="nav-text">栈</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%A0%88"><span class="nav-number">1.1.</span> <span class="nav-text">静态栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%A0%88"><span class="nav-number">1.2.</span> <span class="nav-text">动态栈</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%9F%E5%88%97"><span class="nav-number">2.</span> <span class="nav-text">队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%98%9F%E5%88%97"><span class="nav-number">2.1.</span> <span class="nav-text">静态队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E9%98%9F%E5%88%97"><span class="nav-number">2.2.</span> <span class="nav-text">动态队列</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概念图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图 术语 邻接点-在一个无向图中，若存在一条边&lt;Vi,Vj&gt;，则称Vi，Vj为此边的两个端点，并称它们互为邻接点 出&#x2F;入边-在一个有向图张，若存在一条边&lt;Vi,Vj&gt;，则">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构-图">
+<meta property="og:url" content="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%9B%BE/index.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="概念图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图 术语 邻接点-在一个无向图中，若存在一条边&lt;Vi,Vj&gt;，则称Vi，Vj为此边的两个端点，并称它们互为邻接点 出&#x2F;入边-在一个有向图张，若存在一条边&lt;Vi,Vj&gt;，则">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-12-27T09:31:26.965Z">
+<meta property="article:modified_time" content="2022-12-28T02:12:58.231Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Tech;Data;Vision">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%9B%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>数据结构-图 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%9B%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构-图
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 10:12:58" itemprop="dateModified" datetime="2022-12-28T10:12:58+08:00">2022-12-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图</p>
+<h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><ol>
+<li>邻接点-在一个无向图中，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称Vi，Vj为此边的两个端点，并称它们互为邻接点</li>
+<li>出/入边-在一个有向图张，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称此边为顶点Vi的出边，顶点Vj的一条入边</li>
+<li>度/入度/出度-无向图中的度定义为以该顶点为一个端点的边的数目，记为D(V)。有向图的入度定为多少边指向该顶点，出度是该顶点出边的个数</li>
+</ol>
+<h2 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h2><p><code>邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。对于无向图 如果顶点b1和b2是连接的，那么在二维矩阵中matrix[b1,b2]和matrix[b2,b1]位置的值置为1，如果是有向图b1指向b2，那么 matrix[b1,b2]=1,matrix[b2,b1]=0；下面用一个例子表示无向图和有向图的邻接矩阵；</code></p>
+<p>如果图是一个带权图，需要把1换为相应边上的权值，把非对角线上的换成一个很大的特定的实数则可，表示相应的边不存在，这个特定的实数通常用无穷大或MaxValue来表示，他要大于图G中所有边的权值</p>
+<p><a href="#matrix">代码实现</a></p>
+<h2 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h2><p>邻接矩阵与邻接表相比，它会造成空间的一定损失，它需要为每个顶点都分配n个边的空间，其实有很多边都是不存在边，但是邻接表的实现就不一样，它只关心存在的边，不关心不存在的边。邻接表由数组+链表组成对于上面的无向图，邻接表表示为（由于有向和无向的差别不是太大，所以只是画出了无向的邻接表表示）</p>
+<p><a href="#table">代码实现</a></p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p><span id="matrix">邻接矩阵实现</span></p>
+<pre><code>package Graph;
+//边集数组 ，存放边的信息
+//邻域数组表示  和 邻域表表示  是两种不同的表示方式
+//表示的是插入边的元素，边的起点和终点  边的权重
+public class EdgeElement &#123;
+    int fromvex;
+    int endvex;
+    int weight;
+
+    public EdgeElement(int v1,int v2)&#123;
+        //对于无权重图的初始化
+        fromvex=v1;
+        endvex=v2;
+        weight=1;
+    &#125;
+    public EdgeElement(int v1,int v2,int wgt)&#123;
+        //对于有权重图的初始化
+        fromvex=v1;
+        endvex=v2;
+        weight=wgt;
+    &#125;    
+&#125;
+
+
+package Graph;
+//可以通过边集来得到一个图的构成
+public interface Graph &#123;
+    void creatGraph(EdgeElement d[]);        //通过边结点来构建一个图
+    GraphType graphType();                //返回图的类型  无向无权图 无向有权图  有向无权图  有向有权图 定义一个枚举变量
+    int vertices();                    //返回图的顶点数
+    int edges();                    //返回图的边数
+    boolean find(int i,int j);            //从图中查找一条边(i,j)是否存在
+    void putEdge(EdgeElement theEdge);        //像图中插入一条边 theEdge
+    void removeEdge(int i,int j);            //从图中删除一条边
+    int degree(int i);                //返回顶点i的度
+    int inDegree(int i);                //返回顶点i的入度
+    int outDegree(int i);                //返回顶点i的出度
+    void output();                    //以图的顶点集和边集的形式输出一个图
+    void depthFirstSearch(int v);            //从顶点v开始深度优先搜索整幅图
+    void breadthFirstSearch(int v);            //从顶点v开始广度优先搜索整幅图
+&#125;
+
+//在邻域数组中写数据
+public void creatGraph(EdgeElement[] d) &#123;
+    int i;
+    for(i=0;i&lt;d.length;i++)&#123;
+        if(d[i]==null) break;
+        int v1,v2;
+        v1=d[i].fromvex;
+        v2=d[i].endvex;
+        if(v1&lt;0 || v1&gt;n-1 || v2&lt;0 || v2&gt;n-1 || v1==v2)&#123;
+            System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
+            System.exit(0);
+        &#125;
+        if(type==GraphType.NoDirectionNoWeight)&#123;
+            a[v1][v2]=a[v2][v1]=1;
+        &#125;else if(type==GraphType.NoDirectionWeight)&#123;
+            a[v1][v2]=a[v2][v1]=d[i].weight;
+        &#125;else if(type==GraphType.DirectionNoWeight)&#123;
+            a[v1][v2]=1;
+        &#125;else&#123;
+            a[v1][v2]=d[i].weight;
+        &#125;
+    &#125;
+    e=i;            //边的数目
+&#125;
+
+public void putEdge(EdgeElement theEdge) &#123;
+    int v1,v2;
+    v1=theEdge.fromvex;
+    v2=theEdge.endvex;
+    if(v1&lt;0 || v1&gt;n-1 || v2&lt;0 || v2&gt;n-1 || v1==v2)&#123;
+        System.out.println(&quot;边的顶点序号无效，退出运行！&quot;);
+        System.exit(0);
+    &#125;
+    if(a[v1][v2]==0 || a[v1][v2]==MaxValue) e++;        //边数e的值加一
+    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
+        if(type==GraphType.NoDirectionNoWeight)&#123;
+            a[v1][v2]=a[v2][v1]=1;
+        &#125;else&#123;
+            a[v1][v2]=a[v2][v1]=theEdge.weight;
+        &#125;
+    &#125;else&#123;
+        if(type==GraphType.DirectionNoWeight) a[v1][v2]=1;
+        else&#123;
+            a[v1][v2]=theEdge.weight;
+        &#125;
+    &#125;
+&#125;
+
+public void removeEdge(int i, int j) &#123;
+    if(i&lt;0 || i&gt;n-1 || j&lt;0 || j&gt;n-1 || i==j)&#123;
+        System.out.println(&quot;边的顶点序号无效，退出运行！&quot;);
+        System.exit(0);
+    &#125;
+    if(a[i][j]==0 || a[i][j]==MaxValue)&#123;
+        System.out.println(&quot;要删除的边不存在，退出运行！&quot;);
+        System.exit(0);            
+    &#125;
+    if(type==GraphType.NoDirectionNoWeight)&#123;
+        a[i][j]=a[j][i]=0;
+    &#125;else if(type==GraphType.NoDirectionWeight)&#123;
+        a[i][j]=a[j][i]=MaxValue;
+    &#125;else if(type==GraphType.DirectionNoWeight)&#123;
+        a[i][j]=0;
+    &#125;else a[i][j]=MaxValue;
+    e--;
+&#125;
+
+//得到该结点的度
+public int degree(int i) &#123;
+    if(i&lt;0 || i&gt; n-1)&#123;
+        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    int k=0;
+    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
+        for(int j=0;j&lt;n;j++)&#123;
+            if(a[i][j]!=0 &amp;&amp; a[j][i]!=MaxValue) k++;
+
+        &#125;
+    &#125;else&#123;
+        k = inDegree(i)+outDegree(i);
+    &#125;
+    return k;
+&#125;
+//入度
+public int inDegree(int i) &#123;                    
+    if(i&lt;0 || i&gt; n-1)&#123;
+        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
+        return -1;
+    &#125;
+    int k=0;
+    for(int j=0;j&lt;n;i++)&#123;
+        if(a[j][i]!=0 &amp;&amp; a[j][i]!=MaxValue) k++;
+    &#125;
+    return k;
+&#125;
+//出度
+public int outDegree(int i) &#123;
+    if(i&lt;0 || i&gt; n-1)&#123;
+        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
+        return -1;
+    &#125;
+    int k=0;
+    for(int j=0;j&lt;n;i++)&#123;
+        if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue) k++;
+    &#125;
+    return k;
+&#125;
+
+//输出
+public void output() &#123;
+    int i,j;
+    System.out.print(&quot;V=&#123;&quot;);//输出顶点集合
+    for(i=0;i&lt;n-1;i++)&#123;
+        System.out.print(i+&quot;,&quot;);
+    &#125;
+    System.out.print(n-1+&quot;&#125;&quot;);//输出顶点集合
+    //输出边集合
+    System.out.print(&quot;E=&#123;&quot;);
+    if(type==GraphType.NoDirectionNoWeight || type==GraphType.DirectionNoWeight)&#123;
+        for(i=0;i&lt;n;i++)&#123;
+            for(j=0;j&lt;n;j++)&#123;
+                if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue)&#123;
+                    if(type==GraphType.NoDirectionNoWeight)&#123;
+                        if(i&lt;j)System.out.print(&quot;(&quot;+i+&quot;,&quot;+j+&quot;),&quot;);
+                    &#125;else&#123;
+                        System.out.print(&quot;&lt;&quot;+i+&quot;,&quot;+j+&quot;&gt;&quot;);
+                    &#125;
+                &#125;
+            &#125;
+        &#125;
+    &#125;else&#123;
+        for(i=0;i&lt;n;i++)&#123;
+            for(j=0;j&lt;n;j++)&#123;
+                if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue)&#123;
+                    if(type==GraphType.NoDirectionWeight)&#123;
+                        if(i&lt;j)System.out.print(&quot;(&quot;+i+&quot;,&quot;+j+&quot;)&quot;+a[i][j]+&quot;,&quot;);
+                    &#125;else System.out.print(&quot;&lt;&quot;+i+&quot;,&quot;+j+&quot;&gt;&quot;+a[i][j]+&quot;,&quot;);
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    System.out.print(&quot;&#125;&quot;);
+&#125;
+
+//深度优先进行搜索   是从哪个顶点开始遍历，这里可以用顶点序号表示顶点
+public void depthFirstSearch(int v) &#123;        //驱动函数
+    boolean visited[]=new boolean[n];
+    for(int i=0;i&lt;n;i++)&#123;
+        visited[i]=false;
+    &#125;
+    dfs(v,visited);                            //把每个结点遍历一次。
+    System.out.println();
+&#125;
+//进行深度优先搜索的内部递归方法使用
+private void dfs(int i,boolean visited[])&#123;    //工作函数
+    System.out.print(i+&quot; &quot;);
+    visited[i]=true;
+    for(int j=0;j&lt;n;j++)&#123;
+        if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue &amp;&amp; !visited[j])&#123;
+            dfs(j,visited);
+        &#125;
+    &#125;
+&#125;
+</code></pre><p><span id="table">邻接表实现</span></p>
+<pre><code>package GraphLink;
+//定义邻接表类型
+public class EdgeNode&#123;
+    //需要一个存储自身结点
+    int adjvex;
+    int weight;
+    EdgeNode next;
+    //无权图
+    public EdgeNode(int adj,EdgeNode nt)&#123;
+        this.adjvex=adj;
+        this.next=nt;
+        this.weight=1;
+    &#125;
+    //有权图
+    public EdgeNode(int adj,int wgt,EdgeNode nt)&#123;
+        this.adjvex=adj;
+        this.weight=wgt;
+        this.next=nt;
+    &#125;
+&#125;
+
+//生成图函数
+@Override
+public void creatGraph(EdgeElement[] d) &#123;
+    int i;
+    for(i=0;i&lt;d.length;i++)&#123;//处理边集合  如果边集合重复 那程序不就有问题了么  这点要处理
+        if(d[i]==null) break;
+        int v1,v2,weight;
+        v1=d[i].fromvex;
+        v2=d[i].endvex;
+        weight=d[i].weight;
+        if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
+            System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
+            System.exit(0);
+        &#125;
+        if(type==GraphType.NoDirectionNoWeight)&#123;//处理无方向 无权重的图
+            a[v1]=new EdgeNode(v2,a[v1]);//把边挂载在主干上,a为EdgeNode类型的一维数组
+            a[v2]=new EdgeNode(v1,a[v2]);//处理第二条边
+        &#125;else if(type==GraphType.NoDirectionWeight)&#123;//处理无向有权图
+            a[v1]=new EdgeNode(v2,weight,a[v1]);
+            a[v2]=new EdgeNode(v1,weight,a[v2]);
+        &#125;else if(type==GraphType.DirectionNoWeight)&#123;//处理有向无权图
+            a[v1]=new EdgeNode(v2,a[v1]);
+        &#125;else &#123;
+            a[v1]=new EdgeNode(v2,weight,a[v1]);
+        &#125;
+    &#125;
+    e=i;
+&#125;
+
+//在图中查找一条边
+public boolean find(int v1,int v2)&#123;
+    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
+        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    EdgeNode p=a[v1];
+    while(p!=null)&#123;
+        if(p.adjvex==v2)&#123;
+            return true;
+        &#125;
+        p=p.next;
+    &#125;
+    return false;
+&#125;
+
+//向图中插入一条边
+public void putEdge(EdgeElement theEdge)&#123;
+    int v1,v2,weight;
+    v1=theEdge.fromvex;
+    v2=theEdge.endvex;
+    weight=theEdge.weight;
+    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
+        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    EdgeNode p=a[v1];
+    while(p!=null)&#123;
+        if(p.adjvex==v2)&#123;
+            break;//退出后处理
+        &#125;
+        p=p.next;
+    &#125;
+    if(p==null) e++;
+    else&#123;
+        if(type==GraphType.DirectionWeight || type==GraphType.NoDirectionWeight)&#123;
+            p.weight=weight;
+        &#125;
+        if(type==GraphType.NoDirectionWeight)&#123;//无向有权重的另一条边也要处理
+            EdgeNode q=a[v2];
+            while(q!=null)&#123;
+                if(q.adjvex==v1) break;
+                q=q.next;
+            &#125;
+            q.weight=weight;
+        &#125;
+        return;
+    &#125;
+    if(type==GraphType.NoDirectionNoWeight)&#123;//如果是无向无权重
+        a[v1]=new EdgeNode(v2, a[v1]);
+        a[v2]=new EdgeNode(v1, a[v2]);
+    &#125;else if(type==GraphType.NoDirectionWeight)&#123;//处理无向有权重
+        a[v1]=new EdgeNode(v2,weight,a[v1]);
+        a[v2]=new EdgeNode(v1,weight,a[v2]);
+    &#125;else if(type==GraphType.DirectionNoWeight)&#123;//有向无权重
+        a[v1]=new EdgeNode(v2,a[v1]);
+    &#125;else&#123;
+        a[v1]=new EdgeNode(v2, weight,a[v1]);
+    &#125;
+&#125;
+
+public void removeEdge(int v1,int v2)&#123;
+    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
+        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
+        System.exit(0);
+    &#125;
+    EdgeNode p=a[v1],q=null;//拿到主干结点
+    while(p!=null)&#123;
+        if(p.adjvex==v2) break;
+        q=p;
+        p=p.next;
+    &#125;
+    if(p==null)&#123;
+        System.out.println(&quot;要删除的边不存在，程序退出运行&quot;);
+        System.exit(0);
+    &#125;
+    if(q==null)&#123;//该结点在表头上 主干的节点就是需要找的结点
+        a[v1]=a[v1].next;
+    &#125;else&#123;
+        q.next=p.next;//嫁接上
+    &#125;
+    //删除无向图的另一个结点上的边
+    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
+        EdgeNode p1=a[v2],q1=null;
+        while(p1!=null)&#123;
+            if(p1.adjvex==v1)&#123;
+                break;
+            &#125;
+            q1=p1;
+            p1=p1.next;
+        &#125;
+        if(q1==null)&#123;
+            a[v2]=a[v2].next;
+        &#125;else&#123;
+            q1.next=p1.next;
+        &#125;
+    &#125;
+    e--;
+&#125;
+
+//返回一个顶点的度，度分为入度和出度，要分别处理
+public int degree(int i)&#123;
+    if(i&lt;0||i&gt;n-1)&#123;
+        System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
+        System.exit(0);            
+    &#125;
+    int k=0;
+    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
+        EdgeNode p=a[i];
+        while(p!=null)&#123;
+            k++;
+            p=p.next;
+        &#125;
+        return k;
+    &#125;else return inDegree(i)+outDegree(i);
+&#125;
+//求出并返回一个顶点的入度
+public int inDegree(int i)&#123;//返回指向该顶点的度，入度，用双循环来实现
+    int k=0;//记录入度个数
+    if(i&lt;0||i&gt;n-1)&#123;
+        System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
+        System.exit(0);            
+    &#125;
+    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
+        return -1;
+    &#125;else&#123;
+        for(int j=0;j&lt;n;j++)&#123;
+            EdgeNode p=a[j];
+            while(p!=null)&#123;
+                if(p.adjvex==i)k++;
+                p=p.next;
+            &#125;
+        &#125;
+    &#125;
+    return k;
+&#125;
+//返回一个顶点的出度
+public int outDegree(int i)&#123;
+    int k=0;//记录出度的数目
+    EdgeNode p=a[i];
+    while(p!=null)&#123;
+        k++;
+        p=p.next;
+    &#125;
+    return k;
+&#125;
+
+//得到邻接矩阵
+public int[][] getAdjacencyMatrix()&#123;
+    int adjacencyMatrix[][]=new int[n][n];
+    if(type==GraphType.DirectionNoWeight||type==GraphType.DirectionWeight)&#123;//有向性
+        //有向 那不存在的边是存在一个InfinityValue
+        for(int i=0;i&lt;n;i++)&#123;
+            for(int j=0;j&lt;n;j++)&#123;
+                if(i==j) adjacencyMatrix[i][j]=0;
+                else adjacencyMatrix[i][j]=InfinityValue;
+            &#125;
+        &#125;
+    &#125;else&#123;
+        //无向 都设置为0
+        for(int i=0;i&lt;n;i++)&#123;
+            for(int j=0;j&lt;n;j++)&#123;
+                 adjacencyMatrix[i][j]=0;
+            &#125;
+        &#125;            
+    &#125;
+        //遍历整个图
+        for(int i=0;i&lt;n;i++)&#123;
+            EdgeNode p=a[i];
+            while(p!=null)&#123;
+                adjacencyMatrix[i][p.adjvex]=p.weight;
+                p=p.next;
+            &#125;
+        &#125;    
+    return adjacencyMatrix;
+&#125;
+</code></pre>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91/" rel="prev" title="二叉搜索树">
+      <i class="fa fa-chevron-left"></i> 二叉搜索树
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/27/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%A0%91/" rel="next" title="树">
+      树 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AF%E8%AF%AD"><span class="nav-number">2.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5"><span class="nav-number">3.</span> <span class="nav-text">邻接矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%BB%E6%8E%A5%E8%A1%A8"><span class="nav-number">4.</span> <span class="nav-text">邻接表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
