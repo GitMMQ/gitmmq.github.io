@@ -48,7 +48,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>树 | Qi</title>
   
 
@@ -241,6 +241,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -271,7 +278,7 @@
 <p>森林 : n棵不相交的树的集合为森林</p>
 <h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>常用于实现二叉查找树、二叉堆</p>
 <ul>
-<li><p>每个节点至多有两颗子树（树的度&lt;=2）,子树分左右</p>
+<li><p>每个节点至多有两颗子树（树的度&lt;&#x3D;2）,子树分左右</p>
 </li>
 <li><p>第i层至多有2i-1个节点，深度为k的二叉树，最多节点数2^k-1个节点（具有最多节点的称作满二叉树），其中每个节点都与深度k满二叉树中1-n节点对应，则为完全二叉树</p>
 </li>
@@ -317,51 +324,59 @@
 <li>用树的孩子兄弟链来表示键树，称为双链树；每个Node有三个域：symbol域：存储关键字的一个字符；son域：存储指向第一棵子树的根的指针；brother域：存储指向右兄弟的指针。 </li>
 <li>用多重链表来表示键树，称为Trie树或字典树。</li>
 </ol>
-<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d=26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质：<br>1) 根节点不包含字符，除根节点外每一个节点都只包含一个字符；<br>2) 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串；<br>3) 每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用：<br>1) 串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。<br>2) “串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。<br>3) 最长公共前缀 </p>
-<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S=S1S2..Si..Sn，和整数i，1 &lt;= i &lt;= n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S=XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
-<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L = b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
+<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d&#x3D;26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质： </p>
+<ol>
+<li>根节点不包含字符，除根节点外每一个节点都只包含一个字符； </li>
+<li>从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串； </li>
+<li>每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用： </li>
+<li>串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。 </li>
+<li>“串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。 </li>
+<li>最长公共前缀</li>
+</ol>
+<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S&#x3D;S1S2..Si..Sn，和整数i，1 &lt;&#x3D; i &lt;&#x3D; n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S&#x3D;XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
+<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L &#x3D; b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
 <h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
 <p><span id="hafman">哈夫曼树代码实现</span></p>
 <pre><code>import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-
+ 
 public class HuffmanTree &#123;
-
+ 
     public static class Node&lt;E&gt; &#123;
         E data;
         double weight;
         Node leftChild;
         Node rightChild;
-
+ 
         public Node(E data, double weight) &#123;
             super();
             this.data = data;
             this.weight = weight;
         &#125;
-
+ 
         public String toString() &#123;
             return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
         &#125;
     &#125;
-
+ 
     public static void main(String[] args) &#123;
         List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
-
+ 
         nodes.add(new Node(&quot;A&quot;, 40.0));
         nodes.add(new Node(&quot;B&quot;, 8.0));
         nodes.add(new Node(&quot;C&quot;, 10.0));
         nodes.add(new Node(&quot;D&quot;, 30.0));
         nodes.add(new Node(&quot;E&quot;, 10.0));
         nodes.add(new Node(&quot;F&quot;, 2.0));
-
+        
         Node root = HuffmanTree.createTree(nodes);
-
+        
         System.out.println(breadthFirst(root));
-
+ 
     &#125;
-
+ 
     /**
      * 构造哈夫曼树
      * 
@@ -376,25 +391,25 @@ public class HuffmanTree &#123;
             //获取权值最小的两个节点
             Node left = nodes.get(nodes.size()-1);
             Node right = nodes.get(nodes.size()-2);
-
+            
             //生成新节点，新节点的权值为两个子节点的权值之和
             Node parent = new Node(null, left.weight + right.weight);
-
+            
             //让新节点作为两个权值最小节点的父节点
             parent.leftChild = left;
             parent.rightChild = right;
-
+            
             //删除权值最小的两个节点
             nodes.remove(nodes.size()-1);
             nodes.remove(nodes.size()-1);
-
+            
             //将新节点加入到集合中
             nodes.add(parent);
         &#125;
-
+        
         return nodes.get(0);
     &#125;
-
+ 
     /**
      * 将指定集合中的i和j索引处的元素交换
      * 
@@ -408,7 +423,7 @@ public class HuffmanTree &#123;
         nodes.set(i, nodes.get(j));
         nodes.set(j, tmp);
     &#125;
-
+ 
     /**
      * 实现快速排序算法，用于对节点进行排序
      * 
@@ -431,57 +446,58 @@ public class HuffmanTree &#123;
                 // 找到小于分界值的元素的索引，或者j已经到了start处
                 while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
                     ;
-
+ 
                 if (i &lt; j) &#123;
                     swap(nodes, i, j);
                 &#125; else &#123;
                     break;
                 &#125;
             &#125;
-
+ 
             swap(nodes, start, j);
-
+ 
             //递归左边子序列
             subSort(nodes, start, j - 1);
             //递归右边子序列
             subSort(nodes, j + 1, end);
         &#125;
     &#125;
-
+    
     public static void quickSort(List&lt;Node&gt; nodes)&#123;
         subSort(nodes, 0, nodes.size()-1);
     &#125;
-
+    
     //广度优先遍历
     public static List&lt;Node&gt; breadthFirst(Node root)&#123;
         Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
         List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
-
+        
         if(root!=null)&#123;
             //将根元素加入“队列”
             queue.offer(root);
         &#125;
-
+        
         while(!queue.isEmpty())&#123;
             //将该队列的“队尾”元素加入到list中
             list.add(queue.peek());
             Node p = queue.poll();
-
+            
             //如果左子节点不为null，将它加入到队列
             if(p.leftChild != null)&#123;
                 queue.offer(p.leftChild);
             &#125;
-
+            
             //如果右子节点不为null，将它加入到队列
             if(p.rightChild != null)&#123;
                 queue.offer(p.rightChild);
             &#125;
         &#125;
-
+        
         return list;
     &#125;
 &#125;
 </code></pre>
+
     </div>
 
     
@@ -575,20 +591,20 @@ public class HuffmanTree &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -624,17 +640,59 @@ public class HuffmanTree &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -688,6 +746,26 @@ public class HuffmanTree &#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

@@ -43,7 +43,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>Qi</title>
   
 
@@ -788,21 +788,21 @@
 
       
           <p>Gradient Boosting Decision Tree 迭代决策树，泛化能力较强</p>
-<p>几乎可用于所有回归问题（线性/非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。<br>可用于<a target="_blank" rel="noopener" href="http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf" title="搜索排序">搜索排序</a></p>
-<h2 id="Regression-Decistion-Tree"><a href="#Regression-Decistion-Tree" class="headerlink" title="Regression Decistion Tree"></a>Regression Decistion Tree</h2><h3 id="分类树"><a href="#分类树" class="headerlink" title="分类树"></a>分类树</h3><p>C4.5分类树:在每次分枝时，是穷举每一个feature的每一个阈值，找到使得按照feature&lt;=阈值，和feature&gt;阈值分成的两个分枝的熵最大的feature和阈值（熵最大的概念可理解成尽可能每个分枝的男女比例都远离1:1），按照该标准分枝得到两个新节点，用同样方法继续分枝直到所有人都被分入性别唯一的叶子节点，或达到预设的终止条件，若最终叶子节点中的性别不唯一，则以多数人的性别作为该叶子节点的性别。</p>
-<h3 id="回归树"><a href="#回归树" class="headerlink" title="回归树"></a>回归树</h3><p>在每个节点（不一定是叶子节点）都会得一个预测值，以年龄为例，该预测值等于属于这个节点的所有人年龄的平均值。分枝时穷举每一个feature的每个阈值找最好的分割点，但衡量最好的标准不再是最大熵，而是最小化均方差–即（每个人的年龄-预测年龄）^2 的总和 / N，或者说是每个人的预测误差平方和 除以 N。这很好理解，被预测出错的人数越多，错的越离谱，均方差就越大，通过最小化均方差能够找到最靠谱的分枝依据。分枝直到每个叶子节点上人的年龄都唯一（这太难了）或者达到预设的终止条件（如叶子个数上限），若最终叶子节点上人的年龄不唯一，则以该节点上所有人的平均年龄做为该叶子节点的预测年龄。</p>
+<p>几乎可用于所有回归问题（线性&#x2F;非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。<br>可用于<a target="_blank" rel="noopener" href="http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf" title="搜索排序">搜索排序</a></p>
+<h2 id="Regression-Decistion-Tree"><a href="#Regression-Decistion-Tree" class="headerlink" title="Regression Decistion Tree"></a>Regression Decistion Tree</h2><h3 id="分类树"><a href="#分类树" class="headerlink" title="分类树"></a>分类树</h3><p>C4.5分类树:在每次分枝时，是穷举每一个feature的每一个阈值，找到使得按照feature&lt;&#x3D;阈值，和feature&gt;阈值分成的两个分枝的熵最大的feature和阈值（熵最大的概念可理解成尽可能每个分枝的男女比例都远离1:1），按照该标准分枝得到两个新节点，用同样方法继续分枝直到所有人都被分入性别唯一的叶子节点，或达到预设的终止条件，若最终叶子节点中的性别不唯一，则以多数人的性别作为该叶子节点的性别。</p>
+<h3 id="回归树"><a href="#回归树" class="headerlink" title="回归树"></a>回归树</h3><p>在每个节点（不一定是叶子节点）都会得一个预测值，以年龄为例，该预测值等于属于这个节点的所有人年龄的平均值。分枝时穷举每一个feature的每个阈值找最好的分割点，但衡量最好的标准不再是最大熵，而是最小化均方差–即（每个人的年龄-预测年龄）^2 的总和 &#x2F; N，或者说是每个人的预测误差平方和 除以 N。这很好理解，被预测出错的人数越多，错的越离谱，均方差就越大，通过最小化均方差能够找到最靠谱的分枝依据。分枝直到每个叶子节点上人的年龄都唯一（这太难了）或者达到预设的终止条件（如叶子个数上限），若最终叶子节点上人的年龄不唯一，则以该节点上所有人的平均年龄做为该叶子节点的预测年龄。</p>
 <p>参考：<a target="_blank" rel="noopener" href="http://www.schonlau.net/publication/05stata_boosting.pdf">http://www.schonlau.net/publication/05stata_boosting.pdf</a></p>
 <h2 id="Gradient-Boosting"><a href="#Gradient-Boosting" class="headerlink" title="Gradient Boosting"></a>Gradient Boosting</h2><p>多棵树来共同决策。GBDT的核心就在于，每一棵树学的是之前所有树结论和的残差，这个残差就是一个加预测值后能得真实值的累加量。比如A的真实年龄是18岁，但第一棵树的预测年龄是12岁，差了6岁，即残差为6岁。那么在第二棵树里我们把A的年龄设为6岁去学习，如果第二棵树真的能把A分到6岁的叶子节点，那累加两棵树的结论就是A的真实年龄；如果第二棵树的结论是5岁，则A仍然存在1岁的残差，第三棵树里A的年龄就变成1岁，继续学。这就是Gradient Boosting在GBDT中的意义，简单吧。</p>
-<p>残差： A的预测值 + A的残差 = A的实际值 ，残差为0，极为真实值，（过拟合问题）</p>
+<p>残差： A的预测值 + A的残差 &#x3D; A的实际值 ，残差为0，极为真实值，（过拟合问题）</p>
 <p>优点：Boosting的最大好处在于，每一步的残差计算其实变相地增大了分错instance的权重，而已经分对的instance则都趋向于0。这样后面的树就能越来越专注那些前面被分错的instance。</p>
 <p>Adaboost是另一种boost方法，它按分类对错，分配不同的weight，计算cost function时使用这些weight，从而让“错分的样本权重越来越大，使它们更被重视”。Bootstrap也有类似思想，它在每一步迭代时不改变模型本身，也不计算残差，而是从N个instance训练集中按一定概率重新抽取N个instance出来（单个instance可以被重复sample），对着这N个新的instance再训练一轮。由于数据集变了迭代模型训练结果也不一样，而一个instance被前面分错的越厉害，它的概率就被设的越高，这样就能同样达到逐步关注被分错的instance，逐步完善的效果。Adaboost的方法被实践证明是一种很好的防止过拟合的方法，但至于为什么则至今没从理论上被证明。GBDT也可以在使用残差的同时引入Bootstrap re-sampling，GBDT多数实现版本中也增加的这个选项，但是否一定使用则有不同看法。re-sampling一个缺点是它的随机性，即同样的数据集合训练两遍结果是不一样的，也就是模型不可稳定复现，这对评估是很大挑战，比如很难说一个模型变好是因为你选用了更好的feature，还是由于这次sample的随机因素。</p>
 <p>参考：<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Gradient_boosted_trees#Gradient_tree_boosting">http://en.wikipedia.org/wiki/Gradient_boosted_trees#Gradient_tree_boosting</a></p>
 <h2 id="Shrinkage"><a href="#Shrinkage" class="headerlink" title="Shrinkage"></a>Shrinkage</h2><p>每次走一小步逐渐逼近结果的效果，要比每次迈一大步很快逼近结果的方式更容易避免过拟合。即它不完全信任每一个棵残差树，它认为每棵树只学到了真理的一小部分，累加的时候只累加一小部分，通过多学几棵树弥补不足。</p>
 <p>没用Shrinkage时：（yi表示第i棵树上y的预测值， y(1~i)表示前i棵树y的综合预测值）</p>
-<p>y(i+1) = 残差(y1~yi)， 其中： 残差(y1~yi) =  y真实值 - y(1 ~ i)</p>
-<p>y(1 ~ i) = SUM(y1, …, yi)</p>
+<p>y(i+1) &#x3D; 残差(y1<del>yi)， 其中： 残差(y1</del>yi) &#x3D;  y真实值 - y(1 ~ i)</p>
+<p>y(1 ~ i) &#x3D; SUM(y1, …, yi)</p>
 <p>Shrinkage不改变第一个方程，只把第二个方程改为： </p>
-<p>y(1 ~ i) = y(1 ~ i-1) + step * yi</p>
+<p>y(1 ~ i) &#x3D; y(1 ~ i-1) + step * yi</p>
 <p>即Shrinkage仍然以残差作为学习目标，但对于残差学习出来的结果，只累加一小部分（step*残差）逐步逼近目标，step一般都比较小，如0.01~0.001（注意该step非gradient的step），导致各个树的残差是渐变的而不是陡变的。直觉上这也很好理解，不像直接用残差一步修复误差，而是只修复一点点，其实就是把大步切成了很多小步。本质上，Shrinkage为每棵树设置了一个weight，累加时要乘以这个weight，但和Gradient并没有关系。这个weight就是step。就像Adaboost一样，Shrinkage能减少过拟合发生也是经验证明的，目前还没有看到从理论的证明。</p>
 <h2 id="RankNet"><a href="#RankNet" class="headerlink" title="RankNet"></a>RankNet</h2><p>实际的搜索排序使用的是LambdaMART算法，必须指出的是由于这里要使用排序需要的cost function，LambdaMART迭代用的并不是残差。Lambda在这里充当替代残差的计算方法，它使用了一种类似Gradient*步长模拟残差的方法。这里的MART在求解方法上和之前说的残差略有不同，其区别描述见这里。</p>
 <p>就像所有的机器学习一样，搜索排序的学习也需要训练集，这里一般是用人工标注实现，即对每一个(query,doc) pair给定一个分值（如1,2,3,4）,分值越高表示越相关，越应该排到前面。然而这些绝对的分值本身意义不大，例如你很难说1分和2分文档的相关程度差异是1分和3分文档差距的一半。相关度本身就是一个很主观的评判，标注人员无法做到这种定量标注，这种标准也无法制定。但标注人员很容易做到的是”AB都不错，但文档A比文档B更相关，所以A是4分，B是3分“。RankNet就是基于此制定了一个学习误差衡量方法，即cost function。具体而言，RankNet对任意两个文档A,B，通过它们的人工标注分差，用sigmoid函数估计两者顺序和逆序的概率P1。然后同理用机器学习到的分差计算概率P2（sigmoid的好处在于它允许机器学习得到的分值是任意实数值，只要它们的分差和标准分的分差一致，P2就趋近于P1）。这时利用P1和P2求的两者的交叉熵，该交叉熵就是cost function。它越低说明机器学得的当前排序越趋近于标注排序。为了体现NDCG的作用（NDCG是搜索排序业界最常用的评判标准），RankNet还在cost function中乘以了NDCG。</p>
@@ -1009,7 +1009,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/26283.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23014.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1023,7 +1023,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/26283.html" class="post-title-link" itemprop="url">数据结构-线段树</a>
+            <a href="/posts/23014.html" class="post-title-link" itemprop="url">数据结构-线性表</a>
         </h2>
 
         <div class="post-meta">
@@ -1057,13 +1057,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>938</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -1075,7 +1075,186 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>clear、isEmpty、length、get、insert、remove、indexOf</p>
+<pre><code>public interface IList &#123;
+    // 线性表置空操作
+    public void clear();
+
+    // 判断线性表是否为空操作
+    public boolean isEmpty();
+
+    // 获取线性表中元素的长度操作
+    public int length();
+
+    // 获取指定位置上面的元素操作
+    public Object get(int i);
+
+    // 在指定位置上面插入元素的操作
+    public void insert(int i, Object x);
+
+    // 删除指定位置上面的元素的操作
+    public void remove(int i);
+
+    // 查找指定元素的位置首次出现的位置操作
+    public int indexOf(Object x);
+
+    // 显示线性表中的内容操作
+    public void display();
+&#125;
+</code></pre>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><h3 id="顺序表"><a href="#顺序表" class="headerlink" title="顺序表"></a>顺序表</h3><p>顺序存储， 逻辑上相邻的数据元素，在物理存储上也是相邻的。 不便于插入和删除</p>
+<pre><code>   public class SqList implements IList &#123;
+       // 线性表存储空间
+       private Object[] listElem;
+       // 线性表的当前长度
+       private int curLen;
+   
+       // 顺序表类的构造函数，构造一个存储空间容量为maxSize的线性表
+       public SqList(int maxSize) &#123;
+           // TODO Auto-generated constructor stub
+           curLen = 0;
+           listElem = new Object[maxSize];
+       &#125;
+   
+       // 将一个已经存在的线性表置成空表
+       public void clear() &#123;
+           // TODO Auto-generated method stub
+           // 置顺序表的当前长度为0
+           curLen = 0;
+       &#125;
+   
+       // 判断线性表中的数据元素的个数是否为0，若为0则返回true，否则返回false
+       public boolean isEmpty() &#123;
+           // TODO Auto-generated method stub
+           return curLen == 0;
+       &#125;
+   
+       // 求线性表中的数据元素的个数并返回其值
+       public int length() &#123;
+           // TODO Auto-generated method stub
+           // 返回顺序表的当前长度
+           return curLen;
+       &#125;
+   
+       // 读取到线性表中的第i个数据元素并由函数返回其值，其中i的取值范围为0≤i≤length()-1，若i不在此范围则抛出异常
+       public Object get(int i) &#123;
+           // TODO Auto-generated method stub
+           if (i &lt; 0 || i &gt;= curLen) &#123;
+               throw new RuntimeException(&quot;第&quot; + i + &quot;个元素不存在&quot;);
+           &#125;
+           return listElem[i];
+       &#125;
+   
+       // 在线性表的第i个数据元素之前插入一个值位x的数据元素
+       public void insert(int i, Object x) &#123;
+           // TODO Auto-generated method stub
+           // 判断表是否满了
+           if (curLen == listElem.length) &#123;
+               throw new RuntimeException(&quot;存储空间已经满了，无法插入新的元素&quot;);
+           &#125;
+           // 插入的位置不合法
+           if (i &lt; 0 || i &gt; curLen) &#123;
+               throw new RuntimeException(&quot;插入的位置不合法&quot;);
+           &#125;
+           // 必须要从最后一个元素开始依次逐个后移动，直到第i个数据元素移动完毕为止。
+           for (int j = curLen; j &gt; i; j--) &#123;
+               listElem[j] = listElem[j - 1];
+           &#125;
+           listElem[i] = x;
+           curLen++;
+       &#125;
+   
+       public void remove(int i) &#123;
+           // TODO Auto-generated method stub
+           if (i &lt; 0 || i &gt; curLen - 1) &#123;
+               throw new RuntimeException(&quot;删除的位置不合法&quot;);
+           &#125;
+           for (int j = i; j &lt; curLen; j++) &#123;
+               listElem[j] = listElem[j+1];
+           &#125;
+           curLen--;
+       &#125;
+   
+       // 返回线性表中首次出现指定的数据元素的位序号，若线性表中不包含此数据元素，则返回-1
+       public int indexOf(Object x) &#123;
+           // TODO Auto-generated method stub
+           for (int i = 0; i &lt; curLen; i++) &#123;
+               if (listElem[i].equals(x)) &#123;
+                   return i;
+               &#125;
+           &#125;
+           return -1;
+       &#125;
+   
+       // 输出线性表中的数据元素
+       public void display() &#123;
+           // TODO Auto-generated method stub
+           for (int i = 0; i &lt; curLen; i++) &#123;
+               System.out.print(listElem[i] + &quot; &quot;);
+           &#125;
+           System.out.println();
+       &#125;
+   
+       // 测试
+       public static void main(String[] args) &#123;
+           SqList sqList = new SqList(10);
+           sqList.insert(0, &quot;a&quot;);
+           sqList.insert(1, &quot;z&quot;);
+           sqList.insert(2, &quot;d&quot;);
+           sqList.insert(3, &quot;m&quot;);
+           sqList.insert(4, &quot;z&quot;);
+           int order = sqList.indexOf(&quot;z&quot;);
+           if (order!=-1) &#123;
+               System.out.println(&quot;顺序表中第一次出现的值为z的数据元素的位置为：&quot;+order);
+           &#125;else &#123;
+               System.out.println(&quot;顺序表中不包括z元素&quot;);
+           &#125;
+       &#125;
+   &#125;
+</code></pre>
+<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p>链式存储，单向链表，节点保存下一个节点的引用，便于插入和删除</p>
+<pre><code>public class Node &#123;
+    // 存放结点的值
+    private Object data;
+    // 后继结点的引用
+    private Node next;
+
+    // 无参数时的构造函数
+    public Node() &#123;
+        // TODO Auto-generated constructor stub
+        this(null, null);
+    &#125;
+
+    // 带有一个参数时的构造函数
+    public Node(Object data) &#123;
+        this(data, null);
+    &#125;
+
+    // 带有两个参数时的构造函数
+    public Node(Object data, Node next) &#123;
+        this.data = data;
+        this.next = next;
+    &#125;
+
+    public Object getData() &#123;
+        return data;
+    &#125;
+
+    public void setData(Object data) &#123;
+        this.data = data;
+    &#125;
+
+    public Node getNext() &#123;
+        return next;
+    &#125;
+
+    public void setNext(Node next) &#123;
+        this.next = next;
+    &#125;
+&#125;
+</code></pre>
+
       
     </div>
 
@@ -1093,7 +1272,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1159,20 +1338,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1208,17 +1387,59 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -1272,6 +1493,26 @@
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

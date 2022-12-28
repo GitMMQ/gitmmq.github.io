@@ -43,7 +43,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>Qi</title>
   
 
@@ -188,267 +188,6 @@
 
           <div class="content index posts-expand">
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23014.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/23014.html" class="post-title-link" itemprop="url">数据结构-线性表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>938</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
-<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>clear、isEmpty、length、get、insert、remove、indexOf</p>
-<pre><code>public interface IList &#123;
-    // 线性表置空操作
-    public void clear();
-
-    // 判断线性表是否为空操作
-    public boolean isEmpty();
-
-    // 获取线性表中元素的长度操作
-    public int length();
-
-    // 获取指定位置上面的元素操作
-    public Object get(int i);
-
-    // 在指定位置上面插入元素的操作
-    public void insert(int i, Object x);
-
-    // 删除指定位置上面的元素的操作
-    public void remove(int i);
-
-    // 查找指定元素的位置首次出现的位置操作
-    public int indexOf(Object x);
-
-    // 显示线性表中的内容操作
-    public void display();
-&#125;
-</code></pre><h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><h3 id="顺序表"><a href="#顺序表" class="headerlink" title="顺序表"></a>顺序表</h3><p>顺序存储， 逻辑上相邻的数据元素，在物理存储上也是相邻的。 不便于插入和删除</p>
-<pre><code>public class SqList implements IList &#123;
-    // 线性表存储空间
-    private Object[] listElem;
-    // 线性表的当前长度
-    private int curLen;
-
-    // 顺序表类的构造函数，构造一个存储空间容量为maxSize的线性表
-    public SqList(int maxSize) &#123;
-        // TODO Auto-generated constructor stub
-        curLen = 0;
-        listElem = new Object[maxSize];
-    &#125;
-
-    // 将一个已经存在的线性表置成空表
-    public void clear() &#123;
-        // TODO Auto-generated method stub
-        // 置顺序表的当前长度为0
-        curLen = 0;
-    &#125;
-
-    // 判断线性表中的数据元素的个数是否为0，若为0则返回true，否则返回false
-    public boolean isEmpty() &#123;
-        // TODO Auto-generated method stub
-        return curLen == 0;
-    &#125;
-
-    // 求线性表中的数据元素的个数并返回其值
-    public int length() &#123;
-        // TODO Auto-generated method stub
-        // 返回顺序表的当前长度
-        return curLen;
-    &#125;
-
-    // 读取到线性表中的第i个数据元素并由函数返回其值，其中i的取值范围为0≤i≤length()-1，若i不在此范围则抛出异常
-    public Object get(int i) &#123;
-        // TODO Auto-generated method stub
-        if (i &lt; 0 || i &gt;= curLen) &#123;
-            throw new RuntimeException(&quot;第&quot; + i + &quot;个元素不存在&quot;);
-        &#125;
-        return listElem[i];
-    &#125;
-
-    // 在线性表的第i个数据元素之前插入一个值位x的数据元素
-    public void insert(int i, Object x) &#123;
-        // TODO Auto-generated method stub
-        // 判断表是否满了
-        if (curLen == listElem.length) &#123;
-            throw new RuntimeException(&quot;存储空间已经满了，无法插入新的元素&quot;);
-        &#125;
-        // 插入的位置不合法
-        if (i &lt; 0 || i &gt; curLen) &#123;
-            throw new RuntimeException(&quot;插入的位置不合法&quot;);
-        &#125;
-        // 必须要从最后一个元素开始依次逐个后移动，直到第i个数据元素移动完毕为止。
-        for (int j = curLen; j &gt; i; j--) &#123;
-            listElem[j] = listElem[j - 1];
-        &#125;
-        listElem[i] = x;
-        curLen++;
-    &#125;
-
-    public void remove(int i) &#123;
-        // TODO Auto-generated method stub
-        if (i &lt; 0 || i &gt; curLen - 1) &#123;
-            throw new RuntimeException(&quot;删除的位置不合法&quot;);
-        &#125;
-        for (int j = i; j &lt; curLen; j++) &#123;
-            listElem[j] = listElem[j+1];
-        &#125;
-        curLen--;
-    &#125;
-
-    // 返回线性表中首次出现指定的数据元素的位序号，若线性表中不包含此数据元素，则返回-1
-    public int indexOf(Object x) &#123;
-        // TODO Auto-generated method stub
-        for (int i = 0; i &lt; curLen; i++) &#123;
-            if (listElem[i].equals(x)) &#123;
-                return i;
-            &#125;
-        &#125;
-        return -1;
-    &#125;
-
-    // 输出线性表中的数据元素
-    public void display() &#123;
-        // TODO Auto-generated method stub
-        for (int i = 0; i &lt; curLen; i++) &#123;
-            System.out.print(listElem[i] + &quot; &quot;);
-        &#125;
-        System.out.println();
-    &#125;
-
-    // 测试
-    public static void main(String[] args) &#123;
-        SqList sqList = new SqList(10);
-        sqList.insert(0, &quot;a&quot;);
-        sqList.insert(1, &quot;z&quot;);
-        sqList.insert(2, &quot;d&quot;);
-        sqList.insert(3, &quot;m&quot;);
-        sqList.insert(4, &quot;z&quot;);
-        int order = sqList.indexOf(&quot;z&quot;);
-        if (order!=-1) &#123;
-            System.out.println(&quot;顺序表中第一次出现的值为z的数据元素的位置为：&quot;+order);
-        &#125;else &#123;
-            System.out.println(&quot;顺序表中不包括z元素&quot;);
-        &#125;
-    &#125;
-&#125;
-</code></pre><h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p>链式存储，单向链表，节点保存下一个节点的引用，便于插入和删除</p>
-<pre><code>public class Node &#123;
-    // 存放结点的值
-    private Object data;
-    // 后继结点的引用
-    private Node next;
-
-    // 无参数时的构造函数
-    public Node() &#123;
-        // TODO Auto-generated constructor stub
-        this(null, null);
-    &#125;
-
-    // 带有一个参数时的构造函数
-    public Node(Object data) &#123;
-        this(data, null);
-    &#125;
-
-    // 带有两个参数时的构造函数
-    public Node(Object data, Node next) &#123;
-        this.data = data;
-        this.next = next;
-    &#125;
-
-    public Object getData() &#123;
-        return data;
-    &#125;
-
-    public void setData(Object data) &#123;
-        this.data = data;
-    &#125;
-
-    public Node getNext() &#123;
-        return next;
-    &#125;
-
-    public void setNext(Node next) &#123;
-        this.next = next;
-    &#125;
-&#125;
-</code></pre>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
       
   
   
@@ -617,7 +356,7 @@ private void leftRotate(RBTNode&lt;T&gt; x) &#123;
         else
             x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
     &#125;
-
+    
     // 将 “x” 设为 “y的左孩子”
     y.left = x;
     // 将 “x的父节点” 设为 “y”
@@ -988,7 +727,8 @@ private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
     if (node!=null)
         setBlack(node);
 &#125;
-</code></pre><h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><pre><code>/**
+</code></pre>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><pre><code>/**
  * Java 语言: 红黑树
  *
  * @author skywang
@@ -1168,7 +908,7 @@ public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
 
         return null;
     &#125;
-
+     
     /* 
      * 查找最大结点：返回tree为根结点的红黑树的最大结点。
      */
@@ -1208,7 +948,7 @@ public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
 
         return y;
     &#125;
-
+     
     /* 
      * 找结点(x)的前驱结点。即，查找&quot;红黑树中数据值小于该结点&quot;的&quot;最大结点&quot;。
      */
@@ -1264,7 +1004,7 @@ public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
             else
                 x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
         &#125;
-
+        
         // 将 “x” 设为 “y的左孩子”
         y.left = x;
         // 将 “x的父节点” 设为 “y”
@@ -1668,7 +1408,7 @@ public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
             if(direction==0)    // tree是根节点
                 System.out.printf(&quot;%2d(B) is root\n&quot;, tree.key);
             else                // tree是分支节点
-                System.out.printf(&quot;%2d(%s) is %2d&apos;s %6s child\n&quot;, tree.key, isRed(tree)?&quot;R&quot;:&quot;B&quot;, key, direction==1?&quot;right&quot; : &quot;left&quot;);
+                System.out.printf(&quot;%2d(%s) is %2d&#39;s %6s child\n&quot;, tree.key, isRed(tree)?&quot;R&quot;:&quot;B&quot;, key, direction==1?&quot;right&quot; : &quot;left&quot;);
 
             print(tree.left, tree.key, -1);
             print(tree.right,tree.key,  1);
@@ -1747,6 +1487,7 @@ public class RBTreeTest &#123;
     &#125;
 &#125;
 </code></pre>
+
       
     </div>
 
@@ -1831,100 +1572,96 @@ public class RBTreeTest &#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><pre><code class="n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素```">
-    //对称矩阵的压缩算法
-    public class SymeMatric &#123;
+          <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><p><code>n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素</code></p>
+<pre><code>//对称矩阵的压缩算法
+public class SymeMatric &#123;
 
-        double[] a;// 矩阵元素
-        int n; // 矩阵的阶数
-        int m;// 一维数组的元素的个数--长度
+    double[] a;// 矩阵元素
+    int n; // 矩阵的阶数
+    int m;// 一维数组的元素的个数--长度
 
-        public SymeMatric(int n) &#123;
-            // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
-            // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
-            // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
-            // 所以一维数组的长度m的值为1,2,3...n的前n项和
-            m = n * (n + 1) / 2; 
-            a = new double[m];
-            this.n = n;
-        &#125;
-
-        // 通过一个二维数组来初始化
-        public void evalute(double[][] b) &#123;
-            int k = 0;
-            for (int i = 0; i &lt; n; i++) &#123;
-                for (int j = 0; j &lt; n; j++) &#123;
-                    // i &gt;= j表示只保存下三角元素
-                    if (i &gt;= j) &#123;
-                        a[k++] = b[i][j];
-                    &#125;
-                &#125;
-            &#125;
-        &#125;
-
-        // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
-        public void evalute(double[] b) &#123;
-            for (int k = 0; k &lt; m; k++) &#123;
-                a[k] = b[k];
-            &#125;
-        &#125;
-
-        // 对称矩阵相加
-        public SymeMatric add(SymeMatric b) &#123;
-            SymeMatric t = new SymeMatric(n);
-            int k;
-            for (int i = 1; i &lt;= n; i++) &#123;
-                for (int j = 1; j &lt;= n; j++) &#123;
-                    if (i &gt;= j) &#123;
-                        k = i * (i - 1) / 2 + j - 1;
-                    &#125; else &#123;
-                        k = j * (j - 1) / 2 + i - 1;
-                    &#125;
-                    // 求和
-                    t.a[k] = a[k] + b.a[k];
-                &#125;
-            &#125;
-            return t;
-        &#125;
-
-        // 打印对称矩阵，这个才是关键！！
-        public void print() &#123;
-            int k;
-            for (int i = 1; i &lt;= n; i++) &#123;
-                for (int j = 1; j &lt;= n; j++) &#123;
-                    if (i &gt;= j) &#123;
-                        k = i * (i - 1) / 2 + j - 1;
-                    &#125; else &#123;
-                        k = j * (j - 1) / 2 + i - 1;
-                    &#125;
-                    System.out.print(&quot; &quot; + a[k]);
-                &#125;
-                System.out.println();
-            &#125;
-        &#125;
-
+    public SymeMatric(int n) &#123;
+        // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
+        // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
+        // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
+        // 所以一维数组的长度m的值为1,2,3...n的前n项和
+        m = n * (n + 1) / 2; 
+        a = new double[m];
+        this.n = n;
     &#125;
 
+    // 通过一个二维数组来初始化
+    public void evalute(double[][] b) &#123;
+        int k = 0;
+        for (int i = 0; i &lt; n; i++) &#123;
+            for (int j = 0; j &lt; n; j++) &#123;
+                // i &gt;= j表示只保存下三角元素
+                if (i &gt;= j) &#123;
+                    a[k++] = b[i][j];
+                &#125;
+            &#125;
+        &#125;
+    &#125;
 
-## 三角矩阵的压缩
+    // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
+    public void evalute(double[] b) &#123;
+        for (int k = 0; k &lt; m; k++) &#123;
+            a[k] = b[k];
+        &#125;
+    &#125;
 
-```m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j
+    // 对称矩阵相加
+    public SymeMatric add(SymeMatric b) &#123;
+        SymeMatric t = new SymeMatric(n);
+        int k;
+        for (int i = 1; i &lt;= n; i++) &#123;
+            for (int j = 1; j &lt;= n; j++) &#123;
+                if (i &gt;= j) &#123;
+                    k = i * (i - 1) / 2 + j - 1;
+                &#125; else &#123;
+                    k = j * (j - 1) / 2 + i - 1;
+                &#125;
+                // 求和
+                t.a[k] = a[k] + b.a[k];
+            &#125;
+        &#125;
+        return t;
+    &#125;
+
+    // 打印对称矩阵，这个才是关键！！
+    public void print() &#123;
+        int k;
+        for (int i = 1; i &lt;= n; i++) &#123;
+            for (int j = 1; j &lt;= n; j++) &#123;
+                if (i &gt;= j) &#123;
+                    k = i * (i - 1) / 2 + j - 1;
+                &#125; else &#123;
+                    k = j * (j - 1) / 2 + i - 1;
+                &#125;
+                System.out.print(&quot; &quot; + a[k]);
+            &#125;
+            System.out.println();
+        &#125;
+    &#125;
+
+&#125;
 </code></pre>
+<h2 id="三角矩阵的压缩"><a href="#三角矩阵的压缩" class="headerlink" title="三角矩阵的压缩"></a>三角矩阵的压缩</h2><p><code>m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</code></p>
 <h2 id="稀疏矩阵的压缩"><a href="#稀疏矩阵的压缩" class="headerlink" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
 <p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
-<pre><code>inal int _ROWS=5;        //定义行数
-final int _COLS=5;        //定义列数
-final int _NOTZERO=6;    //定义稀疏矩阵中不为零的个数
+<pre><code>inal int _ROWS=5;		//定义行数
+final int _COLS=5;		//定义列数
+final int _NOTZERO=6;	//定义稀疏矩阵中不为零的个数
 int i,j,tmpRW,tmpCL,tmpNZ;
 int temp=1;
-int Sparse[][]=new int[_ROWS][_COLS];    //声明稀疏矩阵
+int Sparse[][]=new int[_ROWS][_COLS];	//声明稀疏矩阵
 int Compress[][]=new int[_NOTZERO+1][3];//声明压缩矩阵
-
-for(i=0;i&lt;_ROWS;i++)         //将矩阵初始值都设为0
+    
+for(i=0;i&lt;_ROWS;i++) 		//将矩阵初始值都设为0
     for(j=0;j&lt;_COLS;j++)
         Sparse[i][j]=0;
 
-tmpNZ=_NOTZERO;            //产生随机稀疏矩阵
+tmpNZ=_NOTZERO;			//产生随机稀疏矩阵
 for(i=1;i&lt;tmpNZ+1;i++) &#123;
     tmpRW=(int)(Math.random()*100);
     tmpRW=(tmpRW%_ROWS);
@@ -1949,7 +1686,9 @@ for(i=0;i&lt;_ROWS;i++) &#123;
         &#125;
     &#125;
 &#125;
-</code></pre><p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
+    
+</code></pre>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
 
       
     </div>
@@ -2227,7 +1966,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
         this.data = data;
         this.next = next;
     &#125;
-
+    
 &#125;
 
 public class Stack &#123;
@@ -2331,7 +2070,8 @@ public static void clearStack(Stack stack) &#123;
     stack.stackTop = null;
     stack.stackBottom = stack.stackTop;
 &#125;
-</code></pre><h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出(LILO, Last In Last Out)</p>
+</code></pre>
+<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出(LILO, Last In Last Out)</p>
 <h3 id="静态队列"><a href="#静态队列" class="headerlink" title="静态队列"></a>静态队列</h3><p>数组实现循环队列，节省内存资源</p>
 <pre><code>public class Queue &#123;
 
@@ -2403,7 +2143,7 @@ public static boolean isEmpty(Queue queue) &#123;
         return false;
     &#125;
 &#125;
-
+        
 /**
  * 判断队列是否满了，front和rear指针紧挨着，就是满了
  * @param queue
@@ -2439,7 +2179,9 @@ public static void traverseQueue(Queue queue) &#123;
     &#125;
 
 &#125;
-</code></pre><h3 id="动态队列"><a href="#动态队列" class="headerlink" title="动态队列"></a>动态队列</h3><p>链表实现</p>
+    
+</code></pre>
+<h3 id="动态队列"><a href="#动态队列" class="headerlink" title="动态队列"></a>动态队列</h3><p>链表实现</p>
 
       
     </div>
@@ -2533,7 +2275,7 @@ public static void traverseQueue(Queue queue) &#123;
 <p>森林 : n棵不相交的树的集合为森林</p>
 <h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>常用于实现二叉查找树、二叉堆</p>
 <ul>
-<li><p>每个节点至多有两颗子树（树的度&lt;=2）,子树分左右</p>
+<li><p>每个节点至多有两颗子树（树的度&lt;&#x3D;2）,子树分左右</p>
 </li>
 <li><p>第i层至多有2i-1个节点，深度为k的二叉树，最多节点数2^k-1个节点（具有最多节点的称作满二叉树），其中每个节点都与深度k满二叉树中1-n节点对应，则为完全二叉树</p>
 </li>
@@ -2579,51 +2321,59 @@ public static void traverseQueue(Queue queue) &#123;
 <li>用树的孩子兄弟链来表示键树，称为双链树；每个Node有三个域：symbol域：存储关键字的一个字符；son域：存储指向第一棵子树的根的指针；brother域：存储指向右兄弟的指针。 </li>
 <li>用多重链表来表示键树，称为Trie树或字典树。</li>
 </ol>
-<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d=26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质：<br>1) 根节点不包含字符，除根节点外每一个节点都只包含一个字符；<br>2) 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串；<br>3) 每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用：<br>1) 串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。<br>2) “串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。<br>3) 最长公共前缀 </p>
-<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S=S1S2..Si..Sn，和整数i，1 &lt;= i &lt;= n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S=XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
-<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L = b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
+<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d&#x3D;26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质： </p>
+<ol>
+<li>根节点不包含字符，除根节点外每一个节点都只包含一个字符； </li>
+<li>从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串； </li>
+<li>每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用： </li>
+<li>串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。 </li>
+<li>“串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。 </li>
+<li>最长公共前缀</li>
+</ol>
+<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S&#x3D;S1S2..Si..Sn，和整数i，1 &lt;&#x3D; i &lt;&#x3D; n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S&#x3D;XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
+<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L &#x3D; b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
 <h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
 <p><span id="hafman">哈夫曼树代码实现</span></p>
 <pre><code>import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-
+ 
 public class HuffmanTree &#123;
-
+ 
     public static class Node&lt;E&gt; &#123;
         E data;
         double weight;
         Node leftChild;
         Node rightChild;
-
+ 
         public Node(E data, double weight) &#123;
             super();
             this.data = data;
             this.weight = weight;
         &#125;
-
+ 
         public String toString() &#123;
             return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
         &#125;
     &#125;
-
+ 
     public static void main(String[] args) &#123;
         List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
-
+ 
         nodes.add(new Node(&quot;A&quot;, 40.0));
         nodes.add(new Node(&quot;B&quot;, 8.0));
         nodes.add(new Node(&quot;C&quot;, 10.0));
         nodes.add(new Node(&quot;D&quot;, 30.0));
         nodes.add(new Node(&quot;E&quot;, 10.0));
         nodes.add(new Node(&quot;F&quot;, 2.0));
-
+        
         Node root = HuffmanTree.createTree(nodes);
-
+        
         System.out.println(breadthFirst(root));
-
+ 
     &#125;
-
+ 
     /**
      * 构造哈夫曼树
      * 
@@ -2638,25 +2388,25 @@ public class HuffmanTree &#123;
             //获取权值最小的两个节点
             Node left = nodes.get(nodes.size()-1);
             Node right = nodes.get(nodes.size()-2);
-
+            
             //生成新节点，新节点的权值为两个子节点的权值之和
             Node parent = new Node(null, left.weight + right.weight);
-
+            
             //让新节点作为两个权值最小节点的父节点
             parent.leftChild = left;
             parent.rightChild = right;
-
+            
             //删除权值最小的两个节点
             nodes.remove(nodes.size()-1);
             nodes.remove(nodes.size()-1);
-
+            
             //将新节点加入到集合中
             nodes.add(parent);
         &#125;
-
+        
         return nodes.get(0);
     &#125;
-
+ 
     /**
      * 将指定集合中的i和j索引处的元素交换
      * 
@@ -2670,7 +2420,7 @@ public class HuffmanTree &#123;
         nodes.set(i, nodes.get(j));
         nodes.set(j, tmp);
     &#125;
-
+ 
     /**
      * 实现快速排序算法，用于对节点进行排序
      * 
@@ -2693,57 +2443,58 @@ public class HuffmanTree &#123;
                 // 找到小于分界值的元素的索引，或者j已经到了start处
                 while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
                     ;
-
+ 
                 if (i &lt; j) &#123;
                     swap(nodes, i, j);
                 &#125; else &#123;
                     break;
                 &#125;
             &#125;
-
+ 
             swap(nodes, start, j);
-
+ 
             //递归左边子序列
             subSort(nodes, start, j - 1);
             //递归右边子序列
             subSort(nodes, j + 1, end);
         &#125;
     &#125;
-
+    
     public static void quickSort(List&lt;Node&gt; nodes)&#123;
         subSort(nodes, 0, nodes.size()-1);
     &#125;
-
+    
     //广度优先遍历
     public static List&lt;Node&gt; breadthFirst(Node root)&#123;
         Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
         List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
-
+        
         if(root!=null)&#123;
             //将根元素加入“队列”
             queue.offer(root);
         &#125;
-
+        
         while(!queue.isEmpty())&#123;
             //将该队列的“队尾”元素加入到list中
             list.add(queue.peek());
             Node p = queue.poll();
-
+            
             //如果左子节点不为null，将它加入到队列
             if(p.leftChild != null)&#123;
                 queue.offer(p.leftChild);
             &#125;
-
+            
             //如果右子节点不为null，将它加入到队列
             if(p.rightChild != null)&#123;
                 queue.offer(p.rightChild);
             &#125;
         &#125;
-
+        
         return list;
     &#125;
 &#125;
 </code></pre>
+
       
     </div>
 
@@ -2831,8 +2582,8 @@ public class HuffmanTree &#123;
           <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图</p>
 <h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><ol>
 <li>邻接点-在一个无向图中，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称Vi，Vj为此边的两个端点，并称它们互为邻接点</li>
-<li>出/入边-在一个有向图张，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称此边为顶点Vi的出边，顶点Vj的一条入边</li>
-<li>度/入度/出度-无向图中的度定义为以该顶点为一个端点的边的数目，记为D(V)。有向图的入度定为多少边指向该顶点，出度是该顶点出边的个数</li>
+<li>出&#x2F;入边-在一个有向图张，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称此边为顶点Vi的出边，顶点Vj的一条入边</li>
+<li>度&#x2F;入度&#x2F;出度-无向图中的度定义为以该顶点为一个端点的边的数目，记为D(V)。有向图的入度定为多少边指向该顶点，出度是该顶点出边的个数</li>
 </ol>
 <h2 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h2><p><code>邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。对于无向图 如果顶点b1和b2是连接的，那么在二维矩阵中matrix[b1,b2]和matrix[b2,b1]位置的值置为1，如果是有向图b1指向b2，那么 matrix[b1,b2]=1,matrix[b2,b1]=0；下面用一个例子表示无向图和有向图的邻接矩阵；</code></p>
 <p>如果图是一个带权图，需要把1换为相应边上的权值，把非对角线上的换成一个很大的特定的实数则可，表示相应的边不存在，这个特定的实数通常用无穷大或MaxValue来表示，他要大于图G中所有边的权值</p>
@@ -2848,7 +2599,7 @@ public class EdgeElement &#123;
     int fromvex;
     int endvex;
     int weight;
-
+    
     public EdgeElement(int v1,int v2)&#123;
         //对于无权重图的初始化
         fromvex=v1;
@@ -2860,26 +2611,26 @@ public class EdgeElement &#123;
         fromvex=v1;
         endvex=v2;
         weight=wgt;
-    &#125;    
+    &#125;	
 &#125;
 
 
 package Graph;
 //可以通过边集来得到一个图的构成
 public interface Graph &#123;
-    void creatGraph(EdgeElement d[]);        //通过边结点来构建一个图
-    GraphType graphType();                //返回图的类型  无向无权图 无向有权图  有向无权图  有向有权图 定义一个枚举变量
-    int vertices();                    //返回图的顶点数
-    int edges();                    //返回图的边数
-    boolean find(int i,int j);            //从图中查找一条边(i,j)是否存在
-    void putEdge(EdgeElement theEdge);        //像图中插入一条边 theEdge
-    void removeEdge(int i,int j);            //从图中删除一条边
-    int degree(int i);                //返回顶点i的度
-    int inDegree(int i);                //返回顶点i的入度
-    int outDegree(int i);                //返回顶点i的出度
-    void output();                    //以图的顶点集和边集的形式输出一个图
-    void depthFirstSearch(int v);            //从顶点v开始深度优先搜索整幅图
-    void breadthFirstSearch(int v);            //从顶点v开始广度优先搜索整幅图
+    void creatGraph(EdgeElement d[]);		//通过边结点来构建一个图
+    GraphType graphType();				//返回图的类型  无向无权图 无向有权图  有向无权图  有向有权图 定义一个枚举变量
+    int vertices();					//返回图的顶点数
+    int edges();					//返回图的边数
+    boolean find(int i,int j);			//从图中查找一条边(i,j)是否存在
+    void putEdge(EdgeElement theEdge);		//像图中插入一条边 theEdge
+    void removeEdge(int i,int j);			//从图中删除一条边
+    int degree(int i);				//返回顶点i的度
+    int inDegree(int i);				//返回顶点i的入度
+    int outDegree(int i);				//返回顶点i的出度
+    void output();					//以图的顶点集和边集的形式输出一个图
+    void depthFirstSearch(int v);			//从顶点v开始深度优先搜索整幅图
+    void breadthFirstSearch(int v);			//从顶点v开始广度优先搜索整幅图
 &#125;
 
 //在邻域数组中写数据
@@ -2904,7 +2655,7 @@ public void creatGraph(EdgeElement[] d) &#123;
             a[v1][v2]=d[i].weight;
         &#125;
     &#125;
-    e=i;            //边的数目
+    e=i;			//边的数目
 &#125;
 
 public void putEdge(EdgeElement theEdge) &#123;
@@ -2915,7 +2666,7 @@ public void putEdge(EdgeElement theEdge) &#123;
         System.out.println(&quot;边的顶点序号无效，退出运行！&quot;);
         System.exit(0);
     &#125;
-    if(a[v1][v2]==0 || a[v1][v2]==MaxValue) e++;        //边数e的值加一
+    if(a[v1][v2]==0 || a[v1][v2]==MaxValue) e++;		//边数e的值加一
     if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
         if(type==GraphType.NoDirectionNoWeight)&#123;
             a[v1][v2]=a[v2][v1]=1;
@@ -2937,7 +2688,7 @@ public void removeEdge(int i, int j) &#123;
     &#125;
     if(a[i][j]==0 || a[i][j]==MaxValue)&#123;
         System.out.println(&quot;要删除的边不存在，退出运行！&quot;);
-        System.exit(0);            
+        System.exit(0);			
     &#125;
     if(type==GraphType.NoDirectionNoWeight)&#123;
         a[i][j]=a[j][i]=0;
@@ -2959,7 +2710,7 @@ public int degree(int i) &#123;
     if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
         for(int j=0;j&lt;n;j++)&#123;
             if(a[i][j]!=0 &amp;&amp; a[j][i]!=MaxValue) k++;
-
+            
         &#125;
     &#125;else&#123;
         k = inDegree(i)+outDegree(i);
@@ -2967,7 +2718,7 @@ public int degree(int i) &#123;
     return k;
 &#125;
 //入度
-public int inDegree(int i) &#123;                    
+public int inDegree(int i) &#123;					
     if(i&lt;0 || i&gt; n-1)&#123;
         System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
         System.exit(0);
@@ -3034,16 +2785,16 @@ public void output() &#123;
 &#125;
 
 //深度优先进行搜索   是从哪个顶点开始遍历，这里可以用顶点序号表示顶点
-public void depthFirstSearch(int v) &#123;        //驱动函数
+public void depthFirstSearch(int v) &#123;		//驱动函数
     boolean visited[]=new boolean[n];
     for(int i=0;i&lt;n;i++)&#123;
         visited[i]=false;
     &#125;
-    dfs(v,visited);                            //把每个结点遍历一次。
+    dfs(v,visited);							//把每个结点遍历一次。
     System.out.println();
 &#125;
 //进行深度优先搜索的内部递归方法使用
-private void dfs(int i,boolean visited[])&#123;    //工作函数
+private void dfs(int i,boolean visited[])&#123;	//工作函数
     System.out.print(i+&quot; &quot;);
     visited[i]=true;
     for(int j=0;j&lt;n;j++)&#123;
@@ -3052,7 +2803,8 @@ private void dfs(int i,boolean visited[])&#123;    //工作函数
         &#125;
     &#125;
 &#125;
-</code></pre><p><span id="table">邻接表实现</span></p>
+</code></pre>
+<p><span id="table">邻接表实现</span></p>
 <pre><code>package GraphLink;
 //定义邻接表类型
 public class EdgeNode&#123;
@@ -3207,7 +2959,7 @@ public void removeEdge(int v1,int v2)&#123;
 public int degree(int i)&#123;
     if(i&lt;0||i&gt;n-1)&#123;
         System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
-        System.exit(0);            
+        System.exit(0);			
     &#125;
     int k=0;
     if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
@@ -3224,7 +2976,7 @@ public int inDegree(int i)&#123;//返回指向该顶点的度，入度，用双�
     int k=0;//记录入度个数
     if(i&lt;0||i&gt;n-1)&#123;
         System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
-        System.exit(0);            
+        System.exit(0);			
     &#125;
     if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
         return -1;
@@ -3267,7 +3019,7 @@ public int[][] getAdjacencyMatrix()&#123;
             for(int j=0;j&lt;n;j++)&#123;
                  adjacencyMatrix[i][j]=0;
             &#125;
-        &#125;            
+        &#125;			
     &#125;
         //遍历整个图
         for(int i=0;i&lt;n;i++)&#123;
@@ -3276,10 +3028,11 @@ public int[][] getAdjacencyMatrix()&#123;
                 adjacencyMatrix[i][p.adjvex]=p.weight;
                 p=p.next;
             &#125;
-        &#125;    
+        &#125;	
     return adjacencyMatrix;
 &#125;
 </code></pre>
+
       
     </div>
 
@@ -3464,10 +3217,409 @@ public int[][] getAdjacencyMatrix()&#123;
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/32086.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/32086.html" class="post-title-link" itemprop="url">234树</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>平衡树，子节点数目可以达到4个</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ol>
+<li><p>若父节点中存有1个数据项，则必有2个子节点。</p>
+</li>
+<li><p>若父节点中存有2个数据项，则必有3个子节点。</p>
+</li>
+<li><p>若父节点中存有3个数据项，则必有4个子节点。</p>
+</li>
+</ol>
+<h2 id="构造"><a href="#构造" class="headerlink" title="构造"></a>构造</h2><p>插入数据：</p>
+<ul>
+<li><p>未满节点直接插入</p>
+</li>
+<li><p>满节点 ABC 分裂 A不变 B到父节点 C到右侧</p>
+</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>class Node
+&#123;
+private static final int ORDER = 4;
+private int numItems;//节点中实际存储的数据项数目，其值一定不大于3
+private Node parent;
+private Node childArray[] = new Node[ORDER];//子节点数组
+private DataItem itemArray[] = new DataItem[ORDER-1];//存储数据项数组
+//-------------------------------------------------------------
+// 把参数中的节点作为子节点，与当前节点进行连接
+public void connectChild(int childNum, Node child)
+   &#123;
+   childArray[childNum] = child;
+   if(child != null)
+      child.parent = this;//当前节点作为父节点
+   &#125;
+//-------------------------------------------------------------
+// 断开参数确定的节点与当前节点的连接，这个节点一定是当前节点的子节点。
+public Node disconnectChild(int childNum)
+   &#123;
+   Node tempNode = childArray[childNum];
+   childArray[childNum] = null; //断开连接
+   return tempNode;//返回要这个子节点
+   &#125;
+//-------------------------------------------------------------
+public Node getChild(int childNum)//获取相应的子节点
+   &#123; return childArray[childNum]; &#125;
+//-------------------------------------------------------------
+public Node getParent()//获取父节点
+   &#123; return parent; &#125;
+//-------------------------------------------------------------
+public boolean isLeaf()//是否是叶结点
+   &#123; return (childArray[0]==null) ? true : false; &#125;//叶结点没有子节点
+//-------------------------------------------------------------
+public int getNumItems()//获取实际存储的数据项数目
+  &#123; return numItems; &#125;
+//-------------------------------------------------------------
+public DataItem getItem(int index)   // 获取具体的数据项
+   &#123; return itemArray[index]; &#125;
+//-------------------------------------------------------------
+public boolean isFull()//该节点是否已满
+   &#123; return (numItems==ORDER-1) ? true : false; &#125;
+//-------------------------------------------------------------
+public int findItem(long key)       // 查找
+   &#123;                                    
+   for(int j=0; j&lt;ORDER-1; j++)         // 遍历数组
+      &#123;                                 
+      if(itemArray[j] == null)          // 数组未满，未找到
+         break;
+      else if(itemArray[j].dData == key)
+         return j;
+      &#125;
+   return -1;
+   &#125;  // end findItem
+//-------------------------------------------------------------
+public int insertItem(DataItem newItem)//节点未满的插入
+   &#123;
+   numItems++;                          
+   long newKey = newItem.dData;         // 获得关键字
+ 
+   for(int j=ORDER-2; j&gt;=0; j--)        // 因为节点未满，所以从倒数第二项向前查找
+      &#123;                              
+      if(itemArray[j] == null)          // 没存数据
+         continue;                      
+      else                              
+         &#123;                              
+         long itsKey = itemArray[j].dData;//获得关键字
+         if(newKey &lt; itsKey)            //插入位置在其前面，但未必相邻
+            itemArray[j+1] = itemArray[j]; //当前数据项后移
+         else
+            &#123;
+            itemArray[j+1] = newItem;   // 在其后位置插入
+            return j+1;                 // 返回插入的位置下标
+            &#125;                           //    new item
+         &#125;  // end else (not null)
+      &#125;  // end for                     // shifted all items,
+   //若上述代码没有执行返回操作，那么这是空节点（只有初始时根是这个情况）
+   itemArray[0] = newItem;              // insert new item
+   return 0;
+   &#125;  // end insertItem()
+//-------------------------------------------------------------
+public DataItem removeItem()        // 移除数据项，从后向前移除
+   &#123;
+   // 假设节点非空
+   DataItem temp = itemArray[numItems-1];  // 要移除的数据项
+   itemArray[numItems-1] = null;           // 移除
+   numItems--;                             // 数据项数目减一
+   return temp;                            // 返回要移除的数据项
+   &#125;
+//-------------------------------------------------------------
+public void displayNode()           // format &quot;/24/56/74/&quot;
+   &#123;
+   for(int j=0; j&lt;numItems; j++)
+      itemArray[j].displayItem();   // &quot;/56&quot;
+   System.out.println(&quot;/&quot;);         // final &quot;/&quot;
+   &#125;
+//-------------------------------------------------------------
+&#125;  // end class Node
+////////////////////////////////////////////////////////////////
+
+
+class Tree234
+&#123;
+private Node root = new Node();            // 创建树的根
+//-------------------------------------------------------------
+//获取查找的下一个节点
+public Node getNextChild(Node theNode, long theValue)
+&#123;
+int j;
+// 假设这个节点不是叶结点
+int numItems = theNode.getNumItems();//获得当前节点的数据项数目
+for(j=0; j&lt;numItems; j++)          
+   &#123;                             
+   if( theValue &lt; theNode.getItem(j).dData )
+      return theNode.getChild(j);  // 返回相应的节点
+   &#125;  // end for                   
+return theNode.getChild(j);        // 此时j=numItems
+&#125;
+//-------------------------------------------------------------
+public int find(long key)
+   &#123;
+   Node curNode = root;
+   int childNumber;
+   while(true)
+      &#123;
+      if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行
+         return childNumber;               // found it
+      else if( curNode.isLeaf() )//叶结点上也没找到
+         return -1;                        // can&#39;t find it
+      else                                 // 不是叶结点，则继续向下查找
+         curNode = getNextChild(curNode, key);
+      &#125;  // end while
+   &#125;
+//-------------------------------------------------------------
+// 插入数据项
+public void insert(long dValue)
+   &#123;
+   Node curNode = root;//当前节点标志
+   DataItem tempItem = new DataItem(dValue);//插入数据项封装
+ 
+   while(true)
+      &#123;
+      if( curNode.isFull() )               // 是满节点
+         &#123;
+         split(curNode);                   // 分裂
+         curNode = curNode.getParent();    // 回到分裂出的父节点上
+                                           // 继续向下查找
+         curNode = getNextChild(curNode, dValue);
+         &#125;  // end if(node is full)
+//后面的操作中节点都未满，否则先执行上面的代码
+      else if( curNode.isLeaf() )          // 是叶结点，非满
+         break;                            // 跳出，直接插入
+   
+      else
+         curNode = getNextChild(curNode, dValue);//向下查找
+      &#125;  // end while
+ 
+   curNode.insertItem(tempItem);       // 此时节点一定不满，直接插入数据项，
+   &#125;  // end insert()
+//-------------------------------------------------------------
+public void split(Node thisNode)     // 分裂
+   &#123;
+   // 操作中节点一定是满节点，否则不会执行该操作
+   DataItem itemB, itemC;
+   Node parent, child2, child3;
+   int itemIndex;
+ 
+   itemC = thisNode.removeItem();    // 移除最右边的两个数据项，并保存为B和C
+   itemB = thisNode.removeItem();    // 
+   child2 = thisNode.disconnectChild(2); // //断开最右边两个子节点的链接
+   child3 = thisNode.disconnectChild(3); // 
+ 
+   Node newRight = new Node();       //新建一个节点，作为当前节点的兄弟节点
+ 
+   if(thisNode==root)                // 是根
+      &#123;
+      root = new Node();                // 新建一个根
+      parent = root;                    // 把新根设为父节点
+      root.connectChild(0, thisNode);   // 连接父节点和子节点
+      &#125;
+   else                              // 不是根
+      parent = thisNode.getParent();    // 获取父节点
+ 
+  
+   itemIndex = parent.insertItem(itemB); // 把B插入父节点中，返回插入位置
+   int n = parent.getNumItems();         // 获得总数据项数目
+ 
+   for(int j=n-1; j&gt;itemIndex; j--)          //从后向前移除
+      &#123;                                    
+      Node temp = parent.disconnectChild(j); // 断开连接
+      parent.connectChild(j+1, temp);        // 连接到新的位置
+      &#125;
+                           
+   parent.connectChild(itemIndex+1, newRight);//连接到新位置
+ 
+   // 处理兄弟节点
+   newRight.insertItem(itemC);       // 将C放入兄弟节点中
+   newRight.connectChild(0, child2); // 把子节点中最右边的两个连接到兄弟节点上
+   newRight.connectChild(1, child3); //
+   &#125;  // end split()
+//-------------------------------------------------------------
+// gets appropriate child of node during search for value
+ 
+public void displayTree()
+   &#123;
+   recDisplayTree(root, 0, 0);
+   &#125;
+//-------------------------------------------------------------
+private void recDisplayTree(Node thisNode, int level,
+                                           int childNumber)
+   &#123;
+   System.out.print(&quot;level=&quot;+level+&quot; child=&quot;+childNumber+&quot; &quot;);
+   thisNode.displayNode();               // display this node
+ 
+   // call ourselves for each child of this node
+   int numItems = thisNode.getNumItems();
+   for(int j=0; j&lt;numItems+1; j++)
+      &#123;
+      Node nextNode = thisNode.getChild(j);
+      if(nextNode != null)
+         recDisplayTree(nextNode, level+1, j);
+      else
+         return;
+      &#125;
+   &#125;  // end recDisplayTree()
+//-------------------------------------------------------------\
+&#125;  // end class Tree234
+////////////////////////////////////////////////////////////////
+
+
+import java.io.*;
+ 
+class Tree234App
+&#123;
+public static void main(String[] args) throws IOException
+   &#123;
+   long value;
+   Tree234 theTree = new Tree234();
+ 
+   theTree.insert(50);
+   theTree.insert(40);
+   theTree.insert(60);
+   theTree.insert(30);
+   theTree.insert(70);
+ 
+   while(true)
+      &#123;
+      System.out.print(&quot;Enter first letter of &quot;);
+      System.out.print(&quot;show, insert, or find: &quot;);
+      char choice = getChar();
+      switch(choice)
+         &#123;
+         case &#39;s&#39;:
+            theTree.displayTree();
+            break;
+         case &#39;i&#39;:
+            System.out.print(&quot;Enter value to insert: &quot;);
+            value = getInt();
+            theTree.insert(value);
+            break;
+         case &#39;f&#39;:
+            System.out.print(&quot;Enter value to find: &quot;);
+            value = getInt();
+            int found = theTree.find(value);
+            if(found != -1)
+               System.out.println(&quot;Found &quot;+value);
+            else
+               System.out.println(&quot;Could not find &quot;+value);
+            break;
+         default:
+            System.out.print(&quot;Invalid entry\n&quot;);
+         &#125;  // end switch
+      &#125;  // end while
+   &#125;  // end main()
+//--------------------------------------------------------------
+public static String getString() throws IOException
+   &#123;
+   InputStreamReader isr = new InputStreamReader(System.in);
+   BufferedReader br = new BufferedReader(isr);
+   String s = br.readLine();
+   return s;
+   &#125;
+//--------------------------------------------------------------
+public static char getChar() throws IOException
+   &#123;
+   String s = getString();
+   return s.charAt(0);
+   &#125;
+ 
+//-------------------------------------------------------------
+public static int getInt() throws IOException
+   &#123;
+   String s = getString();
+   return Integer.parseInt(s);
+   &#125;
+//-------------------------------------------------------------
+&#125;  // end class Tree234App
+////////////////////////////////////////////////////////////////
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -3533,20 +3685,20 @@ public int[][] getAdjacencyMatrix()&#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -3582,17 +3734,59 @@ public int[][] getAdjacencyMatrix()&#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -3646,6 +3840,26 @@ public int[][] getAdjacencyMatrix()&#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

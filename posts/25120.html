@@ -45,7 +45,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>贪心算法-旅行商问题 | Qi</title>
   
 
@@ -238,6 +238,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -266,15 +273,17 @@
 <h2 id="贪心算法"><a href="#贪心算法" class="headerlink" title="贪心算法"></a>贪心算法</h2><p>在对问题求解时，总是做出当前情况下的最好选择，否则将来可能会后悔，故名“贪心”。这是一种算法策略，每次选择得到的都是局部最优解。选择的策略必须具备无后效性，即某个状态以前的过程不会影响以后的状态，只与当前状态有关。 </p>
 <p>求解的问题分成若干个子问题，每一个子问题求解，得到子问题的局部最优解，子问题的局部最优解合成原问题的一个解</p>
 <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>从某一个城市开始，每次选择一个城市，直到所有的城市被走完。 </li>
+<li><p>从某一个城市开始，每次选择一个城市，直到所有的城市被走完。 </p>
+</li>
 <li><p>每次在选择下一个城市的时候，只考虑当前情况，保证迄今为止经过的路径总距离最小。</p>
-<pre><code>从问题的某一初始解出发；
-    while （能朝给定总目标前进一步）
-    &#123; 
-          利用可行的决策，求出可行解的一个解元素；
-    &#125;
-由所有解元素组合成问题的一个可行解
-</code></pre></li>
+<pre><code> 从问题的某一初始解出发；
+     while （能朝给定总目标前进一步）
+     &#123; 
+           利用可行的决策，求出可行解的一个解元素；
+     &#125;
+ 由所有解元素组合成问题的一个可行解
+</code></pre>
+</li>
 </ol>
 <h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
 <li>不能保证最终为最优解</li>
@@ -282,24 +291,24 @@
 <li>无后效性</li>
 </ul>
 <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;
-
+ 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
+ 
 public class TxTsp &#123;
-
+ 
     private int cityNum; // 城市数量
     private int[][] distance; // 距离矩阵
-
+ 
     private int[] colable;//代表列，也表示是否走过，走过置0
     private int[] row;//代表行，选过置0
-
+ 
     public TxTsp(int n) &#123;
         cityNum = n;
     &#125;
-
+ 
     private void init(String filename) throws IOException &#123;
         // 读取数据
         int[] x;
@@ -319,7 +328,7 @@ public class TxTsp &#123;
             y[i] = Integer.valueOf(strcol[2]);// y坐标
         &#125;
         data.close();
-
+ 
         // 计算距离矩阵
         // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628
         for (int i = 0; i &lt; cityNum - 1; i++) &#123;
@@ -339,27 +348,27 @@ public class TxTsp &#123;
                 &#125;
             &#125;
         &#125;
-
+ 
         distance[cityNum - 1][cityNum - 1] = 0;
-
+ 
         colable = new int[cityNum];
         colable[0] = 0;
         for (int i = 1; i &lt; cityNum; i++) &#123;
             colable[i] = 1;
         &#125;
-
+ 
         row = new int[cityNum];
         for (int i = 0; i &lt; cityNum; i++) &#123;
             row[i] = 1;
         &#125;
-
+ 
     &#125;
-
+    
     public void solve()&#123;
-
+        
         int[] temp = new int[cityNum];
         String path=&quot;0&quot;;
-
+        
         int s=0;//计算距离
         int i=0;//当前节点
         int j=0;//下一个节点
@@ -376,7 +385,7 @@ public class TxTsp &#123;
             //找出下一节点
             row[i] = 0;//行置0，表示已经选过
             colable[j] = 0;//列0，表示已经走过
-
+            
             path+=&quot;--&gt;&quot; + j;
             //System.out.println(i + &quot;--&gt;&quot; + j);
             //System.out.println(distance[i][j]);
@@ -385,9 +394,9 @@ public class TxTsp &#123;
         &#125;
         System.out.println(&quot;路径:&quot; + path);
         System.out.println(&quot;总距离为:&quot; + s);
-
+        
     &#125;
-
+    
     public int selectmin(int[] p)&#123;
         int j = 0, m = p[0], k = 0;
         //寻找第一个可用节点，注意最后一次寻找，没有可用节点
@@ -415,8 +424,8 @@ public class TxTsp &#123;
         &#125;
         return k;
     &#125;
-
-
+ 
+ 
     public void printinit() &#123;
         System.out.println(&quot;print begin....&quot;);
         for (int i = 0; i &lt; cityNum; i++) &#123;
@@ -427,7 +436,7 @@ public class TxTsp &#123;
         &#125;
         System.out.println(&quot;print end....&quot;);
     &#125;
-
+ 
     public static void main(String[] args) throws IOException &#123;
         System.out.println(&quot;Start....&quot;);
         TxTsp ts = new TxTsp(48);
@@ -437,6 +446,7 @@ public class TxTsp &#123;
     &#125;
 &#125;
 </code></pre>
+
     </div>
 
     
@@ -530,20 +540,20 @@ public class TxTsp &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -579,17 +589,59 @@ public class TxTsp &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -643,6 +695,26 @@ public class TxTsp &#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="代码实现&#x2F;**  * 无向图  *&#x2F; public class NoDirectionGraph &amp;#123;      private int mMaxSize; &#x2F;&#x2F;图中包含的最大顶点数     private GraphVertex[] vertexList; &#x2F;&#x2F;顶点数组     private int[][] indicatorMat; &#x2F;&#x2F;指示顶点之间的连通关系的邻接矩阵     pr">
+  <meta name="description" content="代码实现&#x2F;**  * 无向图  *&#x2F; public class NoDirectionGraph &amp;#123;       private int mMaxSize; &#x2F;&#x2F;图中包含的最大顶点数     private GraphVertex[] vertexList; &#x2F;&#x2F;顶点数组     private int[][] indicatorMat; &#x2F;&#x2F;指示顶点之间的连通关系的邻接矩阵     p">
 <meta property="og:type" content="article">
 <meta property="og:title" content="图的遍历">
 <meta property="og:url" content="https://www.fastolf.com/posts/42854.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="代码实现&#x2F;**  * 无向图  *&#x2F; public class NoDirectionGraph &amp;#123;      private int mMaxSize; &#x2F;&#x2F;图中包含的最大顶点数     private GraphVertex[] vertexList; &#x2F;&#x2F;顶点数组     private int[][] indicatorMat; &#x2F;&#x2F;指示顶点之间的连通关系的邻接矩阵     pr">
+<meta property="og:description" content="代码实现&#x2F;**  * 无向图  *&#x2F; public class NoDirectionGraph &amp;#123;       private int mMaxSize; &#x2F;&#x2F;图中包含的最大顶点数     private GraphVertex[] vertexList; &#x2F;&#x2F;顶点数组     private int[][] indicatorMat; &#x2F;&#x2F;指示顶点之间的连通关系的邻接矩阵     p">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.486Z">
 <meta property="article:modified_time" content="2022-12-28T06:40:43.811Z">
@@ -45,7 +45,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>图的遍历 | Qi</title>
   
 
@@ -238,6 +238,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -264,13 +271,13 @@
  * 无向图
  */
 public class NoDirectionGraph &#123;
-
+ 
     private int mMaxSize; //图中包含的最大顶点数
     private GraphVertex[] vertexList; //顶点数组
     private int[][] indicatorMat; //指示顶点之间的连通关系的邻接矩阵
     private int nVertex; //当前实际保存的顶点数目
-
-
+    
+    
     public NoDirectionGraph(int maxSize) &#123;
         mMaxSize = maxSize;
         vertexList = new GraphVertex[mMaxSize];
@@ -283,17 +290,17 @@ public class NoDirectionGraph &#123;
             &#125;
         &#125;
     &#125;
-
-
+    
+    
     public void addVertex(GraphVertex v) &#123;
         if(nVertex &lt; mMaxSize) &#123;
             vertexList[nVertex++] = v;
-
+            
         &#125; else &#123;
             System.out.println(&quot;---插入失败，顶点数量已达上限!&quot;);
         &#125;
     &#125;
-
+    
     /**
      * 修改邻接矩阵，添加新的边
      * @param start
@@ -303,12 +310,12 @@ public class NoDirectionGraph &#123;
         indicatorMat[start][end] = 1;
         indicatorMat[end][start] = 1;
     &#125;
-
+    
     /**
      * 打印邻接矩阵
      */
     public void printIndicatorMat() &#123;
-
+        
         for(int[] line:indicatorMat) &#123;
             for(int i:line) &#123;
                 System.out.print(i + &quot; &quot;);
@@ -316,7 +323,7 @@ public class NoDirectionGraph &#123;
             System.out.println();
         &#125;
     &#125;
-
+    
     /**
      * 深度优先遍历
      * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
@@ -341,7 +348,7 @@ public class NoDirectionGraph &#123;
             &#125;
         &#125;
     &#125;
-
+    
     /**
      * 得到当前顶点的下一个顶点所在行
      * @param column
@@ -355,7 +362,7 @@ public class NoDirectionGraph &#123;
         &#125;
         return -1;
     &#125;
-
+    
     /**
      * 广度优先遍历
      * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
@@ -382,22 +389,22 @@ public class NoDirectionGraph &#123;
 
 
 
-
+ 
 /**
  * 使用数组实现栈结构
  */
 public class ArrayStack &#123;
-
+ 
     private int[] tArray; 
     private int topIndex = -1; //表示当前栈顶元素的索引位置
     private int CAPACITY_STEP = 12; //数组容量扩展步长
-
-
+    
+    
     public ArrayStack() &#123;
         /***创建泛型数组的一种方法***/
         tArray = new int[CAPACITY_STEP]; 
     &#125;
-
+    
     /**
      * 弹出栈顶元素方法
      * @return
@@ -412,7 +419,7 @@ public class ArrayStack &#123;
             return i;
         &#125;
     &#125;
-
+    
     /**
      * 向栈中插入一个元素
      * @param t
@@ -432,7 +439,7 @@ public class ArrayStack &#123;
             tArray[topIndex] = t;
         &#125;
     &#125;
-
+    
     /**
      * 得到栈顶元素，但不弹出
      * @return
@@ -445,7 +452,7 @@ public class ArrayStack &#123;
             return tArray[topIndex];
         &#125;
     &#125;
-
+    
     /**
      * 判断当前栈是否为空
      * @return
@@ -453,7 +460,7 @@ public class ArrayStack &#123;
     public boolean isEmpty() &#123;
         return (topIndex &lt; 0);
     &#125;
-
+    
     /**
      * 打印栈中元素
      */
@@ -473,16 +480,16 @@ public class ChainQueue &#123;
     private QueueNode head; // 指向队列头节点
     private QueueNode tail; // 指向队列尾节点
     private int size = 0; // 队列尺寸
-
+ 
     public ChainQueue() &#123;
-
+ 
     &#125;
-
+ 
     /**
      * 插入新节点到队列尾
      */
     public void insert(QueueNode node) &#123;
-
+ 
         // 当然也可以这么写,添加tail.prev = node
         if (head == null) &#123;
             head = node;
@@ -494,7 +501,7 @@ public class ChainQueue &#123;
         &#125;
         size++;
     &#125;
-
+ 
     /**
      * 移除队列首节点
      */
@@ -509,7 +516,7 @@ public class ChainQueue &#123;
             return null;
         &#125;
     &#125;
-
+ 
     /**
      * 队列是否为空
      * 
@@ -522,7 +529,7 @@ public class ChainQueue &#123;
             return true;
         &#125;
     &#125;
-
+ 
     /**
      * 返回队列首节点，但不移除
      */
@@ -535,7 +542,7 @@ public class ChainQueue &#123;
             return null;
         &#125;
     &#125;
-
+ 
     /**
      * 返回队列大小
      * 
@@ -544,7 +551,7 @@ public class ChainQueue &#123;
     public int size() &#123;
         return size;
     &#125;
-
+    
     /**
      * 打印队列中的元素
      */
@@ -557,7 +564,7 @@ public class ChainQueue &#123;
         System.out.println();
     &#125;
 &#125;
-
+ 
 /**
  * 节点类
  * 
@@ -567,21 +574,21 @@ public class ChainQueue &#123;
 class QueueNode &#123;
     QueueNode prev;
     QueueNode next;
-
+ 
     int data;
-
+ 
     public QueueNode(int data) &#123;
         this.data = data;
     &#125;
-
+ 
     public int getData() &#123;
         return data;
     &#125;
-
+ 
     public void setData(int data) &#123;
         this.data = data;
     &#125;
-
+ 
     @Override
     public String toString() &#123;
         // TODO Auto-generated method stub
@@ -590,6 +597,7 @@ class QueueNode &#123;
     &#125;
 &#125;
 </code></pre>
+
     </div>
 
     
@@ -683,20 +691,20 @@ class QueueNode &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -732,17 +740,59 @@ class QueueNode &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -796,6 +846,26 @@ class QueueNode &#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

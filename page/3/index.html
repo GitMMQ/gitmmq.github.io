@@ -43,7 +43,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>Qi</title>
   
 
@@ -434,22 +434,24 @@
 <li>下一步：生长</li>
 <li><code>繁殖得到 一对刚出生的兔子-&gt; 第1步</code></li>
 </ol>
-<p>总结： 当月的兔子数=上月兔子数+当月新生兔子  数列的当前列=前两列之和</p>
+<p>总结： 当月的兔子数&#x3D;上月兔子数+当月新生兔子  数列的当前列&#x3D;前两列之和</p>
 <h2 id="递归算法"><a href="#递归算法" class="headerlink" title="递归算法"></a>递归算法</h2><p>指数阶算法，效率较低，时间复杂度爆炸增量</p>
-<pre><code>Fib1(int n)
-
-&#123; if(n&lt;1)
-
-       return -1;
-
-  if(n==1||n==2)
-
-        return 1;
-
-   return Fib1(n-1)+Fib1(n-2);
-
-&#125;
-</code></pre><h2 id="数组记录先两项值"><a href="#数组记录先两项值" class="headerlink" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
+<pre><code>    Fib1(int n)
+    
+    &#123; if(n&lt;1)
+    
+           return -1;
+    
+      if(n==1||n==2)
+    
+            return 1;
+    
+       return Fib1(n-1)+Fib1(n-2);
+    
+    &#125;
+    
+</code></pre>
+<h2 id="数组记录先两项值"><a href="#数组记录先两项值" class="headerlink" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
 <pre><code>Fib2(intn)
 &#123;
     if(n&lt;1)
@@ -462,7 +464,10 @@
         return a[n];
      &#125;
 &#125;
-</code></pre><h2 id="迭代法"><a href="#迭代法" class="headerlink" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
+         
+    
+</code></pre>
+<h2 id="迭代法"><a href="#迭代法" class="headerlink" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
 <pre><code>Fib3(intn)
 &#123;
     inti,s1,s2;
@@ -478,44 +483,48 @@
     &#125;
     return s2;
  &#125;
-</code></pre><h2 id="矩阵乘法"><a href="#矩阵乘法" class="headerlink" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</code></p>
-<pre><code>public static int ValueN(int n)&#123;
-      if(n&lt;1)&#123;
-          return 0;
-      &#125;
-      if(n==1 || n==2)&#123;
-          return 1;
-      &#125;
-       int [][] base=&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;;
-       int [][] res=matrixPower(base,n-2);
-       return res[0][0]+res[1][0];
-    &#125;
-    public static int[][] matrixPower(int[][] m,int p)&#123;
-        if(p==0)
-            return null;
-        if(p==1)
-            return m;
-        int[][] res=matrixPower(m,p&gt;&gt;1);
-        res=muliMatrix(res,res);
-        if((p&amp;1)==1)&#123;
-            res=muliMatrix(res,m);
-        &#125;
-        return res;
-    &#125;
-    //求两个矩阵相乘得到一个新的矩阵
-    public static int[][] muliMatrix(int[][] m1,int[][] m2)&#123;
-        int [][] res=new int[m1.length][m2[0].length];
-        for(int i=0;i&lt;m1.length;i++)&#123;
-            for(int j=0;j&lt;m2[0].length;j++)&#123;
-                for(int k=0;k&lt;m2.length;k++)&#123;
-                    res[i][j]+=m1[i][k]*m2[k][j];
-                &#125;
-            &#125;
-        &#125;
-        return res;
-    &#125;
-&#125;
+ 
 </code></pre>
+<h2 id="矩阵乘法"><a href="#矩阵乘法" class="headerlink" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</code></p>
+<pre><code>   public static int ValueN(int n)&#123;
+         if(n&lt;1)&#123;
+             return 0;
+         &#125;
+         if(n==1 || n==2)&#123;
+             return 1;
+         &#125;
+          int [][] base=&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;;
+          int [][] res=matrixPower(base,n-2);
+          return res[0][0]+res[1][0];
+       &#125;
+       public static int[][] matrixPower(int[][] m,int p)&#123;
+           if(p==0)
+               return null;
+           if(p==1)
+               return m;
+           int[][] res=matrixPower(m,p&gt;&gt;1);
+           res=muliMatrix(res,res);
+           if((p&amp;1)==1)&#123;
+               res=muliMatrix(res,m);
+           &#125;
+           return res;
+       &#125;
+       //求两个矩阵相乘得到一个新的矩阵
+       public static int[][] muliMatrix(int[][] m1,int[][] m2)&#123;
+           int [][] res=new int[m1.length][m2[0].length];
+           for(int i=0;i&lt;m1.length;i++)&#123;
+               for(int j=0;j&lt;m2[0].length;j++)&#123;
+                   for(int k=0;k&lt;m2.length;k++)&#123;
+                       res[i][j]+=m1[i][k]*m2[k][j];
+                   &#125;
+               &#125;
+           &#125;
+           return res;
+       &#125;
+   &#125;
+  
+</code></pre>
+
       
     </div>
 
@@ -1077,20 +1086,22 @@ public static int bf(String ts, String ps) &#123;
     &#125;
 
 &#125;
-</code></pre><p>优化：考虑先前匹配的结果和模式串的特点（最长前缀），i可以不动，只移动j，到位置k</p>
+</code></pre>
+<p>优化：考虑先前匹配的结果和模式串的特点（最长前缀），i可以不动，只移动j，到位置k</p>
 <h2 id="寻找k"><a href="#寻找k" class="headerlink" title="寻找k"></a>寻找k</h2><p>规律： 最前面的k个字符和j之前的最后k个字符是一样的</p>
 <p> <img src="http://thyrsi.com/t6/625/1543997868x1822611383.jpg" alt="alt text" title="示例"></p>
 <h2 id="推导："><a href="#推导：" class="headerlink" title="推导："></a>推导：</h2><pre><code>T[i] != P[j] 
 T[i-j ~ i-1] == P[0 ~ j-1] 
 P[0 ~ k-1] == P[j-k ~ j-1]
 ==&gt; T[i-k ~ i-1] == P[0 ~ k-1]
-</code></pre><h3 id="由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k"><a href="#由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k" class="headerlink" title="由于每个j对应的k都可能不同，可以找到一个j~k对应关系 next[j] = k"></a>由于每个j对应的k都可能不同，可以找到一个j~k对应关系 <code>next[j] = k</code></h3><h2 id="四个规则"><a href="#四个规则" class="headerlink" title="四个规则"></a>四个规则</h2><ol>
+</code></pre>
+<h3 id="由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k"><a href="#由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k" class="headerlink" title="由于每个j对应的k都可能不同，可以找到一个j~k对应关系 next[j] = k"></a>由于每个j对应的k都可能不同，可以找到一个j~k对应关系 <code>next[j] = k</code></h3><h2 id="四个规则"><a href="#四个规则" class="headerlink" title="四个规则"></a>四个规则</h2><ol>
 <li>j在最左边了，匹配失败，i指针后移</li>
 <li><code>P[0 ~ k-1] == p[j-k ~ j-1] 且 P[k] == P[j]时，next[j+1] == k + 1 == next[j] + 1，找到最大公共前后缀数</code></li>
 <li><code>P[0 ~ k-1] == p[j-k ~ j-1] 且 P[k] != P[j]时，k=next[k]（在位置k不匹配了，往下找不到更长的前缀字串了，但可以根据k找到最长前后缀数）</code></li>
 </ol>
 <blockquote>
-<p>递归思想: 不匹配，递归找不匹配位置k前面有没有相同前缀后缀，一直找到next[0]=-1为止，此时next[j]=k+1=-1+1=0</p>
+<p>递归思想: 不匹配，递归找不匹配位置k前面有没有相同前缀后缀，一直找到next[0]&#x3D;-1为止，此时next[j]&#x3D;k+1&#x3D;-1+1&#x3D;0</p>
 </blockquote>
 <p><img src="http://thyrsi.com/t6/625/1543997916x1822611383.jpg" alt="alt text"></p>
 <pre><code>public static int[] getNext(String ps) &#123;
@@ -1122,7 +1133,8 @@ P[0 ~ k-1] == P[j-k ~ j-1]
     return next;
 
 &#125;
-</code></pre><h3 id="当P-j-P-next-j-已经与主串不匹配"><a href="#当P-j-P-next-j-已经与主串不匹配" class="headerlink" title="当P[j] == P[next[j]],已经与主串不匹配`"></a>当P[j] == P[next[j]],已经与主串不匹配`</h3><pre><code>public static int[] getNext(String ps) &#123;
+</code></pre>
+<h3 id="当P-j-x3D-x3D-P-next-j-已经与主串不匹配-96"><a href="#当P-j-x3D-x3D-P-next-j-已经与主串不匹配-96" class="headerlink" title="当P[j] &#x3D;&#x3D; P[next[j]],已经与主串不匹配&#96;"></a>当P[j] &#x3D;&#x3D; P[next[j]],已经与主串不匹配&#96;</h3><pre><code>public static int[] getNext(String ps) &#123;
 
     char[] p = ps.toCharArray();
 
@@ -1159,7 +1171,8 @@ P[0 ~ k-1] == P[j-k ~ j-1]
     return next;
 
 &#125;
-</code></pre><h2 id="匹配过程"><a href="#匹配过程" class="headerlink" title="匹配过程"></a>匹配过程</h2><pre><code>public static int KMP(String ts, String ps) &#123;
+</code></pre>
+<h2 id="匹配过程"><a href="#匹配过程" class="headerlink" title="匹配过程"></a>匹配过程</h2><pre><code>public static int KMP(String ts, String ps) &#123;
 
     char[] t = ts.toCharArray();
 
@@ -1203,6 +1216,7 @@ P[0 ~ k-1] == P[j-k ~ j-1]
 
 &#125;
 </code></pre>
+
       
     </div>
 
@@ -1307,7 +1321,7 @@ P[0 ~ k-1] == P[j-k ~ j-1]
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1373,20 +1387,20 @@ P[0 ~ k-1] == P[j-k ~ j-1]
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1422,17 +1436,59 @@ P[0 ~ k-1] == P[j-k ~ j-1]
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -1486,6 +1542,26 @@ P[0 ~ k-1] == P[j-k ~ j-1]
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

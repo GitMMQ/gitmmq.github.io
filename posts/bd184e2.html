@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="nodejs 版本需要考虑主题支持的版本范围，最好应大于10 小于 15，推荐使用12 参考官方文档 安装前提 安装hexo123npm install -g hexo-clinpm install -g hexo 环境变量配置 全局安装的目录  启动一个blog项目12345678npm install hexo-cli -ghexo init blogcd blognpm installhex">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo自定义菜单">
+<meta property="og:url" content="https://www.fastolf.com/posts/bd184e2.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="nodejs 版本需要考虑主题支持的版本范围，最好应大于10 小于 15，推荐使用12 参考官方文档 安装前提 安装hexo123npm install -g hexo-clinpm install -g hexo 环境变量配置 全局安装的目录  启动一个blog项目12345678npm install hexo-cli -ghexo init blogcd blognpm installhex">
+<meta property="og:locale">
+<meta property="og:image" content="https://www.fastolf.com/img/gitio_custom_domain_20221228193328.png">
+<meta property="og:image" content="https://www.fastolf.com/img/ali_dns_config_20221228164219.png">
+<meta property="article:published_time" content="2021-09-26T11:06:24.000Z">
+<meta property="article:modified_time" content="2022-12-28T14:58:04.821Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="next">
+<meta property="article:tag" content="博客">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.fastolf.com/img/gitio_custom_domain_20221228193328.png">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/bd184e2.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>hexo自定义菜单 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/bd184e2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hexo自定义菜单
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-26 19:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T19:06:24+08:00">2021-09-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 22:58:04" itemprop="dateModified" datetime="2022-12-28T22:58:04+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="nodejs-版本"><a href="#nodejs-版本" class="headerlink" title="nodejs 版本"></a>nodejs 版本</h2><p>需要考虑主题支持的版本范围，最好应大于10 小于 15，推荐使用12</p>
+<p>参考官方文档 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/index.html#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90">安装前提</a></p>
+<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br><span class="line">npm install -g hexo </span><br><span class="line">环境变量配置 全局安装的目录</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动一个blog项目"><a href="#启动一个blog项目" class="headerlink" title="启动一个blog项目"></a>启动一个blog项目</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br><span class="line">hexo new &quot;postName&quot;</span><br><span class="line">hexo new page &quot;pageName&quot;</span><br><span class="line">hexo generate</span><br><span class="line">hexo server</span><br></pre></td></tr></table></figure>
+
+<h2 id="主题配置"><a href="#主题配置" class="headerlink" title="主题配置"></a>主题配置</h2><h2 id="菜单项配置"><a href="#菜单项配置" class="headerlink" title="菜单项配置"></a>菜单项配置</h2><h3 id="新增页面"><a href="#新增页面" class="headerlink" title="新增页面"></a>新增页面</h3><p>source 目录下新建 tags、categories、about文件夹</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo new page &quot;tags&quot;</span><br><span class="line">hexo new page &quot;categories&quot;</span><br><span class="line">hexo new page &quot;about&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="博文的头部"><a href="#博文的头部" class="headerlink" title="博文的头部"></a>博文的头部</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: Hello World</span><br><span class="line">date: 2022/3/26 00:00:00</span><br><span class="line">categories:</span><br><span class="line"><span class="bullet">	-</span> Java</span><br><span class="line">tags: # 标签</span><br><span class="line"><span class="bullet">	-</span> Web</span><br><span class="line"><span class="section">	- Server</span></span><br><span class="line"><span class="section">---</span></span><br><span class="line"></span><br><span class="line">摘要</span><br><span class="line">正文</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改主题配置文件"><a href="#修改主题配置文件" class="headerlink" title="修改主题配置文件"></a>修改主题配置文件</h3><p>theme&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: / || fa fa-home</span><br><span class="line">  tags: /tags/ || fa fa-tags</span><br><span class="line">  categories: /categories/ || fa fa-th</span><br><span class="line">  archives: /archives/ || fa fa-archive</span><br><span class="line">  about: /about/ || fa fa-user</span><br><span class="line">  #schedule: /schedule/ || fa fa-calendar</span><br><span class="line">  #sitemap: /sitemap.xml || fa fa-sitemap</span><br><span class="line">  #commonweal: /404/ || fa fa-heartbeat</span><br></pre></td></tr></table></figure>
+
+<h2 id="定制页面"><a href="#定制页面" class="headerlink" title="定制页面"></a>定制页面</h2><p>Hexo的scripts目录下新增customcategory.js</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> pagination = <span class="built_in">require</span>(<span class="string">&#x27;hexo-pagination&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> filteredCategory = <span class="string">&#x27;分析&#x27;</span>;</span><br><span class="line"></span><br><span class="line">hexo.<span class="property">extend</span>.<span class="property">generator</span>.<span class="title function_">register</span>(<span class="string">&#x27;customcategory&#x27;</span>, <span class="keyword">function</span>(<span class="params">locals</span>)&#123;</span><br><span class="line">  <span class="keyword">var</span> analysisPosts = locals.<span class="property">posts</span>.<span class="title function_">filter</span>(<span class="keyword">function</span>(<span class="params">x</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> x.<span class="property">categories</span>.<span class="property">data</span>[<span class="number">0</span>].<span class="property">name</span> == filteredCategory;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">pagination</span>(<span class="string">&#x27;analysis&#x27;</span>, analysisPosts, &#123;</span><br><span class="line">    <span class="attr">perPage</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="attr">layout</span>: [<span class="string">&#x27;customcategory&#x27;</span>]</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>参考 <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo-pagination#hexo-pagination">hexo-pagination</a> 的使用方式</p>
+<h2 id="定制模板"><a href="#定制模板" class="headerlink" title="定制模板"></a>定制模板</h2><p>theme&#x2F;next&#x2F;layout 下新增 customcategory.swig</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &#x27;_layout.swig&#x27; %&#125;</span><br><span class="line">&#123;% import &#x27;_macro/post-collapse.swig&#x27; as post_template with context %&#125;</span><br><span class="line">&#123;% import &#x27;_macro/sidebar.swig&#x27; as sidebar_template with context %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block title %&#125;&#123;&#123; __(&#x27;title.category&#x27;) &#125;&#125;: &#123;&#123; page.category &#125;&#125; | &#123;&#123; title &#125;&#125;&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block class %&#125;category&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block content %&#125;</span><br><span class="line"></span><br><span class="line">  &#123;######################&#125;</span><br><span class="line">  &#123;### CATEGORY BLOCK ###&#125;</span><br><span class="line">  &#123;######################&#125;</span><br><span class="line">  &lt;div class=&quot;post-block&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;posts-collapse&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;collection-title&quot;&gt;</span><br><span class="line">        &lt;h2 class=&quot;collection-header&quot;&gt;</span><br><span class="line">          &#123;&#123;- page.category &#125;&#125;</span><br><span class="line">          &lt;small&gt;&#123;&#123; __(&#x27;title.category&#x27;) &#125;&#125;&lt;/small&gt;</span><br><span class="line">        &lt;/h2&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">      &#123;&#123; post_template.render(page.posts) &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  &#123;##########################&#125;</span><br><span class="line">  &#123;### END CATEGORY BLOCK ###&#125;</span><br><span class="line">  &#123;##########################&#125;</span><br><span class="line"></span><br><span class="line">  &#123;% include &#x27;_partials/pagination.swig&#x27; %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block sidebar %&#125;</span><br><span class="line">  &#123;&#123; sidebar_template.render(false) &#125;&#125;</span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo常用命令"><a href="#hexo常用命令" class="headerlink" title="hexo常用命令"></a>hexo常用命令</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hexo init</span><br><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo server</span><br><span class="line">hexo deploy</span><br><span class="line">(新版本支持首字母缩写命令，如 hexo g -&gt; hexo generate)</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo常用插件"><a href="#hexo常用插件" class="headerlink" title="hexo常用插件"></a>hexo常用插件</h2><p>插件地址: <a target="_blank" rel="noopener" href="https://hexo.io/plugins/">https://hexo.io/plugins/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&quot;hexo&quot;: &quot;^5.4.2&quot;,</span><br><span class="line">&quot;hexo-cake-moon-menu&quot;: &quot;^2.5.0&quot;,</span><br><span class="line">&quot;hexo-abbrlink&quot;: &quot;^2.2.1&quot;,</span><br><span class="line">&quot;hexo-asset-image&quot;: &quot;^1.0.0&quot;,</span><br><span class="line">&quot;hexo-auto-category&quot;: &quot;^0.2.1&quot;,</span><br><span class="line">&quot;hexo-calendar&quot;: &quot;^1.0.6&quot;,</span><br><span class="line">&quot;hexo-cli&quot;: &quot;^4.3.0&quot;,</span><br><span class="line">&quot;hexo-deployer-git&quot;: &quot;^0.3.1&quot;,</span><br><span class="line">&quot;hexo-generator-archive&quot;: &quot;^0.1.5&quot;,</span><br><span class="line">&quot;hexo-generator-baidu-sitemap&quot;: &quot;^0.1.9&quot;,</span><br><span class="line">&quot;hexo-generator-category&quot;: &quot;^0.1.3&quot;,</span><br><span class="line">&quot;hexo-generator-index&quot;: &quot;^0.2.1&quot;,</span><br><span class="line">&quot;hexo-generator-search&quot;: &quot;^2.4.3&quot;,</span><br><span class="line">&quot;hexo-generator-searchdb&quot;: &quot;^1.4.1&quot;,</span><br><span class="line">&quot;hexo-generator-sitemap&quot;: &quot;^3.0.1&quot;,</span><br><span class="line">&quot;hexo-generator-tag&quot;: &quot;^0.2.0&quot;,</span><br><span class="line">&quot;hexo-renderer-ejs&quot;: &quot;^0.3.1&quot;,</span><br><span class="line">&quot;hexo-renderer-marked&quot;: &quot;^0.3.2&quot;,</span><br><span class="line">&quot;hexo-renderer-stylus&quot;: &quot;^0.3.3&quot;,</span><br><span class="line">&quot;hexo-renderer-swig&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">&quot;hexo-server&quot;: &quot;^0.3.3&quot;,</span><br><span class="line">&quot;hexo-theme-next&quot;: &quot;^8.14.0&quot;,</span><br><span class="line">&quot;hexo-word-counter&quot;: &quot;^0.1.0&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-note用法"><a href="#hexo-note用法" class="headerlink" title="hexo note用法"></a>hexo note用法</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/tag-plugins">https://hexo.io/zh-cn/docs/tag-plugins</a></p>
+<h3 id="配置部分"><a href="#配置部分" class="headerlink" title="配置部分"></a>配置部分</h3><p>theme&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">note:</span></span><br><span class="line">  <span class="comment"># Note tag style values:</span></span><br><span class="line">  <span class="comment">#  - simple    bs-callout old alert style. Default.</span></span><br><span class="line">  <span class="comment">#  - modern    bs-callout new (v2-v3) alert style.</span></span><br><span class="line">  <span class="comment">#  - flat      flat callout style with background, like on Mozilla or StackOverflow.</span></span><br><span class="line">  <span class="comment">#  - disabled  disable all CSS styles import of note tag.</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">simple</span></span><br><span class="line">  <span class="attr">icons:</span> <span class="literal">true</span> <span class="comment">#false时PC端不显示图标，但移动端仍会显示，故需要在标签语句中手动no-icon进行标注</span></span><br><span class="line">  <span class="attr">border_radius:</span> <span class="number">3</span></span><br><span class="line">  <span class="comment"># Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).</span></span><br><span class="line">  <span class="comment"># Offset also applied to label tag variables. This option can work with disabled note tag.</span></span><br><span class="line">  <span class="attr">light_bg_offset:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行模板"><a href="#执行模板" class="headerlink" title="执行模板"></a>执行模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">note.js</span><br><span class="line">&#123;% note [class] [no-icon] %&#125;</span><br><span class="line">Any content (support inline tags too.io).</span><br><span class="line">&#123;% endnote %&#125;</span><br><span class="line">[class]   : default | primary | success | info | warning | danger.</span><br><span class="line">[no-icon] : Disable icon in note.</span><br><span class="line">All parameters are optional.</span><br></pre></td></tr></table></figure>
+
+<h3 id="example"><a href="#example" class="headerlink" title="example"></a>example</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% note default %&#125;</span><br><span class="line">#### Default Header</span><br><span class="line">Welcome to [Hexo!](https://hexo.io)</span><br><span class="line">&#123;% endnote %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-tabs用法"><a href="#hexo-tabs用法" class="headerlink" title="hexo tabs用法"></a>hexo tabs用法</h2><h3 id="配置部分-1"><a href="#配置部分-1" class="headerlink" title="配置部分"></a>配置部分</h3><p>theme&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">next/_config.yml</span></span><br><span class="line"><span class="attr">tabs:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">transition:</span></span><br><span class="line">    <span class="attr">tabs:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">labels:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">border_radius:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h3 id="执行模板-1"><a href="#执行模板-1" class="headerlink" title="执行模板"></a>执行模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#123;% tabs Unique name, [index] %&#125;</span><br><span class="line">&lt;!-- tab [Tab caption] [@icon] --&gt;</span><br><span class="line">Any content (support inline tags too).</span><br><span class="line">&lt;!-- endtab --&gt;</span><br><span class="line">&#123;% endtabs %&#125;</span><br><span class="line"></span><br><span class="line">Unique name   : Unique name of tabs block tag without comma.</span><br><span class="line">                Will be used in #id&#x27;s as prefix for each tab with their index numbers.</span><br><span class="line">                If there are whitespaces in name, for generate #id all whitespaces will replaced by dashes.</span><br><span class="line">                Only for current url of post/page must be unique!</span><br><span class="line">[index]       : Index number of active tab.</span><br><span class="line">                If not specified, first tab (1) will be selected.</span><br><span class="line">                If index is -1, no tab will be selected. It&#x27;s will be something like spoiler.</span><br><span class="line">                Optional parameter.</span><br><span class="line">[Tab caption] : Caption of current tab.</span><br><span class="line">                If not caption specified, unique name with tab index suffix will be used as caption of tab.</span><br><span class="line">                If not caption specified, but specified icon, caption will empty.</span><br><span class="line">                Optional parameter.</span><br><span class="line">[@icon]       : FontAwesome icon name (without &#x27;fa-&#x27; at the begining).</span><br><span class="line">                Can be specified with or without space; e.g. &#x27;Tab caption @icon&#x27; similar to &#x27;Tab caption@icon&#x27;.</span><br><span class="line">                Optional parameter.</span><br></pre></td></tr></table></figure>
+
+<h3 id="example-1"><a href="#example-1" class="headerlink" title="example"></a>example</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;% tabs First unique name %&#125;</span><br><span class="line">&lt;!-- tab --&gt;</span><br><span class="line">**This is Tab 1.**</span><br><span class="line">&lt;!-- endtab --&gt;</span><br><span class="line">&lt;!-- tab --&gt;</span><br><span class="line">**This is Tab 2.**</span><br><span class="line">&lt;!-- endtab --&gt;</span><br><span class="line">&lt;!-- tab --&gt;</span><br><span class="line">**This is Tab 3.**</span><br><span class="line">&lt;!-- endtab --&gt;</span><br><span class="line">&#123;% endtabs %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-pdf用法"><a href="#hexo-pdf用法" class="headerlink" title="hexo pdf用法"></a>hexo pdf用法</h2><h3 id="配置部分-2"><a href="#配置部分-2" class="headerlink" title="配置部分"></a>配置部分</h3><p>theme&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">next/_config.yml</span></span><br><span class="line"><span class="attr">pdf:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># Default height</span></span><br><span class="line">  <span class="attr">height:</span> <span class="string">500px</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行模板-2"><a href="#执行模板-2" class="headerlink" title="执行模板"></a>执行模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pdf.js</span><br><span class="line">&#123;% pdf url [height] %&#125;</span><br><span class="line">[url]    : Relative path to PDF file.</span><br><span class="line">[height] : Optional. Height of the PDF display element, e.g. 800px.</span><br></pre></td></tr></table></figure>
+<h3 id="example-2"><a href="#example-2" class="headerlink" title="example"></a>example</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% pdf https://example.com/sample.pdf %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-video用法"><a href="#hexo-video用法" class="headerlink" title="hexo video用法"></a>hexo video用法</h2><h3 id="执行模板-3"><a href="#执行模板-3" class="headerlink" title="执行模板"></a>执行模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">video.js</span><br><span class="line">&#123;% video url %&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="example-3"><a href="#example-3" class="headerlink" title="example"></a>example</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;% video /path/to/your/video.mp4 %&#125;</span><br><span class="line">&#123;% video https://example.com/sample.mp4 %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-Group-pictures用法"><a href="#hexo-Group-pictures用法" class="headerlink" title="hexo Group-pictures用法"></a>hexo Group-pictures用法</h2><h3 id="执行模板-4"><a href="#执行模板-4" class="headerlink" title="执行模板"></a>执行模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">group-pictures.js</span><br><span class="line">&#123;% grouppicture [group]-[layout] %&#125;&#123;% endgrouppicture %&#125;</span><br><span class="line">&#123;% gp [group]-[layout] %&#125;&#123;% endgp %&#125;</span><br><span class="line">[group]  : Total number of pictures to add in the group.</span><br><span class="line">[layout] : Default picture under the group to show.</span><br></pre></td></tr></table></figure>
+<h3 id="example-4"><a href="#example-4" class="headerlink" title="example"></a>example</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% grouppicture 7-5%&#125;</span><br><span class="line">  ![](https://suncos-01-1254144885.cos.ap-shanghai.myqcloud.com/%E6%89%8B%E6%9C%BA/IMG_20160720_192243_AO_HDR.jpg)</span><br><span class="line">  ![](https://suncos-01-1254144885.cos.ap-shanghai.myqcloud.com/%E6%89%8B%E6%9C%BA/IMG_20160817_185254_AO_HDR.jpg)</span><br><span class="line">&#123;% endgrouppicture %&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hexo-写作模板"><a href="#hexo-写作模板" class="headerlink" title="hexo 写作模板"></a>hexo 写作模板</h2><p><a target="_blank" rel="noopener" href="https://www.bas369.com/more/learning_notes/2020/03/14/Markdown%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF/">https://www.bas369.com/more/learning_notes/2020/03/14/Markdown%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF/</a></p>
+<h2 id="hexo-资源文件夹"><a href="#hexo-资源文件夹" class="headerlink" title="hexo 资源文件夹"></a>hexo 资源文件夹</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/asset-folders.html">https://hexo.io/zh-cn/docs/asset-folders.html</a></p>
+<h2 id="github-svg-corner"><a href="#github-svg-corner" class="headerlink" title="github svg corner"></a>github svg corner</h2><p><a target="_blank" rel="noopener" href="https://tholman.com/github-corners/">https://tholman.com/github-corners/</a></p>
+<h2 id="githubPage访问地址问题"><a href="#githubPage访问地址问题" class="headerlink" title="githubPage访问地址问题"></a>githubPage访问地址问题</h2><p>repository名称需要与githubPage名称保持一致<br>域名在github repository setting中配置，每次上传被覆盖<br>需要配置cname文件</p>
+<p><img src="/img/gitio_custom_domain_20221228193328.png" alt="GithubPage"></p>
+<h2 id="cname-重定向"><a href="#cname-重定向" class="headerlink" title="cname 重定向"></a>cname 重定向</h2><p>hexo 站点配置文件 _config.yml中设置url为域名<br>githubPage 重定向机制 source目录新建CNAME文件，添加域名地址<br>如果你的 CNAME 文件为 example.com，那么 <a target="_blank" rel="noopener" href="http://www.example.com/">www.example.com</a> 会定向到 example.com。<br>如果你的 CNAME 文件为 <a target="_blank" rel="noopener" href="http://www.example.com,那么/">www.example.com，那么</a> example.com 会定向到 <a target="_blank" rel="noopener" href="http://www.example.com/">www.example.com</a></p>
+<p><img src="/img/ali_dns_config_20221228164219.png" alt="阿里DNS配置"></p>
+<h2 id="hexo配置文件说明"><a href="#hexo配置文件说明" class="headerlink" title="hexo配置文件说明"></a>hexo配置文件说明</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/configuration">https://hexo.io/zh-cn/docs/configuration</a></p>
+<h2 id="hexo-语言"><a href="#hexo-语言" class="headerlink" title="hexo 语言"></a>hexo 语言</h2><p>站点配置文件 language: zh-Hans &#x2F;&#x2F; 这里设置语言 简体中文<br>对应主题语言目录中的 文件名 需要保持一致</p>
+<h2 id="hexo-问题处理"><a href="#hexo-问题处理" class="headerlink" title="hexo 问题处理"></a>hexo 问题处理</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">https://hexo.io/docs/troubleshooting.html</a></p>
+<h3 id="访问页面直接显示未经过渲染的模板"><a href="#访问页面直接显示未经过渲染的模板" class="headerlink" title="访问页面直接显示未经过渲染的模板"></a>访问页面直接显示未经过渲染的模板</h3><p>hexo在5.0版本以上移除了swig</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i hexo-renderer-swig --save</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.eson.org/categories/">https://blog.eson.org/categories/</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/hexo/" rel="tag"># hexo</a>
+              <a href="/tags/next/" rel="tag"># next</a>
+              <a href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag"># 博客</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/343ed70.html" rel="prev" title="node常见错误处理">
+      <i class="fa fa-chevron-left"></i> node常见错误处理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/b76ba195.html" rel="next" title="LF will be replaced by CRLF">
+      LF will be replaced by CRLF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#nodejs-%E7%89%88%E6%9C%AC"><span class="nav-number">1.</span> <span class="nav-text">nodejs 版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hexo"><span class="nav-number">2.</span> <span class="nav-text">安装hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AAblog%E9%A1%B9%E7%9B%AE"><span class="nav-number">3.</span> <span class="nav-text">启动一个blog项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">主题配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8F%9C%E5%8D%95%E9%A1%B9%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">菜单项配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E9%A1%B5%E9%9D%A2"><span class="nav-number">5.1.</span> <span class="nav-text">新增页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%9A%E6%96%87%E7%9A%84%E5%A4%B4%E9%83%A8"><span class="nav-number">5.2.</span> <span class="nav-text">博文的头部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">5.3.</span> <span class="nav-text">修改主题配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E5%88%B6%E9%A1%B5%E9%9D%A2"><span class="nav-number">6.</span> <span class="nav-text">定制页面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E5%88%B6%E6%A8%A1%E6%9D%BF"><span class="nav-number">7.</span> <span class="nav-text">定制模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">8.</span> <span class="nav-text">hexo常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo%E5%B8%B8%E7%94%A8%E6%8F%92%E4%BB%B6"><span class="nav-number">9.</span> <span class="nav-text">hexo常用插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-note%E7%94%A8%E6%B3%95"><span class="nav-number">10.</span> <span class="nav-text">hexo note用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%83%A8%E5%88%86"><span class="nav-number">10.1.</span> <span class="nav-text">配置部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E6%9D%BF"><span class="nav-number">10.2.</span> <span class="nav-text">执行模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example"><span class="nav-number">10.3.</span> <span class="nav-text">example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-tabs%E7%94%A8%E6%B3%95"><span class="nav-number">11.</span> <span class="nav-text">hexo tabs用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%83%A8%E5%88%86-1"><span class="nav-number">11.1.</span> <span class="nav-text">配置部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E6%9D%BF-1"><span class="nav-number">11.2.</span> <span class="nav-text">执行模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-1"><span class="nav-number">11.3.</span> <span class="nav-text">example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-pdf%E7%94%A8%E6%B3%95"><span class="nav-number">12.</span> <span class="nav-text">hexo pdf用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%83%A8%E5%88%86-2"><span class="nav-number">12.1.</span> <span class="nav-text">配置部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E6%9D%BF-2"><span class="nav-number">12.2.</span> <span class="nav-text">执行模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-2"><span class="nav-number">12.3.</span> <span class="nav-text">example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-video%E7%94%A8%E6%B3%95"><span class="nav-number">13.</span> <span class="nav-text">hexo video用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E6%9D%BF-3"><span class="nav-number">13.1.</span> <span class="nav-text">执行模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-3"><span class="nav-number">13.2.</span> <span class="nav-text">example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-Group-pictures%E7%94%A8%E6%B3%95"><span class="nav-number">14.</span> <span class="nav-text">hexo Group-pictures用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E6%9D%BF-4"><span class="nav-number">14.1.</span> <span class="nav-text">执行模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-4"><span class="nav-number">14.2.</span> <span class="nav-text">example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF"><span class="nav-number">15.</span> <span class="nav-text">hexo 写作模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">16.</span> <span class="nav-text">hexo 资源文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github-svg-corner"><span class="nav-number">17.</span> <span class="nav-text">github svg corner</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#githubPage%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E9%97%AE%E9%A2%98"><span class="nav-number">18.</span> <span class="nav-text">githubPage访问地址问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cname-%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">19.</span> <span class="nav-text">cname 重定向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E"><span class="nav-number">20.</span> <span class="nav-text">hexo配置文件说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-%E8%AF%AD%E8%A8%80"><span class="nav-number">21.</span> <span class="nav-text">hexo 语言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86"><span class="nav-number">22.</span> <span class="nav-text">hexo 问题处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E9%A1%B5%E9%9D%A2%E7%9B%B4%E6%8E%A5%E6%98%BE%E7%A4%BA%E6%9C%AA%E7%BB%8F%E8%BF%87%E6%B8%B2%E6%9F%93%E7%9A%84%E6%A8%A1%E6%9D%BF"><span class="nav-number">22.1.</span> <span class="nav-text">访问页面直接显示未经过渲染的模板</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">23.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">37k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:15</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

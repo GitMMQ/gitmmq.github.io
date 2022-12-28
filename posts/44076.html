@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="对称矩阵的压缩     &#x2F;&#x2F;对称矩阵的压缩算法     public class SymeMatric &amp;#123;          double[] a;&#x2F;&#x2F; 矩阵元素         int n; &#x2F;&#x2F; 矩阵的阶数         int m;&#x2F;&#x2F; 一维数组的元素的个数--长度          public SymeMatric(int n) &amp;#123;             &#x2F;&#x2F; 对">
+  <meta name="description" content="对称矩阵的压缩n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)&#x2F;2个元素 &#x2F;&#x2F;对称矩阵的压缩算法 public class SymeMatric &amp;#123;      double[] a;&#x2F;&#x2F; 矩阵元素     int n; &#x2F;&#x2F; 矩阵的阶数     int m;&#x2F;&#x2F; 一维数组的元素的个数--长度      public SymeMatric(i">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据结构-矩阵压缩">
 <meta property="og:url" content="https://www.fastolf.com/posts/44076.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="对称矩阵的压缩     &#x2F;&#x2F;对称矩阵的压缩算法     public class SymeMatric &amp;#123;          double[] a;&#x2F;&#x2F; 矩阵元素         int n; &#x2F;&#x2F; 矩阵的阶数         int m;&#x2F;&#x2F; 一维数组的元素的个数--长度          public SymeMatric(int n) &amp;#123;             &#x2F;&#x2F; 对">
+<meta property="og:description" content="对称矩阵的压缩n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)&#x2F;2个元素 &#x2F;&#x2F;对称矩阵的压缩算法 public class SymeMatric &amp;#123;      double[] a;&#x2F;&#x2F; 矩阵元素     int n; &#x2F;&#x2F; 矩阵的阶数     int m;&#x2F;&#x2F; 一维数组的元素的个数--长度      public SymeMatric(i">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.014Z">
 <meta property="article:modified_time" content="2022-12-28T06:40:43.799Z">
@@ -45,7 +45,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>数据结构-矩阵压缩 | Qi</title>
   
 
@@ -238,6 +238,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -260,100 +267,96 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><pre><code class="n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素```">
-    //对称矩阵的压缩算法
-    public class SymeMatric &#123;
+        <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><p><code>n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素</code></p>
+<pre><code>//对称矩阵的压缩算法
+public class SymeMatric &#123;
 
-        double[] a;// 矩阵元素
-        int n; // 矩阵的阶数
-        int m;// 一维数组的元素的个数--长度
+    double[] a;// 矩阵元素
+    int n; // 矩阵的阶数
+    int m;// 一维数组的元素的个数--长度
 
-        public SymeMatric(int n) &#123;
-            // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
-            // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
-            // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
-            // 所以一维数组的长度m的值为1,2,3...n的前n项和
-            m = n * (n + 1) / 2; 
-            a = new double[m];
-            this.n = n;
-        &#125;
-
-        // 通过一个二维数组来初始化
-        public void evalute(double[][] b) &#123;
-            int k = 0;
-            for (int i = 0; i &lt; n; i++) &#123;
-                for (int j = 0; j &lt; n; j++) &#123;
-                    // i &gt;= j表示只保存下三角元素
-                    if (i &gt;= j) &#123;
-                        a[k++] = b[i][j];
-                    &#125;
-                &#125;
-            &#125;
-        &#125;
-
-        // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
-        public void evalute(double[] b) &#123;
-            for (int k = 0; k &lt; m; k++) &#123;
-                a[k] = b[k];
-            &#125;
-        &#125;
-
-        // 对称矩阵相加
-        public SymeMatric add(SymeMatric b) &#123;
-            SymeMatric t = new SymeMatric(n);
-            int k;
-            for (int i = 1; i &lt;= n; i++) &#123;
-                for (int j = 1; j &lt;= n; j++) &#123;
-                    if (i &gt;= j) &#123;
-                        k = i * (i - 1) / 2 + j - 1;
-                    &#125; else &#123;
-                        k = j * (j - 1) / 2 + i - 1;
-                    &#125;
-                    // 求和
-                    t.a[k] = a[k] + b.a[k];
-                &#125;
-            &#125;
-            return t;
-        &#125;
-
-        // 打印对称矩阵，这个才是关键！！
-        public void print() &#123;
-            int k;
-            for (int i = 1; i &lt;= n; i++) &#123;
-                for (int j = 1; j &lt;= n; j++) &#123;
-                    if (i &gt;= j) &#123;
-                        k = i * (i - 1) / 2 + j - 1;
-                    &#125; else &#123;
-                        k = j * (j - 1) / 2 + i - 1;
-                    &#125;
-                    System.out.print(&quot; &quot; + a[k]);
-                &#125;
-                System.out.println();
-            &#125;
-        &#125;
-
+    public SymeMatric(int n) &#123;
+        // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
+        // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
+        // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
+        // 所以一维数组的长度m的值为1,2,3...n的前n项和
+        m = n * (n + 1) / 2; 
+        a = new double[m];
+        this.n = n;
     &#125;
 
+    // 通过一个二维数组来初始化
+    public void evalute(double[][] b) &#123;
+        int k = 0;
+        for (int i = 0; i &lt; n; i++) &#123;
+            for (int j = 0; j &lt; n; j++) &#123;
+                // i &gt;= j表示只保存下三角元素
+                if (i &gt;= j) &#123;
+                    a[k++] = b[i][j];
+                &#125;
+            &#125;
+        &#125;
+    &#125;
 
-## 三角矩阵的压缩
+    // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
+    public void evalute(double[] b) &#123;
+        for (int k = 0; k &lt; m; k++) &#123;
+            a[k] = b[k];
+        &#125;
+    &#125;
 
-```m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j
+    // 对称矩阵相加
+    public SymeMatric add(SymeMatric b) &#123;
+        SymeMatric t = new SymeMatric(n);
+        int k;
+        for (int i = 1; i &lt;= n; i++) &#123;
+            for (int j = 1; j &lt;= n; j++) &#123;
+                if (i &gt;= j) &#123;
+                    k = i * (i - 1) / 2 + j - 1;
+                &#125; else &#123;
+                    k = j * (j - 1) / 2 + i - 1;
+                &#125;
+                // 求和
+                t.a[k] = a[k] + b.a[k];
+            &#125;
+        &#125;
+        return t;
+    &#125;
+
+    // 打印对称矩阵，这个才是关键！！
+    public void print() &#123;
+        int k;
+        for (int i = 1; i &lt;= n; i++) &#123;
+            for (int j = 1; j &lt;= n; j++) &#123;
+                if (i &gt;= j) &#123;
+                    k = i * (i - 1) / 2 + j - 1;
+                &#125; else &#123;
+                    k = j * (j - 1) / 2 + i - 1;
+                &#125;
+                System.out.print(&quot; &quot; + a[k]);
+            &#125;
+            System.out.println();
+        &#125;
+    &#125;
+
+&#125;
 </code></pre>
+<h2 id="三角矩阵的压缩"><a href="#三角矩阵的压缩" class="headerlink" title="三角矩阵的压缩"></a>三角矩阵的压缩</h2><p><code>m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</code></p>
 <h2 id="稀疏矩阵的压缩"><a href="#稀疏矩阵的压缩" class="headerlink" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
 <p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
-<pre><code>inal int _ROWS=5;        //定义行数
-final int _COLS=5;        //定义列数
-final int _NOTZERO=6;    //定义稀疏矩阵中不为零的个数
+<pre><code>inal int _ROWS=5;		//定义行数
+final int _COLS=5;		//定义列数
+final int _NOTZERO=6;	//定义稀疏矩阵中不为零的个数
 int i,j,tmpRW,tmpCL,tmpNZ;
 int temp=1;
-int Sparse[][]=new int[_ROWS][_COLS];    //声明稀疏矩阵
+int Sparse[][]=new int[_ROWS][_COLS];	//声明稀疏矩阵
 int Compress[][]=new int[_NOTZERO+1][3];//声明压缩矩阵
-
-for(i=0;i&lt;_ROWS;i++)         //将矩阵初始值都设为0
+    
+for(i=0;i&lt;_ROWS;i++) 		//将矩阵初始值都设为0
     for(j=0;j&lt;_COLS;j++)
         Sparse[i][j]=0;
 
-tmpNZ=_NOTZERO;            //产生随机稀疏矩阵
+tmpNZ=_NOTZERO;			//产生随机稀疏矩阵
 for(i=1;i&lt;tmpNZ+1;i++) &#123;
     tmpRW=(int)(Math.random()*100);
     tmpRW=(tmpRW%_ROWS);
@@ -378,7 +381,9 @@ for(i=0;i&lt;_ROWS;i++) &#123;
         &#125;
     &#125;
 &#125;
-</code></pre><p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
+    
+</code></pre>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
 
     </div>
 
@@ -459,7 +464,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E7%A7%B0%E7%9F%A9%E9%98%B5%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">1.</span> <span class="nav-text">对称矩阵的压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.</span> <span class="nav-text">稀疏矩阵的压缩</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E7%A7%B0%E7%9F%A9%E9%98%B5%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">1.</span> <span class="nav-text">对称矩阵的压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E7%9F%A9%E9%98%B5%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.</span> <span class="nav-text">三角矩阵的压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="nav-number">3.</span> <span class="nav-text">稀疏矩阵的压缩</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -473,20 +478,20 @@ for(i=0;i&lt;_ROWS;i++) &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -522,17 +527,59 @@ for(i=0;i&lt;_ROWS;i++) &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -586,6 +633,26 @@ for(i=0;i&lt;_ROWS;i++) &#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

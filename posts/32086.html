@@ -45,7 +45,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>234树 | Qi</title>
   
 
@@ -238,6 +238,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -334,7 +341,7 @@ public int insertItem(DataItem newItem)//节点未满的插入
    &#123;
    numItems++;                          
    long newKey = newItem.dData;         // 获得关键字
-
+ 
    for(int j=ORDER-2; j&gt;=0; j--)        // 因为节点未满，所以从倒数第二项向前查找
       &#123;                              
       if(itemArray[j] == null)          // 没存数据
@@ -403,7 +410,7 @@ public int find(long key)
       if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行
          return childNumber;               // found it
       else if( curNode.isLeaf() )//叶结点上也没找到
-         return -1;                        // can&apos;t find it
+         return -1;                        // can&#39;t find it
       else                                 // 不是叶结点，则继续向下查找
          curNode = getNextChild(curNode, key);
       &#125;  // end while
@@ -414,7 +421,7 @@ public void insert(long dValue)
    &#123;
    Node curNode = root;//当前节点标志
    DataItem tempItem = new DataItem(dValue);//插入数据项封装
-
+ 
    while(true)
       &#123;
       if( curNode.isFull() )               // 是满节点
@@ -427,11 +434,11 @@ public void insert(long dValue)
 //后面的操作中节点都未满，否则先执行上面的代码
       else if( curNode.isLeaf() )          // 是叶结点，非满
          break;                            // 跳出，直接插入
-
+   
       else
          curNode = getNextChild(curNode, dValue);//向下查找
       &#125;  // end while
-
+ 
    curNode.insertItem(tempItem);       // 此时节点一定不满，直接插入数据项，
    &#125;  // end insert()
 //-------------------------------------------------------------
@@ -441,14 +448,14 @@ public void split(Node thisNode)     // 分裂
    DataItem itemB, itemC;
    Node parent, child2, child3;
    int itemIndex;
-
+ 
    itemC = thisNode.removeItem();    // 移除最右边的两个数据项，并保存为B和C
    itemB = thisNode.removeItem();    // 
    child2 = thisNode.disconnectChild(2); // //断开最右边两个子节点的链接
    child3 = thisNode.disconnectChild(3); // 
-
+ 
    Node newRight = new Node();       //新建一个节点，作为当前节点的兄弟节点
-
+ 
    if(thisNode==root)                // 是根
       &#123;
       root = new Node();                // 新建一个根
@@ -457,19 +464,19 @@ public void split(Node thisNode)     // 分裂
       &#125;
    else                              // 不是根
       parent = thisNode.getParent();    // 获取父节点
-
-
+ 
+  
    itemIndex = parent.insertItem(itemB); // 把B插入父节点中，返回插入位置
    int n = parent.getNumItems();         // 获得总数据项数目
-
+ 
    for(int j=n-1; j&gt;itemIndex; j--)          //从后向前移除
       &#123;                                    
       Node temp = parent.disconnectChild(j); // 断开连接
       parent.connectChild(j+1, temp);        // 连接到新的位置
       &#125;
-
+                           
    parent.connectChild(itemIndex+1, newRight);//连接到新位置
-
+ 
    // 处理兄弟节点
    newRight.insertItem(itemC);       // 将C放入兄弟节点中
    newRight.connectChild(0, child2); // 把子节点中最右边的两个连接到兄弟节点上
@@ -477,7 +484,7 @@ public void split(Node thisNode)     // 分裂
    &#125;  // end split()
 //-------------------------------------------------------------
 // gets appropriate child of node during search for value
-
+ 
 public void displayTree()
    &#123;
    recDisplayTree(root, 0, 0);
@@ -488,7 +495,7 @@ private void recDisplayTree(Node thisNode, int level,
    &#123;
    System.out.print(&quot;level=&quot;+level+&quot; child=&quot;+childNumber+&quot; &quot;);
    thisNode.displayNode();               // display this node
-
+ 
    // call ourselves for each child of this node
    int numItems = thisNode.getNumItems();
    for(int j=0; j&lt;numItems+1; j++)
@@ -506,20 +513,20 @@ private void recDisplayTree(Node thisNode, int level,
 
 
 import java.io.*;
-
+ 
 class Tree234App
 &#123;
 public static void main(String[] args) throws IOException
    &#123;
    long value;
    Tree234 theTree = new Tree234();
-
+ 
    theTree.insert(50);
    theTree.insert(40);
    theTree.insert(60);
    theTree.insert(30);
    theTree.insert(70);
-
+ 
    while(true)
       &#123;
       System.out.print(&quot;Enter first letter of &quot;);
@@ -527,15 +534,15 @@ public static void main(String[] args) throws IOException
       char choice = getChar();
       switch(choice)
          &#123;
-         case &apos;s&apos;:
+         case &#39;s&#39;:
             theTree.displayTree();
             break;
-         case &apos;i&apos;:
+         case &#39;i&#39;:
             System.out.print(&quot;Enter value to insert: &quot;);
             value = getInt();
             theTree.insert(value);
             break;
-         case &apos;f&apos;:
+         case &#39;f&#39;:
             System.out.print(&quot;Enter value to find: &quot;);
             value = getInt();
             int found = theTree.find(value);
@@ -563,7 +570,7 @@ public static char getChar() throws IOException
    String s = getString();
    return s.charAt(0);
    &#125;
-
+ 
 //-------------------------------------------------------------
 public static int getInt() throws IOException
    &#123;
@@ -574,6 +581,7 @@ public static int getInt() throws IOException
 &#125;  // end class Tree234App
 ////////////////////////////////////////////////////////////////
 </code></pre>
+
     </div>
 
     
@@ -667,20 +675,20 @@ public static int getInt() throws IOException
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -716,17 +724,59 @@ public static int getInt() throws IOException
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -780,6 +830,26 @@ public static int getInt() throws IOException
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>

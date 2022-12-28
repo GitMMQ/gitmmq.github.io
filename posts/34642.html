@@ -45,7 +45,7 @@
     lang   : 'zh-Hans'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>遗传算法 | Qi</title>
   
 
@@ -238,6 +238,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -288,15 +295,15 @@
 <li>选择策略</li>
 </ul>
 <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;  
-
+  
 import java.io.BufferedReader;  
 import java.io.FileInputStream;  
 import java.io.IOException;  
 import java.io.InputStreamReader;  
 import java.util.Random;  
-
+  
 public class GA &#123;  
-
+  
     private int scale;// 种群规模  
     private int cityNum; // 城市数量，染色体长度  
     private int MAX_GEN; // 运行代数  
@@ -304,23 +311,23 @@ public class GA &#123;
     private int bestT;// 最佳出现代数  
     private int bestLength; // 最佳长度  
     private int[] bestTour; // 最佳路径  
-
+  
     // 初始种群，父代种群，行数表示种群规模，一行代表一个个体，即染色体，列表示染色体基因片段  
     private int[][] oldPopulation;  
     private int[][] newPopulation;// 新的种群，子代种群  
     private int[] fitness;// 种群适应度，表示种群中各个个体的适应度  
-
+  
     private float[] Pi;// 种群中各个个体的累计概率  
     private float Pc;// 交叉概率  
     private float Pm;// 变异概率  
     private int t;// 当前代数  
-
+  
     private Random random;  
-
+  
     public GA() &#123;  
-
+  
     &#125;  
-
+  
     /** 
      * constructor of GA 
      *  
@@ -343,7 +350,7 @@ public class GA &#123;
         Pc = c;  
         Pm = m;  
     &#125;  
-
+  
     // 给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默  
     @SuppressWarnings(&quot;resource&quot;)  
     /** 
@@ -389,26 +396,26 @@ public class GA &#123;
             &#125;  
         &#125;  
         distance[cityNum - 1][cityNum - 1] = 0;  
-
+  
         bestLength = Integer.MAX_VALUE;  
         bestTour = new int[cityNum + 1];  
         bestT = 0;  
         t = 0;  
-
+  
         newPopulation = new int[scale][cityNum];  
         oldPopulation = new int[scale][cityNum];  
         fitness = new int[scale];  
         Pi = new float[scale];  
-
+  
         random = new Random(System.currentTimeMillis());  
         /* 
          * for(int i=0;i&lt;cityNum;i++) &#123; for(int j=0;j&lt;cityNum;j++) &#123; 
          * System.out.print(distance[i][j]+&quot;,&quot;); &#125; System.out.println(); &#125; 
          */  
         // 初始化种群  
-
+  
     &#125;  
-
+  
     // 初始化种群  
     void initGroup() &#123;  
         int i, j, k;  
@@ -429,13 +436,13 @@ public class GA &#123;
                 &#125;  
             &#125;  
         &#125;  
-
+  
         /* 
          * for(i=0;i&lt;scale;i++) &#123; for(j=0;j&lt;cityNum;j++) &#123; 
          * System.out.print(oldPopulation[i][j]+&quot;,&quot;); &#125; System.out.println(); &#125; 
          */  
     &#125;  
-
+  
     public int evaluate(int[] chromosome) &#123;  
         // 0123  
         int len = 0;  
@@ -447,35 +454,35 @@ public class GA &#123;
         len += distance[chromosome[cityNum - 1]][chromosome[0]];  
         return len;  
     &#125;  
-
+  
     // 计算种群中各个个体的累积概率，前提是已经计算出各个个体的适应度fitness[max]，作为赌轮选择策略一部分，Pi[max]  
     void countRate() &#123;  
         int k;  
         double sumFitness = 0;// 适应度总和  
-
+  
         double[] tempf = new double[scale];  
-
+  
         for (k = 0; k &lt; scale; k++) &#123;  
             tempf[k] = 10.0 / fitness[k];  
             sumFitness += tempf[k];  
         &#125;  
-
+  
         Pi[0] = (float) (tempf[0] / sumFitness);  
         for (k = 1; k &lt; scale; k++) &#123;  
             Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);  
         &#125;  
-
+  
         /* 
          * for(k=0;k&lt;scale;k++) &#123; System.out.println(fitness[k]+&quot; &quot;+Pi[k]); &#125; 
          */  
     &#125;  
-
+  
     // 挑选某代种群中适应度最高的个体，直接复制到子代中  
     // 前提是已经计算出各个个体的适应度Fitness[max]  
     public void selectBestGh() &#123;  
         int k, i, maxid;  
         int maxevaluation;  
-
+  
         maxid = 0;  
         maxevaluation = fitness[0];  
         for (k = 1; k &lt; scale; k++) &#123;  
@@ -484,7 +491,7 @@ public class GA &#123;
                 maxid = k;  
             &#125;  
         &#125;  
-
+  
         if (bestLength &gt; maxevaluation) &#123;  
             bestLength = maxevaluation;  
             bestT = t;// 最好的染色体出现的代数;  
@@ -492,12 +499,12 @@ public class GA &#123;
                 bestTour[i] = oldPopulation[maxid][i];  
             &#125;  
         &#125;  
-
+  
         // System.out.println(&quot;代数 &quot; + t + &quot; &quot; + maxevaluation);  
         // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
         copyGh(0, maxid);// 将当代种群中适应度最高的染色体k复制到新种群中，排在第一位0  
     &#125;  
-
+  
     // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
     public void copyGh(int k, int kk) &#123;  
         int i;  
@@ -505,7 +512,7 @@ public class GA &#123;
             newPopulation[k][i] = oldPopulation[kk][i];  
         &#125;  
     &#125;  
-
+  
     // 赌轮选择策略挑选  
     public void select() &#123;  
         int k, i, selectId;  
@@ -525,19 +532,19 @@ public class GA &#123;
             copyGh(k, selectId);  
         &#125;  
     &#125;  
-
+  
     //进化函数，正常交叉变异  
     public void evolution() &#123;  
         int k;  
         // 挑选某代种群中适应度最高的个体  
         selectBestGh();  
-
+  
         // 赌轮选择策略挑选scale-1个下一代个体  
         select();  
-
+  
         // Random random = new Random(System.currentTimeMillis());  
         float r;  
-
+  
         // 交叉方法  
         for (k = 0; k &lt; scale; k = k + 2) &#123;  
             r = random.nextFloat();// /产生概率  
@@ -562,22 +569,22 @@ public class GA &#123;
                     OnCVariation(k + 1);  
                 &#125;  
             &#125;  
-
+  
         &#125;  
     &#125;  
-
+  
     //进化函数，保留最好染色体不进行交叉变异  
     public void evolution1() &#123;  
         int k;  
         // 挑选某代种群中适应度最高的个体  
         selectBestGh();  
-
+  
         // 赌轮选择策略挑选scale-1个下一代个体  
         select();  
-
+  
         // Random random = new Random(System.currentTimeMillis());  
         float r;  
-
+  
         for (k = 1; k + 1 &lt; scale / 2; k = k + 2) &#123;  
             r = random.nextFloat();// /产生概率  
             if (r &lt; Pc) &#123;  
@@ -603,9 +610,9 @@ public class GA &#123;
                 OnCVariation(k);  
             &#125;  
         &#125;  
-
+  
     &#125;  
-
+  
     // 类OX交叉算子  
     void OXCross(int k1, int k2) &#123;  
         int i, j, k, flag;  
@@ -613,17 +620,17 @@ public class GA &#123;
         int[] Gh1 = new int[cityNum];  
         int[] Gh2 = new int[cityNum];  
         // Random random = new Random(System.currentTimeMillis());  
-
+  
         ran1 = random.nextInt(65535) % cityNum;  
         ran2 = random.nextInt(65535) % cityNum;  
         // System.out.println();  
         // System.out.println(&quot;-----------------------&quot;);  
         // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
-
+  
         while (ran1 == ran2) &#123;  
             ran2 = random.nextInt(65535) % cityNum;  
         &#125;  
-
+  
         if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
         &#123;  
             temp = ran1;  
@@ -641,7 +648,7 @@ public class GA &#123;
             Gh2[i] = newPopulation[k1][j];  
         &#125;  
         // 已近赋值i=ran2-ran1个基因  
-
+  
         for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
         &#123;  
             Gh1[j] = newPopulation[k1][k++];  
@@ -654,7 +661,7 @@ public class GA &#123;
                 j++;  
             &#125;  
         &#125;  
-
+  
         for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
         &#123;  
             Gh2[j] = newPopulation[k2][k++];  
@@ -667,12 +674,12 @@ public class GA &#123;
                 j++;  
             &#125;  
         &#125;  
-
+  
         for (i = 0; i &lt; cityNum; i++) &#123;  
             newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
             newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
         &#125;  
-
+  
         // System.out.println(&quot;进行交叉--------------------------&quot;);  
         // System.out.println(k1+&quot;交叉后...&quot;);  
         // for (i = 0; i &lt; cityNum; i++) &#123;  
@@ -686,7 +693,7 @@ public class GA &#123;
         // System.out.println();  
         // System.out.println(&quot;交叉完毕--------------------------&quot;);  
     &#125;  
-
+  
     // 交叉算子,相同染色体交叉产生不同子代染色体  
     public void OXCross1(int k1, int k2) &#123;  
         int i, j, k, flag;  
@@ -694,27 +701,27 @@ public class GA &#123;
         int[] Gh1 = new int[cityNum];  
         int[] Gh2 = new int[cityNum];  
         // Random random = new Random(System.currentTimeMillis());  
-
+  
         ran1 = random.nextInt(65535) % cityNum;  
         ran2 = random.nextInt(65535) % cityNum;  
         while (ran1 == ran2) &#123;  
             ran2 = random.nextInt(65535) % cityNum;  
         &#125;  
-
+  
         if (ran1 &gt; ran2)// 确保ran1&lt;ran2  
         &#123;  
             temp = ran1;  
             ran1 = ran2;  
             ran2 = temp;  
         &#125;  
-
+  
         // 将染色体1中的第三部分移到染色体2的首部  
         for (i = 0, j = ran2; j &lt; cityNum; i++, j++) &#123;  
             Gh2[i] = newPopulation[k1][j];  
         &#125;  
-
+  
         flag = i;// 染色体2原基因开始位置  
-
+  
         for (k = 0, j = flag; j &lt; cityNum;)// 染色体长度  
         &#123;  
             Gh2[j] = newPopulation[k2][k++];  
@@ -727,7 +734,7 @@ public class GA &#123;
                 j++;  
             &#125;  
         &#125;  
-
+  
         flag = ran1;  
         for (k = 0, j = 0; k &lt; cityNum;)// 染色体长度  
         &#123;  
@@ -741,29 +748,29 @@ public class GA &#123;
                 j++;  
             &#125;  
         &#125;  
-
+  
         flag = cityNum - ran1;  
-
+  
         for (i = 0, j = flag; j &lt; cityNum; j++, i++) &#123;  
             Gh1[j] = newPopulation[k2][i];  
         &#125;  
-
+  
         for (i = 0; i &lt; cityNum; i++) &#123;  
             newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
             newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
         &#125;  
     &#125;  
-
+  
     // 多次对换变异算子  
     public void OnCVariation(int k) &#123;  
         int ran1, ran2, temp;  
         int count;// 对换次数  
-
+  
         // Random random = new Random(System.currentTimeMillis());  
         count = random.nextInt(65535) % cityNum;  
-
+  
         for (int i = 0; i &lt; count; i++) &#123;  
-
+  
             ran1 = random.nextInt(65535) % cityNum;  
             ran2 = random.nextInt(65535) % cityNum;  
             while (ran1 == ran2) &#123;  
@@ -773,16 +780,16 @@ public class GA &#123;
             newPopulation[k][ran1] = newPopulation[k][ran2];  
             newPopulation[k][ran2] = temp;  
         &#125;  
-
+  
         /* 
          * for(i=0;i&lt;L;i++) &#123; printf(&quot;%d &quot;,newGroup[k][i]); &#125; printf(&quot;\n&quot;); 
          */  
     &#125;  
-
+  
     public void solve() &#123;  
         int i;  
         int k;  
-
+  
         // 初始化种群  
         initGroup();  
         // 计算初始化种群适应度，Fitness[max]  
@@ -800,7 +807,7 @@ public class GA &#123;
             System.out.println();  
             System.out.println(&quot;----&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
         &#125;  
-
+          
         for (t = 0; t &lt; MAX_GEN; t++) &#123;  
             //evolution1();  
             evolution();  
@@ -817,7 +824,7 @@ public class GA &#123;
             // 计算种群中各个个体的累积概率  
             countRate();  
         &#125;  
-
+  
         System.out.println(&quot;最后种群...&quot;);  
         for (k = 0; k &lt; scale; k++) &#123;  
             for (i = 0; i &lt; cityNum; i++) &#123;  
@@ -826,7 +833,7 @@ public class GA &#123;
             System.out.println();  
             System.out.println(&quot;---&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
         &#125;  
-
+  
         System.out.println(&quot;最佳长度出现代数：&quot;);  
         System.out.println(bestT);  
         System.out.println(&quot;最佳长度&quot;);  
@@ -835,10 +842,10 @@ public class GA &#123;
         for (i = 0; i &lt; cityNum; i++) &#123;  
             System.out.print(bestTour[i] + &quot;,&quot;);  
         &#125;  
-
+  
     &#125;  
-
-
+  
+      
     /** 
      * @param args 
      * @throws IOException 
@@ -849,9 +856,10 @@ public class GA &#123;
         ga.init(&quot;c://data.txt&quot;);  
         ga.solve();  
     &#125;  
-
+  
 &#125;
-</code></pre><p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/tyhj_sf/article/details/53321527">https://blog.csdn.net/tyhj_sf/article/details/53321527</a></p>
+</code></pre>
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/tyhj_sf/article/details/53321527">https://blog.csdn.net/tyhj_sf/article/details/53321527</a></p>
 
     </div>
 
@@ -946,20 +954,20 @@ public class GA &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -995,17 +1003,59 @@ public class GA &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:15</span>
 </div>
+
+<!--
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+-->
 
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -1059,6 +1109,26 @@ public class GA &#123;
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
 </body>
 </html>
