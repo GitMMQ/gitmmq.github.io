@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标 优缺点 思想简单，可视乎表达，易理解，可以处理多分类问题 可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度 基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树 过于复杂的概念，无法表达  决策树 CARTCART: classifcation and regressio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树">
+<meta property="og:url" content="https://www.fastolf.com/posts/51507.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标 优缺点 思想简单，可视乎表达，易理解，可以处理多分类问题 可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度 基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树 过于复杂的概念，无法表达  决策树 CARTCART: classifcation and regressio">
+<meta property="og:locale">
+<meta property="og:image" content="http://thyrsi.com/t6/625/1543991582x2890174459.jpg">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_iris_0011.png">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_001.png">
+<meta property="og:image" content="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_multioutput_001.png">
+<meta property="article:published_time" content="2022-12-27T09:31:27.233Z">
+<meta property="article:modified_time" content="2022-12-28T06:40:43.813Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Tech;Data;Vision">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://thyrsi.com/t6/625/1543991582x2890174459.jpg">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/51507.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>决策树 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/51507.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          决策树
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>796</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><ul>
+<li>思想简单，可视乎表达，易理解，可以处理多分类问题</li>
+<li>可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度</li>
+<li>基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树</li>
+<li>过于复杂的概念，无法表达</li>
+</ul>
+<h2 id="决策树-CART"><a href="#决策树-CART" class="headerlink" title="决策树 CART"></a>决策树 CART</h2><p>CART: classifcation and regression tree</p>
+<h2 id="irsi数据集构建分类决策树"><a href="#irsi数据集构建分类决策树" class="headerlink" title="irsi数据集构建分类决策树"></a>irsi数据集构建分类决策树</h2><pre><code>from sklearn.datasets import load_iris
+from sklearn import tree
+
+#加载iris数据集
+iris = load_iris()
+
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(iris.data, iris.target)
+
+import pydotplus
+dot_data = tree.export_graphviz(clf, out_file=None)
+#dot_data = tree.export_graphviz(clf, out_file=None, 
+                              feature_names=iris.feature_names,  
+                              class_names=iris.target_names,  
+                              filled=True, rounded=True,  
+                              special_characters=True)
+graph = pydotplus.graph_from_dot_data(dot_data)
+#导出决策树
+graph.write_pdf(&quot;iris.pdf&quot;) 
+#Image(graph.create_png())
+</code></pre><p><img src="http://thyrsi.com/t6/625/1543991582x2890174459.jpg" alt="iris树"></p>
+<h2 id="sklearn-example"><a href="#sklearn-example" class="headerlink" title="sklearn example"></a>sklearn example</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+
+# Parameters
+n_classes = 3
+plot_colors = &quot;ryb&quot;
+plot_step = 0.02
+
+# Load data
+iris = load_iris()
+
+for pairidx, pair in enumerate([[0, 1], [0, 2], [0, 3],
+                                [1, 2], [1, 3], [2, 3]]):
+    # We only take the two corresponding features
+    X = iris.data[:, pair]
+    y = iris.target
+
+    # Train
+    clf = DecisionTreeClassifier().fit(X, y)
+
+    # Plot the decision boundary
+    plt.subplot(2, 3, pairidx + 1)
+
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step),
+                         np.arange(y_min, y_max, plot_step))
+    plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
+
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    cs = plt.contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+
+    plt.xlabel(iris.feature_names[pair[0]])
+    plt.ylabel(iris.feature_names[pair[1]])
+
+    # Plot the training points
+    for i, color in zip(range(n_classes), plot_colors):
+        idx = np.where(y == i)
+        plt.scatter(X[idx, 0], X[idx, 1], c=color, label=iris.target_names[i],
+                    cmap=plt.cm.RdYlBu, edgecolor=&apos;black&apos;, s=15)
+
+plt.suptitle(&quot;Decision surface of a decision tree using paired features&quot;)
+plt.legend(loc=&apos;lower right&apos;, borderpad=0, handletextpad=0)
+plt.axis(&quot;tight&quot;)
+plt.show()
+</code></pre><p>   <img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_iris_0011.png" alt="iris树"></p>
+<p>链接：<a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py">https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py</a></p>
+<h2 id="决策树回归"><a href="#决策树回归" class="headerlink" title="决策树回归"></a>决策树回归</h2><p>max_depth：图的深度，值太大会导致过拟合</p>
+<pre><code># Import the necessary modules and libraries
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+import matplotlib.pyplot as plt
+
+# Create a random dataset
+rng = np.random.RandomState(1)
+X = np.sort(5 * rng.rand(80, 1), axis=0)
+y = np.sin(X).ravel() #学习sin曲线
+y[::5] += 3 * (0.5 - rng.rand(16)) #干扰值
+
+# Fit regression model
+regr_1 = DecisionTreeRegressor(max_depth=2)
+regr_2 = DecisionTreeRegressor(max_depth=5)
+regr_1.fit(X, y)
+regr_2.fit(X, y)
+
+# Predict
+X_test = np.arange(0.0, 5.0, 0.01)[:, np.newaxis]
+y_1 = regr_1.predict(X_test)
+y_2 = regr_2.predict(X_test)
+
+# Plot the results
+plt.figure()
+plt.scatter(X, y, s=20, edgecolor=&quot;black&quot;,
+            c=&quot;darkorange&quot;, label=&quot;data&quot;)
+plt.plot(X_test, y_1, color=&quot;cornflowerblue&quot;,
+         label=&quot;max_depth=2&quot;, linewidth=2)
+plt.plot(X_test, y_2, color=&quot;yellowgreen&quot;, label=&quot;max_depth=5&quot;, linewidth=2)
+plt.xlabel(&quot;data&quot;)
+plt.ylabel(&quot;target&quot;)
+plt.title(&quot;Decision Tree Regression&quot;)
+plt.legend()
+plt.show()
+</code></pre><p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_001.png" alt="iris树"></p>
+<p>链接：<a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py</a></p>
+<h2 id="多输出问题"><a href="#多输出问题" class="headerlink" title="多输出问题"></a>多输出问题</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeRegressor
+
+# Create a random dataset
+rng = np.random.RandomState(1)
+X = np.sort(200 * rng.rand(100, 1) - 100, axis=0)
+y = np.array([np.pi * np.sin(X).ravel(), np.pi * np.cos(X).ravel()]).T #输出X正弦 余弦
+y[::5, :] += (0.5 - rng.rand(20, 2)) #干扰
+
+# Fit regression model
+regr_1 = DecisionTreeRegressor(max_depth=2)
+regr_2 = DecisionTreeRegressor(max_depth=5)
+regr_3 = DecisionTreeRegressor(max_depth=8)
+regr_1.fit(X, y)
+regr_2.fit(X, y)
+regr_3.fit(X, y)
+
+# Predict
+X_test = np.arange(-100.0, 100.0, 0.01)[:, np.newaxis]
+y_1 = regr_1.predict(X_test)
+y_2 = regr_2.predict(X_test)
+y_3 = regr_3.predict(X_test)
+
+# Plot the results
+plt.figure()
+s = 25
+plt.scatter(y[:, 0], y[:, 1], c=&quot;navy&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;data&quot;)
+plt.scatter(y_1[:, 0], y_1[:, 1], c=&quot;cornflowerblue&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=2&quot;)
+plt.scatter(y_2[:, 0], y_2[:, 1], c=&quot;red&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=5&quot;)
+plt.scatter(y_3[:, 0], y_3[:, 1], c=&quot;orange&quot;, s=s,
+            edgecolor=&quot;black&quot;, label=&quot;max_depth=8&quot;)
+plt.xlim([-6, 6])
+plt.ylim([-6, 6])
+plt.xlabel(&quot;target 1&quot;)
+plt.ylabel(&quot;target 2&quot;)
+plt.title(&quot;Multi-output Decision Tree Regression&quot;)
+plt.legend(loc=&quot;best&quot;)
+plt.show()
+</code></pre><p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_multioutput_001.png" alt="iris树"></p>
+<p>链接：<a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/5656.html" rel="prev" title="信息熵">
+      <i class="fa fa-chevron-left"></i> 信息熵
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/5567.html" rel="next" title="基于信息熵分词">
+      基于信息熵分词 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E6%A0%91-CART"><span class="nav-number">2.</span> <span class="nav-text">决策树 CART</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#irsi%E6%95%B0%E6%8D%AE%E9%9B%86%E6%9E%84%E5%BB%BA%E5%88%86%E7%B1%BB%E5%86%B3%E7%AD%96%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">irsi数据集构建分类决策树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sklearn-example"><span class="nav-number">4.</span> <span class="nav-text">sklearn example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E6%A0%91%E5%9B%9E%E5%BD%92"><span class="nav-number">5.</span> <span class="nav-text">决策树回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E8%BE%93%E5%87%BA%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">多输出问题</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">36k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
