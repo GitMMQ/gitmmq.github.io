@@ -192,7 +192,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28769.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/742.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -206,1321 +206,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/28769.html" class="post-title-link" itemprop="url">红黑树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:46" itemprop="dateModified" datetime="2022-12-28T14:40:46+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>18 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>红黑树是特殊的二叉查找树</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
-<li>每个节点或者是黑色，或者是红色。</li>
-<li>根节点是黑色。</li>
-<li>每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！）</li>
-<li>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
-<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
-</ul>
-<p>注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-    &#125;
-
-    ...
-&#125;
-
-public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-    &#125;
-
-    ...
-&#125;
-
-/* 
- * 对红黑树的节点(x)进行左旋转
- *
- * 左旋示意图(对节点x进行左旋)：
- *      px                              px
- *     /                               /
- *    x                               y                
- *   /  \      --(左旋)-.           / \                #
- *  lx   y                          x  ry     
- *     /   \                       /  \
- *    ly   ry                     lx  ly  
- *
- *
- */
-private void leftRotate(RBTNode&lt;T&gt; x) &#123;
-    // 设置x的右孩子为y
-    RBTNode&lt;T&gt; y = x.right;
-
-    // 将 “y的左孩子” 设为 “x的右孩子”；
-    // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
-    x.right = y.left;
-    if (y.left != null)
-        y.left.parent = x;
-
-    // 将 “x的父亲” 设为 “y的父亲”
-    y.parent = x.parent;
-
-    if (x.parent == null) &#123;
-        this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
-    &#125; else &#123;
-        if (x.parent.left == x)
-            x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-        else
-            x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-    &#125;
-    
-    // 将 “x” 设为 “y的左孩子”
-    y.left = x;
-    // 将 “x的父节点” 设为 “y”
-    x.parent = y;
-&#125;
-
-/* 
- * 对红黑树的节点(y)进行右旋转
- *
- * 右旋示意图(对节点y进行左旋)：
- *            py                               py
- *           /                                /
- *          y                                x                  
- *         /  \      --(右旋)-.            /  \                     #
- *        x   ry                           lx   y  
- *       / \                                   / \                   #
- *      lx  rx                                rx  ry
- * 
- */
-private void rightRotate(RBTNode&lt;T&gt; y) &#123;
-    // 设置x是当前节点的左孩子。
-    RBTNode&lt;T&gt; x = y.left;
-
-    // 将 “x的右孩子” 设为 “y的左孩子”；
-    // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
-    y.left = x.right;
-    if (x.right != null)
-        x.right.parent = y;
-
-    // 将 “y的父亲” 设为 “x的父亲”
-    x.parent = y.parent;
-
-    if (y.parent == null) &#123;
-        this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
-    &#125; else &#123;
-        if (y == y.parent.right)
-            y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
-        else
-            y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
-    &#125;
-
-    // 将 “y” 设为 “x的右孩子”
-    x.right = y;
-
-    // 将 “y的父节点” 设为 “x”
-    y.parent = x;
-&#125;
-
-/* 
- * 将结点插入到红黑树中
- *
- * 参数说明：
- *     node 插入的结点        // 对应《算法导论》中的node
- */
-private void insert(RBTNode&lt;T&gt; node) &#123;
-    int cmp;
-    RBTNode&lt;T&gt; y = null;
-    RBTNode&lt;T&gt; x = this.mRoot;
-
-    // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
-    while (x != null) &#123;
-        y = x;
-        cmp = node.key.compareTo(x.key);
-        if (cmp &lt; 0)
-            x = x.left;
-        else
-            x = x.right;
-    &#125;
-
-    node.parent = y;
-    if (y!=null) &#123;
-        cmp = node.key.compareTo(y.key);
-        if (cmp &lt; 0)
-            y.left = node;
-        else
-            y.right = node;
-    &#125; else &#123;
-        this.mRoot = node;
-    &#125;
-
-    // 2. 设置节点的颜色为红色
-    node.color = RED;
-
-    // 3. 将它重新修正为一颗二叉查找树
-    insertFixUp(node);
-&#125;
-
-/* 
- * 新建结点(key)，并将其插入到红黑树中
- *
- * 参数说明：
- *     key 插入结点的键值
- */
-public void insert(T key) &#123;
-    RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
-
-    // 如果新建结点失败，则返回。
-    if (node != null)
-        insert(node);
-&#125;
-
-
-/*
- * 红黑树插入修正函数
- *
- * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
- * 目的是将它重新塑造成一颗红黑树。
- *
- * 参数说明：
- *     node 插入的结点        // 对应《算法导论》中的z
- */
-private void insertFixUp(RBTNode&lt;T&gt; node) &#123;
-    RBTNode&lt;T&gt; parent, gparent;
-
-    // 若“父节点存在，并且父节点的颜色是红色”
-    while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) &#123;
-        gparent = parentOf(parent);
-
-        //若“父节点”是“祖父节点的左孩子”
-        if (parent == gparent.left) &#123;
-            // Case 1条件：叔叔节点是红色
-            RBTNode&lt;T&gt; uncle = gparent.right;
-            if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                setBlack(uncle);
-                setBlack(parent);
-                setRed(gparent);
-                node = gparent;
-                continue;
-            &#125;
-
-            // Case 2条件：叔叔是黑色，且当前节点是右孩子
-            if (parent.right == node) &#123;
-                RBTNode&lt;T&gt; tmp;
-                leftRotate(parent);
-                tmp = parent;
-                parent = node;
-                node = tmp;
-            &#125;
-
-            // Case 3条件：叔叔是黑色，且当前节点是左孩子。
-            setBlack(parent);
-            setRed(gparent);
-            rightRotate(gparent);
-        &#125; else &#123;    //若“z的父节点”是“z的祖父节点的右孩子”
-            // Case 1条件：叔叔节点是红色
-            RBTNode&lt;T&gt; uncle = gparent.left;
-            if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                setBlack(uncle);
-                setBlack(parent);
-                setRed(gparent);
-                node = gparent;
-                continue;
-            &#125;
-
-            // Case 2条件：叔叔是黑色，且当前节点是左孩子
-            if (parent.left == node) &#123;
-                RBTNode&lt;T&gt; tmp;
-                rightRotate(parent);
-                tmp = parent;
-                parent = node;
-                node = tmp;
-            &#125;
-
-            // Case 3条件：叔叔是黑色，且当前节点是右孩子。
-            setBlack(parent);
-            setRed(gparent);
-            leftRotate(gparent);
-        &#125;
-    &#125;
-
-    // 将根节点设为黑色
-    setBlack(this.mRoot);
-&#125;
-
-
-/* 
- * 删除结点(node)，并返回被删除的结点
- *
- * 参数说明：
- *     node 删除的结点
- */
-private void remove(RBTNode&lt;T&gt; node) &#123;
-    RBTNode&lt;T&gt; child, parent;
-    boolean color;
-
-    // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
-    if ( (node.left!=null) &amp;&amp; (node.right!=null) ) &#123;
-        // 被删节点的后继节点。(称为&quot;取代节点&quot;)
-        // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
-        RBTNode&lt;T&gt; replace = node;
-
-        // 获取后继节点
-        replace = replace.right;
-        while (replace.left != null)
-            replace = replace.left;
-
-        // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
-        if (parentOf(node)!=null) &#123;
-            if (parentOf(node).left == node)
-                parentOf(node).left = replace;
-            else
-                parentOf(node).right = replace;
-        &#125; else &#123;
-            // &quot;node节点&quot;是根节点，更新根节点。
-            this.mRoot = replace;
-        &#125;
-
-        // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
-        // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
-        child = replace.right;
-        parent = parentOf(replace);
-        // 保存&quot;取代节点&quot;的颜色
-        color = colorOf(replace);
-
-        // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
-        if (parent == node) &#123;
-            parent = replace;
-        &#125; else &#123;
-            // child不为空
-            if (child!=null)
-                setParent(child, parent);
-            parent.left = child;
-
-            replace.right = node.right;
-            setParent(node.right, replace);
-        &#125;
-
-        replace.parent = node.parent;
-        replace.color = node.color;
-        replace.left = node.left;
-        node.left.parent = replace;
-
-        if (color == BLACK)
-            removeFixUp(child, parent);
-
-        node = null;
-        return ;
-    &#125;
-
-    if (node.left !=null) &#123;
-        child = node.left;
-    &#125; else &#123;
-        child = node.right;
-    &#125;
-
-    parent = node.parent;
-    // 保存&quot;取代节点&quot;的颜色
-    color = node.color;
-
-    if (child!=null)
-        child.parent = parent;
-
-    // &quot;node节点&quot;不是根节点
-    if (parent!=null) &#123;
-        if (parent.left == node)
-            parent.left = child;
-        else
-            parent.right = child;
-    &#125; else &#123;
-        this.mRoot = child;
-    &#125;
-
-    if (color == BLACK)
-        removeFixUp(child, parent);
-    node = null;
-&#125;
-
-/* 
- * 删除结点(z)，并返回被删除的结点
- *
- * 参数说明：
- *     tree 红黑树的根结点
- *     z 删除的结点
- */
-public void remove(T key) &#123;
-    RBTNode&lt;T&gt; node; 
-
-    if ((node = search(mRoot, key)) != null)
-        remove(node);
-&#125;
-
-
-
-/*
- * 红黑树删除修正函数
- *
- * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
- * 目的是将它重新塑造成一颗红黑树。
- *
- * 参数说明：
- *     node 待修正的节点
- */
-private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-    RBTNode&lt;T&gt; other;
-
-    while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) &#123;
-        if (parent.left == node) &#123;
-            other = parent.right;
-            if (isRed(other)) &#123;
-                // Case 1: x的兄弟w是红色的  
-                setBlack(other);
-                setRed(parent);
-                leftRotate(parent);
-                other = parent.right;
-            &#125;
-
-            if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                (other.right==null || isBlack(other.right))) &#123;
-                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                setRed(other);
-                node = parent;
-                parent = parentOf(node);
-            &#125; else &#123;
-
-                if (other.right==null || isBlack(other.right)) &#123;
-                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                    setBlack(other.left);
-                    setRed(other);
-                    rightRotate(other);
-                    other = parent.right;
-                &#125;
-                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                setColor(other, colorOf(parent));
-                setBlack(parent);
-                setBlack(other.right);
-                leftRotate(parent);
-                node = this.mRoot;
-                break;
-            &#125;
-        &#125; else &#123;
-
-            other = parent.left;
-            if (isRed(other)) &#123;
-                // Case 1: x的兄弟w是红色的  
-                setBlack(other);
-                setRed(parent);
-                rightRotate(parent);
-                other = parent.left;
-            &#125;
-
-            if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                (other.right==null || isBlack(other.right))) &#123;
-                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                setRed(other);
-                node = parent;
-                parent = parentOf(node);
-            &#125; else &#123;
-
-                if (other.left==null || isBlack(other.left)) &#123;
-                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                    setBlack(other.right);
-                    setRed(other);
-                    leftRotate(other);
-                    other = parent.left;
-                &#125;
-
-                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                setColor(other, colorOf(parent));
-                setBlack(parent);
-                setBlack(other.left);
-                rightRotate(parent);
-                node = this.mRoot;
-                break;
-            &#125;
-        &#125;
-    &#125;
-
-    if (node!=null)
-        setBlack(node);
-&#125;
-</code></pre>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><pre><code>/**
- * Java 语言: 红黑树
- *
- * @author skywang
- * @date 2013/11/07
- */
-
-public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-        public T getKey() &#123;
-            return key;
-        &#125;
-
-        public String toString() &#123;
-            return &quot;&quot;+key+(this.color==RED?&quot;(R)&quot;:&quot;B&quot;);
-        &#125;
-    &#125;
-
-    public RBTree() &#123;
-        mRoot=null;
-    &#125;
-
-    private RBTNode&lt;T&gt; parentOf(RBTNode&lt;T&gt; node) &#123;
-        return node!=null ? node.parent : null;
-    &#125;
-    private boolean colorOf(RBTNode&lt;T&gt; node) &#123;
-        return node!=null ? node.color : BLACK;
-    &#125;
-    private boolean isRed(RBTNode&lt;T&gt; node) &#123;
-        return ((node!=null)&amp;&amp;(node.color==RED)) ? true : false;
-    &#125;
-    private boolean isBlack(RBTNode&lt;T&gt; node) &#123;
-        return !isRed(node);
-    &#125;
-    private void setBlack(RBTNode&lt;T&gt; node) &#123;
-        if (node!=null)
-            node.color = BLACK;
-    &#125;
-    private void setRed(RBTNode&lt;T&gt; node) &#123;
-        if (node!=null)
-            node.color = RED;
-    &#125;
-    private void setParent(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-        if (node!=null)
-            node.parent = parent;
-    &#125;
-    private void setColor(RBTNode&lt;T&gt; node, boolean color) &#123;
-        if (node!=null)
-            node.color = color;
-    &#125;
-
-    /*
-     * 前序遍历&quot;红黑树&quot;
-     */
-    private void preOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null) &#123;
-            System.out.print(tree.key+&quot; &quot;);
-            preOrder(tree.left);
-            preOrder(tree.right);
-        &#125;
-    &#125;
-
-    public void preOrder() &#123;
-        preOrder(mRoot);
-    &#125;
-
-    /*
-     * 中序遍历&quot;红黑树&quot;
-     */
-    private void inOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null) &#123;
-            inOrder(tree.left);
-            System.out.print(tree.key+&quot; &quot;);
-            inOrder(tree.right);
-        &#125;
-    &#125;
-
-    public void inOrder() &#123;
-        inOrder(mRoot);
-    &#125;
-
-
-    /*
-     * 后序遍历&quot;红黑树&quot;
-     */
-    private void postOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null)
-        &#123;
-            postOrder(tree.left);
-            postOrder(tree.right);
-            System.out.print(tree.key+&quot; &quot;);
-        &#125;
-    &#125;
-
-    public void postOrder() &#123;
-        postOrder(mRoot);
-    &#125;
-
-
-    /*
-     * (递归实现)查找&quot;红黑树x&quot;中键值为key的节点
-     */
-    private RBTNode&lt;T&gt; search(RBTNode&lt;T&gt; x, T key) &#123;
-        if (x==null)
-            return x;
-
-        int cmp = key.compareTo(x.key);
-        if (cmp &lt; 0)
-            return search(x.left, key);
-        else if (cmp &gt; 0)
-            return search(x.right, key);
-        else
-            return x;
-    &#125;
-
-    public RBTNode&lt;T&gt; search(T key) &#123;
-        return search(mRoot, key);
-    &#125;
-
-    /*
-     * (非递归实现)查找&quot;红黑树x&quot;中键值为key的节点
-     */
-    private RBTNode&lt;T&gt; iterativeSearch(RBTNode&lt;T&gt; x, T key) &#123;
-        while (x!=null) &#123;
-            int cmp = key.compareTo(x.key);
-
-            if (cmp &lt; 0) 
-                x = x.left;
-            else if (cmp &gt; 0) 
-                x = x.right;
-            else
-                return x;
-        &#125;
-
-        return x;
-    &#125;
-
-    public RBTNode&lt;T&gt; iterativeSearch(T key) &#123;
-        return iterativeSearch(mRoot, key);
-    &#125;
-
-    /* 
-     * 查找最小结点：返回tree为根结点的红黑树的最小结点。
-     */
-    private RBTNode&lt;T&gt; minimum(RBTNode&lt;T&gt; tree) &#123;
-        if (tree == null)
-            return null;
-
-        while(tree.left != null)
-            tree = tree.left;
-        return tree;
-    &#125;
-
-    public T minimum() &#123;
-        RBTNode&lt;T&gt; p = minimum(mRoot);
-        if (p != null)
-            return p.key;
-
-        return null;
-    &#125;
-     
-    /* 
-     * 查找最大结点：返回tree为根结点的红黑树的最大结点。
-     */
-    private RBTNode&lt;T&gt; maximum(RBTNode&lt;T&gt; tree) &#123;
-        if (tree == null)
-            return null;
-
-        while(tree.right != null)
-            tree = tree.right;
-        return tree;
-    &#125;
-
-    public T maximum() &#123;
-        RBTNode&lt;T&gt; p = maximum(mRoot);
-        if (p != null)
-            return p.key;
-
-        return null;
-    &#125;
-
-    /* 
-     * 找结点(x)的后继结点。即，查找&quot;红黑树中数据值大于该结点&quot;的&quot;最小结点&quot;。
-     */
-    public RBTNode&lt;T&gt; successor(RBTNode&lt;T&gt; x) &#123;
-        // 如果x存在右孩子，则&quot;x的后继结点&quot;为 &quot;以其右孩子为根的子树的最小结点&quot;。
-        if (x.right != null)
-            return minimum(x.right);
-
-        // 如果x没有右孩子。则x有以下两种可能：
-        // (01) x是&quot;一个左孩子&quot;，则&quot;x的后继结点&quot;为 &quot;它的父结点&quot;。
-        // (02) x是&quot;一个右孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有左孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的后继结点&quot;。
-        RBTNode&lt;T&gt; y = x.parent;
-        while ((y!=null) &amp;&amp; (x==y.right)) &#123;
-            x = y;
-            y = y.parent;
-        &#125;
-
-        return y;
-    &#125;
-     
-    /* 
-     * 找结点(x)的前驱结点。即，查找&quot;红黑树中数据值小于该结点&quot;的&quot;最大结点&quot;。
-     */
-    public RBTNode&lt;T&gt; predecessor(RBTNode&lt;T&gt; x) &#123;
-        // 如果x存在左孩子，则&quot;x的前驱结点&quot;为 &quot;以其左孩子为根的子树的最大结点&quot;。
-        if (x.left != null)
-            return maximum(x.left);
-
-        // 如果x没有左孩子。则x有以下两种可能：
-        // (01) x是&quot;一个右孩子&quot;，则&quot;x的前驱结点&quot;为 &quot;它的父结点&quot;。
-        // (01) x是&quot;一个左孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有右孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的前驱结点&quot;。
-        RBTNode&lt;T&gt; y = x.parent;
-        while ((y!=null) &amp;&amp; (x==y.left)) &#123;
-            x = y;
-            y = y.parent;
-        &#125;
-
-        return y;
-    &#125;
-
-    /* 
-     * 对红黑树的节点(x)进行左旋转
-     *
-     * 左旋示意图(对节点x进行左旋)：
-     *      px                              px
-     *     /                               /
-     *    x                               y                
-     *   /  \      --(左旋)-.           / \                #
-     *  lx   y                          x  ry     
-     *     /   \                       /  \
-     *    ly   ry                     lx  ly  
-     *
-     *
-     */
-    private void leftRotate(RBTNode&lt;T&gt; x) &#123;
-        // 设置x的右孩子为y
-        RBTNode&lt;T&gt; y = x.right;
-
-        // 将 “y的左孩子” 设为 “x的右孩子”；
-        // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
-        x.right = y.left;
-        if (y.left != null)
-            y.left.parent = x;
-
-        // 将 “x的父亲” 设为 “y的父亲”
-        y.parent = x.parent;
-
-        if (x.parent == null) &#123;
-            this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
-        &#125; else &#123;
-            if (x.parent.left == x)
-                x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-            else
-                x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-        &#125;
-        
-        // 将 “x” 设为 “y的左孩子”
-        y.left = x;
-        // 将 “x的父节点” 设为 “y”
-        x.parent = y;
-    &#125;
-
-    /* 
-     * 对红黑树的节点(y)进行右旋转
-     *
-     * 右旋示意图(对节点y进行左旋)：
-     *            py                               py
-     *           /                                /
-     *          y                                x                  
-     *         /  \      --(右旋)-.            /  \                     #
-     *        x   ry                           lx   y  
-     *       / \                                   / \                   #
-     *      lx  rx                                rx  ry
-     * 
-     */
-    private void rightRotate(RBTNode&lt;T&gt; y) &#123;
-        // 设置x是当前节点的左孩子。
-        RBTNode&lt;T&gt; x = y.left;
-
-        // 将 “x的右孩子” 设为 “y的左孩子”；
-        // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
-        y.left = x.right;
-        if (x.right != null)
-            x.right.parent = y;
-
-        // 将 “y的父亲” 设为 “x的父亲”
-        x.parent = y.parent;
-
-        if (y.parent == null) &#123;
-            this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
-        &#125; else &#123;
-            if (y == y.parent.right)
-                y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
-            else
-                y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
-        &#125;
-
-        // 将 “y” 设为 “x的右孩子”
-        x.right = y;
-
-        // 将 “y的父节点” 设为 “x”
-        y.parent = x;
-    &#125;
-
-    /*
-     * 红黑树插入修正函数
-     *
-     * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
-     * 目的是将它重新塑造成一颗红黑树。
-     *
-     * 参数说明：
-     *     node 插入的结点        // 对应《算法导论》中的z
-     */
-    private void insertFixUp(RBTNode&lt;T&gt; node) &#123;
-        RBTNode&lt;T&gt; parent, gparent;
-
-        // 若“父节点存在，并且父节点的颜色是红色”
-        while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) &#123;
-            gparent = parentOf(parent);
-
-            //若“父节点”是“祖父节点的左孩子”
-            if (parent == gparent.left) &#123;
-                // Case 1条件：叔叔节点是红色
-                RBTNode&lt;T&gt; uncle = gparent.right;
-                if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                    setBlack(uncle);
-                    setBlack(parent);
-                    setRed(gparent);
-                    node = gparent;
-                    continue;
-                &#125;
-
-                // Case 2条件：叔叔是黑色，且当前节点是右孩子
-                if (parent.right == node) &#123;
-                    RBTNode&lt;T&gt; tmp;
-                    leftRotate(parent);
-                    tmp = parent;
-                    parent = node;
-                    node = tmp;
-                &#125;
-
-                // Case 3条件：叔叔是黑色，且当前节点是左孩子。
-                setBlack(parent);
-                setRed(gparent);
-                rightRotate(gparent);
-            &#125; else &#123;    //若“z的父节点”是“z的祖父节点的右孩子”
-                // Case 1条件：叔叔节点是红色
-                RBTNode&lt;T&gt; uncle = gparent.left;
-                if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                    setBlack(uncle);
-                    setBlack(parent);
-                    setRed(gparent);
-                    node = gparent;
-                    continue;
-                &#125;
-
-                // Case 2条件：叔叔是黑色，且当前节点是左孩子
-                if (parent.left == node) &#123;
-                    RBTNode&lt;T&gt; tmp;
-                    rightRotate(parent);
-                    tmp = parent;
-                    parent = node;
-                    node = tmp;
-                &#125;
-
-                // Case 3条件：叔叔是黑色，且当前节点是右孩子。
-                setBlack(parent);
-                setRed(gparent);
-                leftRotate(gparent);
-            &#125;
-        &#125;
-
-        // 将根节点设为黑色
-        setBlack(this.mRoot);
-    &#125;
-
-    /* 
-     * 将结点插入到红黑树中
-     *
-     * 参数说明：
-     *     node 插入的结点        // 对应《算法导论》中的node
-     */
-    private void insert(RBTNode&lt;T&gt; node) &#123;
-        int cmp;
-        RBTNode&lt;T&gt; y = null;
-        RBTNode&lt;T&gt; x = this.mRoot;
-
-        // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
-        while (x != null) &#123;
-            y = x;
-            cmp = node.key.compareTo(x.key);
-            if (cmp &lt; 0)
-                x = x.left;
-            else
-                x = x.right;
-        &#125;
-
-        node.parent = y;
-        if (y!=null) &#123;
-            cmp = node.key.compareTo(y.key);
-            if (cmp &lt; 0)
-                y.left = node;
-            else
-                y.right = node;
-        &#125; else &#123;
-            this.mRoot = node;
-        &#125;
-
-        // 2. 设置节点的颜色为红色
-        node.color = RED;
-
-        // 3. 将它重新修正为一颗二叉查找树
-        insertFixUp(node);
-    &#125;
-
-    /* 
-     * 新建结点(key)，并将其插入到红黑树中
-     *
-     * 参数说明：
-     *     key 插入结点的键值
-     */
-    public void insert(T key) &#123;
-        RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
-
-        // 如果新建结点失败，则返回。
-        if (node != null)
-            insert(node);
-    &#125;
-
-
-    /*
-     * 红黑树删除修正函数
-     *
-     * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
-     * 目的是将它重新塑造成一颗红黑树。
-     *
-     * 参数说明：
-     *     node 待修正的节点
-     */
-    private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-        RBTNode&lt;T&gt; other;
-
-        while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) &#123;
-            if (parent.left == node) &#123;
-                other = parent.right;
-                if (isRed(other)) &#123;
-                    // Case 1: x的兄弟w是红色的  
-                    setBlack(other);
-                    setRed(parent);
-                    leftRotate(parent);
-                    other = parent.right;
-                &#125;
-
-                if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                    (other.right==null || isBlack(other.right))) &#123;
-                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                    setRed(other);
-                    node = parent;
-                    parent = parentOf(node);
-                &#125; else &#123;
-
-                    if (other.right==null || isBlack(other.right)) &#123;
-                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                        setBlack(other.left);
-                        setRed(other);
-                        rightRotate(other);
-                        other = parent.right;
-                    &#125;
-                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                    setColor(other, colorOf(parent));
-                    setBlack(parent);
-                    setBlack(other.right);
-                    leftRotate(parent);
-                    node = this.mRoot;
-                    break;
-                &#125;
-            &#125; else &#123;
-
-                other = parent.left;
-                if (isRed(other)) &#123;
-                    // Case 1: x的兄弟w是红色的  
-                    setBlack(other);
-                    setRed(parent);
-                    rightRotate(parent);
-                    other = parent.left;
-                &#125;
-
-                if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                    (other.right==null || isBlack(other.right))) &#123;
-                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                    setRed(other);
-                    node = parent;
-                    parent = parentOf(node);
-                &#125; else &#123;
-
-                    if (other.left==null || isBlack(other.left)) &#123;
-                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                        setBlack(other.right);
-                        setRed(other);
-                        leftRotate(other);
-                        other = parent.left;
-                    &#125;
-
-                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                    setColor(other, colorOf(parent));
-                    setBlack(parent);
-                    setBlack(other.left);
-                    rightRotate(parent);
-                    node = this.mRoot;
-                    break;
-                &#125;
-            &#125;
-        &#125;
-
-        if (node!=null)
-            setBlack(node);
-    &#125;
-
-    /* 
-     * 删除结点(node)，并返回被删除的结点
-     *
-     * 参数说明：
-     *     node 删除的结点
-     */
-    private void remove(RBTNode&lt;T&gt; node) &#123;
-        RBTNode&lt;T&gt; child, parent;
-        boolean color;
-
-        // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
-        if ( (node.left!=null) &amp;&amp; (node.right!=null) ) &#123;
-            // 被删节点的后继节点。(称为&quot;取代节点&quot;)
-            // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
-            RBTNode&lt;T&gt; replace = node;
-
-            // 获取后继节点
-            replace = replace.right;
-            while (replace.left != null)
-                replace = replace.left;
-
-            // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
-            if (parentOf(node)!=null) &#123;
-                if (parentOf(node).left == node)
-                    parentOf(node).left = replace;
-                else
-                    parentOf(node).right = replace;
-            &#125; else &#123;
-                // &quot;node节点&quot;是根节点，更新根节点。
-                this.mRoot = replace;
-            &#125;
-
-            // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
-            // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
-            child = replace.right;
-            parent = parentOf(replace);
-            // 保存&quot;取代节点&quot;的颜色
-            color = colorOf(replace);
-
-            // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
-            if (parent == node) &#123;
-                parent = replace;
-            &#125; else &#123;
-                // child不为空
-                if (child!=null)
-                    setParent(child, parent);
-                parent.left = child;
-
-                replace.right = node.right;
-                setParent(node.right, replace);
-            &#125;
-
-            replace.parent = node.parent;
-            replace.color = node.color;
-            replace.left = node.left;
-            node.left.parent = replace;
-
-            if (color == BLACK)
-                removeFixUp(child, parent);
-
-            node = null;
-            return ;
-        &#125;
-
-        if (node.left !=null) &#123;
-            child = node.left;
-        &#125; else &#123;
-            child = node.right;
-        &#125;
-
-        parent = node.parent;
-        // 保存&quot;取代节点&quot;的颜色
-        color = node.color;
-
-        if (child!=null)
-            child.parent = parent;
-
-        // &quot;node节点&quot;不是根节点
-        if (parent!=null) &#123;
-            if (parent.left == node)
-                parent.left = child;
-            else
-                parent.right = child;
-        &#125; else &#123;
-            this.mRoot = child;
-        &#125;
-
-        if (color == BLACK)
-            removeFixUp(child, parent);
-        node = null;
-    &#125;
-
-    /* 
-     * 删除结点(z)，并返回被删除的结点
-     *
-     * 参数说明：
-     *     tree 红黑树的根结点
-     *     z 删除的结点
-     */
-    public void remove(T key) &#123;
-        RBTNode&lt;T&gt; node; 
-
-        if ((node = search(mRoot, key)) != null)
-            remove(node);
-    &#125;
-
-    /*
-     * 销毁红黑树
-     */
-    private void destroy(RBTNode&lt;T&gt; tree) &#123;
-        if (tree==null)
-            return ;
-
-        if (tree.left != null)
-            destroy(tree.left);
-        if (tree.right != null)
-            destroy(tree.right);
-
-        tree=null;
-    &#125;
-
-    public void clear() &#123;
-        destroy(mRoot);
-        mRoot = null;
-    &#125;
-
-    /*
-     * 打印&quot;红黑树&quot;
-     *
-     * key        -- 节点的键值 
-     * direction  --  0，表示该节点是根节点;
-     *               -1，表示该节点是它的父结点的左孩子;
-     *                1，表示该节点是它的父结点的右孩子。
-     */
-    private void print(RBTNode&lt;T&gt; tree, T key, int direction) &#123;
-
-        if(tree != null) &#123;
-
-            if(direction==0)    // tree是根节点
-                System.out.printf(&quot;%2d(B) is root\n&quot;, tree.key);
-            else                // tree是分支节点
-                System.out.printf(&quot;%2d(%s) is %2d&#39;s %6s child\n&quot;, tree.key, isRed(tree)?&quot;R&quot;:&quot;B&quot;, key, direction==1?&quot;right&quot; : &quot;left&quot;);
-
-            print(tree.left, tree.key, -1);
-            print(tree.right,tree.key,  1);
-        &#125;
-    &#125;
-
-    public void print() &#123;
-        if (mRoot != null)
-            print(mRoot, mRoot.key, 0);
-    &#125;
-&#125;
-
-/**
- * Java 语言: 二叉查找树
- *
- * @author skywang
- * @date 2013/11/07
- */
-public class RBTreeTest &#123;
-
-    private static final int a[] = &#123;10, 40, 30, 60, 90, 70, 20, 50, 80&#125;;
-    private static final boolean mDebugInsert = false;    // &quot;插入&quot;动作的检测开关(false，关闭；true，打开)
-    private static final boolean mDebugDelete = false;    // &quot;删除&quot;动作的检测开关(false，关闭；true，打开)
-
-    public static void main(String[] args) &#123;
-        int i, ilen = a.length;
-        RBTree&lt;Integer&gt; tree=new RBTree&lt;Integer&gt;();
-
-        System.out.printf(&quot;== 原始数据: &quot;);
-        for(i=0; i&lt;ilen; i++)
-            System.out.printf(&quot;%d &quot;, a[i]);
-        System.out.printf(&quot;\n&quot;);
-
-        for(i=0; i&lt;ilen; i++) &#123;
-            tree.insert(a[i]);
-            // 设置mDebugInsert=true,测试&quot;添加函数&quot;
-            if (mDebugInsert) &#123;
-                System.out.printf(&quot;== 添加节点: %d\n&quot;, a[i]);
-                System.out.printf(&quot;== 树的详细信息: \n&quot;);
-                tree.print();
-                System.out.printf(&quot;\n&quot;);
-            &#125;
-        &#125;
-
-        System.out.printf(&quot;== 前序遍历: &quot;);
-        tree.preOrder();
-
-        System.out.printf(&quot;\n== 中序遍历: &quot;);
-        tree.inOrder();
-
-        System.out.printf(&quot;\n== 后序遍历: &quot;);
-        tree.postOrder();
-        System.out.printf(&quot;\n&quot;);
-
-        System.out.printf(&quot;== 最小值: %s\n&quot;, tree.minimum());
-        System.out.printf(&quot;== 最大值: %s\n&quot;, tree.maximum());
-        System.out.printf(&quot;== 树的详细信息: \n&quot;);
-        tree.print();
-        System.out.printf(&quot;\n&quot;);
-
-        // 设置mDebugDelete=true,测试&quot;删除函数&quot;
-        if (mDebugDelete) &#123;
-            for(i=0; i&lt;ilen; i++)
-            &#123;
-                tree.remove(a[i]);
-
-                System.out.printf(&quot;== 删除节点: %d\n&quot;, a[i]);
-                System.out.printf(&quot;== 树的详细信息: \n&quot;);
-                tree.print();
-                System.out.printf(&quot;\n&quot;);
-            &#125;
-        &#125;
-
-        // 销毁二叉树
-        tree.clear();
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/44076.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/44076.html" class="post-title-link" itemprop="url">数据结构-矩阵压缩</a>
+            <a href="/posts/742.html" class="post-title-link" itemprop="url">中文分词</a>
         </h2>
 
         <div class="post-meta">
@@ -1545,7 +231,7 @@ public class RBTreeTest &#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -1554,7 +240,388 @@ public class RBTreeTest &#123;
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>751</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>基于字典、词库匹配</li>
+<li>基于词频度统计</li>
+<li>基于知识理解</li>
+</ul>
+<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
+<ol>
+<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
+<li>机械分词法</li>
+</ol>
+<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
+<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
+<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
+<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
+<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
+<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
+<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
+<p>问题：</p>
+<ol>
+<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
+</li>
+<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
+</li>
+</ol>
+<p>解决方案：</p>
+<p>基于词的频度统计的分词方法：</p>
+<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
+<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
+<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/50689.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/50689.html" class="post-title-link" itemprop="url">xgboost</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>20</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>参考: [博客 xgboost原理]( <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhouxiaohui888/p/6008368.html">https://www.cnblogs.com/zhouxiaohui888/p/6008368.html</a> “xgboost”）</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://github.com/dmlc/xgboost" title="xgboost">github xgboost学习</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22038.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/22038.html" class="post-title-link" itemprop="url">svm</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>207</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在特征空间上找到最佳的分离超平面使得训练集上正负样本间隔最大</p>
+<p>用来解决二分类问题的有监督学习算法</p>
+<p>引入了核方法之后SVM也可以用来解决非线性问题</p>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>硬间隔支持向量机（线性可分支持向量机）：当训练数据线性可分时，可通过硬间隔最大化学得一个线性可分支持向量机。</li>
+<li>软间隔支持向量机：当训练数据近似线性可分时，可通过软间隔最大化学得一个线性支持向量机。</li>
+<li>非线性支持向量机：当训练数据线性不可分时，可通过核方法以及软间隔最大化学得一个非线性支持向量机。</li>
+</ul>
+<p>参考: <a target="_blank" rel="noopener" href="https://blog.csdn.net/liugan528/article/details/79448379" title="svm">svm</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/27391.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/27391.html" class="post-title-link" itemprop="url">softmax回归</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>可以看作是逻辑回归的推广</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28677.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/28677.html" class="post-title-link" itemprop="url">机器学习-ResNet</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>694</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1572,123 +639,10 @@ public class RBTreeTest &#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><p><code>n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素</code></p>
-<pre><code>//对称矩阵的压缩算法
-public class SymeMatric &#123;
-
-    double[] a;// 矩阵元素
-    int n; // 矩阵的阶数
-    int m;// 一维数组的元素的个数--长度
-
-    public SymeMatric(int n) &#123;
-        // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
-        // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
-        // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
-        // 所以一维数组的长度m的值为1,2,3...n的前n项和
-        m = n * (n + 1) / 2; 
-        a = new double[m];
-        this.n = n;
-    &#125;
-
-    // 通过一个二维数组来初始化
-    public void evalute(double[][] b) &#123;
-        int k = 0;
-        for (int i = 0; i &lt; n; i++) &#123;
-            for (int j = 0; j &lt; n; j++) &#123;
-                // i &gt;= j表示只保存下三角元素
-                if (i &gt;= j) &#123;
-                    a[k++] = b[i][j];
-                &#125;
-            &#125;
-        &#125;
-    &#125;
-
-    // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
-    public void evalute(double[] b) &#123;
-        for (int k = 0; k &lt; m; k++) &#123;
-            a[k] = b[k];
-        &#125;
-    &#125;
-
-    // 对称矩阵相加
-    public SymeMatric add(SymeMatric b) &#123;
-        SymeMatric t = new SymeMatric(n);
-        int k;
-        for (int i = 1; i &lt;= n; i++) &#123;
-            for (int j = 1; j &lt;= n; j++) &#123;
-                if (i &gt;= j) &#123;
-                    k = i * (i - 1) / 2 + j - 1;
-                &#125; else &#123;
-                    k = j * (j - 1) / 2 + i - 1;
-                &#125;
-                // 求和
-                t.a[k] = a[k] + b.a[k];
-            &#125;
-        &#125;
-        return t;
-    &#125;
-
-    // 打印对称矩阵，这个才是关键！！
-    public void print() &#123;
-        int k;
-        for (int i = 1; i &lt;= n; i++) &#123;
-            for (int j = 1; j &lt;= n; j++) &#123;
-                if (i &gt;= j) &#123;
-                    k = i * (i - 1) / 2 + j - 1;
-                &#125; else &#123;
-                    k = j * (j - 1) / 2 + i - 1;
-                &#125;
-                System.out.print(&quot; &quot; + a[k]);
-            &#125;
-            System.out.println();
-        &#125;
-    &#125;
-
-&#125;
-</code></pre>
-<h2 id="三角矩阵的压缩"><a href="#三角矩阵的压缩" class="headerlink" title="三角矩阵的压缩"></a>三角矩阵的压缩</h2><p><code>m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</code></p>
-<h2 id="稀疏矩阵的压缩"><a href="#稀疏矩阵的压缩" class="headerlink" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
-<p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
-<pre><code>inal int _ROWS=5;		//定义行数
-final int _COLS=5;		//定义列数
-final int _NOTZERO=6;	//定义稀疏矩阵中不为零的个数
-int i,j,tmpRW,tmpCL,tmpNZ;
-int temp=1;
-int Sparse[][]=new int[_ROWS][_COLS];	//声明稀疏矩阵
-int Compress[][]=new int[_NOTZERO+1][3];//声明压缩矩阵
-    
-for(i=0;i&lt;_ROWS;i++) 		//将矩阵初始值都设为0
-    for(j=0;j&lt;_COLS;j++)
-        Sparse[i][j]=0;
-
-tmpNZ=_NOTZERO;			//产生随机稀疏矩阵
-for(i=1;i&lt;tmpNZ+1;i++) &#123;
-    tmpRW=(int)(Math.random()*100);
-    tmpRW=(tmpRW%_ROWS);
-    tmpCL=(int)(Math.random()*100);
-    tmpCL=(tmpCL%_COLS);
-    if(Sparse[tmpRW][tmpCL]!=0)
-        tmpNZ++;
-    Sparse[tmpRW][tmpCL]=i;
-&#125;
-
-/*开始压缩稀疏矩阵*/
-Compress[0][0]=_ROWS;
-Compress[0][1]=_COLS;
-Compress[0][2]=_NOTZERO;
-for(i=0;i&lt;_ROWS;i++) &#123;
-    for(j=0;j&lt;_COLS;j++) &#123;
-        if(Sparse[i][j]!=0)&#123;
-            Compress[temp][0]=i;
-            Compress[temp][1]=j;
-            Compress[temp][2]=Sparse[i][j];
-            temp++;
-        &#125;
-    &#125;
-&#125;
-    
-</code></pre>
-<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
+          <p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件</p>
+<p>从经验来看，网络的深度对模型的性能至关重要，当增加网络层数后，网络可以进行更加复杂的特征模式的提取，所以当模型更深时理论上可以取得更好的结果，从图2中也可以看出网络越深而效果越好的一个实践证据。但是更深的网络其性能一定会更好吗？实验发现深度网络出现了退化问题（Degradation problem）：网络深度增加时，网络准确度出现饱和，甚至出现下降。这个现象可以在图3中直观看出来：56层的网络比20层网络效果还要差。这不会是过拟合问题，因为56层网络的训练误差同样高。我们知道深层网络存在着梯度消失或者爆炸的问题，这使得深度学习模型很难训练。但是现在已经存在一些技术手段如BatchNorm来缓解这个问题。因此，出现深度网络的退化问题是非常令人诧异的。</p>
+<p>深度网络的退化问题至少说明深度网络不容易训练。但是我们考虑这样一个事实：现在你有一个浅层网络，你想通过向上堆积新层来建立深层网络，一个极端情况是这些增加的层什么也不学习，仅仅复制浅层网络的特征，即这样新层是恒等映射（Identity mapping）。在这种情况下，深层网络应该至少和浅层网络性能一样，也不应该出现退化现象。好吧，你不得不承认肯定是目前的训练方法有问题，才使得深层网络很难去找到一个好的参数。</p>
+<p>这个有趣的假设让何博士灵感爆发，他提出了残差学习来解决退化问题。对于一个堆积层结构（几层堆积而成）当输入为时其学习到的特征记为，现在我们希望其可以学习到残差，这样其实原始的学习特征是。之所以这样是因为残差学习相比原始特征直接学习更容易。当残差为0时，此时堆积层仅仅做了恒等映射，至少网络性能不会下降，实际上残差不会为0，这也会使得堆积层在输入特征基础上学习到新的特征，从而拥有更好的性能。残差学习的结构如图4所示。这有点类似与电路中的“短路”，所以是一种短路连接（shortcutconnection）。</p>
 
       
     </div>
@@ -1708,7 +662,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/46674.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6463.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1722,7 +676,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/46674.html" class="post-title-link" itemprop="url">树堆</a>
+            <a href="/posts/6463.html" class="post-title-link" itemprop="url">hinge损失函数</a>
         </h2>
 
         <div class="post-meta">
@@ -1747,7 +701,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -1793,7 +747,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/38791.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/35874.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1807,7 +761,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/38791.html" class="post-title-link" itemprop="url">树链</a>
+            <a href="/posts/35874.html" class="post-title-link" itemprop="url">GMM模型</a>
         </h2>
 
         <div class="post-meta">
@@ -1817,7 +771,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -1832,7 +786,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -1841,7 +795,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>49</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1859,7 +813,10 @@ for(i=0;i&lt;_ROWS;i++) &#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>高斯混合模型是一种混合模型，混合的基本分布是高斯分布</p>
+<p>参考《统计学习方法》</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmziscoming/p/5750849.html">浅显易懂的GMM模型及其训练过程</a></p>
+
       
     </div>
 
@@ -1878,7 +835,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/12863.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/134.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1892,7 +849,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/12863.html" class="post-title-link" itemprop="url">数据结构-栈、队列</a>
+            <a href="/posts/134.html" class="post-title-link" itemprop="url">GBDT原理</a>
         </h2>
 
         <div class="post-meta">
@@ -1902,7 +859,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -1917,7 +874,7 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -1926,13 +883,13 @@ for(i=0;i&lt;_ROWS;i++) &#123;
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>693</span>
+              <span>2.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>3 分钟</span>
+              <span>9 分钟</span>
             </span>
 
         </div>
@@ -1944,244 +901,28 @@ for(i=0;i&lt;_ROWS;i++) &#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出(LIFO, Last In First Out)</p>
-<h3 id="静态栈"><a href="#静态栈" class="headerlink" title="静态栈"></a>静态栈</h3><p>数组 栈大小固定</p>
-<h3 id="动态栈"><a href="#动态栈" class="headerlink" title="动态栈"></a>动态栈</h3><p>链表 栈大小不固定</p>
-<pre><code>public class Node &#123;
-
-    //数据域
-    public int data;
-
-    //指针域，指向下一个节点
-    public Node next;
-
-    public Node() &#123;
-    &#125;
-
-    public Node(int data) &#123;
-        this.data = data;
-    &#125;
-
-    public Node(int data, Node next) &#123;
-        this.data = data;
-        this.next = next;
-    &#125;
-    
-&#125;
-
-public class Stack &#123;
-
-    public Node stackTop;//栈顶
-    public Node stackBottom;//栈底
-
-    public Stack(Node stackTop, Node stackBottom) &#123;
-        this.stackTop = stackTop;
-        this.stackBottom = stackBottom;
-    &#125;
-
-    public Stack() &#123;
-    &#125;
-
-
-&#125;
-
-/**
- * 进栈
- *
- * @param stack 栈
- * @param value 要进栈的元素
- */
-public static void pushStack(Stack stack, int value) &#123;
-
-    // 封装数据成节点
-    Node newNode = new Node(value);
-
-
-    // 栈顶本来指向的节点交由新节点来指向
-    newNode.next = stack.stackTop;
-
-    // 栈顶指针指向新节点
-    stack.stackTop = newNode;
-
-&#125;
-
-
-/**
- * 遍历栈(只要栈顶指针不指向栈底指针，就一直输出)
- *
- * @param stack
- */
-public static void traverse(Stack stack) &#123;
-    Node stackTop = stack.stackTop;
-
-    while (stackTop != stack.stackBottom) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y：&quot; + stackTop.data);
-
-        stackTop = stackTop.next;
-    &#125;
-
-
-&#125;
-
-/**
- * 判断该栈是否为空
- *
- * @param stack
- */
-public static void isEmpty(Stack stack) &#123;
-    if (stack.stackTop == stack.stackBottom) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;该栈为空&quot;);
-    &#125; else &#123;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;该栈不为空&quot;);
-
-    &#125;
-
-&#125;
-
-/**
- * 出栈(将栈顶的指针指向下一个节点)
- * @param stack
- */
-public static void popStack(Stack stack) &#123;
-
-    // 栈不为空才能出栈
-    if (!isEmpty(stack)) &#123;
-
-        //栈顶元素
-        Node top = stack.stackTop;
-
-        // 栈顶指针指向下一个节点
-        stack.stackTop = top.next;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;出栈的元素是：&quot; + top.data);
-
-    &#125;
-&#125;
-
-/**
- * 清空栈
- * @param stack
- */
-public static void clearStack(Stack stack) &#123;
-
-    stack.stackTop = null;
-    stack.stackBottom = stack.stackTop;
-&#125;
-</code></pre>
-<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出(LILO, Last In Last Out)</p>
-<h3 id="静态队列"><a href="#静态队列" class="headerlink" title="静态队列"></a>静态队列</h3><p>数组实现循环队列，节省内存资源</p>
-<pre><code>public class Queue &#123;
-
-
-    //数组
-    public int [] arrays;
-
-    //指向第一个有效的元素
-    public int front = 0;
-
-    //指向有效数据的下一个元素(即指向无效的数据)
-    public int rear = 0;
-
-&#125;
-
-
-/**
- * 入队
- *
- * @param queue
- */
-public static void enQueue(Queue queue,int value) &#123;
-
-    // 不是满的队列才能入队
-    if (!isFull(queue)) &#123;
-
-        // 将新的元素插入到队尾中
-        queue.arrays[queue.rear] = value;
-
-        // rear节点移动到新的无效元素位置上
-        queue.rear = (queue.rear + 1) % queue.arrays.length;
-    &#125;
-&#125;
-
-/**
- * 出队
- *
- * @param queue
- */
-public static void outQueue(Queue queue) &#123;
-
-    //判断该队列是否为null
-    if (!isEmpty(queue)) &#123;
-
-
-        //不为空才出队
-        int value = queue.arrays[queue.front];
-        System.out.println(&quot;关注公众号：Java3y---&gt;出队的元素是：&quot; + value);
-
-        // front指针往后面移
-        queue.front = (queue.front + 1) % queue.arrays.length;
-
-    &#125;
-
-
-&#125;
-
-/**
- * 判断队列是否空，front和rear指针相等，就是空了
- * @param queue
- * @return
- */
-public static boolean isEmpty(Queue queue) &#123;
-    if (queue.rear  == queue.front) &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列空的！&quot;);
-        return true;
-    &#125; else &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列非空！&quot;);
-        return false;
-    &#125;
-&#125;
-        
-/**
- * 判断队列是否满了，front和rear指针紧挨着，就是满了
- * @param queue
- * @return
- */
-public static boolean isFull(Queue queue) &#123;
-    if ((queue.rear + 1) % queue.arrays.length == queue.front) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列满了！&quot;);
-        return true;
-    &#125; else &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列没满了！&quot;);
-        return false;
-    &#125;
-&#125;
-
-/**
- * 遍历队列
- * @param queue
- *
- */
-public static void traverseQueue(Queue queue) &#123;
-
-    // front的位置
-    int i = queue.front;
-
-    while (i != queue.rear) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y---&gt;&quot; + queue.arrays[i]);
-
-        //移动front
-        i = (i + 1) % queue.arrays.length;
-    &#125;
-
-&#125;
-    
-</code></pre>
-<h3 id="动态队列"><a href="#动态队列" class="headerlink" title="动态队列"></a>动态队列</h3><p>链表实现</p>
+          <p>Gradient Boosting Decision Tree 迭代决策树，泛化能力较强</p>
+<p>几乎可用于所有回归问题（线性&#x2F;非线性），相对logistic regression仅能用于线性回归，GBDT的适用面非常广。亦可用于二分类问题（设定阈值，大于阈值为正例，反之为负例）。<br>可用于<a target="_blank" rel="noopener" href="http://research.microsoft.com/pubs/132652/MSR-TR-2010-82.pdf" title="搜索排序">搜索排序</a></p>
+<h2 id="Regression-Decistion-Tree"><a href="#Regression-Decistion-Tree" class="headerlink" title="Regression Decistion Tree"></a>Regression Decistion Tree</h2><h3 id="分类树"><a href="#分类树" class="headerlink" title="分类树"></a>分类树</h3><p>C4.5分类树:在每次分枝时，是穷举每一个feature的每一个阈值，找到使得按照feature&lt;&#x3D;阈值，和feature&gt;阈值分成的两个分枝的熵最大的feature和阈值（熵最大的概念可理解成尽可能每个分枝的男女比例都远离1:1），按照该标准分枝得到两个新节点，用同样方法继续分枝直到所有人都被分入性别唯一的叶子节点，或达到预设的终止条件，若最终叶子节点中的性别不唯一，则以多数人的性别作为该叶子节点的性别。</p>
+<h3 id="回归树"><a href="#回归树" class="headerlink" title="回归树"></a>回归树</h3><p>在每个节点（不一定是叶子节点）都会得一个预测值，以年龄为例，该预测值等于属于这个节点的所有人年龄的平均值。分枝时穷举每一个feature的每个阈值找最好的分割点，但衡量最好的标准不再是最大熵，而是最小化均方差–即（每个人的年龄-预测年龄）^2 的总和 &#x2F; N，或者说是每个人的预测误差平方和 除以 N。这很好理解，被预测出错的人数越多，错的越离谱，均方差就越大，通过最小化均方差能够找到最靠谱的分枝依据。分枝直到每个叶子节点上人的年龄都唯一（这太难了）或者达到预设的终止条件（如叶子个数上限），若最终叶子节点上人的年龄不唯一，则以该节点上所有人的平均年龄做为该叶子节点的预测年龄。</p>
+<p>参考：<a target="_blank" rel="noopener" href="http://www.schonlau.net/publication/05stata_boosting.pdf">http://www.schonlau.net/publication/05stata_boosting.pdf</a></p>
+<h2 id="Gradient-Boosting"><a href="#Gradient-Boosting" class="headerlink" title="Gradient Boosting"></a>Gradient Boosting</h2><p>多棵树来共同决策。GBDT的核心就在于，每一棵树学的是之前所有树结论和的残差，这个残差就是一个加预测值后能得真实值的累加量。比如A的真实年龄是18岁，但第一棵树的预测年龄是12岁，差了6岁，即残差为6岁。那么在第二棵树里我们把A的年龄设为6岁去学习，如果第二棵树真的能把A分到6岁的叶子节点，那累加两棵树的结论就是A的真实年龄；如果第二棵树的结论是5岁，则A仍然存在1岁的残差，第三棵树里A的年龄就变成1岁，继续学。这就是Gradient Boosting在GBDT中的意义，简单吧。</p>
+<p>残差： A的预测值 + A的残差 &#x3D; A的实际值 ，残差为0，极为真实值，（过拟合问题）</p>
+<p>优点：Boosting的最大好处在于，每一步的残差计算其实变相地增大了分错instance的权重，而已经分对的instance则都趋向于0。这样后面的树就能越来越专注那些前面被分错的instance。</p>
+<p>Adaboost是另一种boost方法，它按分类对错，分配不同的weight，计算cost function时使用这些weight，从而让“错分的样本权重越来越大，使它们更被重视”。Bootstrap也有类似思想，它在每一步迭代时不改变模型本身，也不计算残差，而是从N个instance训练集中按一定概率重新抽取N个instance出来（单个instance可以被重复sample），对着这N个新的instance再训练一轮。由于数据集变了迭代模型训练结果也不一样，而一个instance被前面分错的越厉害，它的概率就被设的越高，这样就能同样达到逐步关注被分错的instance，逐步完善的效果。Adaboost的方法被实践证明是一种很好的防止过拟合的方法，但至于为什么则至今没从理论上被证明。GBDT也可以在使用残差的同时引入Bootstrap re-sampling，GBDT多数实现版本中也增加的这个选项，但是否一定使用则有不同看法。re-sampling一个缺点是它的随机性，即同样的数据集合训练两遍结果是不一样的，也就是模型不可稳定复现，这对评估是很大挑战，比如很难说一个模型变好是因为你选用了更好的feature，还是由于这次sample的随机因素。</p>
+<p>参考：<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Gradient_boosted_trees#Gradient_tree_boosting">http://en.wikipedia.org/wiki/Gradient_boosted_trees#Gradient_tree_boosting</a></p>
+<h2 id="Shrinkage"><a href="#Shrinkage" class="headerlink" title="Shrinkage"></a>Shrinkage</h2><p>每次走一小步逐渐逼近结果的效果，要比每次迈一大步很快逼近结果的方式更容易避免过拟合。即它不完全信任每一个棵残差树，它认为每棵树只学到了真理的一小部分，累加的时候只累加一小部分，通过多学几棵树弥补不足。</p>
+<p>没用Shrinkage时：（yi表示第i棵树上y的预测值， y(1~i)表示前i棵树y的综合预测值）</p>
+<p>y(i+1) &#x3D; 残差(y1<del>yi)， 其中： 残差(y1</del>yi) &#x3D;  y真实值 - y(1 ~ i)</p>
+<p>y(1 ~ i) &#x3D; SUM(y1, …, yi)</p>
+<p>Shrinkage不改变第一个方程，只把第二个方程改为： </p>
+<p>y(1 ~ i) &#x3D; y(1 ~ i-1) + step * yi</p>
+<p>即Shrinkage仍然以残差作为学习目标，但对于残差学习出来的结果，只累加一小部分（step*残差）逐步逼近目标，step一般都比较小，如0.01~0.001（注意该step非gradient的step），导致各个树的残差是渐变的而不是陡变的。直觉上这也很好理解，不像直接用残差一步修复误差，而是只修复一点点，其实就是把大步切成了很多小步。本质上，Shrinkage为每棵树设置了一个weight，累加时要乘以这个weight，但和Gradient并没有关系。这个weight就是step。就像Adaboost一样，Shrinkage能减少过拟合发生也是经验证明的，目前还没有看到从理论的证明。</p>
+<h2 id="RankNet"><a href="#RankNet" class="headerlink" title="RankNet"></a>RankNet</h2><p>实际的搜索排序使用的是LambdaMART算法，必须指出的是由于这里要使用排序需要的cost function，LambdaMART迭代用的并不是残差。Lambda在这里充当替代残差的计算方法，它使用了一种类似Gradient*步长模拟残差的方法。这里的MART在求解方法上和之前说的残差略有不同，其区别描述见这里。</p>
+<p>就像所有的机器学习一样，搜索排序的学习也需要训练集，这里一般是用人工标注实现，即对每一个(query,doc) pair给定一个分值（如1,2,3,4）,分值越高表示越相关，越应该排到前面。然而这些绝对的分值本身意义不大，例如你很难说1分和2分文档的相关程度差异是1分和3分文档差距的一半。相关度本身就是一个很主观的评判，标注人员无法做到这种定量标注，这种标准也无法制定。但标注人员很容易做到的是”AB都不错，但文档A比文档B更相关，所以A是4分，B是3分“。RankNet就是基于此制定了一个学习误差衡量方法，即cost function。具体而言，RankNet对任意两个文档A,B，通过它们的人工标注分差，用sigmoid函数估计两者顺序和逆序的概率P1。然后同理用机器学习到的分差计算概率P2（sigmoid的好处在于它允许机器学习得到的分值是任意实数值，只要它们的分差和标准分的分差一致，P2就趋近于P1）。这时利用P1和P2求的两者的交叉熵，该交叉熵就是cost function。它越低说明机器学得的当前排序越趋近于标注排序。为了体现NDCG的作用（NDCG是搜索排序业界最常用的评判标准），RankNet还在cost function中乘以了NDCG。</p>
+<p>好，现在我们有了cost function，而且它是和各个文档的当前分值yi相关的，那么虽然我们不知道它的全局最优方向，但可以求导求Gradient，Gradient即每个文档得分的一个下降方向组成的N维向量，N为文档个数（应该说是query-doc pair个数）。这里仅仅是把”求残差“的逻辑替换为”求梯度“，可以这样想：梯度方向为每一步最优方向，累加的步数多了，总能走到局部最优点，若该点恰好为全局最优点，那和用残差的效果是一样的。这时套到之前讲的逻辑，GDBT就已经可以上了。那么最终排序怎么产生呢？很简单，每个样本通过Shrinkage累加都会得到一个最终得分，直接按分数从大到小排序就可以了（因为机器学习产生的是实数域的预测分，极少会出现在人工标注中常见的两文档分数相等的情况，几乎不同考虑同分文档的排序方式）</p>
+<p>另外，如果feature个数太多，每一棵回归树都要耗费大量时间，这时每个分支时可以随机抽一部分feature来遍历求最优（ELF源码实现方式）。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/pinard/p/6140514.html">https://www.cnblogs.com/pinard/p/6140514.html</a></p>
 
       
     </div>
@@ -2201,7 +942,7 @@ public static void traverseQueue(Queue queue) &#123;
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23384.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2215,7 +956,7 @@ public static void traverseQueue(Queue queue) &#123;
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/23384.html" class="post-title-link" itemprop="url">树</a>
+            <a href="/posts/2.html" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -2225,7 +966,7 @@ public static void traverseQueue(Queue queue) &#123;
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -2240,7 +981,7 @@ public static void traverseQueue(Queue queue) &#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -2249,857 +990,7 @@ public static void traverseQueue(Queue queue) &#123;
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>3.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>12 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。</p>
-<h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><p>节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点</p>
-<p>树的度 : 树中的节点的度最大值为树的度</p>
-<p>节点的层次 : 根为第一层，往下依次递增</p>
-<p>树的深度 : 节点层次最大值为树的深度</p>
-<p>森林 : n棵不相交的树的集合为森林</p>
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>常用于实现二叉查找树、二叉堆</p>
-<ul>
-<li><p>每个节点至多有两颗子树（树的度&lt;&#x3D;2）,子树分左右</p>
-</li>
-<li><p>第i层至多有2i-1个节点，深度为k的二叉树，最多节点数2^k-1个节点（具有最多节点的称作满二叉树），其中每个节点都与深度k满二叉树中1-n节点对应，则为完全二叉树</p>
-</li>
-</ul>
-<p><img src="http://thyrsi.com/t6/626/1544146169x2890211738.jpg" alt="满二叉树"></p>
-<p><img src="http://thyrsi.com/t6/626/1544146212x2890211738.jpg" alt="完全二叉树"></p>
-<h2 id="二叉排序树"><a href="#二叉排序树" class="headerlink" title="二叉排序树"></a>二叉排序树</h2><ul>
-<li>左子树所有节点值小于根节点，右子树所有节点值大于根节点值</li>
-<li>左右子树都是二叉排序树</li>
-</ul>
-<h2 id="二叉平衡树-AVL"><a href="#二叉平衡树-AVL" class="headerlink" title="二叉平衡树 AVL"></a>二叉平衡树 AVL</h2><ul>
-<li>左右子树深度差不超过1</li>
-<li>左右子树都是二叉平衡树</li>
-</ul>
-<h2 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h2><p>最优二叉树</p>
-<p><a href="#hafman">代码实现</a></p>
-<h3 id="哈夫曼编码"><a href="#哈夫曼编码" class="headerlink" title="哈夫曼编码"></a>哈夫曼编码</h3><p>解决报文编码的问题，将字符串转换为唯一的二进制码，且二进制码的长度最小</p>
-<p>每个字符在字符串中出现频率为W，其编码长度为L，编码字符n个，则编码后二进制码的总长度为W1L1+W2L2+…+WnLn，利用哈夫曼树特性求总长最小编码</p>
-<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>平衡的多路查找树</p>
-<p>B树的阶：所有孩子节点树的最大值（m叉树：每个节点最多m棵子树）</p>
-<p>分支节点最少有两颗子树</p>
-<p>分支节点包含信息（n，A0，K1，A1，K2，A2，…，Kn，An），其中，n为结点中的关键字树，A为指向子树根结点的指针，K为关键字，且Ai-1所指子树中所有结点的关键字均小于Ki，An所指子树中所有结点的关键字均大于Kn；</p>
-<p>所有的叶子结点都出现在同一层次上，并且不带信息（可以看作是外部结点或查找失败的结点，实际上这些结点不存在，指向这些结点的指针为空</p>
-<h2 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h2><p>B+树是应文件系统所需而出的一种B-树的变型树。一棵m阶B+树和m阶的B-树的差异在于</p>
-<ol>
-<li><p>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点；</p>
-</li>
-<li><p>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</p>
-</li>
-</ol>
-<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><p>红黑树，一种二叉查找树，但在每个结点上增加一个存储位表示结点的颜色，可以是Red或Black。通过对任何一条从根到叶子的简单路径上各个结点的颜色进行约束，红黑树确保没有一条路径会比其他路径长出2倍，因而是近似于平衡的。树中每个结点包含5个属性：color、key、left、right和p。如果一个结点没有子节点或父节点，则该结点相应的指针属性值为NIL，我们可以把这些NIL视为指向二叉搜索树的叶节点（外部结点）的指针，而把带关键字的结点视为树的内部结点。</p>
-<h3 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h3><ol>
-<li>每个结点或是红色的，或是黑色的</li>
-<li>根结点是黑色的</li>
-<li>每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的</li>
-<li>如果一个结点是红色的，则它的两个子结点都是黑色的</li>
-<li>对每个结点，从该结点到其所有后代叶结点的简单路径上，均包含相同数目的黑色结点</li>
-<li>虽然本质上是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)</li>
-</ol>
-<h2 id="键树"><a href="#键树" class="headerlink" title="键树"></a>键树</h2><p>如果一个关键字可以表示成字符的序号，即字符串，那么可以用键树（keyword tree），又称数字搜索树或字符树，来表示这样的字符串的集合。键树的结构受启发于一部大型字典的“书边标目”。字典中标出首字母是 A，B，C，…，Z的单词所在页，再对各部分标出第二字母为A，B，C，…，Z的单词所在的页等等。<br>键树是一种特殊的查找树，它是一棵度大于等于2的树，树中的每个节点不是包含一个或几个关键字，而是只含有组成关键字的符号。<br>比如：如果关键字是数值，则节点中只包含一个数位；如果关键字是单词，则节点中只包含一个字母字符。根结点不代表任何字符，根以下第一层的结点对应于字符串的第一个字符，第二层的结点对应于字符串的第二个字符……每个字符串可由一个特殊的字符如“$”等作为字符串的结束符，用一个叶子结点来表示该特殊字符。把从根到叶子的路径上，所有结点（除根以外）对应的字符连接起来，就得到一个字符串。因此，每个叶子结点对应一个关键字。在叶子结点还可以包含一个指针，指向该关键字所对应的元素。整个字符串集合中的字符串的数目等于叶子结点的数目。如果一个集合中的关键字都具有这样的字符串特性，那么，该关键字集合就可采用这样一棵键树来表示。 </p>
-<p>键树的存储通常有两种方式： </p>
-<ol>
-<li>用树的孩子兄弟链来表示键树，称为双链树；每个Node有三个域：symbol域：存储关键字的一个字符；son域：存储指向第一棵子树的根的指针；brother域：存储指向右兄弟的指针。 </li>
-<li>用多重链表来表示键树，称为Trie树或字典树。</li>
-</ol>
-<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d&#x3D;26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质： </p>
-<ol>
-<li>根节点不包含字符，除根节点外每一个节点都只包含一个字符； </li>
-<li>从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串； </li>
-<li>每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用： </li>
-<li>串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。 </li>
-<li>“串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。 </li>
-<li>最长公共前缀</li>
-</ol>
-<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S&#x3D;S1S2..Si..Sn，和整数i，1 &lt;&#x3D; i &lt;&#x3D; n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S&#x3D;XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
-<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L &#x3D; b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
-<h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
-<p><span id="hafman">哈夫曼树代码实现</span></p>
-<pre><code>import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
- 
-public class HuffmanTree &#123;
- 
-    public static class Node&lt;E&gt; &#123;
-        E data;
-        double weight;
-        Node leftChild;
-        Node rightChild;
- 
-        public Node(E data, double weight) &#123;
-            super();
-            this.data = data;
-            this.weight = weight;
-        &#125;
- 
-        public String toString() &#123;
-            return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
-        &#125;
-    &#125;
- 
-    public static void main(String[] args) &#123;
-        List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
- 
-        nodes.add(new Node(&quot;A&quot;, 40.0));
-        nodes.add(new Node(&quot;B&quot;, 8.0));
-        nodes.add(new Node(&quot;C&quot;, 10.0));
-        nodes.add(new Node(&quot;D&quot;, 30.0));
-        nodes.add(new Node(&quot;E&quot;, 10.0));
-        nodes.add(new Node(&quot;F&quot;, 2.0));
-        
-        Node root = HuffmanTree.createTree(nodes);
-        
-        System.out.println(breadthFirst(root));
- 
-    &#125;
- 
-    /**
-     * 构造哈夫曼树
-     * 
-     * @param nodes
-     *            节点集合
-     * @return 构造出来的哈夫曼树的根节点
-     */
-    private static Node createTree(List&lt;Node&gt; nodes) &#123;
-        // 只要nodes数组中还有2个以上的节点
-        while (nodes.size() &gt; 1) &#123;
-            quickSort(nodes);
-            //获取权值最小的两个节点
-            Node left = nodes.get(nodes.size()-1);
-            Node right = nodes.get(nodes.size()-2);
-            
-            //生成新节点，新节点的权值为两个子节点的权值之和
-            Node parent = new Node(null, left.weight + right.weight);
-            
-            //让新节点作为两个权值最小节点的父节点
-            parent.leftChild = left;
-            parent.rightChild = right;
-            
-            //删除权值最小的两个节点
-            nodes.remove(nodes.size()-1);
-            nodes.remove(nodes.size()-1);
-            
-            //将新节点加入到集合中
-            nodes.add(parent);
-        &#125;
-        
-        return nodes.get(0);
-    &#125;
- 
-    /**
-     * 将指定集合中的i和j索引处的元素交换
-     * 
-     * @param nodes
-     * @param i
-     * @param j
-     */
-    private static void swap(List&lt;Node&gt; nodes, int i, int j) &#123;
-        Node tmp;
-        tmp = nodes.get(i);
-        nodes.set(i, nodes.get(j));
-        nodes.set(j, tmp);
-    &#125;
- 
-    /**
-     * 实现快速排序算法，用于对节点进行排序
-     * 
-     * @param nodes
-     * @param start
-     * @param end
-     */
-    private static void subSort(List&lt;Node&gt; nodes, int start, int end) &#123;
-        if (start &lt; end) &#123;
-            // 以第一个元素作为分界值
-            Node base = nodes.get(start);
-            // i从左边搜索，搜索大于分界值的元素的索引
-            int i = start;
-            // j从右边开始搜索，搜索小于分界值的元素的索引
-            int j = end + 1;
-            while (true) &#123;
-                // 找到大于分界值的元素的索引，或者i已经到了end处
-                while (i &lt; end &amp;&amp; nodes.get(++i).weight &gt;= base.weight)
-                    ;
-                // 找到小于分界值的元素的索引，或者j已经到了start处
-                while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
-                    ;
- 
-                if (i &lt; j) &#123;
-                    swap(nodes, i, j);
-                &#125; else &#123;
-                    break;
-                &#125;
-            &#125;
- 
-            swap(nodes, start, j);
- 
-            //递归左边子序列
-            subSort(nodes, start, j - 1);
-            //递归右边子序列
-            subSort(nodes, j + 1, end);
-        &#125;
-    &#125;
-    
-    public static void quickSort(List&lt;Node&gt; nodes)&#123;
-        subSort(nodes, 0, nodes.size()-1);
-    &#125;
-    
-    //广度优先遍历
-    public static List&lt;Node&gt; breadthFirst(Node root)&#123;
-        Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
-        List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
-        
-        if(root!=null)&#123;
-            //将根元素加入“队列”
-            queue.offer(root);
-        &#125;
-        
-        while(!queue.isEmpty())&#123;
-            //将该队列的“队尾”元素加入到list中
-            list.add(queue.peek());
-            Node p = queue.poll();
-            
-            //如果左子节点不为null，将它加入到队列
-            if(p.leftChild != null)&#123;
-                queue.offer(p.leftChild);
-            &#125;
-            
-            //如果右子节点不为null，将它加入到队列
-            if(p.rightChild != null)&#123;
-                queue.offer(p.rightChild);
-            &#125;
-        &#125;
-        
-        return list;
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/41634.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/41634.html" class="post-title-link" itemprop="url">数据结构-图</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:46" itemprop="dateModified" datetime="2022-12-28T14:40:46+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>2.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>10 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图是由顶点集（VertexSet）和边集（EdgeSet）组成，针对图G，顶点集和边集分别记为V(G)和E(G)。依据图的边集是否为有向，可把图分为有向图和无向图，根据图是否有权重，可以分为有权图和无权图</p>
-<h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><ol>
-<li>邻接点-在一个无向图中，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称Vi，Vj为此边的两个端点，并称它们互为邻接点</li>
-<li>出&#x2F;入边-在一个有向图张，若存在一条边<code>&lt;Vi,Vj&gt;</code>，则称此边为顶点Vi的出边，顶点Vj的一条入边</li>
-<li>度&#x2F;入度&#x2F;出度-无向图中的度定义为以该顶点为一个端点的边的数目，记为D(V)。有向图的入度定为多少边指向该顶点，出度是该顶点出边的个数</li>
-</ol>
-<h2 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h2><p><code>邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。对于无向图 如果顶点b1和b2是连接的，那么在二维矩阵中matrix[b1,b2]和matrix[b2,b1]位置的值置为1，如果是有向图b1指向b2，那么 matrix[b1,b2]=1,matrix[b2,b1]=0；下面用一个例子表示无向图和有向图的邻接矩阵；</code></p>
-<p>如果图是一个带权图，需要把1换为相应边上的权值，把非对角线上的换成一个很大的特定的实数则可，表示相应的边不存在，这个特定的实数通常用无穷大或MaxValue来表示，他要大于图G中所有边的权值</p>
-<p><a href="#matrix">代码实现</a></p>
-<h2 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h2><p>邻接矩阵与邻接表相比，它会造成空间的一定损失，它需要为每个顶点都分配n个边的空间，其实有很多边都是不存在边，但是邻接表的实现就不一样，它只关心存在的边，不关心不存在的边。邻接表由数组+链表组成对于上面的无向图，邻接表表示为（由于有向和无向的差别不是太大，所以只是画出了无向的邻接表表示）</p>
-<p><a href="#table">代码实现</a></p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p><span id="matrix">邻接矩阵实现</span></p>
-<pre><code>package Graph;
-//边集数组 ，存放边的信息
-//邻域数组表示  和 邻域表表示  是两种不同的表示方式
-//表示的是插入边的元素，边的起点和终点  边的权重
-public class EdgeElement &#123;
-    int fromvex;
-    int endvex;
-    int weight;
-    
-    public EdgeElement(int v1,int v2)&#123;
-        //对于无权重图的初始化
-        fromvex=v1;
-        endvex=v2;
-        weight=1;
-    &#125;
-    public EdgeElement(int v1,int v2,int wgt)&#123;
-        //对于有权重图的初始化
-        fromvex=v1;
-        endvex=v2;
-        weight=wgt;
-    &#125;	
-&#125;
-
-
-package Graph;
-//可以通过边集来得到一个图的构成
-public interface Graph &#123;
-    void creatGraph(EdgeElement d[]);		//通过边结点来构建一个图
-    GraphType graphType();				//返回图的类型  无向无权图 无向有权图  有向无权图  有向有权图 定义一个枚举变量
-    int vertices();					//返回图的顶点数
-    int edges();					//返回图的边数
-    boolean find(int i,int j);			//从图中查找一条边(i,j)是否存在
-    void putEdge(EdgeElement theEdge);		//像图中插入一条边 theEdge
-    void removeEdge(int i,int j);			//从图中删除一条边
-    int degree(int i);				//返回顶点i的度
-    int inDegree(int i);				//返回顶点i的入度
-    int outDegree(int i);				//返回顶点i的出度
-    void output();					//以图的顶点集和边集的形式输出一个图
-    void depthFirstSearch(int v);			//从顶点v开始深度优先搜索整幅图
-    void breadthFirstSearch(int v);			//从顶点v开始广度优先搜索整幅图
-&#125;
-
-//在邻域数组中写数据
-public void creatGraph(EdgeElement[] d) &#123;
-    int i;
-    for(i=0;i&lt;d.length;i++)&#123;
-        if(d[i]==null) break;
-        int v1,v2;
-        v1=d[i].fromvex;
-        v2=d[i].endvex;
-        if(v1&lt;0 || v1&gt;n-1 || v2&lt;0 || v2&gt;n-1 || v1==v2)&#123;
-            System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
-            System.exit(0);
-        &#125;
-        if(type==GraphType.NoDirectionNoWeight)&#123;
-            a[v1][v2]=a[v2][v1]=1;
-        &#125;else if(type==GraphType.NoDirectionWeight)&#123;
-            a[v1][v2]=a[v2][v1]=d[i].weight;
-        &#125;else if(type==GraphType.DirectionNoWeight)&#123;
-            a[v1][v2]=1;
-        &#125;else&#123;
-            a[v1][v2]=d[i].weight;
-        &#125;
-    &#125;
-    e=i;			//边的数目
-&#125;
-
-public void putEdge(EdgeElement theEdge) &#123;
-    int v1,v2;
-    v1=theEdge.fromvex;
-    v2=theEdge.endvex;
-    if(v1&lt;0 || v1&gt;n-1 || v2&lt;0 || v2&gt;n-1 || v1==v2)&#123;
-        System.out.println(&quot;边的顶点序号无效，退出运行！&quot;);
-        System.exit(0);
-    &#125;
-    if(a[v1][v2]==0 || a[v1][v2]==MaxValue) e++;		//边数e的值加一
-    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
-        if(type==GraphType.NoDirectionNoWeight)&#123;
-            a[v1][v2]=a[v2][v1]=1;
-        &#125;else&#123;
-            a[v1][v2]=a[v2][v1]=theEdge.weight;
-        &#125;
-    &#125;else&#123;
-        if(type==GraphType.DirectionNoWeight) a[v1][v2]=1;
-        else&#123;
-            a[v1][v2]=theEdge.weight;
-        &#125;
-    &#125;
-&#125;
-
-public void removeEdge(int i, int j) &#123;
-    if(i&lt;0 || i&gt;n-1 || j&lt;0 || j&gt;n-1 || i==j)&#123;
-        System.out.println(&quot;边的顶点序号无效，退出运行！&quot;);
-        System.exit(0);
-    &#125;
-    if(a[i][j]==0 || a[i][j]==MaxValue)&#123;
-        System.out.println(&quot;要删除的边不存在，退出运行！&quot;);
-        System.exit(0);			
-    &#125;
-    if(type==GraphType.NoDirectionNoWeight)&#123;
-        a[i][j]=a[j][i]=0;
-    &#125;else if(type==GraphType.NoDirectionWeight)&#123;
-        a[i][j]=a[j][i]=MaxValue;
-    &#125;else if(type==GraphType.DirectionNoWeight)&#123;
-        a[i][j]=0;
-    &#125;else a[i][j]=MaxValue;
-    e--;
-&#125;
-
-//得到该结点的度
-public int degree(int i) &#123;
-    if(i&lt;0 || i&gt; n-1)&#123;
-        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    int k=0;
-    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
-        for(int j=0;j&lt;n;j++)&#123;
-            if(a[i][j]!=0 &amp;&amp; a[j][i]!=MaxValue) k++;
-            
-        &#125;
-    &#125;else&#123;
-        k = inDegree(i)+outDegree(i);
-    &#125;
-    return k;
-&#125;
-//入度
-public int inDegree(int i) &#123;					
-    if(i&lt;0 || i&gt; n-1)&#123;
-        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
-        return -1;
-    &#125;
-    int k=0;
-    for(int j=0;j&lt;n;i++)&#123;
-        if(a[j][i]!=0 &amp;&amp; a[j][i]!=MaxValue) k++;
-    &#125;
-    return k;
-&#125;
-//出度
-public int outDegree(int i) &#123;
-    if(i&lt;0 || i&gt; n-1)&#123;
-        System.out.println(&quot;参数的顶点序号值无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    if(type==GraphType.NoDirectionNoWeight || type==GraphType.NoDirectionWeight)&#123;
-        return -1;
-    &#125;
-    int k=0;
-    for(int j=0;j&lt;n;i++)&#123;
-        if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue) k++;
-    &#125;
-    return k;
-&#125;
-
-//输出
-public void output() &#123;
-    int i,j;
-    System.out.print(&quot;V=&#123;&quot;);//输出顶点集合
-    for(i=0;i&lt;n-1;i++)&#123;
-        System.out.print(i+&quot;,&quot;);
-    &#125;
-    System.out.print(n-1+&quot;&#125;&quot;);//输出顶点集合
-    //输出边集合
-    System.out.print(&quot;E=&#123;&quot;);
-    if(type==GraphType.NoDirectionNoWeight || type==GraphType.DirectionNoWeight)&#123;
-        for(i=0;i&lt;n;i++)&#123;
-            for(j=0;j&lt;n;j++)&#123;
-                if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue)&#123;
-                    if(type==GraphType.NoDirectionNoWeight)&#123;
-                        if(i&lt;j)System.out.print(&quot;(&quot;+i+&quot;,&quot;+j+&quot;),&quot;);
-                    &#125;else&#123;
-                        System.out.print(&quot;&lt;&quot;+i+&quot;,&quot;+j+&quot;&gt;&quot;);
-                    &#125;
-                &#125;
-            &#125;
-        &#125;
-    &#125;else&#123;
-        for(i=0;i&lt;n;i++)&#123;
-            for(j=0;j&lt;n;j++)&#123;
-                if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue)&#123;
-                    if(type==GraphType.NoDirectionWeight)&#123;
-                        if(i&lt;j)System.out.print(&quot;(&quot;+i+&quot;,&quot;+j+&quot;)&quot;+a[i][j]+&quot;,&quot;);
-                    &#125;else System.out.print(&quot;&lt;&quot;+i+&quot;,&quot;+j+&quot;&gt;&quot;+a[i][j]+&quot;,&quot;);
-                &#125;
-            &#125;
-        &#125;
-    &#125;
-    System.out.print(&quot;&#125;&quot;);
-&#125;
-
-//深度优先进行搜索   是从哪个顶点开始遍历，这里可以用顶点序号表示顶点
-public void depthFirstSearch(int v) &#123;		//驱动函数
-    boolean visited[]=new boolean[n];
-    for(int i=0;i&lt;n;i++)&#123;
-        visited[i]=false;
-    &#125;
-    dfs(v,visited);							//把每个结点遍历一次。
-    System.out.println();
-&#125;
-//进行深度优先搜索的内部递归方法使用
-private void dfs(int i,boolean visited[])&#123;	//工作函数
-    System.out.print(i+&quot; &quot;);
-    visited[i]=true;
-    for(int j=0;j&lt;n;j++)&#123;
-        if(a[i][j]!=0 &amp;&amp; a[i][j]!=MaxValue &amp;&amp; !visited[j])&#123;
-            dfs(j,visited);
-        &#125;
-    &#125;
-&#125;
-</code></pre>
-<p><span id="table">邻接表实现</span></p>
-<pre><code>package GraphLink;
-//定义邻接表类型
-public class EdgeNode&#123;
-    //需要一个存储自身结点
-    int adjvex;
-    int weight;
-    EdgeNode next;
-    //无权图
-    public EdgeNode(int adj,EdgeNode nt)&#123;
-        this.adjvex=adj;
-        this.next=nt;
-        this.weight=1;
-    &#125;
-    //有权图
-    public EdgeNode(int adj,int wgt,EdgeNode nt)&#123;
-        this.adjvex=adj;
-        this.weight=wgt;
-        this.next=nt;
-    &#125;
-&#125;
-
-//生成图函数
-@Override
-public void creatGraph(EdgeElement[] d) &#123;
-    int i;
-    for(i=0;i&lt;d.length;i++)&#123;//处理边集合  如果边集合重复 那程序不就有问题了么  这点要处理
-        if(d[i]==null) break;
-        int v1,v2,weight;
-        v1=d[i].fromvex;
-        v2=d[i].endvex;
-        weight=d[i].weight;
-        if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
-            System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
-            System.exit(0);
-        &#125;
-        if(type==GraphType.NoDirectionNoWeight)&#123;//处理无方向 无权重的图
-            a[v1]=new EdgeNode(v2,a[v1]);//把边挂载在主干上,a为EdgeNode类型的一维数组
-            a[v2]=new EdgeNode(v1,a[v2]);//处理第二条边
-        &#125;else if(type==GraphType.NoDirectionWeight)&#123;//处理无向有权图
-            a[v1]=new EdgeNode(v2,weight,a[v1]);
-            a[v2]=new EdgeNode(v1,weight,a[v2]);
-        &#125;else if(type==GraphType.DirectionNoWeight)&#123;//处理有向无权图
-            a[v1]=new EdgeNode(v2,a[v1]);
-        &#125;else &#123;
-            a[v1]=new EdgeNode(v2,weight,a[v1]);
-        &#125;
-    &#125;
-    e=i;
-&#125;
-
-//在图中查找一条边
-public boolean find(int v1,int v2)&#123;
-    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
-        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    EdgeNode p=a[v1];
-    while(p!=null)&#123;
-        if(p.adjvex==v2)&#123;
-            return true;
-        &#125;
-        p=p.next;
-    &#125;
-    return false;
-&#125;
-
-//向图中插入一条边
-public void putEdge(EdgeElement theEdge)&#123;
-    int v1,v2,weight;
-    v1=theEdge.fromvex;
-    v2=theEdge.endvex;
-    weight=theEdge.weight;
-    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
-        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    EdgeNode p=a[v1];
-    while(p!=null)&#123;
-        if(p.adjvex==v2)&#123;
-            break;//退出后处理
-        &#125;
-        p=p.next;
-    &#125;
-    if(p==null) e++;
-    else&#123;
-        if(type==GraphType.DirectionWeight || type==GraphType.NoDirectionWeight)&#123;
-            p.weight=weight;
-        &#125;
-        if(type==GraphType.NoDirectionWeight)&#123;//无向有权重的另一条边也要处理
-            EdgeNode q=a[v2];
-            while(q!=null)&#123;
-                if(q.adjvex==v1) break;
-                q=q.next;
-            &#125;
-            q.weight=weight;
-        &#125;
-        return;
-    &#125;
-    if(type==GraphType.NoDirectionNoWeight)&#123;//如果是无向无权重
-        a[v1]=new EdgeNode(v2, a[v1]);
-        a[v2]=new EdgeNode(v1, a[v2]);
-    &#125;else if(type==GraphType.NoDirectionWeight)&#123;//处理无向有权重
-        a[v1]=new EdgeNode(v2,weight,a[v1]);
-        a[v2]=new EdgeNode(v1,weight,a[v2]);
-    &#125;else if(type==GraphType.DirectionNoWeight)&#123;//有向无权重
-        a[v1]=new EdgeNode(v2,a[v1]);
-    &#125;else&#123;
-        a[v1]=new EdgeNode(v2, weight,a[v1]);
-    &#125;
-&#125;
-
-public void removeEdge(int v1,int v2)&#123;
-    if(v1&lt;0||v1&gt;n-1||v2&lt;0||v2&gt;n-1||v1==v2)&#123;
-        System.out.println(&quot;边的顶点序号无效，退出运行&quot;);
-        System.exit(0);
-    &#125;
-    EdgeNode p=a[v1],q=null;//拿到主干结点
-    while(p!=null)&#123;
-        if(p.adjvex==v2) break;
-        q=p;
-        p=p.next;
-    &#125;
-    if(p==null)&#123;
-        System.out.println(&quot;要删除的边不存在，程序退出运行&quot;);
-        System.exit(0);
-    &#125;
-    if(q==null)&#123;//该结点在表头上 主干的节点就是需要找的结点
-        a[v1]=a[v1].next;
-    &#125;else&#123;
-        q.next=p.next;//嫁接上
-    &#125;
-    //删除无向图的另一个结点上的边
-    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
-        EdgeNode p1=a[v2],q1=null;
-        while(p1!=null)&#123;
-            if(p1.adjvex==v1)&#123;
-                break;
-            &#125;
-            q1=p1;
-            p1=p1.next;
-        &#125;
-        if(q1==null)&#123;
-            a[v2]=a[v2].next;
-        &#125;else&#123;
-            q1.next=p1.next;
-        &#125;
-    &#125;
-    e--;
-&#125;
-
-//返回一个顶点的度，度分为入度和出度，要分别处理
-public int degree(int i)&#123;
-    if(i&lt;0||i&gt;n-1)&#123;
-        System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
-        System.exit(0);			
-    &#125;
-    int k=0;
-    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
-        EdgeNode p=a[i];
-        while(p!=null)&#123;
-            k++;
-            p=p.next;
-        &#125;
-        return k;
-    &#125;else return inDegree(i)+outDegree(i);
-&#125;
-//求出并返回一个顶点的入度
-public int inDegree(int i)&#123;//返回指向该顶点的度，入度，用双循环来实现
-    int k=0;//记录入度个数
-    if(i&lt;0||i&gt;n-1)&#123;
-        System.out.println(&quot;顶点超过了范围，程序退出运行&quot;);
-        System.exit(0);			
-    &#125;
-    if(type==GraphType.NoDirectionNoWeight||type==GraphType.NoDirectionWeight)&#123;
-        return -1;
-    &#125;else&#123;
-        for(int j=0;j&lt;n;j++)&#123;
-            EdgeNode p=a[j];
-            while(p!=null)&#123;
-                if(p.adjvex==i)k++;
-                p=p.next;
-            &#125;
-        &#125;
-    &#125;
-    return k;
-&#125;
-//返回一个顶点的出度
-public int outDegree(int i)&#123;
-    int k=0;//记录出度的数目
-    EdgeNode p=a[i];
-    while(p!=null)&#123;
-        k++;
-        p=p.next;
-    &#125;
-    return k;
-&#125;
-
-//得到邻接矩阵
-public int[][] getAdjacencyMatrix()&#123;
-    int adjacencyMatrix[][]=new int[n][n];
-    if(type==GraphType.DirectionNoWeight||type==GraphType.DirectionWeight)&#123;//有向性
-        //有向 那不存在的边是存在一个InfinityValue
-        for(int i=0;i&lt;n;i++)&#123;
-            for(int j=0;j&lt;n;j++)&#123;
-                if(i==j) adjacencyMatrix[i][j]=0;
-                else adjacencyMatrix[i][j]=InfinityValue;
-            &#125;
-        &#125;
-    &#125;else&#123;
-        //无向 都设置为0
-        for(int i=0;i&lt;n;i++)&#123;
-            for(int j=0;j&lt;n;j++)&#123;
-                 adjacencyMatrix[i][j]=0;
-            &#125;
-        &#125;			
-    &#125;
-        //遍历整个图
-        for(int i=0;i&lt;n;i++)&#123;
-            EdgeNode p=a[i];
-            while(p!=null)&#123;
-                adjacencyMatrix[i][p.adjvex]=p.weight;
-                p=p.next;
-            &#125;
-        &#125;	
-    return adjacencyMatrix;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/61466.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/61466.html" class="post-title-link" itemprop="url">二叉搜索树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>0</span>
+              <span>374</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -3117,7 +1008,15 @@ public int[][] getAdjacencyMatrix()&#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <hr>
+<h2 id="title-机器学习-GAN"><a href="#title-机器学习-GAN" class="headerlink" title="title:机器学习-GAN"></a>title:机器学习-GAN</h2><p>Generative Adversarial Network，就是大家耳熟能详的 GAN，由 Ian Goodfellow 首先提出，在这两年更是深度学习中最热门的东西，仿佛什么东西都能由 GAN 做出来。我最近刚入门 GAN，看了些资料，做一些笔记。</p>
+<p>1.Generation<br>什么是生成（generation）？就是模型通过学习一些数据，然后生成类似的数据。让机器看一些动物图片，然后自己来产生动物的图片，这就是生成。</p>
+<p>以前就有很多可以用来生成的技术了，比如 auto-encoder（自编码器）</p>
+<p>你训练一个 encoder，把 input 转换成 code，然后训练一个 decoder，把 code 转换成一个 image，然后计算得到的 image 和 input 之间的 MSE（mean square error），训练完这个 model 之后，取出后半部分 NN Decoder，输入一个随机的 code，就能 generate 一个 image。</p>
+<p>但是 auto-encoder 生成 image 的效果，当然看着很别扭啦，一眼就能看出真假。所以后来还提出了比如VAE这样的生成模型，我对此也不是很了解，在这就不细说。</p>
+<p>上述的这些生成模型，其实有一个非常严重的弊端。比如 VAE，它生成的 image 是希望和 input 越相似越好，但是 model 是如何来衡量这个相似呢？model 会计算一个 loss，采用的大多是 MSE，即每一个像素上的均方差。loss 小真的表示相似嘛？</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bonelee/p/9166084.html" title="gan">gan</a></p>
+
       
     </div>
 
@@ -3136,7 +1035,7 @@ public int[][] getAdjacencyMatrix()&#123;
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/54793.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2664.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -3150,7 +1049,7 @@ public int[][] getAdjacencyMatrix()&#123;
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/54793.html" class="post-title-link" itemprop="url">AVL树</a>
+            <a href="/posts/2664.html" class="post-title-link" itemprop="url">baggging</a>
         </h2>
 
         <div class="post-meta">
@@ -3160,7 +1059,7 @@ public int[][] getAdjacencyMatrix()&#123;
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -3175,7 +1074,7 @@ public int[][] getAdjacencyMatrix()&#123;
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
                 </span>
             </span>
 
@@ -3184,7 +1083,7 @@ public int[][] getAdjacencyMatrix()&#123;
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>12</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -3202,405 +1101,9 @@ public int[][] getAdjacencyMatrix()&#123;
     <div class="post-body" itemprop="articleBody">
 
       
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/32086.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/32086.html" class="post-title-link" itemprop="url">234树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>平衡树，子节点数目可以达到4个</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ol>
-<li><p>若父节点中存有1个数据项，则必有2个子节点。</p>
-</li>
-<li><p>若父节点中存有2个数据项，则必有3个子节点。</p>
-</li>
-<li><p>若父节点中存有3个数据项，则必有4个子节点。</p>
-</li>
-</ol>
-<h2 id="构造"><a href="#构造" class="headerlink" title="构造"></a>构造</h2><p>插入数据：</p>
-<ul>
-<li><p>未满节点直接插入</p>
-</li>
-<li><p>满节点 ABC 分裂 A不变 B到父节点 C到右侧</p>
-</li>
-</ul>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>class Node
-&#123;
-private static final int ORDER = 4;
-private int numItems;//节点中实际存储的数据项数目，其值一定不大于3
-private Node parent;
-private Node childArray[] = new Node[ORDER];//子节点数组
-private DataItem itemArray[] = new DataItem[ORDER-1];//存储数据项数组
-//-------------------------------------------------------------
-// 把参数中的节点作为子节点，与当前节点进行连接
-public void connectChild(int childNum, Node child)
-   &#123;
-   childArray[childNum] = child;
-   if(child != null)
-      child.parent = this;//当前节点作为父节点
-   &#125;
-//-------------------------------------------------------------
-// 断开参数确定的节点与当前节点的连接，这个节点一定是当前节点的子节点。
-public Node disconnectChild(int childNum)
-   &#123;
-   Node tempNode = childArray[childNum];
-   childArray[childNum] = null; //断开连接
-   return tempNode;//返回要这个子节点
-   &#125;
-//-------------------------------------------------------------
-public Node getChild(int childNum)//获取相应的子节点
-   &#123; return childArray[childNum]; &#125;
-//-------------------------------------------------------------
-public Node getParent()//获取父节点
-   &#123; return parent; &#125;
-//-------------------------------------------------------------
-public boolean isLeaf()//是否是叶结点
-   &#123; return (childArray[0]==null) ? true : false; &#125;//叶结点没有子节点
-//-------------------------------------------------------------
-public int getNumItems()//获取实际存储的数据项数目
-  &#123; return numItems; &#125;
-//-------------------------------------------------------------
-public DataItem getItem(int index)   // 获取具体的数据项
-   &#123; return itemArray[index]; &#125;
-//-------------------------------------------------------------
-public boolean isFull()//该节点是否已满
-   &#123; return (numItems==ORDER-1) ? true : false; &#125;
-//-------------------------------------------------------------
-public int findItem(long key)       // 查找
-   &#123;                                    
-   for(int j=0; j&lt;ORDER-1; j++)         // 遍历数组
-      &#123;                                 
-      if(itemArray[j] == null)          // 数组未满，未找到
-         break;
-      else if(itemArray[j].dData == key)
-         return j;
-      &#125;
-   return -1;
-   &#125;  // end findItem
-//-------------------------------------------------------------
-public int insertItem(DataItem newItem)//节点未满的插入
-   &#123;
-   numItems++;                          
-   long newKey = newItem.dData;         // 获得关键字
- 
-   for(int j=ORDER-2; j&gt;=0; j--)        // 因为节点未满，所以从倒数第二项向前查找
-      &#123;                              
-      if(itemArray[j] == null)          // 没存数据
-         continue;                      
-      else                              
-         &#123;                              
-         long itsKey = itemArray[j].dData;//获得关键字
-         if(newKey &lt; itsKey)            //插入位置在其前面，但未必相邻
-            itemArray[j+1] = itemArray[j]; //当前数据项后移
-         else
-            &#123;
-            itemArray[j+1] = newItem;   // 在其后位置插入
-            return j+1;                 // 返回插入的位置下标
-            &#125;                           //    new item
-         &#125;  // end else (not null)
-      &#125;  // end for                     // shifted all items,
-   //若上述代码没有执行返回操作，那么这是空节点（只有初始时根是这个情况）
-   itemArray[0] = newItem;              // insert new item
-   return 0;
-   &#125;  // end insertItem()
-//-------------------------------------------------------------
-public DataItem removeItem()        // 移除数据项，从后向前移除
-   &#123;
-   // 假设节点非空
-   DataItem temp = itemArray[numItems-1];  // 要移除的数据项
-   itemArray[numItems-1] = null;           // 移除
-   numItems--;                             // 数据项数目减一
-   return temp;                            // 返回要移除的数据项
-   &#125;
-//-------------------------------------------------------------
-public void displayNode()           // format &quot;/24/56/74/&quot;
-   &#123;
-   for(int j=0; j&lt;numItems; j++)
-      itemArray[j].displayItem();   // &quot;/56&quot;
-   System.out.println(&quot;/&quot;);         // final &quot;/&quot;
-   &#125;
-//-------------------------------------------------------------
-&#125;  // end class Node
-////////////////////////////////////////////////////////////////
-
-
-class Tree234
-&#123;
-private Node root = new Node();            // 创建树的根
-//-------------------------------------------------------------
-//获取查找的下一个节点
-public Node getNextChild(Node theNode, long theValue)
-&#123;
-int j;
-// 假设这个节点不是叶结点
-int numItems = theNode.getNumItems();//获得当前节点的数据项数目
-for(j=0; j&lt;numItems; j++)          
-   &#123;                             
-   if( theValue &lt; theNode.getItem(j).dData )
-      return theNode.getChild(j);  // 返回相应的节点
-   &#125;  // end for                   
-return theNode.getChild(j);        // 此时j=numItems
-&#125;
-//-------------------------------------------------------------
-public int find(long key)
-   &#123;
-   Node curNode = root;
-   int childNumber;
-   while(true)
-      &#123;
-      if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行
-         return childNumber;               // found it
-      else if( curNode.isLeaf() )//叶结点上也没找到
-         return -1;                        // can&#39;t find it
-      else                                 // 不是叶结点，则继续向下查找
-         curNode = getNextChild(curNode, key);
-      &#125;  // end while
-   &#125;
-//-------------------------------------------------------------
-// 插入数据项
-public void insert(long dValue)
-   &#123;
-   Node curNode = root;//当前节点标志
-   DataItem tempItem = new DataItem(dValue);//插入数据项封装
- 
-   while(true)
-      &#123;
-      if( curNode.isFull() )               // 是满节点
-         &#123;
-         split(curNode);                   // 分裂
-         curNode = curNode.getParent();    // 回到分裂出的父节点上
-                                           // 继续向下查找
-         curNode = getNextChild(curNode, dValue);
-         &#125;  // end if(node is full)
-//后面的操作中节点都未满，否则先执行上面的代码
-      else if( curNode.isLeaf() )          // 是叶结点，非满
-         break;                            // 跳出，直接插入
-   
-      else
-         curNode = getNextChild(curNode, dValue);//向下查找
-      &#125;  // end while
- 
-   curNode.insertItem(tempItem);       // 此时节点一定不满，直接插入数据项，
-   &#125;  // end insert()
-//-------------------------------------------------------------
-public void split(Node thisNode)     // 分裂
-   &#123;
-   // 操作中节点一定是满节点，否则不会执行该操作
-   DataItem itemB, itemC;
-   Node parent, child2, child3;
-   int itemIndex;
- 
-   itemC = thisNode.removeItem();    // 移除最右边的两个数据项，并保存为B和C
-   itemB = thisNode.removeItem();    // 
-   child2 = thisNode.disconnectChild(2); // //断开最右边两个子节点的链接
-   child3 = thisNode.disconnectChild(3); // 
- 
-   Node newRight = new Node();       //新建一个节点，作为当前节点的兄弟节点
- 
-   if(thisNode==root)                // 是根
-      &#123;
-      root = new Node();                // 新建一个根
-      parent = root;                    // 把新根设为父节点
-      root.connectChild(0, thisNode);   // 连接父节点和子节点
-      &#125;
-   else                              // 不是根
-      parent = thisNode.getParent();    // 获取父节点
- 
-  
-   itemIndex = parent.insertItem(itemB); // 把B插入父节点中，返回插入位置
-   int n = parent.getNumItems();         // 获得总数据项数目
- 
-   for(int j=n-1; j&gt;itemIndex; j--)          //从后向前移除
-      &#123;                                    
-      Node temp = parent.disconnectChild(j); // 断开连接
-      parent.connectChild(j+1, temp);        // 连接到新的位置
-      &#125;
-                           
-   parent.connectChild(itemIndex+1, newRight);//连接到新位置
- 
-   // 处理兄弟节点
-   newRight.insertItem(itemC);       // 将C放入兄弟节点中
-   newRight.connectChild(0, child2); // 把子节点中最右边的两个连接到兄弟节点上
-   newRight.connectChild(1, child3); //
-   &#125;  // end split()
-//-------------------------------------------------------------
-// gets appropriate child of node during search for value
- 
-public void displayTree()
-   &#123;
-   recDisplayTree(root, 0, 0);
-   &#125;
-//-------------------------------------------------------------
-private void recDisplayTree(Node thisNode, int level,
-                                           int childNumber)
-   &#123;
-   System.out.print(&quot;level=&quot;+level+&quot; child=&quot;+childNumber+&quot; &quot;);
-   thisNode.displayNode();               // display this node
- 
-   // call ourselves for each child of this node
-   int numItems = thisNode.getNumItems();
-   for(int j=0; j&lt;numItems+1; j++)
-      &#123;
-      Node nextNode = thisNode.getChild(j);
-      if(nextNode != null)
-         recDisplayTree(nextNode, level+1, j);
-      else
-         return;
-      &#125;
-   &#125;  // end recDisplayTree()
-//-------------------------------------------------------------\
-&#125;  // end class Tree234
-////////////////////////////////////////////////////////////////
-
-
-import java.io.*;
- 
-class Tree234App
-&#123;
-public static void main(String[] args) throws IOException
-   &#123;
-   long value;
-   Tree234 theTree = new Tree234();
- 
-   theTree.insert(50);
-   theTree.insert(40);
-   theTree.insert(60);
-   theTree.insert(30);
-   theTree.insert(70);
- 
-   while(true)
-      &#123;
-      System.out.print(&quot;Enter first letter of &quot;);
-      System.out.print(&quot;show, insert, or find: &quot;);
-      char choice = getChar();
-      switch(choice)
-         &#123;
-         case &#39;s&#39;:
-            theTree.displayTree();
-            break;
-         case &#39;i&#39;:
-            System.out.print(&quot;Enter value to insert: &quot;);
-            value = getInt();
-            theTree.insert(value);
-            break;
-         case &#39;f&#39;:
-            System.out.print(&quot;Enter value to find: &quot;);
-            value = getInt();
-            int found = theTree.find(value);
-            if(found != -1)
-               System.out.println(&quot;Found &quot;+value);
-            else
-               System.out.println(&quot;Could not find &quot;+value);
-            break;
-         default:
-            System.out.print(&quot;Invalid entry\n&quot;);
-         &#125;  // end switch
-      &#125;  // end while
-   &#125;  // end main()
-//--------------------------------------------------------------
-public static String getString() throws IOException
-   &#123;
-   InputStreamReader isr = new InputStreamReader(System.in);
-   BufferedReader br = new BufferedReader(isr);
-   String s = br.readLine();
-   return s;
-   &#125;
-//--------------------------------------------------------------
-public static char getChar() throws IOException
-   &#123;
-   String s = getString();
-   return s.charAt(0);
-   &#125;
- 
-//-------------------------------------------------------------
-public static int getInt() throws IOException
-   &#123;
-   String s = getString();
-   return Integer.parseInt(s);
-   &#125;
-//-------------------------------------------------------------
-&#125;  // end class Tree234App
-////////////////////////////////////////////////////////////////
-</code></pre>
+          <p>又放回采样</p>
+<p>OOB数据</p>
+<p>测试误差</p>
 
       
     </div>
@@ -3619,7 +1122,7 @@ public static int getInt() throws IOException
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -3685,20 +1188,20 @@ public static int getInt() throws IOException
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -3725,7 +1228,7 @@ public static int getInt() throws IOException
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -3734,12 +1237,12 @@ public static int getInt() throws IOException
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">37k</span>
+    <span title="站点总字数">43k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:15</span>
+    <span title="站点阅读时长">2:36</span>
 </div>
 
 <!--
