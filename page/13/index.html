@@ -2795,7 +2795,7 @@ end while;
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+                <time title="修改时间：2023-01-06 17:52:55" itemprop="dateModified" datetime="2023-01-06T17:52:55+08:00">2023-01-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -2842,21 +2842,8 @@ end while;
 <p>实际的执行效果是，如果session B先执行，由于这个语句对表t主键索引加了(-∞,1]这个next-key</p>
 <p>lock，会在语句执行完成后，才允许session A的insert语句执行。但如果没有锁的话，就可能出现session B的insert语句先执行，但是后写入binlog的情况。于</p>
 <p>是，在binlog_format&#x3D;statement的情况下，binlog里面就记录了这样的语句序列：</p>
-<p>CREATE TABLE t̀  ̀(</p>
-<p>  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,</p>
-<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
-<p>  &#96;d  ̀int(11) DEFAULT NULL,</p>
-<p>  PRIMARY KEY (̀ id )̀,</p>
-<p>  UNIQUE KEY &#96;c  ̀(̀ c )̀</p>
-<p>) ENGINE&#x3D;InnoDB;</p>
-<p>insert into t values(null, 1,1);</p>
-<p>insert into t values(null, 2,2);</p>
-<p>insert into t values(null, 3,3);</p>
-<p>insert into t values(null, 4,4);</p>
-<p>create table t2 like t</p>
-<p>insert into t2(c,d) select c,d from t;</p>
-<p>insert into t values(-1,-1,-1);</p>
-<p>insert into t2(c,d) select c,d from t;</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t̀  ̀(</span><br><span class="line"></span><br><span class="line">  ìd  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line"></span><br><span class="line">  `c  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line"></span><br><span class="line">  `d  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line"></span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (̀ id )̀,</span><br><span class="line"></span><br><span class="line">  <span class="keyword">UNIQUE</span> KEY `c  ̀(̀ c )̀</span><br><span class="line"></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB;</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">3</span>,<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">4</span>,<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> t2 <span class="keyword">like</span> t</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="number">-1</span>,<span class="number">-1</span>,<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;</span><br></pre></td></tr></table></figure>
+
 <p>这个语句到了备库执行，就会把id&#x3D;-1这一行也写到表t2中，出现主备不一致。insert 循环写入</p>
 <p>当然了，执行insert … select 的时候，对目标表也不是锁全表，而是只锁住需要访问的资源。如果现在有这么一个需求：要往表t2中插入一行数据，这一行的c值是表t中c值的最大值加1。此时，我们可以这么写这条SQL语句 ：</p>
 <p>这个语句的加锁范围，就是表t索引c上的(3,4]和(4,supremum]这两个next-key lock，以及主键索</p>
