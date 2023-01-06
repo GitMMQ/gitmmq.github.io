@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题解析45 | 自增id用完怎么办？2019-02-25 林晓斌 MySQL里有很多自增的id，每个自增id都是定义了初始值，然后不停地往上加步长。虽然自然数 是没有上限的，但是在计算机里，只要定义了表示这个数的字节长度，那它就有上限。比如，无 符号整型(unsigned int)是4个字节，上限就是2 -1。既然自增id有上限，就有可能被用完。但是，自增id用完了会怎么样呢？今天这篇文章，我们">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql-自增id用完怎么办">
+<meta property="og:url" content="https://www.fastolf.com/posts/bd94ce79.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="问题解析45 | 自增id用完怎么办？2019-02-25 林晓斌 MySQL里有很多自增的id，每个自增id都是定义了初始值，然后不停地往上加步长。虽然自然数 是没有上限的，但是在计算机里，只要定义了表示这个数的字节长度，那它就有上限。比如，无 符号整型(unsigned int)是4个字节，上限就是2 -1。既然自增id有上限，就有可能被用完。但是，自增id用完了会怎么样呢？今天这篇文章，我们">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-19T22:12:03.000Z">
+<meta property="article:modified_time" content="2023-01-06T09:44:03.211Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/bd94ce79.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>mysql-自增id用完怎么办 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/bd94ce79.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql-自增id用完怎么办
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-20 06:12:03" itemprop="dateCreated datePublished" datetime="2019-12-20T06:12:03+08:00">2019-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>26 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>45 | 自增id用完怎么办？2019-02-25 林晓斌</p>
+<p>MySQL里有很多自增的id，每个自增id都是定义了初始值，然后不停地往上加步长。虽然自然数</p>
+<p>是没有上限的，但是在计算机里，只要定义了表示这个数的字节长度，那它就有上限。比如，无</p>
+<p>符号整型(unsigned int)是4个字节，上限就是2 -1。既然自增id有上限，就有可能被用完。但是，自增id用完了会怎么样呢？今天这篇文章，我们就来看看MySQL里面的几种自增id，一起分析一下它们的值达到上限以后，</p>
+<p>会出现什么情况。表定义自增值id</p>
+<p>说到自增id，你第一个想到的应该就是表结构定义里的自增字段，也就是我在第39篇文章《自增</p>
+<p>主键为什么不是连续的？》中和你介绍过的自增主键id。表定义的自增值达到上限后的逻辑是：再申请下一个id时，得到的值保持不变。我们可以通过下面这个语句序列验证一下：</p>
+<p>32</p>
+<p>可以看到，第一个insert语句插入数据成功后，这个表的AUTO_INCREMENT没有改变（还是</p>
+<p>4294967295），就导致了第二个insert语句又拿到相同的自增id值，再试图执行插入语句，报主</p>
+<p>键冲突错误。2 -1（4294967295）不是一个特别大的数，对于一个频繁插入删除数据的表来说，是可能会被</p>
+<p>用完的。因此在建表的时候你需要考察你的表是否有可能达到这个上限，如果有可能，就应该创</p>
+<p>建成8个字节的bigint unsigned。InnoDB系统自增row_id</p>
+<p>如果你创建的InnoDB表没有指定主键，那么InnoDB会给你创建一个不可见的，长度为6个字节</p>
+<p>的row_id。InnoDB维护了一个全局的dict_sys.row_id值，所有无主键的InnoDB表，每插入一行</p>
+<p>数据，都将当前的dict_sys.row_id值作为要插入数据的row_id，然后把dict_sys.row_id的值加1。实际上，在代码实现时row_id是一个长度为8字节的无符号长整型(bigint unsigned)。但</p>
+<p>是，InnoDB在设计时，给row_id留的只是6个字节的长度，这样写到数据表中时只放了最后6个</p>
+<p>字节，所以row_id能写到数据表中的值，就有两个特征：</p>
+<ol>
+<li><p>row_id写入表中的值范围，是从0到2 -1；</p>
+</li>
+<li><p>当dict_sys.row_id&#x3D;2 时，如果再有插入数据的行为要来申请row_id，拿到以后再取最后6个</p>
+</li>
+</ol>
+<p>字节的话就是0。也就是说，写入表的row_id是从0开始到2 -1。达到上限后，下一个值就是0，然后继续循环。当然，2 -1这个值本身已经很大了，但是如果一个MySQL实例跑得足够久的话，还是可能达到</p>
+<p>这个上限的。在InnoDB逻辑里，申请到row_id&#x3D;N后，就将这行数据写入表中；如果表中已经存</p>
+<p>create table t(id int unsigned auto_increment primary key) auto_increment&#x3D;4294967295;</p>
+<p>insert into t values(null);</p>
+<p>&#x2F;&#x2F;成功插入一行 4294967295</p>
+<p>show create table t;</p>
+<p>&#x2F;* CREATE TABLE t̀  ̀(</p>
+<p>  ìd  ̀int(10) unsigned NOT NULL AUTO_INCREMENT,</p>
+<p>  PRIMARY KEY (̀ id )̀</p>
+<p>) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;4294967295;</p>
+<p>*&#x2F;</p>
+<p>insert into t values(null);</p>
+<p>&#x2F;&#x2F;Duplicate entry ‘4294967295’ for key ‘PRIMARY’</p>
+<p>32</p>
+<p>48</p>
+<p>48</p>
+<p>48</p>
+<p>48</p>
+<p>在row_id&#x3D;N的行，新写入的行就会覆盖原有的行。要验证这个结论的话，你可以通过gdb修改系统的自增row_id来实现。注意，用gdb改变量这个</p>
+<p>操作是为了便于我们复现问题，只能在测试环境使用。图1 row_id用完的验证序列</p>
+<p>图2 row_id用完的效果验证</p>
+<p>可以看到，在我用gdb将dict_sys.row_id设置为2 之后，再插入的a&#x3D;2的行会出现在表t的第一</p>
+<p>行，因为这个值的row_id&#x3D;0。之后再插入的a&#x3D;3的行，由于row_id&#x3D;1，就覆盖了之前a&#x3D;1的行，</p>
+<p>因为a&#x3D;1这一行的row_id也是1。从这个角度看，我们还是应该在InnoDB表中主动创建自增主键。因为，表自增id到达上限后，</p>
+<p>再插入数据时报主键冲突错误，是更能被接受的。毕竟覆盖数据，就意味着数据丢失，影响的是数据可靠性；报主键冲突，是插入失败，影响的是</p>
+<p>可用性。而一般情况下，可靠性优先于可用性。Xid</p>
+<p>48</p>
+<p>在第15篇文章《答疑文章（一）：日志和索引相关问题》中，我和你介绍redo log和binlog相配</p>
+<p>合的时候，提到了它们有一个共同的字段叫作Xid。它在MySQL中是用来对应事务的。那么，Xid在MySQL内部是怎么生成的呢？MySQL内部维护了一个全局变量global_query_id，每次执行语句的时候将它赋值给Query_id，</p>
+<p>然后给这个变量加1。如果当前语句是这个事务执行的第一条语句，那么MySQL还会同时把</p>
+<p>Query_id赋值给这个事务的Xid。而global_query_id是一个纯内存变量，重启之后就清零了。所以你就知道了，在同一个数据库实</p>
+<p>例中，不同事务的Xid也是有可能相同的。但是MySQL重启之后会重新生成新的binlog文件，这就保证了，同一个binlog文件里，Xid一定是</p>
+<p>惟一的。虽然MySQL重启不会导致同一个binlog里面出现两个相同的Xid，但是如果global_query_id达到</p>
+<p>上限后，就会继续从0开始计数。从理论上讲，还是就会出现同一个binlog里面出现相同Xid的场</p>
+<p>景。因为global_query_id定义的长度是8个字节，这个自增值的上限是2 -1。要出现这种情况，必须</p>
+<p>是下面这样的过程：</p>
+<ol>
+<li><p>执行一个事务，假设Xid是A；</p>
+</li>
+<li><p>接下来执行2 次查询语句，让global_query_id回到A；</p>
+</li>
+<li><p>再启动一个事务，这个事务的Xid也是A。不过，2 这个值太大了，大到你可以认为这个可能性只会存在于理论上。Innodb trx_id</p>
+</li>
+</ol>
+<p>Xid和InnoDB的trx_id是两个容易混淆的概念。Xid是由server层维护的。InnoDB内部使用Xid，就是为了能够在InnoDB事务和server之间做关</p>
+<p>联。但是，InnoDB自己的trx_id，是另外维护的。其实，你应该非常熟悉这个trx_id。它就是在我们在第8篇文章《事务到底是隔离的还是不隔离</p>
+<p>的？》中讲事务可见性时，用到的事务id（transaction id）。InnoDB内部维护了一个max_trx_id全局变量，每次需要申请一个新的trx_id时，就获得</p>
+<p>max_trx_id的当前值，然后并将max_trx_id加1。InnoDB数据可见性的核心思想是：每一行数据都记录了更新它的trx_id，当一个事务读到一行数</p>
+<p>64</p>
+<p>64</p>
+<p>64</p>
+<p>据的时候，判断这个数据是否可见的方法，就是通过事务的一致性视图与这行数据的trx_id做对</p>
+<p>比。对于正在执行的事务，你可以从information_schema.innodb_trx表中看到事务的trx_id。我在上一篇文章的末尾留给你的思考题，就是关于从innodb_trx表里面查到的trx_id的。现在，我</p>
+<p>们一起来看一个事务现场：</p>
+<p>图3 事务的trx_id</p>
+<p>session B里，我从innodb_trx表里查出的这两个字段，第二个字段trx_mysql_thread_id就是线程</p>
+<p>id。显示线程id，是为了说明这两次查询看到的事务对应的线程id都是5，也就是session A所在</p>
+<p>的线程。可以看到，T2时刻显示的trx_id是一个很大的数；T4时刻显示的trx_id是1289，看上去是一个比</p>
+<p>较正常的数字。这是什么原因呢？实际上，在T1时刻，session A还没有涉及到更新，是一个只读事务。而对于只读事务，InnoDB</p>
+<p>并不会分配trx_id。也就是说：</p>
+<ol>
+<li>在T1时刻，trx_id的值其实就是0。而这个很大的数，只是显示用的。一会儿我会再和你说说</li>
+</ol>
+<p>这个数据的生成逻辑。2. 直到session A 在T3时刻执行insert语句的时候，InnoDB才真正分配了trx_id。所以，T4时</p>
+<p>刻，session B查到的这个trx_id的值就是1289。需要注意的是，除了显而易见的修改类语句外，如果在select 语句后面加上for update，这个事</p>
+<p>务也不是只读事务。在上一篇文章的评论区，有同学提出，实验的时候发现不止加1。这是因为：</p>
+<ol>
+<li>update 和 delete语句除了事务本身，还涉及到标记删除旧数据，也就是要把数据放到purge</li>
+</ol>
+<p>队列里等待后续物理删除，这个操作也会把max_trx_id+1， 因此在一个事务中至少加2；</p>
+<ol start="2">
+<li>InnoDB的后台操作，比如表的索引信息统计这类操作，也是会启动内部事务的，因此你可</li>
+</ol>
+<p>能看到，trx_id值并不是按照加1递增的。那么，T2时刻查到的这个很大的数字是怎么来的呢？其实，这个数字是每次查询的时候由系统临时计算出来的。它的算法是：把当前事务的trx变量的</p>
+<p>指针地址转成整数，再加上2 。使用这个算法，就可以保证以下两点：</p>
+<ol>
+<li>因为同一个只读事务在执行期间，它的指针地址是不会变的，所以不论是在 innodb_trx还是</li>
+</ol>
+<p>在innodb_locks表里，同一个只读事务查出来的trx_id就会是一样的。2. 如果有并行的多个只读事务，每个事务的trx变量的指针地址肯定不同。这样，不同的并发只</p>
+<p>读事务，查出来的trx_id就是不同的。那么，为什么还要再加上2 呢？在显示值里面加上2 ，目的是要保证只读事务显示的trx_id值比较大，正常情况下就会区别于读</p>
+<p>写事务的id。但是，trx_id跟row_id的逻辑类似，定义长度也是8个字节。因此，在理论上还是可</p>
+<p>能出现一个读写事务与一个只读事务显示的trx_id相同的情况。不过这个概率很低，并且也没有</p>
+<p>什么实质危害，可以不管它。另一个问题是，只读事务不分配trx_id，有什么好处呢？一个好处是，这样做可以减小事务视图里面活跃事务数组的大小。因为当前正在运行的只读</p>
+<p>事务，是不影响数据的可见性判断的。所以，在创建事务的一致性视图时，InnoDB就只需要</p>
+<p>拷贝读写事务的trx_id。另一个好处是，可以减少trx_id的申请次数。在InnoDB里，即使你只是执行一个普通的select</p>
+<p>语句，在执行过程中，也是要对应一个只读事务的。所以只读事务优化后，普通的查询语句</p>
+<p>不需要申请trx_id，就大大减少了并发事务申请trx_id的锁冲突。48</p>
+<p>48</p>
+<p>48</p>
+<p>由于只读事务不分配trx_id，一个自然而然的结果就是trx_id的增加速度变慢了。但是，max_trx_id会持久化存储，重启也不会重置为0，那么从理论上讲，只要一个MySQL服务</p>
+<p>跑得足够久，就可能出现max_trx_id达到2 -1的上限，然后从0开始的情况。当达到这个状态后，MySQL就会持续出现一个脏读的bug，我们来复现一下这个bug。首先我们需要把当前的max_trx_id先修改成2 -1。注意：这个case里使用的是可重复读隔离级</p>
+<p>别。具体的操作流程如下：</p>
+<p>图 4 复现脏读</p>
+<p>由于我们已经把系统的max_trx_id设置成了2 -1，所以在session A启动的事务TA的低水位就是</p>
+<p>48</p>
+<p>48</p>
+<p>48</p>
+<p>48</p>
+<p>2 -1。在T2时刻，session B执行第一条update语句的事务id就是2 -1，而第二条update语句的事务id</p>
+<p>就是0了，这条update语句执行后生成的数据版本上的trx_id就是0。在T3时刻，session A执行select语句的时候，判断可见性发现，c&#x3D;3这个数据版本的trx_id，小于</p>
+<p>事务TA的低水位，因此认为这个数据可见。但，这个是脏读。由于低水位值会持续增加，而事务id从0开始计数，就导致了系统在这个时刻之后，所有的查询</p>
+<p>都会出现脏读的。并且，MySQL重启时max_trx_id也不会清0，也就是说重启MySQL，这个bug仍然存在。那么，这个bug也是只存在于理论上吗？假设一个MySQL实例的TPS是每秒50万，持续这个压力的话，在17.8年后，就会出现这个情</p>
+<p>况。如果TPS更高，这个年限自然也就更短了。但是，从MySQL的真正开始流行到现在，恐怕</p>
+<p>都还没有实例跑到过这个上限。不过，这个bug是只要MySQL实例服务时间够长，就会必然出现</p>
+<p>的。当然，这个例子更现实的意义是，可以加深我们对低水位和数据可见性的理解。你也可以借此机</p>
+<p>会再回顾下第8篇文章《事务到底是隔离的还是不隔离的？》中的相关内容。thread_id</p>
+<p>接下来，我们再看看线程id（thread_id）。其实，线程id才是MySQL中最常见的一种自增id。平</p>
+<p>时我们在查各种现场的时候，show processlist里面的第一列，就是thread_id。thread_id的逻辑很好理解：系统保存了一个全局变量thread_id_counter，每新建一个连接，就</p>
+<p>将thread_id_counter赋值给这个新连接的线程变量。thread_id_counter定义的大小是4个字节，因此达到2 -1后，它就会重置为0，然后继续增加。但是，你不会在show processlist里看到两个相同的thread_id。这，是因为MySQL设计了一个唯一数组的逻辑，给新线程分配thread_id的时候，逻辑代码是这</p>
+<p>样的：</p>
+<p>48</p>
+<p>48</p>
+<p>32</p>
+<p>do {</p>
+<p>  new_id&#x3D; thread_id_counter++;</p>
+<p>} while (!thread_ids.insert_unique(new_id).second);</p>
+<p>这个代码逻辑简单而且实现优雅，相信你一看就能明白。小结</p>
+<p>今天这篇文章，我给你介绍了MySQL不同的自增id达到上限以后的行为。数据库系统作为一个可</p>
+<p>能需要7*24小时全年无休的服务，考虑这些边界是非常有必要的。每种自增id有各自的应用场景，在达到上限后的表现也不同：</p>
+<ol>
+<li>表的自增id达到上限后，再申请时它的值就不会改变，进而导致继续插入数据时报主键冲突</li>
+</ol>
+<p>的错误。2. row_id达到上限后，则会归0再重新递增，如果出现相同的row_id，后写的数据会覆盖之前</p>
+<p>的数据。3. Xid只需要不在同一个binlog文件中出现重复值即可。虽然理论上会出现重复值，但是概率极</p>
+<p>小，可以忽略不计。4. InnoDB的max_trx_id 递增值每次MySQL重启都会被保存起来，所以我们文章中提到的脏读</p>
+<p>的例子就是一个必现的bug，好在留给我们的时间还很充裕。5. thread_id是我们使用中最常见的，而且也是处理得最好的一个自增id逻辑了。当然，在MySQL里还有别的自增id，比如table_id、binlog文件序号等，就留给你去验证和探索</p>
+<p>了。不同的自增id有不同的上限值，上限值的大小取决于声明的类型长度。而我们专栏声明的上限id</p>
+<p>就是45，所以今天这篇文章也是我们的最后一篇技术文章了。既然没有下一个id了，课后也就没有思考题了。今天，我们换一个轻松的话题，请你来说说，读</p>
+<p>完专栏以后有什么感想吧。这个“感想”，既可以是你读完专栏前后对某一些知识点的理解发生的变化，也可以是你积累的学</p>
+<p>习专栏文章的好方法，当然也可以是吐槽或者对未来的期望。欢迎你给我留言，我们在评论区见，也欢迎你把这篇文章分享给更多的朋友一起阅读。Continue   12</p>
+<p>跟着学了三个多月，受益匪浅，学到了很多新的知识和其中的原理！</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>早 </p>
+<p>2019-02-25</p>
+<p>克劳德   7</p>
+<p>本人服务端工程师，在学习这门课之前数据库一直是我的短板，曾听朋友说MySQL或数据库中</p>
+<p>涉及了很多方面的知识点，每一个拿出来展开讲几乎都能出一本书了，对数据库是越来越忌惮</p>
+<p>，同时也因为工作上并没有过多接触，水平便一直停留在编写简单SQL层面。在面试中被问到数据库问题，只能无奈的说这块不太清楚，也曾在网上自学过，但网上的文章</p>
+<p>知识点比较零散，很多都是给出一些结论性的观点，由于不了解其内部原理，记忆很难深刻。老实说，当初报这门课的时候就像买技术书籍一样，我相信大家都有这样的体会，以为买到了</p>
+<p>就等于学到了，所以有一段时间没有点开看过，以至于后面开始学的时候都是在追赶老师和大</p>
+<p>家的进度，唯一遗憾的地方就是没能跟老师及时留言互动。这门课虽然是文字授课，但字里行间给我的感觉就是很亲切很舒服，为什么呢，因为老师可以</p>
+<p>把晦涩的知识变得通俗易懂，有时我在思考，如果让我来讲一个自己擅长的领域是否也能做到</p>
+<p>这一点，如果要做到的话需要什么样的知识储备呢。最后真要感谢老师的这门课，让我从心里不再惧怕数据库问题，不管是工作还是面试中信心倍</p>
+<p>增，现在时不时都敢和我们DBA“切磋切磋“了，哈哈。精选留言</p>
+<p>祝好~</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p> “切磋切磋“</p>
+<p>留言不会“过时”哈，在对应的章节下面提出相关的问题，我会持续关注评论区</p>
+<p>2019-02-25</p>
+<p>三胖   3</p>
+<p>老师，我才学了四分之一的课程，但是这门课已经更新完了，我是直接跑到最后一节技术篇来</p>
+<p>留言的！很想知道，后来者比如我在学到后面的课程时遇到问题留言，老师还会看会回复吗？（老师的课程超值！！）</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>会看的</p>
+<p>后台系统是按照留言时间显示的</p>
+<p>而且我在这事情上有强迫症，一定会让“未处理问题”变成0的 </p>
+<p>只是说如果是其他同学评论区问过的问题，我可能就不会重复回复了</p>
+<p>2019-02-25</p>
+<p>某、人   2</p>
+<p>很遗憾没能坚持到最后,但是也很庆幸能遇到这么好的专栏。以前了解mysql都是一些零散的知</p>
+<p>识点,通过学习完专栏,不论是mysql整体架构还是基础的知识点,都有了更深的认识。以后就把老</p>
+<p>师的文档当官方文档查,出现问题先来看看专栏。感触特别深的是,老师对于提到的每一个问题,都会严谨又认真的去回答,尽量帮助每一位同学都</p>
+<p>能有所收获。要做到这一点，是特别耗费精力的。感谢老师的传道授业解惑,希望以后有机会能当面向老师请教问题。期待老师下一部杰作</p>
+<p>2019-02-26</p>
+<p> 作者回复</p>
+<p>刚过完年都是很忙的， 找时间补上哈，等你的评论区留言^_^</p>
+<p>2019-02-26</p>
+<p>夜空中最亮的星（华仔）   2</p>
+<p>不知道是最后一篇，否则的话就慢些读完了；</p>
+<p>我是一名运维，公司也没有DBA，所以MySQL库也归我收拾；</p>
+<p>读了老师的专栏，操作起数据库来，心情更好了；</p>
+<p>老师的课，让我有了想看完《高性能MySQL》的兴趣；</p>
+<p>听了老师的课，开发都来问我数据库的问题了，高兴；</p>
+<p>老师你会有返场吗？我猜会  </p>
+<p>可否透漏下接下来的安排，会有续集吗？进阶吗？不想这一别就是一生。您的从未谋面的学生。2019-02-25</p>
+<p> 作者回复</p>
+<p>谢谢你</p>
+<p>“开发都来问我数据库的问题了”，当年我也是这么开始“入坑”，加油</p>
+<p>2019-02-25</p>
+<p>极客时间   2</p>
+<p>通過這個專欄的系統學習，梳理很多知識點、擴展了我對MySQL的認識及以後使用。感謝老師</p>
+<p>的諄諄教導！</p>
+<p>2019-02-25</p>
+<p>NoDBA   1</p>
+<p>低版本thread_id超过2^32-1后，在general log显示是负数，高版本貌似没有这个问题，是否高</p>
+<p>版本的thread_id是8字节呢？2019-02-27</p>
+<p> 作者回复</p>
+<p>主要不是定义的问题，而是打印的时候代码问题，按照这个代码输出的：</p>
+<p>“%5ld “, (long) thread_id</p>
+<p>是个bug， 超过2^31就变成负数了，</p>
+<p>新版本改了</p>
+<p>好问题 </p>
+<p>2019-02-28</p>
+<p>kun   1</p>
+<p>感觉戛然而止哈 没学够，后面还会再回顾，老师辛苦！</p>
+<p>2019-02-26</p>
+<p>亮   1</p>
+<p>老师，sql 的where里 &lt; 10001 和 &lt;&#x3D; 10000有什么区别吗？2019-02-25</p>
+<p> 作者回复</p>
+<p>这要看你关注的是什么</p>
+<p>你这么问，应该这个字段是整型吧？从查询结果可能是一样的，</p>
+<p>不过锁的范围不同，你可以看下21篇</p>
+<p>2019-02-25</p>
+<p>IceGeek17   1</p>
+<p>IceGeek17   1</p>
+<p>感谢老师，课程受益匪浅，</p>
+<p>课程结束后，如果有问题，是继续在这里的评论区提问，还是会有另外一条答疑通道？另外，在第35篇我提了几个问题，老师还没有回答，我这里再贴一下，老师看一下</p>
+<p>问题一：</p>
+<p>对于BKA算法的流程理解，用文中的例子，先把t1表（小表）中查询需要的字段放入join_buffer,</p>
+<p>然后把join_buffer里的字段值批量传给t2表，先根据索引a查到id，然后得到一批主键id，再根据</p>
+<p>主键id排序，然后再根据排完序的id去主键索引查数据（这里用到MRR）</p>
+<p>理解是否正确？这里对于主键id排序是在哪里做的，是在join_buffer里，还是另外再开辟一块临时内存？如果在j</p>
+<p>oin_buffer里，那join_buffer里的每行内容是不是：t2.id + t1查询必须的字段，并且join_buffer里</p>
+<p>是根据id排序的？问题二：</p>
+<p>虽然MySQL官方没有支持hash join，但是之前看到文章说，MariaDB已经支持hash join，能不</p>
+<p>能后续在答疑文章中简单总结下mariaDB支持的join算法</p>
+<p>问题三：</p>
+<p>在实际项目中，一个比较困惑的问题，看到过这样的类似写法：</p>
+<p>select xxx from t1 join t2 on t1.id &#x3D; t2.id for update （目的是获取几个表上最新的数据，并且加</p>
+<p>上锁，防止数据被更新）</p>
+<p>这里有几个问题：</p>
+<ol>
+<li>像这样 join + for update，表上的加锁规则是怎么样的？是不是在需要join的两个表上根据具</li>
+</ol>
+<p>体的查询执行过程都加上锁？2）像这样 join + for update 的用法是否合理？碰到这样的场景，应该怎么去做？问题四：</p>
+<p>看过阿里输出的开发手册里，强调 “最多不超过三表join”，实际项目中，给我感觉很难做到所有</p>
+<p>业务都不超过三表join，那这里的问题就是，有什么相关的经验方法，可以尽量降低参与join的</p>
+<p>数据表？比如，在数据表里添加冗余字段，可以降低参与join的数据表数量，还有什么其他好的方法？2019-02-25</p>
+<p> 作者回复</p>
+<p>就在我们评论区，提跟文章相关的内容，会继续关注。问题一、前面的过程理解正确，MRR过程用的是read_rnd_buffer </p>
+<p>问题二、其实我们文中最后那个过程，你把他设想成在MySQL内部执行。。问题三、这种复杂的语句，你要把我们两部分知识点连起来看。一个原则：for update的话，执</p>
+<p>行语句过程中扫到的间隙和记录都要加锁。 当然最好是不这么做，拆成两个语句会好些。问题四、还是我文中的建议，如果都用NLJ或BKA算法的join其实还好，所以看看explain。降低join表数量的方法，基本上行就是冗余字段和拆成多个语句这两个方向了</p>
+<p>2019-02-25</p>
+<p>Leon    1</p>
+<p>跟着老师终于学到了最后，每天的地铁时间无比充实，我对mysql的基本原理和工作流程大致</p>
+<p>有了初步的了解，而不是以前的增删查改，打算以后抽时间再二刷三刷，等全部搞懂后，再去</p>
+<p>看看高性能mysql这本书，如果时间允许，打算再去自己参照教程实现一个简易的DB，课程虽</p>
+<p>然结束了，仍然感觉意犹未尽，希望老师拉一个倍洽群，大家一起在里面讨论和学习</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>  </p>
+<p>评论区一直会开放</p>
+<p>大家到对应的文章去提相关问题  </p>
+<p>二刷三刷我也一直在哦 </p>
+<p>2019-02-25</p>
+<p>Dkey   1</p>
+<p>当前系统并无其他事务存在时，启动一个只读事务时（意味没有事务id），它的低高水位是怎</p>
+<p>么样的老师。2019-02-25</p>
+<p> 作者回复</p>
+<p>假设当前没有其他事务存在，假设当前的max_trx_id&#x3D;N,</p>
+<p>这时候启动一个只读事务，它的高低水位就都是N。2019-02-25</p>
+<p>shawn   1</p>
+<p>受益匪浅，最后几讲还想了解下null值如何建立索引，由于null直接不能比较和排序，MySQL能</p>
+<p>区分出每一个null值吗</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>可以，因为普通索引上都有主键值对吧，</p>
+<p>所以其实是 (null, id1), (null, id2) ….</p>
+<p>2019-02-25</p>
+<p>亢星东   0</p>
+<p>id是有上限的，这个的id上限是45，这个结局可以，讲的不错，学到很多</p>
+<p>2019-03-13</p>
+<p>Bamboo   0</p>
+<p>今天终于读完了，从对MySQL只停留在CRUD操作的水平，慢慢开始对MySQL底层的机制有</p>
+<p>了一些认识，在遇到问题时，会首先从底层原理去分析，并结合explain来验证自己的分析，一</p>
+<p>次很nice的学习之旅。感谢大神老师这么认真负责，节假日都不休息，哈哈！</p>
+<p>2019-03-12</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-03-13</p>
+<p>ArtistLu   0</p>
+<p>相遇恨晚 ，安慰下自己，种树的最好时机是十年前，其次是现在！！！谢谢老师</p>
+<p>2019-03-08</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-03-09</p>
+<p>fighting   0</p>
+<p>已经二刷了，准备三刷四刷</p>
+<p>2019-03-07</p>
+<p> 作者回复</p>
+<p>   </p>
+<p>2019-03-09</p>
+<p>沙漠里的骆驼   0</p>
+<p>讲的非常好，是我遇到课程讲授最好的了。今天刚和池老师说，希望可以有线下的课程，比如</p>
+<p>完成一个数据库的完整设计，从最上层的sql语法解析器到底层的文件调度系统。在集中的时间</p>
+<p>里面比如1个月或者2个月，线下组织大家一起，每个人都完成一个tiny_db的工程。我想这是最</p>
+<p>好的成长了。不知道老师是否也有这方面的想法？不管如何，真的很感谢老师。如此娓娓道来，所谓的如沐春风便是如此吧。2019-03-06</p>
+<p> 作者回复</p>
+<p>谢谢你。后面只要还是在评论区继续和大家交流 </p>
+<p>2019-03-07</p>
+<p>芬   0</p>
+<p>学习到了很多平时没有关注到的小细节，很赞！当然 师傅领进门 修行靠个人。剩下的就是自己</p>
+<p>好好消化应用了，谢谢老师</p>
+<p>2019-02-28</p>
+<p>封建的风   0</p>
+<p>之前很多知识点有点粗浅，尤其在行版本可见性，redo log&amp;bin log关系，加锁的原理章节，深</p>
+<p>入浅出，受益匪浅。感谢老师精品专栏，后期再二刷</p>
+<p>2019-02-27</p>
+<pre><code>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/67a42e4.html" rel="prev" title="mysql-答疑文章（三）：说一说这些好问题">
+      <i class="fa fa-chevron-left"></i> mysql-答疑文章（三）：说一说这些好问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/93f81e0.html" rel="next" title="mysql-顾林晓斌：我的 MySQL 心路历程">
+      mysql-顾林晓斌：我的 MySQL 心路历程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">390k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:40</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

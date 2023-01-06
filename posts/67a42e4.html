@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题解析44 | 答疑文章（三）：说一说这些好问题 2019-02-22 林晓斌 这是我们专栏的最后一篇答疑文章，今天我们来说说一些好问题。在我看来，能够帮我们扩展一个逻辑的边界的问题，就是好问题。因为通过解决这样的问题，能 够加深我们对这个逻辑的理解，或者帮我们关联到另外一个知识点，进而可以帮助我们建立起自 己的知识网络。在工作中会问好问题，是一个很重要的能力。经过这段时间的学习，从评论区的问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql-答疑文章（三）：说一说这些好问题">
+<meta property="og:url" content="https://www.fastolf.com/posts/67a42e4.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="问题解析44 | 答疑文章（三）：说一说这些好问题 2019-02-22 林晓斌 这是我们专栏的最后一篇答疑文章，今天我们来说说一些好问题。在我看来，能够帮我们扩展一个逻辑的边界的问题，就是好问题。因为通过解决这样的问题，能 够加深我们对这个逻辑的理解，或者帮我们关联到另外一个知识点，进而可以帮助我们建立起自 己的知识网络。在工作中会问好问题，是一个很重要的能力。经过这段时间的学习，从评论区的问题">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-18T22:16:32.000Z">
+<meta property="article:modified_time" content="2023-01-06T09:44:03.206Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/67a42e4.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>mysql-答疑文章（三）：说一说这些好问题 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/67a42e4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql-答疑文章（三）：说一说这些好问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-19 06:16:32" itemprop="dateCreated datePublished" datetime="2019-12-19T06:16:32+08:00">2019-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>29 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>44 | 答疑文章（三）：说一说这些好问题</p>
+<p>2019-02-22 林晓斌</p>
+<p>这是我们专栏的最后一篇答疑文章，今天我们来说说一些好问题。在我看来，能够帮我们扩展一个逻辑的边界的问题，就是好问题。因为通过解决这样的问题，能</p>
+<p>够加深我们对这个逻辑的理解，或者帮我们关联到另外一个知识点，进而可以帮助我们建立起自</p>
+<p>己的知识网络。在工作中会问好问题，是一个很重要的能力。经过这段时间的学习，从评论区的问题我可以感觉出来，紧跟课程学习的同学，对SQL语句执行</p>
+<p>性能的感觉越来越好了，提出的问题也越来越细致和精准了。接下来，我们就一起看看同学们在评论区提到的这些好问题。在和你一起分析这些问题的时候，</p>
+<p>我会指出它们具体是在哪篇文章出现的。同时，在回答这些问题的过程中，我会假设你已经掌握</p>
+<p>了这篇文章涉及的知识。当然，如果你印象模糊了，也可以跳回文章再复习一次。join的写法</p>
+<p>在第35篇文章《join语句怎么优化？》中，我在介绍join执行顺序的时候，用的都是</p>
+<p>straight_join。@郭健 同学在文后提出了两个问题：</p>
+<ol>
+<li>如果用left join的话，左边的表一定是驱动表吗？2. 如果两个表的join包含多个条件的等值匹配，是都要写到on里面呢，还是只把一个条件写到</li>
+</ol>
+<p>on里面，其他条件写到where部分？为了同时回答这两个问题，我来构造两个表a和b：</p>
+<p>表a和b都有两个字段f1和f2，不同的是表a的字段f1上有索引。然后，我往两个表中都插入了6条</p>
+<p>记录，其中在表a和b中同时存在的数据有4行。@郭健 同学提到的第二个问题，其实就是下面这两种写法的区别：</p>
+<p>我把这两条语句分别记为Q1和Q2。首先，需要说明的是，这两个left join语句的语义逻辑并不相同。我们先来看一下它们的执行结</p>
+<p>果。create table a(f1 int, f2 int, index(f1))engine&#x3D;innodb;</p>
+<p>create table b(f1 int, f2 int)engine&#x3D;innodb;</p>
+<p>insert into a values(1,1),(2,2),(3,3),(4,4),(5,5),(6,6);</p>
+<p>insert into b values(3,3),(4,4),(5,5),(6,6),(7,7),(8,8);</p>
+<p>select * from a left join b on(a.f1&#x3D;b.f1) and (a.f2&#x3D;b.f2); &#x2F;<em>Q1</em>&#x2F;</p>
+<p>select * from a left join b on(a.f1&#x3D;b.f1) where (a.f2&#x3D;b.f2);&#x2F;<em>Q2</em>&#x2F;</p>
+<p>图1 两个join的查询结果</p>
+<p>可以看到：</p>
+<p>语句Q1返回的数据集是6行，表a中即使没有满足匹配条件的记录，查询结果中也会返回一</p>
+<p>行，并将表b的各个字段值填成NULL。语句Q2返回的是4行。从逻辑上可以这么理解，最后的两行，由于表b中没有匹配的字段，结</p>
+<p>果集里面b.f2的值是空，不满足where 部分的条件判断，因此不能作为结果集的一部分。接下来，我们看看实际执行这两条语句时，MySQL是怎么做的。我们先一起看看语句Q1的explain结果：</p>
+<p>图2 Q1的explain结果</p>
+<p>可以看到，这个结果符合我们的预期：</p>
+<p>驱动表是表a，被驱动表是表b；</p>
+<p>由于表b的f1字段上没有索引，所以使用的是Block Nexted Loop Join（简称BNL） 算法。看到BNL算法，你就应该知道这条语句的执行流程其实是这样的：</p>
+<ol>
+<li>把表a的内容读入join_buffer 中。因为是select * ，所以字段f1和f2都被放入join_buffer了。2. 顺序扫描表b，对于每一行数据，判断join条件（也就是a.f1&#x3D;b.f1 and a.f2&#x3D;b.f2)是否满足，</li>
+</ol>
+<p>满足条件的记录, 作为结果集的一行返回。如果语句中有where子句，需要先判断where部分</p>
+<p>满足条件后，再返回。3. 表b扫描完成后，对于没有被匹配的表a的行（在这个例子中就是(1,1)、(2,2)这两行），把剩</p>
+<p>余字段补上NULL，再放入结果集中。对应的流程图如下：</p>
+<p>图3 left join -BNL算法</p>
+<p>可以看到，这条语句确实是以表a为驱动表，而且从执行效果看，也和使用straight_join是一样</p>
+<p>的。你可能会想，语句Q2的查询结果里面少了最后两行数据，是不是就是把上面流程中的步骤3去掉</p>
+<p>呢？我们还是先看一下语句Q2的expain结果吧。图4 Q2的explain结果</p>
+<p>这里先和你说一句题外话，专栏马上就结束了，我也和你一起根据explain结果“脑补”了很多次一</p>
+<p>条语句的执行流程了，所以我希望你已经具备了这个能力。今天，我们再一起分析一次SQL语句</p>
+<p>的explain结果。可以看到，这条语句是以表b为驱动表的。而如果一条join语句的Extra字段什么都没写的话，就</p>
+<p>表示使用的是Index Nested-Loop Join（简称NLJ）算法。因此，语句Q2的执行流程是这样的：顺序扫描表b，每一行用b.f1到表a中去查，匹配到记录后</p>
+<p>判断a.f2&#x3D;b.f2是否满足，满足条件的话就作为结果集的一部分返回。那么，为什么语句Q1和Q2这两个查询的执行流程会差距这么大呢？其实，这是因为优化器</p>
+<p>基于Q2这个查询的语义做了优化。为了理解这个问题，我需要再和你交代一个背景知识点：在MySQL里，NULL跟任何值执行等值</p>
+<p>判断和不等值判断的结果，都是NULL。这里包括， select NULL &#x3D; NULL 的结果，也是返回</p>
+<p>NULL。因此，语句Q2里面where a.f2&#x3D;b.f2就表示，查询结果里面不会包含b.f2是NULL的行，这样这个</p>
+<p>left join的语义就是“找到这两个表里面，f1、f2对应相同的行。对于表a中存在，而表b中匹配不</p>
+<p>到的行，就放弃”。这样，这条语句虽然用的是left join，但是语义跟join是一致的。因此，优化器就把这条语句的left join改写成了join，然后因为表a的f1上有索引，就把表b作为驱</p>
+<p>动表，这样就可以用上NLJ 算法。在执行explain之后，你再执行show warnings，就能看到这个</p>
+<p>改写的结果，如图5所示。图5 Q2的改写结果</p>
+<p>这个例子说明，即使我们在SQL语句中写成left join，执行过程还是有可能不是从左到右连接</p>
+<p>的。也就是说，使用left join时，左边的表不一定是驱动表。这样看来，如果需要left join的语义，就不能把被驱动表的字段放在where条件里面做等值</p>
+<p>判断或不等值判断，必须都写在on里面。那如果是join语句呢？这时候，我们再看看这两条语句：</p>
+<p>我们再使用一次看explain 和 show warnings的方法，看看优化器是怎么做的。select * from a join b on(a.f1&#x3D;b.f1) and (a.f2&#x3D;b.f2); &#x2F;<em>Q3</em>&#x2F;</p>
+<p>select * from a join b on(a.f1&#x3D;b.f1) where (a.f2&#x3D;b.f2);&#x2F;<em>Q4</em>&#x2F;</p>
+<p>图6 join语句改写</p>
+<p>可以看到，这两条语句都被改写成：</p>
+<p>执行计划自然也是一模一样的。也就是说，在这种情况下，join将判断条件是否全部放在on部分就没有区别了。Simple Nested Loop Join 的性能问题</p>
+<p>我们知道，join语句使用不同的算法，对语句的性能影响会很大。在第34篇文章《到底可不可以</p>
+<p>使用join？》的评论区中，@书策稠浊 和 @朝夕心 两位同学提了一个很不错的问题。我们在文中说到，虽然BNL算法和Simple Nested Loop Join 算法都是要判断M*N次（M和N分别</p>
+<p>是join的两个表的行数），但是Simple Nested Loop Join 算法的每轮判断都要走全表扫描，因此</p>
+<p>性能上BNL算法执行起来会快很多。为了便于说明，我还是先为你简单描述一下这两个算法。BNL算法的执行逻辑是：</p>
+<ol>
+<li><p>首先，将驱动表的数据全部读入内存join_buffer中，这里join_buffer是无序数组；</p>
+</li>
+<li><p>然后，顺序遍历被驱动表的所有行，每一行数据都跟join_buffer中的数据进行匹配，匹配成</p>
+</li>
+</ol>
+<p>功则作为结果集的一部分返回。select * from a join b where (a.f1&#x3D;b.f1) and (a.f2&#x3D;b.f2);</p>
+<p>Simple Nested Loop Join算法的执行逻辑是：顺序取出驱动表中的每一行数据，到被驱动表去做</p>
+<p>全表扫描匹配，匹配成功则作为结果集的一部分返回。这两位同学的疑问是，Simple Nested Loop Join算法，其实也是把数据读到内存里，然后按照匹</p>
+<p>配条件进行判断，为什么性能差距会这么大呢？解释这个问题，需要用到MySQL中索引结构和Buffer Pool的相关知识点：</p>
+<ol>
+<li>在对被驱动表做全表扫描的时候，如果数据没有在Buffer Pool中，就需要等待这部分数据从</li>
+</ol>
+<p>磁盘读入；</p>
+<p>从磁盘读入数据到内存中，会影响正常业务的Buffer Pool命中率，而且这个算法天然会对被</p>
+<p>驱动表的数据做多次访问，更容易将这些数据页放到Buffer Pool的头部（请参考第35篇文</p>
+<p>章中的相关内容)；</p>
+<ol start="2">
+<li>即使被驱动表数据都在内存中，每次查找“下一个记录的操作”，都是类似指针操作。而</li>
+</ol>
+<p>join_buffer中是数组，遍历的成本更低。所以说，BNL算法的性能会更好。distinct 和 group by的性能</p>
+<p>在第37篇文章《什么时候会使用内部临时表？》中，@老杨同志 提了一个好问题：如果只需要</p>
+<p>去重，不需要执行聚合函数，distinct 和group by哪种效率高一些呢？我来展开一下他的问题：如果表t的字段a上没有索引，那么下面这两条语句：</p>
+<p>的性能是不是相同的?</p>
+<p>首先需要说明的是，这种group by的写法，并不是SQL标准的写法。标准的group by语句，是需</p>
+<p>要在select部分加一个聚合函数，比如：</p>
+<p>这条语句的逻辑是：按照字段a分组，计算每组的a出现的次数。在这个结果里，由于做的是聚</p>
+<p>合计算，相同的a只出现一次。select a from t group by a order by null;</p>
+<p>select distinct a from t;</p>
+<p>select a,count(*) from t group by a order by null;</p>
+<p>备注：这里你可以顺便复习一下第37篇文章中关于group by的相关内容。没有了count(*)以后，也就是不再需要执行“计算总数”的逻辑时，第一条语句的逻辑就变成是：</p>
+<p>按照字段a做分组，相同的a的值只返回一行。而这就是distinct的语义，所以不需要执行聚合函</p>
+<p>数时，distinct 和group by这两条语句的语义和执行流程是相同的，因此执行性能也相同。这两条语句的执行流程是下面这样的。1. 创建一个临时表，临时表有一个字段a，并且在这个字段a上创建一个唯一索引；</p>
+<ol start="2">
+<li>遍历表t，依次取数据插入临时表中：</li>
+</ol>
+<p>如果发现唯一键冲突，就跳过；</p>
+<p>否则插入成功；</p>
+<ol start="3">
+<li>遍历完成后，将临时表作为结果集返回给客户端。备库自增主键问题</li>
+</ol>
+<p>除了性能问题，大家对细节的追问也很到位。在第39篇文章《自增主键为什么不是连续</p>
+<p>的？》评论区，@帽子掉了 同学问到：在binlog_format&#x3D;statement时，语句A先获取id&#x3D;1，然后</p>
+<p>语句B获取id&#x3D;2；接着语句B提交，写binlog，然后语句A再写binlog。这时候，如果binlog重放，</p>
+<p>是不是会发生语句B的id为1，而语句A的id为2的不一致情况呢？首先，这个问题默认了“自增id的生成顺序，和binlog的写入顺序可能是不同的”，这个理解是正</p>
+<p>确的。其次，这个问题限定在statement格式下，也是对的。因为row格式的binlog就没有这个问题</p>
+<p>了，Write row event里面直接写了每一行的所有字段的值。而至于为什么不会发生不一致的情况，我们来看一下下面的这个例子。图7 insert 语句的binlog</p>
+<p>可以看到，在insert语句之前，还有一句SET INSERT_ID&#x3D;1。这条命令的意思是，这个线程里下</p>
+<p>一次需要用到自增值的时候，不论当前表的自增值是多少，固定用1这个值。create table t(id int auto_increment primary key);</p>
+<p>insert into t values(null);</p>
+<p>这个SET INSERT_ID语句是固定跟在insert语句之前的，比如@帽子掉了同学提到的场景，主库</p>
+<p>上语句A的id是1，语句B的id是2，但是写入binlog的顺序先B后A，那么binlog就变成：</p>
+<p>你看，在备库上语句B用到的INSERT_ID依然是2，跟主库相同。因此，即使两个INSERT语句在主备库的执行顺序不同，自增主键字段的值也不会不一致。小结</p>
+<p>今天这篇答疑文章，我选了4个好问题和你分享，并做了分析。在我看来，能够提出好问题，首</p>
+<p>先表示这些同学理解了我们文章的内容，进而又做了深入思考。有你们在认真的阅读和思考，对</p>
+<p>我来说是鼓励，也是动力。说实话，短短的三篇答疑文章无法全部展开同学们在评论区留下的高质量问题，之后有的同学还</p>
+<p>会二刷，也会有新的同学加入，大家想到新的问题就请给我留言吧，我会继续关注评论区，和你</p>
+<p>在评论区交流。老规矩，答疑文章也是要有课后思考题的。在第8篇文章的评论区， @XD同学提到一个问题：他查看了一下innodb_trx，发现这个事务的</p>
+<p>trx_id是一个很大的数（281479535353408），而且似乎在同一个session中启动的会话得到的</p>
+<p>trx_id是保持不变的。当执行任何加写锁的语句后，trx_id都会变成一个很小的数字</p>
+<p>（118378）。你可以通过实验验证一下，然后分析看看，事务id的分配规则是什么，以及MySQL为什么要这么</p>
+<p>设计呢？你可以把你的结论和分析写在留言区，我会在下一篇文章和你讨论这个问题。感谢你的收听，也</p>
+<p>欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
+<p>上期的问题是，怎么给分区表t创建自增主键。由于MySQL要求主键包含所有的分区字段，所以</p>
+<p>肯定是要创建联合主键的。这时候就有两种可选：一种是(ftime, id)，另一种是(id, ftime)。如果从利用率上来看，应该使用(ftime, id)这种模式。因为用ftime做分区key，说明大多数语句都</p>
+<p>SET INSERT_ID&#x3D;2;</p>
+<p>语句B；</p>
+<p>SET INSERT_ID&#x3D;1;</p>
+<p>语句A；</p>
+<p>是包含ftime的，使用这种模式，可以利用前缀索引的规则，减少一个索引。这时的建表语句是：</p>
+<p>当然，我的建议是你要尽量使用InnoDB引擎。InnoDB表要求至少有一个索引，以自增字段作为</p>
+<p>第一个字段，所以需要加一个id的单独索引。当然把字段反过来，创建成：</p>
+<p>CREATE TABLE t̀  ̀(</p>
+<p>  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,</p>
+<p>  f̀time  ̀datetime NOT NULL,</p>
+<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
+<p>  PRIMARY KEY (̀ ftime ,̀ ìd )̀</p>
+<p>) ENGINE&#x3D;MyISAM DEFAULT CHARSET&#x3D;latin1</p>
+<p>PARTITION BY RANGE (YEAR(ftime))</p>
+<p>(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE &#x3D; MyISAM,</p>
+<p> PARTITION p_2018 VALUES LESS THAN (2018) ENGINE &#x3D; MyISAM,</p>
+<p> PARTITION p_2019 VALUES LESS THAN (2019) ENGINE &#x3D; MyISAM,</p>
+<p> PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE &#x3D; MyISAM);</p>
+<p>CREATE TABLE t̀  ̀(</p>
+<p>  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,</p>
+<p>  f̀time  ̀datetime NOT NULL,</p>
+<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
+<p>  PRIMARY KEY (̀ ftime ,̀ ìd )̀,</p>
+<p>  KEY ìd  ̀(̀ id )̀</p>
+<p>) ENGINE&#x3D;InnoDB DEFAULT CHARSET&#x3D;latin1</p>
+<p>PARTITION BY RANGE (YEAR(ftime))</p>
+<p>(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE &#x3D; InnoDB,</p>
+<p> PARTITION p_2018 VALUES LESS THAN (2018) ENGINE &#x3D; InnoDB,</p>
+<p> PARTITION p_2019 VALUES LESS THAN (2019) ENGINE &#x3D; InnoDB,</p>
+<p> PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE &#x3D; InnoDB);</p>
+<p>  PRIMARY KEY (̀ id ,̀ f̀time )̀,</p>
+<p>  KEY ìd  ̀(̀ ftime )̀</p>
+<p>也是可以的。评论区留言点赞板：</p>
+<p>永恒记忆   2</p>
+<p>老师，看评论包括您的回复说“ left join 后加上 where 的话， 肯定会被优化器优化成 join where </p>
+<p>的形式， 那是否下次写 left join ..where 的时候， 不如直接写成 join .. where”，这个也是分情况</p>
+<p>的吧比如还是文章中的2张表，select * from a left join b on(a.f1&#x3D;b.f1) where (a.f2&#x3D;2);&#x2F;<em>Q5</em>&#x2F;和se</p>
+<p>lect * from a join b on(a.f1&#x3D;b.f1) where (a.f2&#x3D;2);&#x2F;<em>Q6</em>&#x2F; 这个left join和join的语意和返回结果都不</p>
+<p>一样，怎么能直接写成join呢，如果是where b.f2&#x3D;xx 的where条件可以直接写成join因为根据结</p>
+<p>果是不需要left的。@夹心面包 、@郭江伟 同学提到了最后一种方案。@aliang 同学提了一个好问题，关于open_files_limit和innodb_open_files的关系，我在回复中</p>
+<p>做了说明，大家可以看一下。@万勇 提了一个好问题，实际上对于现在官方的版本，将字段加在中间还是最后，在性能上</p>
+<p>是没差别的。但是，我建议大家养成习惯（如果你是DBA就帮业务开发同学养成习惯），将</p>
+<p>字段加在最后面，因为这样还是比较方便操作的。这个问题，我也在评论的答复中做了说明，</p>
+<p>你可以看一下。精选留言</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>嗯 我的意思是，如果where条件里面，用到了b.f2的判断，干脆就直接写成join，不需要left join</p>
+<p>了</p>
+<p>如果业务逻辑需要left join， 就要把条件都放到on里面</p>
+<p>业务逻辑正确性还是优先的</p>
+<p>2019-02-25</p>
+<p>还一棵树   1</p>
+<p>看到 BNL 算法，你就应该知道这条语句的执行流程其实是这样</p>
+<p>文章中的流程是写错了？还是我理解的有问题</p>
+<p>1、如果是a表数据放入join buffer，根据b的每一条记录去判断是否在a中 如果在则保留记录</p>
+<p>这个更像是b left join a。 而不是a left join b</p>
+<p>2、如果按照这个流程，比如a里面有2行重复的数据， 如果拿b的数据在a中判断，存在则保留</p>
+<p>，那结果集只有一条数据， 而按照a left join b 会出现2条结果的</p>
+<p>2019-02-26</p>
+<p> 作者回复</p>
+<p>“如果按照这个流程，比如a里面有2行重复的数据， 如果拿b的数据在a中判断，存在则保留，</p>
+<p>那结果集只有一条数据，”</p>
+<p>不会呀，你看它是这样的：</p>
+<p>假设join buffer中有两个行1</p>
+<p>然后被驱动表取出一个1，</p>
+<p>跟join buffer中第一个1比较，发现满足条件，放到结果集；</p>
+<p>跟join buffer中第二个1比较，发现满足条件，放到结果集；</p>
+<p>是得到两行的</p>
+<p>2019-03-01</p>
+<p>宝玉   1</p>
+<p>老师，BNl算法，如果where条件中有驱动表的过滤条件，也不会在join时候全部载入内存吧？2019-02-25</p>
+<p> 作者回复</p>
+<p>对，驱动表现过滤，然后进join buffer</p>
+<p>2019-02-25</p>
+<p>千木   1</p>
+<p>千木  1</p>
+<p>老师您好，join使用join_buffer和内存区别那个问题的第一点解释我还是有些纳闷，你说由于从</p>
+<p>磁盘拿数据到内存里面会导致等等的性能问题我能够理解，但是说即使使用nbl算法也会涉及到</p>
+<p>从磁盘拿数据到内存吧，所以这点导致两种算法执行差异貌似不太合理，您觉得呢？2019-02-23</p>
+<p> 作者回复</p>
+<p>BNL算法拿的数据是确定的只会拿一次（遍历一遍）</p>
+<p>而simple nested loop join是会遍历多次的</p>
+<p>2019-02-24</p>
+<p>白永伟   1</p>
+<p>老师，关于备库自增id我有一个问题。既然binlog不管是statement模式还是row模式，里面的in</p>
+<p>sert语句跟着的自增id都是固定的。那假如发生主备切换，备库变成主库后，客户端往新主库里</p>
+<p>插入数据时，自增id的起始值是多少，有没有可能跟已有的记录id冲突？尤其是备库还没有处理</p>
+<p>完同步过来的binlog就开始接受客户端请求时。如果要求备库必须处理完binlog才能接受客户端</p>
+<p>请求，那么怎么保证主备切换的过程中，不影响用户使用。谢谢。2019-02-22</p>
+<p> 作者回复</p>
+<p>“自增id的起始值是多少，有没有可能跟已有的记录id冲突？” </p>
+<p>如果没有主备延迟就不会出现；</p>
+<p>“尤其是备库还没有处理完同步过来的binlog就开始接受客户端请求时。” ， 对，这种情况就会</p>
+<p>。“如果要求备库必须处理完binlog才能接受客户端请求，那么怎么保证主备切换的过程中，不影</p>
+<p>响用户使用” 一般都是有这个要求的。要尽量减少影响，就是控制主备延迟。2019-02-24</p>
+<p>Chris   0</p>
+<p>这两天在线上遇到一个比较诡异的事情，突然有几分钟连不上MySQL，通过error日志和监控的</p>
+<p>processlist显示，MySQL把很多链接都kill掉了，但处于sleep状态和show status的语句没有kill</p>
+<p>，看监控的资源使用情况不是很高，只是innodb rows read指标特别高，现在完全是没头绪了</p>
+<p>2019-03-15</p>
+<p> 作者回复</p>
+<p>看看是不是有什么外部工具在工作</p>
+<p>2019-03-16</p>
+<p>长杰   0</p>
+<p>select * from a left join b on(a.f1&#x3D;b.f1) where (a.f2&#x3D;b.f2);</p>
+<p>老师，这个语句是否可以理解为:先按照on后面的条件关联，获取结果集，然后对结果集用wher</p>
+<p>e条件进行二次过滤？2019-03-02</p>
+<p> 作者回复</p>
+<p>要看索引哈</p>
+<p>如果b上的索引只有f1 是的，</p>
+<p>如果b上的索引是(f1,f2)，就两个一起关联了</p>
+<p>【咱们文中说了，这个语句会被转成普通join哦】</p>
+<p>2019-03-02</p>
+<p>长杰   0</p>
+<p>把表 a 的内容读入 join_buffer 中。因为是 select * ，所以字段 f1 和 f2 都被放入 join_buffer 了</p>
+<p>。顺序扫描表 b，对于每一行数据，判断 join 条件（也就是 a.f1&#x3D;b.f1 and a.f2&#x3D;b.f2) 是否满足，满</p>
+<p>足条件的记录, 作为结果集的一行返回。如果语句中有 where 子句，需要先判断 where 部分满</p>
+<p>足条件后，再返回。表 b 扫描完成后，对于没有被匹配的表 a 的行（在这个例子中就是 (1,1)、(2,2) 这两行），把</p>
+<p>剩余字段补上 NULL，再放入结果集中。是否可以理解为:假如有where条件的情况下，对与满足on条件的行，再去过滤where条件，满</p>
+<p>足就返回；对于不满足on条件的行，b字段补Null后返回，不需要再过滤where条件</p>
+<p>2019-03-02</p>
+<p> 作者回复</p>
+<p>不是，如果有where,并且where里面有用到b.f1或b.f2, 那就要求结果集里面没有这些null的行。就是说where a.f2&#x3D;b.f2的意思是</p>
+<p>Where (a.f2 is not null) and (b.f2 is not null) and (a.f2 &#x3D;b.f2)</p>
+<p>2019-03-02</p>
+<p>梦康   0</p>
+<p> 留言的人太多，辛苦老实答疑了。虽然我的问题没能被翻牌子</p>
+<p>2019-02-25</p>
+<p> 作者回复</p>
+<p>不好意思，确实你的问题比较难一些</p>
+<p>最近在做收尾的工作，后面一定会把问题都清理掉的哈。你的问题质量高，是我喜欢回答的问题类型 </p>
+<p>2019-02-25</p>
+<p>PYH   0</p>
+<p>你好 我想问一下mysql能实现oracle的拉链表么。如果能前提条件是什么？2019-02-24</p>
+<p>龙文   0</p>
+<p>明白了 谢谢老师！</p>
+<p>2019-02-24</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-02-24</p>
+<p>滔滔   0</p>
+<p>老师您好，想请问下在innodb引擎rr隔离级别下，单独的一条update语句是不是默认就是一个事</p>
+<p>务(在执行update前不输入begin)，而单独的一条select语句是不是不会开启一个事务，哪怕是”</p>
+<p>当前读”也不会开启一个事务，更进一步，是不是对表的增删改操作默认都会开启一个事务？ </p>
+<p>2019-02-24</p>
+<p> 作者回复</p>
+<ol>
+<li><p>单独一个update，会启动一个事务</p>
+</li>
+<li><p>单独一个select，也会启动一个事务</p>
+</li>
+<li><p>innodb表，增删改查都会启动一个事务</p>
+</li>
+</ol>
+<p>2019-02-24</p>
+<p>发条橙子 。   0</p>
+<p>啧啧， 原来我写的 left join 一直都不是标准的，每次后面都会加上 where ， 还一直以为左面是</p>
+<p>驱动表 。既然实际上 left join 后加上 where 的话， 肯定会被优化器优化成 join where 的形式，</p>
+<p>那是否下次写 left join ..where 的时候， 不如直接写成 join .. where ，省去优化器自己去优化，</p>
+<p>这样是不是稍稍快些</p>
+<p>2019-02-23</p>
+<p> 作者回复</p>
+<p>是的</p>
+<p>如果原来就有where，说明原来其实也不用left join  </p>
+<p>2019-02-23</p>
+<p>龙文   0</p>
+<p>老师你好，我在第21讲求助了一个死锁问题，当时你回复说后面会解答，不过我浏览了下后续</p>
+<p>文章没找到解答，所以再次求助下。ps:用的阿里云的rds,提了工单没效果啊</p>
+<p>作者回复: 有的，你看一下第40篇 “insert 唯一键冲突”这一段</p>
+<p>ps:我已经离开阿里云挺久的了  </p>
+<hr>
+<p>谢谢老师,我看了第40篇,还是有地方不太明白,再打扰下</p>
+<p>mysql 版本5.6</p>
+<p>隔离级别为rc</p>
+<p>CREATE TABLE <code>uk_test</code> (</p>
+<p><code>id</code> bigint(20) NOT NULL AUTO_INCREMENT,</p>
+<p><code>a</code> int(11) NOT NULL,</p>
+<p><code>b</code> int(11) NOT NULL,</p>
+<p><code>c</code> int(11) NOT NULL,</p>
+<p>PRIMARY KEY (<code>id</code>),</p>
+<p>UNIQUE KEY <code>uk_a_b</code> (<code>a</code>,<code>b</code>) USING BTREE</p>
+<p>) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;7 DEFAULT CHARSET&#x3D;utf8mb4</p>
+<p>表中数据：</p>
+<p>+—-+—+—+—+</p>
+<p>| id | a | b | c |</p>
+<p>+—-+—+—+—+</p>
+<p>| 1 | 1 | 1 | 2 |</p>
+<p>| 6 | 1 | 2 | 1 |</p>
+<p>+—-+—+—+—+</p>
+<p>sql:执行顺序</p>
+<p>session1:begin;</p>
+<p>session2:begin;</p>
+<p>session1:select * from uk_test where a &#x3D; 1 and b &#x3D; 1 for update;</p>
+<p>session2:select * from uk_test where a &#x3D; 1 and b &#x3D; 1 for update;</p>
+<p>session1:insert into uk_test (a,b,c) values(1,1,2) on duplicate key update c &#x3D; 2;</p>
+<p>session2:ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transacti</p>
+<p>on</p>
+<p>我的疑问是:</p>
+<p>1.rc隔离级别下对唯一键的insert也会加next-key lock吗？2.死锁日志显示</p>
+<p>session 1已经成功加上行锁(lock_mode X locks rec but not gap),</p>
+<p>session 2在等待同一个行锁(lock_mode X locks rec but not gap waiting),</p>
+<p>session1这时因为等待lock_mode X waiting而死锁。这里的lock_mode X waiting是指next-key lock吗？如果是的话，没想明白这里怎么形成资源循环等待了？我的猜测是session1 这时持有行锁，要next-key lock 所以要去加gap锁。session 2持有gap锁</p>
+<p>在等行锁。但如果是这样为什么session2 在rc下select for update，且记录存在时会加gap锁?还</p>
+<p>有gap锁加锁不是不互斥吗？2019-02-23</p>
+<p> 作者回复</p>
+<ol>
+<li><p>会</p>
+</li>
+<li><p>你这里</p>
+</li>
+</ol>
+<p>session 1 成功加锁一个record lock；</p>
+<p>session 2执行的是一个select 语句，而且a&#x3D;1 and b&#x3D;1就只锁一行（a，b上有联合唯一索引）</p>
+<p>，这里就是要申请一个记录行锁(but not gap waiting)。这里虽然没有加锁成功，但是已经加入了锁队列（只是这个锁是处于等待状态）</p>
+<p>—这时候队列里面有两个锁对象了</p>
+<p>然后session 1 再insert失败的时候，就要加next-key lock，（注意这个锁对象跟第一个锁对象</p>
+<p>不同）。然后死锁检测看到，2号锁在等1号锁；3号要等2号，而3和1又是同一个session，就认为是死</p>
+<p>锁了。2019-02-24</p>
+<p>龙文   0</p>
+<p>老师你好，我在第21讲求助了一个死锁问题，当时你回复说后面会解答，不过我浏览了下后续</p>
+<p>文章没找到解答，所以再次求助下。ps:用的阿里云的rds,提了工单没效果啊</p>
+<p>2019-02-23</p>
+<p> 作者回复</p>
+<p>有的，你看一下第40篇 “insert 唯一键冲突”这一段</p>
+<p>ps:我已经离开阿里云挺久的了  </p>
+<p>2019-02-23</p>
+<p>夜空中最亮的星（华仔）   0</p>
+<p>订阅了好几个专栏 mysql这个是最优先看的，别的专栏可以跟不上 这个必须跟上，老师计划出</p>
+<p>第二季吗？2019-02-22</p>
+<p>夜空中最亮的星（华仔）   0</p>
+<p>这么快就要结束，好快啊</p>
+<p>2019-02-22</p>
+<p> 作者回复</p>
+<p>跟进得很快啊大家 </p>
+<p>2019-02-22</p>
+<p>一大只    0</p>
+<p>老师好，我做了下课后题的实验，不清楚为啥设计，下面记录了我看到的现象，不一定对哈。使用start transaction with consistent snapshot;</p>
+<p>同一个session的开启快照事务后的trx_id很大并且一致，如果关闭这个session，开启另一个se</p>
+<p>ssion使用snapshot，初始值的trx_id也是与之前的session一致的。如果再打开第二个session使用snapshot，第一次查询trx表，会发现第一个session还是很大只</p>
+<p>，第二个打开的trx_id会很小，但这个很小的trx_id是第一个打开的session的最小trx_id+1。这</p>
+<p>时，如果commit；再start snapshot，那么将会出现一个比第一个session还要大一点的trx_id，</p>
+<p>我开了几个session，第一次是+24，随后都是加12，如下图：</p>
+<p>+———————+—————–+</p>
+<p>| trx_mysql_thread_id | trx_id |</p>
+<p>+———————+—————–+</p>
+<p>| 14672 | 421259275839776 |</p>
+<p>| 14661 | 421259275838864 |</p>
+<p>| 14645 | 421259275837952 |</p>
+<p>| 14587 | 421259275837040 |</p>
+<p>| 14578 | 421259275835216 |</p>
+<p>+———————+—————–+</p>
+<p>只有一个session打开snapshot情况下，trx_id在commit后会增加，但在事务内不会看到trx_id增</p>
+<p>加,使用select,select lock in share mode不会导致trx_id增加。一个ddl操作应该是 trx_id+18</p>
+<p>不在事务内的dml操作：</p>
+<p>delete 1条 trx_id+2 </p>
+<p>delete 多条 trx_id+6</p>
+<p>insert 1条 trx_id+1</p>
+<p>insert values (),()…多条trx_id+5</p>
+<p>update 1条 trx_id+2</p>
+<p>update 多条 trx_id+6</p>
+<p>snapshot事务内的dml操作：</p>
+<p>事务内先select * from tb for update;再delete from tb where id&#x3D;xxx;这样的delete trx_id+1</p>
+<p>如果是事务内直接delete from tb where id&#x3D;xxx;或delete from tb;这样的delete trx_id+6</p>
+<p>事务内update 1条 trx_id+2，如果先select * fom tb for update;再update 1条，有时候是trx_id+2</p>
+<p>，有时候是trx_id+5</p>
+<p>事务内update 多条 trx_id+6</p>
+<p>2019-02-22</p>
+<p> 作者回复</p>
+<p>很好的验证</p>
+<p>下一篇文章会讲到哈</p>
+<p>2019-02-23</p>
+<p>万勇   0</p>
+<p>感谢老师上一期的解答，还请教一个分区表的问题，分区表创建的聚集索引是分区本地维护的</p>
+<p>吧，但是主键索引要保证全局唯一性。那分区和主键索引之间是不是要建立一种关系？另外分</p>
+<p>区表如果我们创建普通索引，按道理可以分区创建的，分区维护自己的普通索引，各分区之间</p>
+<p>互不影响。2019-02-22</p>
+<p> 作者回复</p>
+<p>就是我这篇末尾建议的几种建表方法,就是建立联系了</p>
+<p>2019-02-22</p>
+<p>克劳德   0</p>
+<p>老师好，如果group by用作数据去重，根据文章中描述的，流程2会遍历表依次插入进临时表。我理解的遍历表是通过扫描主键索引来做的，因此同一组的记录只会留下主键值最小的那个，</p>
+<p>是否正确？能否通过扫描其他索引，来达到去重后的记录不按照主键值来决定？2019-02-22</p>
+<p> 作者回复</p>
+<p>1.对,就是扫描这个索引的过程中,第一个碰到的值</p>
+<ol start="2">
+<li>可以,你用force index试试</li>
+</ol>
+<p>2019-02-22</p>
+<pre><code>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/1ed24b5c.html" rel="prev" title="mysql-要不要使用分区表">
+      <i class="fa fa-chevron-left"></i> mysql-要不要使用分区表
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/bd94ce79.html" rel="next" title="mysql-自增id用完怎么办">
+      mysql-自增id用完怎么办 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">390k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:40</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

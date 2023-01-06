@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题解析30 | 答疑文章（二）：用动态的观点看加锁 2019-01-21 林晓斌 在第20和21篇文章中，我和你介绍了InnoDB的间隙锁、next-key lock，以及加锁规则。在这两 篇文章的评论区，出现了很多高质量的留言。我觉得通过分析这些问题，可以帮助你加深对加锁 规则的理解。所以，我就从中挑选了几个有代表性的问题，构成了今天这篇答疑文章的主题，即：用动态的观 点看加锁。为了方便你理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql-答疑文章（二）：用动态的观点看加锁">
+<meta property="og:url" content="https://www.fastolf.com/posts/90c350b7.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="问题解析30 | 答疑文章（二）：用动态的观点看加锁 2019-01-21 林晓斌 在第20和21篇文章中，我和你介绍了InnoDB的间隙锁、next-key lock，以及加锁规则。在这两 篇文章的评论区，出现了很多高质量的留言。我觉得通过分析这些问题，可以帮助你加深对加锁 规则的理解。所以，我就从中挑选了几个有代表性的问题，构成了今天这篇答疑文章的主题，即：用动态的观 点看加锁。为了方便你理解">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-04T22:11:28.000Z">
+<meta property="article:modified_time" content="2023-01-06T09:44:03.214Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/90c350b7.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>mysql-答疑文章（二）：用动态的观点看加锁 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/90c350b7.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql-答疑文章（二）：用动态的观点看加锁
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-05 06:11:28" itemprop="dateCreated datePublished" datetime="2019-12-05T06:11:28+08:00">2019-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>27 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>30 | 答疑文章（二）：用动态的观点看加锁</p>
+<p>2019-01-21 林晓斌</p>
+<p>在第20和21篇文章中，我和你介绍了InnoDB的间隙锁、next-key lock，以及加锁规则。在这两</p>
+<p>篇文章的评论区，出现了很多高质量的留言。我觉得通过分析这些问题，可以帮助你加深对加锁</p>
+<p>规则的理解。所以，我就从中挑选了几个有代表性的问题，构成了今天这篇答疑文章的主题，即：用动态的观</p>
+<p>点看加锁。为了方便你理解，我们再一起复习一下加锁规则。这个规则中，包含了两个“原则”、两</p>
+<p>个“优化”和一个“bug”：</p>
+<p>原则1：加锁的基本单位是next-key lock。希望你还记得，next-key lock是前开后闭区间。原则2：查找过程中访问到的对象才会加锁。优化1：索引上的等值查询，给唯一索引加锁的时候，next-key lock退化为行锁。优化2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-key lock</p>
+<p>退化为间隙锁。一个bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止。接下来，我们的讨论还是基于下面这个表t：</p>
+<p>不等号条件里的等值查询</p>
+<p>有同学对“等值查询”提出了疑问：等值查询和“遍历”有什么区别？为什么我们文章的例子里</p>
+<p>面，where条件是不等号，这个过程里也有等值查询？我们一起来看下这个例子，分析一下这条查询语句的加锁范围：</p>
+<p>利用上面的加锁规则，我们知道这个语句的加锁范围是主键索引上的 (0,5]、(5,10]和(10, 15)。也</p>
+<p>就是说，id&#x3D;15这一行，并没有被加上行锁。为什么呢？我们说加锁单位是next-key lock，都是前开后闭区间，但是这里用到了优化2，即索引上的等值</p>
+<p>查询，向右遍历的时候id&#x3D;15不满足条件，所以next-key lock退化为了间隙锁 (10, 15)。但是，我们的查询语句中where条件是大于号和小于号，这里的“等值查询”又是从哪里来的呢？要知道，加锁动作是发生在语句执行过程中的，所以你在分析加锁行为的时候，要从索引上的数</p>
+<p>据结构开始。这里，我再把这个过程拆解一下。如图1所示，是这个表的索引id的示意图。CREATE TABLE t̀  ̀(</p>
+<p>  ìd  ̀int(11) NOT NULL,</p>
+<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
+<p>  &#96;d  ̀int(11) DEFAULT NULL,</p>
+<p>  PRIMARY KEY (̀ id )̀,</p>
+<p>  KEY &#96;c  ̀(̀ c )̀</p>
+<p>) ENGINE&#x3D;InnoDB;</p>
+<p>insert into t values(0,0,0),(5,5,5),</p>
+<p>(10,10,10),(15,15,15),(20,20,20),(25,25,25);</p>
+<p>begin;</p>
+<p>select * from t where id&gt;9 and id&lt;12 order by id desc for update;</p>
+<p>图1 索引id示意图</p>
+<ol>
+<li>首先这个查询语句的语义是order by id desc，要拿到满足条件的所有行，优化器必须先找</li>
+</ol>
+<p>到“第一个id&lt;12的值”。2. 这个过程是通过索引树的搜索过程得到的，在引擎内部，其实是要找到id&#x3D;12的这个值，只</p>
+<p>是最终没找到，但找到了(10,15)这个间隙。3. 然后向左遍历，在遍历过程中，就不是等值查询了，会扫描到id&#x3D;5这一行，所以会加一个</p>
+<p>next-key lock (0,5]。也就是说，在执行过程中，通过树搜索的方式定位记录的时候，用的是“等值查询”的方法。等值查询的过程</p>
+<p>与上面这个例子对应的，是@发条橙子同学提出的问题：下面这个语句的加锁范围是什么？这条查询语句里用的是in，我们先来看这条语句的explain结果。begin;</p>
+<p>select id from t where c in(5,20,10) lock in share mode;</p>
+<p>图2 in语句的explain结果</p>
+<p>可以看到，这条in语句使用了索引c并且rows&#x3D;3，说明这三个值都是通过B+树搜索定位的。在查找c&#x3D;5的时候，先锁住了(0,5]。但是因为c不是唯一索引，为了确认还有没有别的记录c&#x3D;5，</p>
+<p>就要向右遍历，找到c&#x3D;10才确认没有了，这个过程满足优化2，所以加了间隙锁(5,10)。同样的，执行c&#x3D;10这个逻辑的时候，加锁的范围是(5,10] 和 (10,15)；执行c&#x3D;20这个逻辑的时</p>
+<p>候，加锁的范围是(15,20] 和 (20,25)。通过这个分析，我们可以知道，这条语句在索引c上加的三个记录锁的顺序是：先加c&#x3D;5的记录</p>
+<p>锁，再加c&#x3D;10的记录锁，最后加c&#x3D;20的记录锁。你可能会说，这个加锁范围，不就是从(5,25)中去掉c&#x3D;15的行锁吗？为什么这么麻烦地分段说</p>
+<p>呢？因为我要跟你强调这个过程：这些锁是“在执行过程中一个一个加的”，而不是一次性加上去的。理解了这个加锁过程之后，我们就可以来分析下面例子中的死锁问题了。如果同时有另外一个语句，是这么写的：</p>
+<p>此时的加锁范围，又是什么呢？我们现在都知道间隙锁是不互锁的，但是这两条语句都会在索引c上的c&#x3D;5、10、20这三行记录</p>
+<p>上加记录锁。这里你需要注意一下，由于语句里面是order by c desc， 这三个记录锁的加锁顺序，是先锁</p>
+<p>c&#x3D;20，然后c&#x3D;10，最后是c&#x3D;5。也就是说，这两条语句要加锁相同的资源，但是加锁顺序相反。当这两条语句并发执行的时候，</p>
+<p>就可能出现死锁。关于死锁的信息，MySQL只保留了最后一个死锁的现场，但这个现场还是不完备的。有同学在评论区留言到，希望我能展开一下怎么看死锁。现在，我就来简单分析一下上面这个例</p>
+<p>子的死锁现场。select id from t where c in(5,20,10) order by c desc for update;</p>
+<p>怎么看死锁？图3是在出现死锁后，执行show engine innodb status命令得到的部分输出。这个命令会输出很</p>
+<p>多信息，有一节LATESTDETECTED DEADLOCK，就是记录的最后一次死锁信息。图3 死锁现场</p>
+<p>我们来看看这图中的几个关键信息。1. 这个结果分成三部分：</p>
+<p>(1) TRANSACTION，是第一个事务的信息；</p>
+<p>(2) TRANSACTION，是第二个事务的信息；</p>
+<p>WE ROLL BACK TRANSACTION (1)，是最终的处理结果，表示回滚了第一个事务。2. 第一个事务的信息中：</p>
+<p>WAITING FOR THIS LOCK TO BE GRANTED，表示的是这个事务在等待的锁信息；</p>
+<p>index c of table t̀est .̀̀ t&#96;，说明在等的是表t的索引c上面的锁；</p>
+<p>lock mode S waiting 表示这个语句要自己加一个读锁，当前的状态是等待中；</p>
+<p>Record lock说明这是一个记录锁；</p>
+<p>n_fields 2表示这个记录是两列，也就是字段c和主键字段id；</p>
+<p>0: len 4; hex 0000000a; asc ;;是第一个字段，也就是c。值是十六进制a，也就是10；</p>
+<p>1: len 4; hex 0000000a; asc ;;是第二个字段，也就是主键id，值也是10；</p>
+<p>这两行里面的asc表示的是，接下来要打印出值里面的“可打印字符”，但10不是可打印</p>
+<p>字符，因此就显示空格。第一个事务信息就只显示出了等锁的状态，在等待(c&#x3D;10,id&#x3D;10)这一行的锁。当然你是知道的，既然出现死锁了，就表示这个事务也占有别的锁，但是没有显示出</p>
+<p>来。别着急，我们从第二个事务的信息中推导出来。3. 第二个事务显示的信息要多一些：</p>
+<p>“ HOLDS THE LOCK(S)”用来显示这个事务持有哪些锁；</p>
+<p>index c of table t̀est .̀̀ t  ̀表示锁是在表t的索引c上；</p>
+<p>hex 0000000a和hex 00000014表示这个事务持有c&#x3D;10和c&#x3D;20这两个记录锁；</p>
+<p>WAITING FOR THIS LOCK TO BE GRANTED，表示在等(c&#x3D;5,id&#x3D;5)这个记录锁。从上面这些信息中，我们就知道：</p>
+<ol>
+<li><p>“lock in share mode”的这条语句，持有c&#x3D;5的记录锁，在等c&#x3D;10的锁；</p>
+</li>
+<li><p>“for update”这个语句，持有c&#x3D;20和c&#x3D;10的记录锁，在等c&#x3D;5的记录锁。因此导致了死锁。这里，我们可以得到两个结论：</p>
+</li>
+<li><p>由于锁是一个个加的，要避免死锁，对同一组资源，要按照尽量相同的顺序访问；</p>
+</li>
+<li><p>在发生死锁的时刻，for update 这条语句占有的资源更多，回滚成本更大，所以InnoDB选</p>
+</li>
+</ol>
+<p>择了回滚成本更小的lock in share mode语句，来回滚。怎么看锁等待？看完死锁，我们再来看一个锁等待的例子。在第21篇文章的评论区，@Geek_9ca34e 同学做了一个有趣验证，我把复现步骤列出来：</p>
+<p>图4 delete导致间隙变化</p>
+<p>可以看到，由于session A并没有锁住c&#x3D;10这个记录，所以session B删除id&#x3D;10这一行是可以</p>
+<p>的。但是之后，session B再想insert id&#x3D;10这一行回去就不行了。现在我们一起看一下此时show engine innodb status的结果，看看能不能给我们一些提示。锁信</p>
+<p>息是在这个命令输出结果的TRANSACTIONS这一节。你可以在文稿中看到这张图片</p>
+<p>图 5 锁等待信息</p>
+<p>我们来看几个关键信息。1. index PRIMARY of table t̀est .̀̀ t  ̀，表示这个语句被锁住是因为表t主键上的某个锁。2. lock_mode X locks gap before rec insert intention waiting 这里有几个信息：</p>
+<p>insert intention表示当前线程准备插入一个记录，这是一个插入意向锁。为了便于理</p>
+<p>解，你可以认为它就是这个插入动作本身。gap before rec 表示这是一个间隙锁，而不是记录锁。3. 那么这个gap是在哪个记录之前的呢？接下来的0~4这5行的内容就是这个记录的信息。4. n_fields 5也表示了，这一个记录有5列：</p>
+<p>0: len 4; hex 0000000f; asc ;;第一列是主键id字段，十六进制f就是id&#x3D;15。所以，这时我</p>
+<p>们就知道了，这个间隙就是id&#x3D;15之前的，因为id&#x3D;10已经不存在了，它表示的就是</p>
+<p>(5,15)。1: len 6; hex 000000000513; asc ;;第二列是长度为6字节的事务id，表示最后修改这一</p>
+<p>行的是trx id为1299的事务。2: len 7; hex b0000001250134; asc % 4;; 第三列长度为7字节的回滚段信息。可以看</p>
+<p>到，这里的acs后面有显示内容(%和4)，这是因为刚好这个字节是可打印字符。后面两列是c和d的值，都是15。因此，我们就知道了，由于delete操作把id&#x3D;10这一行删掉了，原来的两个间隙(5,10)、(10,15）</p>
+<p>变成了一个(5,15)。说到这里，你可以联合起来再思考一下这两个现象之间的关联：</p>
+<ol>
+<li><p>session A执行完select语句后，什么都没做，但它加锁的范围突然“变大”了；</p>
+</li>
+<li><p>第21篇文章的课后思考题，当我们执行select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c</p>
+</li>
+</ol>
+<p>desc lock in share mode; 向左扫描到c&#x3D;10的时候，要把(5, 10]锁起来。也就是说，所谓“间隙”，其实根本就是由“这个间隙右边的那个记录”定义的。update的例子</p>
+<p>看过了insert和delete的加锁例子，我们再来看一个update语句的案例。在留言区中@信信 同学</p>
+<p>做了这个试验：</p>
+<p>图 6 update 的例子</p>
+<p>你可以自己分析一下，session A的加锁范围是索引c上的 (5,10]、(10,15]、(15,20]、(20,25]和</p>
+<p>(25,supremum]。之后session B的第一个update语句，要把c&#x3D;5改成c&#x3D;1，你可以理解为两步：</p>
+<ol>
+<li><p>插入(c&#x3D;1, id&#x3D;5)这个记录；</p>
+</li>
+<li><p>删除(c&#x3D;5, id&#x3D;5)这个记录。按照我们上一节说的，索引c上(5,10)间隙是由这个间隙右边的记录，也就是c&#x3D;10定义的。所以</p>
+</li>
+</ol>
+<p>通过这个操作，session A的加锁范围变成了图7所示的样子：</p>
+<p>注意：根据c&gt;5查到的第一个记录是c&#x3D;10，因此不会加(0,5]这个next-key lock。图 7 session B修改后， session A的加锁范围</p>
+<p>好，接下来session B要执行 update t set c &#x3D; 5 where c &#x3D; 1这个语句了，一样地可以拆成两步：</p>
+<ol>
+<li><p>插入(c&#x3D;5, id&#x3D;5)这个记录；</p>
+</li>
+<li><p>删除(c&#x3D;1, id&#x3D;5)这个记录。第一步试图在已经加了间隙锁的(1,10)中插入数据，所以就被堵住了。小结</p>
+</li>
+</ol>
+<p>今天这篇文章，我用前面第20和第21篇文章评论区的几个问题，再次跟你复习了加锁规则。并</p>
+<p>且，我和你重点说明了，分析加锁范围时，一定要配合语句执行逻辑来进行。在我看来，每个想认真了解MySQL原理的同学，应该都要能够做到：通过explain的结果，就能</p>
+<p>够脑补出一个SQL语句的执行流程。达到这样的程度，才算是对索引组织表、索引、锁的概念有</p>
+<p>了比较清晰的认识。你同样也可以用这个方法，来验证自己对这些知识点的掌握程度。在分析这些加锁规则的过程中，我也顺便跟你介绍了怎么看show engine innodb status输出结果</p>
+<p>中的事务信息和死锁信息，希望这些内容对你以后分析现场能有所帮助。老规矩，即便是答疑文章，我也还是要留一个课后问题给你的。上面我们提到一个很重要的点：所谓“间隙”，其实根本就是由“这个间隙右边的那个记录”定义</p>
+<p>的。那么，一个空表有间隙吗？这个间隙是由谁定义的？你怎么验证这个结论呢？你可以把你关于分析和验证方法写在留言区，我会在下一篇文章的末尾和你讨论这个问题。感谢</p>
+<p>你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
+<p>我在上一篇文章最后留给的问题，是分享一下你关于业务监控的处理经验。在这篇文章的评论区，很多同学都分享了不错的经验。这里，我就选择几个比较典型的留言，和</p>
+<p>你分享吧：</p>
+<p>@老杨同志 回答得很详细。他的主要思路就是关于服务状态和服务质量的监控。其中，服务</p>
+<p>状态的监控，一般都可以用外部系统来实现；而服务的质量的监控，就要通过接口的响应时</p>
+<p>间来统计。@Ryoma 同学，提到服务中使用了healthCheck来检测，其实跟我们文中提到的select 1的模</p>
+<p>式类似。@强哥 同学，按照监控的对象，将监控分成了基础监控、服务监控和业务监控，并分享了每</p>
+<p>种监控需要关注的对象。这些都是很好的经验，你也可以根据具体的业务场景借鉴适合自己的方案。令狐少侠   2</p>
+<p>有个问题想确认下，在死锁日志里，lock_mode X waiting是间隙锁+行锁，lock_mode X locks </p>
+<p>rec but not gap这种加but not gap才是行锁？老师你后面能说下group by的原理吗，我看目录里面没有</p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>对， 好问题</p>
+<p>lock_mode X waiting表示next-key lock；</p>
+<p>lock_mode X locks rec but not gap是只有行锁；</p>
+<p>还有一种 “locks gap before rec”，就是只有间隙锁；</p>
+<p>2019-01-23</p>
+<p>Ryoma   2</p>
+<p>删除数据，导致锁扩大的描述：“因此，我们就知道了，由于 delete 操作把 id&#x3D;10 这一行删掉了</p>
+<p>，原来的两个间隙 (5,10)、(10,15）变成了一个 (5,15)。”</p>
+<p>我觉得这个提到的(5, 10) 和 (10, 15)两个间隙会让人有点误解，实际上在删除之前间隙锁只有</p>
+<p>一个(10, 15)，删除了数据之后，导致间隙锁左侧扩张成了5，间隙锁成为了(5, 15)。2019-01-22</p>
+<p> 作者回复</p>
+<p>嗯 所以我这里特别小心地没有写“锁“这个字。间隙 (5,10)、(10,15）是客观存在的。你提得也很对，“锁”是执行过程中才加的，是一个动态的概念。这个问题也能够让大家更了解我们标题的意思，置顶了哈  </p>
+<p>2019-01-22</p>
+<p>    1</p>
+<p>老师好：</p>
+<p>select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c desc for update;</p>
+<p>为什么这种c&#x3D;20就是用来查数据的就不是向右遍历</p>
+<p>select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 这种就是向右遍历</p>
+<p>怎么去判断合适是查找数据，何时又是遍历呢，是因为第一个有order by desc，然后反向向左</p>
+<p>遍历了吗？所以只需要[20,25)来判断已经是最后一个20就可以了是吧</p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>索引搜索就是 “找到第一个值，然后向左或向右遍历”，</p>
+<p>order by desc 就是要用最大的值来找第一个；</p>
+<p>精选留言</p>
+<p>order by就是要用做小的值来找第一个；</p>
+<p>“所以只需要[20,25)来判断已经是最后一个20就可以了是吧”，</p>
+<p>你描述的意思是对的，但是在MySQL里面不建议写这样的前闭后开区间哈，容易造成误解。可以描述为：</p>
+<p>“取第一个id&#x3D;20后，向右遍历(25,25)这个间隙”^_^</p>
+<p>2019-01-22</p>
+<p>老杨同志   1</p>
+<p>先说结论：空表锁 (-supernum，supernum],老师提到过mysql的正无穷是supernum，在没有数</p>
+<p>据的情况下，next-key lock 应该是supernum前面的间隙加 supernum的行锁。但是前开后闭的</p>
+<p>区间，前面的值是什么我也不知道，就写了一个-supernum。稍微验证一下</p>
+<p>session 1）</p>
+<p>begin;</p>
+<p>select * from t where id&gt;9 for update;</p>
+<p>session 2）</p>
+<p>begin;</p>
+<p>insert into t values(0,0,0),(5,5,5);</p>
+<p>（block）</p>
+<p>2019-01-21</p>
+<p> 作者回复</p>
+<p>赞</p>
+<p>show engine innodb status 有惊喜 </p>
+<p>2019-01-21</p>
+<p>Long   0</p>
+<p>感觉这篇文章以及前面加锁的文章，提升了自己的认知。还有，谢谢老师讲解了日志的对应细</p>
+<p>节……还愿了</p>
+<p>2019-01-28</p>
+<p> 作者回复</p>
+<p>   </p>
+<p>2019-01-28</p>
+<p>滔滔   0</p>
+<p>老师，有个疑问，select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c desc lock in share mode; </p>
+<p>向左扫描到 c&#x3D;10 的时候，为什么要把 (5, 10] 锁起来？不锁也不会出现幻读或者逻辑上的不一</p>
+<p>致吧 </p>
+<p>2019-01-23</p>
+<p> 作者回复</p>
+<p>会加锁，insert into t values (6,6,6) 被堵住了</p>
+<p>2019-01-23</p>
+<p>尘封   0</p>
+<p>尘封   0</p>
+<p>老师，咨询个问题，本来想在后面分区表的文章问，发现大纲里没有分区表这一讲。1，timestamp类型为什么不支持分区？2，前面的文章讲过分区不要太多，这个多了会怎么样？比如一个表一千多个分区</p>
+<p>谢谢</p>
+<p>2019-01-23</p>
+<p> 作者回复</p>
+<p>会讲的哈~</p>
+<p>新春快乐~</p>
+<p>2019-02-04</p>
+<p>长杰   0</p>
+<p>老师，还是select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c desc in share mode与select * fro</p>
+<p>m t where id&gt;10 and id&lt;&#x3D;15 for update的问题，为何select * from t where id&gt;10 and id&lt;&#x3D;15 for </p>
+<p>update不能解释为：根据id&#x3D;15来查数据，加锁(15, 20]的时候，可以使用优化2，</p>
+<p>这个等值查询是根据什么规则来定的？ 如果select * from t where id&gt;10 and id&lt;&#x3D;15 for update</p>
+<p>加上order by id desc是否可以按照id&#x3D;15等值查询，利用优化2？多谢指教。2019-01-22</p>
+<p> 作者回复</p>
+<ol>
+<li><p>代码实现上，传入的就是id&gt;10里面的这个10</p>
+</li>
+<li><p>可以的，不过因为id是主键，而且id&#x3D;15这一行存在，我觉得用优化1解释更好哦</p>
+</li>
+</ol>
+<p>2019-01-23</p>
+<p>堕落天使   0</p>
+<p>老师，您好：</p>
+<p>我执行“explain select id from t where c in(5,20,10) lock in share mode;” 时，显示的rows对应的</p>
+<p>值是4。为什么啊？我的mysql版本是：5.7.23-0ubuntu0.16.04.1，具体sql语句如下：</p>
+<p>mysql&gt; select * from t;</p>
+<p>+—-+——+——+</p>
+<p>| id | c | d |</p>
+<p>+—-+——+——+</p>
+<p>| 0 | 0 | 0 |</p>
+<p>| 5 | 5 | 5 |</p>
+<p>| 10 | 10 | 10 |</p>
+<p>| 15 | 15 | 15 |</p>
+<p>| 20 | 20 | 20 |</p>
+<p>| 25 | 25 | 25 |</p>
+<p>| 30 | 10 | 30 |</p>
+<p>+—-+——+——+</p>
+<p>7 rows in set (0.00 sec)</p>
+<p>mysql&gt; explain select id from t where c in(5,20,10) lock in share mode;</p>
+<p>+—-+————-+——-+————+——-+—————+——+———+——+——+———-+——–</p>
+<p>——————+</p>
+<p>| id | select_type | table | partitions | type | possible_keys | key | key_len | ref | rows | filtered | </p>
+<p>Extra |</p>
+<p>+—-+————-+——-+————+——-+—————+——+———+——+——+———-+——–</p>
+<p>——————+</p>
+<p>| 1 | SIMPLE | t | NULL | range | c | c | 5 | NULL | 4 | 100.00 | Using where; Using index |</p>
+<p>+—-+————-+——-+————+——-+—————+——+———+——+——+———-+——–</p>
+<p>——————+</p>
+<p>1 row in set, 1 warning (0.00 sec)</p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>你这个例子里面有两行c&#x3D;10</p>
+<p>2019-01-23</p>
+<p>Ivan   0</p>
+<p>Jan 17 23:52:27 prod-mysql-01 kernel: [ pid ] uid tgid total_vm rss cpu oom_adj oom_score_adj</p>
+<p>name</p>
+<p>Jan 17 23:52:27 prod-mysql-01 kernel: [125254] 0 125254 27087 5 0 0 0 mysqld_safe</p>
+<p>Jan 17 23:52:27 prod-mysql-01 kernel: [126004] 498 126004 24974389 22439356 5 0 0 mysqld</p>
+<p>Jan 17 23:52:27 prod-mysql-01 kernel: [ 5733] 0 5733 7606586 6077037 7 0 0 mysql</p>
+<p>—————————系统日志——————————————————————————–</p>
+<p>老师你好，请教一个问题 ，我在mysql服务器上本地登录，执行了一个SQL（select b.id,b.statu</p>
+<p>s from rb_bak b where id not in (select id from rb );该语句问了找不同数据， rb和 rb_bak 数据</p>
+<p>量均为500万左右），SQL很慢，30分钟也没结果；</p>
+<p>在SQL语句执行期间，发生了OOM，mysql服务被kill。查看系统日志发现 mysqld 占用内存基</p>
+<p>本没有变，但是本机连接mysql的客户端进程（5733）却占用了内存近20G，这很让人费解，S</p>
+<p>QL没有执行完，客户端怎么会占用这么多内存？用其他SQL查询查询不同数据，也就十几条数据，更不可能占用这么多内存呀。还请老师帮忙</p>
+<p>分析一下，谢谢。2019-01-22</p>
+<p> 作者回复</p>
+<p>好问题，第33篇会说到哈</p>
+<p>你可以在mysql客户端参数增加 –quick 再试试</p>
+<p>2019-01-23</p>
+<p>PengfeiWang   0</p>
+<p>老师，您好：</p>
+<p>对文中以下语句感到有困惑：</p>
+<p>我们说加锁单位是 next-key lock，都是前开后闭区，但是这里用到了优化 2，即索引上的等值</p>
+<p>查询，向右遍历的时候id&#x3D;15不满足条件，所以 next-key lock 退化为了间隙锁 (10, 15)。SQL语句中条件中使用的是id字段（唯一索引），那么根据加锁规则这里不应该用的是优化 2，</p>
+<p>而是优化 1，因为优化1中明确指出给唯一索引加锁，从而优化 2的字面意思来理解，它适用于</p>
+<p>普通索引。不知道是不是我理解的不到位？2019-01-22</p>
+<p> 作者回复</p>
+<p>主要是这里这一行不存在。。如果能够明确找到一行锁住的话，使用优化1就更准确些</p>
+<p>2019-01-23</p>
+<p>Justin   0</p>
+<p>想咨询一下 普通索引 如果索引中包括的元素都相同 在索引中顺序是怎么排解的呢 是按主键排</p>
+<p>列的吗 比如(name ,age ) 索引 name age都一样 那索引中会按照主键排序吗？2019-01-22</p>
+<p> 作者回复</p>
+<p>会的</p>
+<p>2019-01-23</p>
+<p>ServerCoder   0</p>
+<p>林老师我有个问题想请教一下，描述如下，望给予指点，先谢谢了！</p>
+<p>环境：虚拟机，CPU 4核，内存8G，系统CentOS7.4，MySQL版本5.6.40</p>
+<p>数据库配置：</p>
+<p>bulk_insert_buffer_size &#x3D; 256M</p>
+<p>sql_mode&#x3D;NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES</p>
+<p>secure_file_priv&#x3D;’’</p>
+<p>default-storage-engine&#x3D;MYISAM</p>
+<p>测试场景修改过的参数(以下这些参数得调整对加载效率没有实质的提升)：</p>
+<p>myisam_repair_threads&#x3D;3</p>
+<p>myisam_sort_buffer_size&#x3D;256M</p>
+<p>net_buffer_length&#x3D;1M</p>
+<p>myisam_use_mmap&#x3D;ON</p>
+<p>key_buffer_size&#x3D;256M</p>
+<p>测试场景：测试程序多线程，通过客户端API，执行load data infile语句加载数据文件</p>
+<p>三个线程，三个文件(每个文件100万条数据、150MB)，三张表(表结构相同，字段类型均为整</p>
+<p>形，没有定义主键，有一个字段加了非唯一索引)，一一对应进行数据加载，数据库没有使用多</p>
+<p>核，而是把一个核心的利用率均分给了三个线程。单个线程加载一个文件大约耗时3秒</p>
+<p>单线程加载三个文件到三张表大约耗时9秒</p>
+<p>三个线程分别加载三个文件到三张表，则每个线程均耗时大约9秒。从这个效果看，单线程顺序</p>
+<p>加载和三线程并发加载耗时相同，没有提升效果。三线程加载过程中查看processlist发现时间主要耗费在了网络读取上。问题：为啥这种场景下MySQL不利用多核？这种并行加载的情况要如何才能让其利用多核，提</p>
+<p>升加载速度</p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>可以用到多核呀，你是怎么得到 “时间主要耗费在了网络读取上。”这个结论的？另外，把这三个文件先拷贝到数据库本地，然后本地执行load看看什么效果？2019-01-23</p>
+<p>慕塔   0</p>
+<p>是这样的 假设只有一主一从 1)是集群只有一个sysbench实例，产生的数据流通过中间件，主</p>
+<p>机分全部写，和30%的读，另外70%的读全部分给从机。2)有两个sysbench，一个读写加压到</p>
+<p>主机，另一个只有加压到从机。主从复制之间通过binlog。问题在1)的QPS累加与2)QPS累加 </p>
+<p>意义一样吗 1)的一条事务有读写，而2)的情况，主机与1)一样，从机的读事务与主机里的读不</p>
+<p>一样吧 </p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>我觉得这两个对比不太公平^_^</p>
+<p>1）的测试可能会出现中间件瓶颈，</p>
+<p>a)网络环节中间增加了一跳；</p>
+<p>b) 如果是小查询，可能proxy先打到瓶颈</p>
+<p>2)的测试结论一般会比1）好些</p>
+<p>但是有这个架构，你肯定是从中间件访问数据库的，所以应该以1的测试结果为准</p>
+<p>2019-01-23</p>
+<p>Jason_鹏   0</p>
+<p>最后一个update的例子，为没有加（0，5）的间隙呢？我理解应该是先拿c＝5去b+树搜索，按</p>
+<p>照间隙索最右原则，应该会加（0，5]的间隙，然后c＝5不满足大于5条件，根据优化2原则退化</p>
+<p>成（0，5）的间隙索，我是这样理解的</p>
+<p>2019-01-22</p>
+<p> 作者回复</p>
+<p>根据c&gt;5查到的第一个记录是c&#x3D;10，因此不会加(0,5]这个next-key lock。你提醒得对，我应该多说明这句， 我加到文稿中啦 </p>
+<p>2019-01-22</p>
+<p>长杰   0</p>
+<p>老师，之前讲这个例子时，select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c desc in share m</p>
+<p>ode;</p>
+<p>最右边加的是 (20, 25)的间隙锁，</p>
+<p>而这个例子select * from t where id&gt;10 and id&lt;&#x3D;15 for update中，最右边加的是(15,20]的next-k</p>
+<p>ey锁，</p>
+<p>这两个查询为何最后边一个加的gap锁，一个加的next-key锁，他们都是&lt;&#x3D;的等值范围查询，区</p>
+<p>别在哪里？2019-01-22</p>
+<p> 作者回复</p>
+<p>select * from t where c&gt;&#x3D;15 and c&lt;&#x3D;20 order by c desc in share mode;</p>
+<p>这个语句是根据 c&#x3D;20 来查数据的，所以加锁(20,25]的时候，可以使用优化2；</p>
+<p>select * from t where id&gt;10 and id&lt;&#x3D;15 for update；</p>
+<p>这里的id&#x3D;20，是用“向右遍历”的方式得到的，没有优化，按照“以next-key lock”为加锁单位来执</p>
+<p>行</p>
+<p>2019-01-22</p>
+<p>库淘淘   0</p>
+<p>对于问题 我理解是这样 </p>
+<p>session 1：</p>
+<p>delete from t;</p>
+<p>begin; select * from t for update;</p>
+<p>session 2:</p>
+<p>insert into t values(1,1,1);发生等待</p>
+<p>show engine innodb status\G; </p>
+<p>…..</p>
+<p>——- TRX HAS BEEN WAITING 5 SEC FOR THIS LOCK TO BE GRANTED:</p>
+<p>RECORD LOCKS space id 75 page no 3 n bits 72 index PRIMARY of table <code>test</code>.<code>t</code> trx id 75209</p>
+<p>0 lock_mode X insert intention waiting</p>
+<p>Record lock, heap no 1 PHYSICAL RECORD: n_fields 1; compact format; info bits 0</p>
+<p>0: len 8; hex 73757072656d756d; asc supremum;;</p>
+<p>其中申请插入意向锁与间隙锁 冲突，supremum这个能否理解为 间隙右边的那个记录</p>
+<p>2019-01-21</p>
+<p> 作者回复</p>
+<p>发现了  </p>
+<p>2019-01-22</p>
+<p>慕塔   0</p>
+<p>大佬 请教下一主多从集群性能测试性能计算问题 如果使用基准测试工具sysbench。数据流有</p>
+<p>两种</p>
+<ol>
+<li></li>
+</ol>
+<p>sysbench—mycat—mysql主机(读写) TPS QPS1</p>
+<p>| |binlog</p>
+<p>mysql从机(只读)QPS2</p>
+<p>那性能指标 TPS QPS&#x3D;QPS1+QPS2</p>
+<ol start="2">
+<li></li>
+</ol>
+<p>sysbench—mysql主机(读写) TPS QPS1</p>
+<p>| binlog</p>
+<p>sysbench—mysql从机(只读)TPS QPS2</p>
+<p>集群性能指标TPS QPS&#x3D;QPS1+QPS2</p>
+<p>这两种哪种严谨些啊？mycat的损失忽略。生产中的集群性能怎么算的呢？？？(还是学生 谢谢！)</p>
+<p>2019-01-21</p>
+<p> 作者回复</p>
+<p>TPS就看主库的写入</p>
+<p>QPS就看所有从库的读能力加和</p>
+<p>不过没看懂你问题中1）和2）的区别 </p>
+<p>2019-01-22</p>
+<p>HuaMax   0</p>
+<p>删除导致锁范围扩大那个例子，id&gt;10 and id&lt;&#x3D;15，锁范围为什么没有10呢？不是应该（5，10]</p>
+<p>吗？2019-01-21</p>
+<p> 作者回复</p>
+<p>不是的，要找id&gt;10的，并没有命中id&#x3D;10哦，你可以理解成就是查到了(10,15)这个间隙</p>
+<p>2019-01-21</p>
+<p>llx   0</p>
+<p>回复@往事随风，顺其自然</p>
+<p>前面有解释为什么，这篇文章有更详细的解释。Gap lock 由右值指定的，由于 c 不是唯一键，</p>
+<p>需要到10，遍历到10的时候，就把 5-10 锁了</p>
+<p>2019-01-21</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-01-21</p>
+<pre><code>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/e5c71a8.html" rel="prev" title="mysql-如何判断一个数据库是不是出问题了">
+      <i class="fa fa-chevron-left"></i> mysql-如何判断一个数据库是不是出问题了
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/3ffe231f.html" rel="next" title="mysql-误删数据后除了跑路还能怎么办">
+      mysql-误删数据后除了跑路还能怎么办 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">390k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:40</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

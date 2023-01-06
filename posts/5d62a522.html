@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题解析28 | 读写分离有哪些坑？2019-01-16 林晓斌 在上一篇文章中，我和你介绍了一主多从的结构以及切换流程。今天我们就继续聊聊一主多从架 构的应用场景：读写分离，以及怎么处理主备延迟导致的读写分离问题。我们在上一篇文章中提到的一主多从的结构，其实就是读写分离的基本结构了。这里，我再把这 张图贴过来，方便你理解。图1 读写分离基本结构 读写分离的主要目标就是分摊主库的压力。图1中的结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql-读写分离有哪些坑">
+<meta property="og:url" content="https://www.fastolf.com/posts/5d62a522.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="问题解析28 | 读写分离有哪些坑？2019-01-16 林晓斌 在上一篇文章中，我和你介绍了一主多从的结构以及切换流程。今天我们就继续聊聊一主多从架 构的应用场景：读写分离，以及怎么处理主备延迟导致的读写分离问题。我们在上一篇文章中提到的一主多从的结构，其实就是读写分离的基本结构了。这里，我再把这 张图贴过来，方便你理解。图1 读写分离基本结构 读写分离的主要目标就是分摊主库的压力。图1中的结构">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-02T22:13:35.000Z">
+<meta property="article:modified_time" content="2023-01-06T09:44:03.224Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/5d62a522.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>mysql-读写分离有哪些坑 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5d62a522.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql-读写分离有哪些坑
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-03 06:13:35" itemprop="dateCreated datePublished" datetime="2019-12-03T06:13:35+08:00">2019-12-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>32 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>28 | 读写分离有哪些坑？2019-01-16 林晓斌</p>
+<p>在上一篇文章中，我和你介绍了一主多从的结构以及切换流程。今天我们就继续聊聊一主多从架</p>
+<p>构的应用场景：读写分离，以及怎么处理主备延迟导致的读写分离问题。我们在上一篇文章中提到的一主多从的结构，其实就是读写分离的基本结构了。这里，我再把这</p>
+<p>张图贴过来，方便你理解。图1 读写分离基本结构</p>
+<p>读写分离的主要目标就是分摊主库的压力。图1中的结构是客户端（client）主动做负载均衡，这</p>
+<p>种模式下一般会把数据库的连接信息放在客户端的连接层。也就是说，由客户端来选择后端数据</p>
+<p>库进行查询。还有一种架构是，在MySQL和客户端之间有一个中间代理层proxy，客户端只连接proxy， 由</p>
+<p>proxy根据请求类型和上下文决定请求的分发路由。图2 带proxy的读写分离架构</p>
+<p>接下来，我们就看一下客户端直连和带proxy的读写分离架构，各有哪些特点。1. 客户端直连方案，因为少了一层proxy转发，所以查询性能稍微好一点儿，并且整体架构简</p>
+<p>单，排查问题更方便。但是这种方案，由于要了解后端部署细节，所以在出现主备切换、库</p>
+<p>迁移等操作的时候，客户端都会感知到，并且需要调整数据库连接信息。你可能会觉得这样客户端也太麻烦了，信息大量冗余，架构很丑。其实也未必，一般采用这</p>
+<p>样的架构，一定会伴随一个负责管理后端的组件，比如Zookeeper，尽量让业务端只专注于</p>
+<p>业务逻辑开发。2. 带proxy的架构，对客户端比较友好。客户端不需要关注后端细节，连接维护、后端信息维</p>
+<p>护等工作，都是由proxy完成的。但这样的话，对后端维护团队的要求会更高。而且，proxy</p>
+<p>也需要有高可用架构。因此，带proxy架构的整体就相对比较复杂。理解了这两种方案的优劣，具体选择哪个方案就取决于数据库团队提供的能力了。但目前看，趋</p>
+<p>势是往带proxy的架构方向发展的。但是，不论使用哪种架构，你都会碰到我们今天要讨论的问题：由于主从可能存在延迟，客户端</p>
+<p>执行完一个更新事务后马上发起查询，如果查询选择的是从库的话，就有可能读到刚刚的事务更</p>
+<p>新之前的状态。这种“在从库上会读到系统的一个过期状态”的现象，在这篇文章里，我们暂且称之为“过期</p>
+<p>读”。前面我们说过了几种可能导致主备延迟的原因，以及对应的优化策略，但是主从延迟还是不能</p>
+<p>100%避免的。不论哪种结构，客户端都希望查询从库的数据结果，跟查主库的数据结果是一样的。接下来，我们就来讨论怎么处理过期读问题。这里，我先把文章中涉及到的处理过期读的方案汇总在这里，以帮助你更好地理解和掌握全文的</p>
+<p>知识脉络。这些方案包括：</p>
+<p>强制走主库方案；</p>
+<p>sleep方案；</p>
+<p>判断主备无延迟方案；</p>
+<p>配合semi-sync方案；</p>
+<p>等主库位点方案；</p>
+<p>等GTID方案。强制走主库方案</p>
+<p>强制走主库方案其实就是，将查询请求做分类。通常情况下，我们可以将查询请求分为这么两</p>
+<p>类：</p>
+<ol>
+<li>对于必须要拿到最新结果的请求，强制将其发到主库上。比如，在一个交易平台上，卖家发</li>
+</ol>
+<p>布商品以后，马上要返回主页面，看商品是否发布成功。那么，这个请求需要拿到最新的结</p>
+<p>果，就必须走主库。2. 对于可以读到旧数据的请求，才将其发到从库上。在这个交易平台上，买家来逛商铺页面，</p>
+<p>就算晚几秒看到最新发布的商品，也是可以接受的。那么，这类请求就可以走从库。你可能会说，这个方案是不是有点畏难和取巧的意思，但其实这个方案是用得最多的。当然，这个方案最大的问题在于，有时候你会碰到“所有查询都不能是过期读”的需求，比如一些</p>
+<p>金融类的业务。这样的话，你就要放弃读写分离，所有读写压力都在主库，等同于放弃了扩展</p>
+<p>性。因此接下来，我们来讨论的话题是：可以支持读写分离的场景下，有哪些解决过期读的方案，并</p>
+<p>分析各个方案的优缺点。Sleep 方案</p>
+<p>主库更新后，读从库之前先sleep一下。具体的方案就是，类似于执行一条select sleep(1)命令。这个方案的假设是，大多数情况下主备延迟在1秒之内，做一个sleep可以有很大概率拿到最新的</p>
+<p>数据。这个方案给你的第一感觉，很可能是不靠谱儿，应该不会有人用吧？并且，你还可能会说，直接</p>
+<p>在发起查询时先执行一条sleep语句，用户体验很不友好啊。但，这个思路确实可以在一定程度上解决问题。为了看起来更靠谱儿，我们可以换一种方式。以卖家发布商品为例，商品发布后，用Ajax（Asynchronous JavaScript + XML，异步JavaScript</p>
+<p>和XML）直接把客户端输入的内容作为“新的商品”显示在页面上，而不是真正地去数据库做查</p>
+<p>询。这样，卖家就可以通过这个显示，来确认产品已经发布成功了。等到卖家再刷新页面，去查看商</p>
+<p>品的时候，其实已经过了一段时间，也就达到了sleep的目的，进而也就解决了过期读的问题。也就是说，这个sleep方案确实解决了类似场景下的过期读问题。但，从严格意义上来说，这个</p>
+<p>方案存在的问题就是不精确。这个不精确包含了两层意思：</p>
+<ol>
+<li><p>如果这个查询请求本来0.5秒就可以在从库上拿到正确结果，也会等1秒；</p>
+</li>
+<li><p>如果延迟超过1秒，还是会出现过期读。看到这里，你是不是有一种“你是不是在逗我”的感觉，这个改进方案虽然可以解决类似Ajax场景</p>
+</li>
+</ol>
+<p>下的过期读问题，但还是怎么看都不靠谱儿。别着急，接下来我就和你介绍一些更准确的方案。判断主备无延迟方案</p>
+<p>要确保备库无延迟，通常有三种做法。通过前面的第25篇文章，我们知道show slave status结果里的seconds_behind_master参数的</p>
+<p>值，可以用来衡量主备延迟时间的长短。所以第一种确保主备无延迟的方法是，每次从库执行查询请求前，先判断</p>
+<p>seconds_behind_master是否已经等于0。如果还不等于0 ，那就必须等到这个参数变为0才能执</p>
+<p>行查询请求。seconds_behind_master的单位是秒，如果你觉得精度不够的话，还可以采用对比位点和GTID</p>
+<p>的方法来确保主备无延迟，也就是我们接下来要说的第二和第三种方法。如图3所示，是一个show slave status结果的部分截图。图3 show slave status结果</p>
+<p>现在，我们就通过这个结果，来看看具体如何通过对比位点和GTID来确保主备无延迟。第二种方法，对比位点确保主备无延迟：</p>
+<p>Master_Log_File和Read_Master_Log_Pos，表示的是读到的主库的最新位点；</p>
+<p>Relay_Master_Log_File和Exec_Master_Log_Pos，表示的是备库执行的最新位点。如果Master_Log_File和Relay_Master_Log_File、Read_Master_Log_Pos和</p>
+<p>Exec_Master_Log_Pos这两组值完全相同，就表示接收到的日志已经同步完成。第三种方法，对比GTID集合确保主备无延迟：</p>
+<p>Auto_Position&#x3D;1 ，表示这对主备关系使用了GTID协议。Retrieved_Gtid_Set，是备库收到的所有日志的GTID集合；</p>
+<p>Executed_Gtid_Set，是备库所有已经执行完成的GTID集合。如果这两个集合相同，也表示备库接收到的日志都已经同步完成。可见，对比位点和对比GTID这两种方法，都要比判断seconds_behind_master是否为0更准确。在执行查询请求之前，先判断从库是否同步完成的方法，相比于sleep方案，准确度确实提升了</p>
+<p>不少，但还是没有达到“精确”的程度。为什么这么说呢？我们现在一起来回顾下，一个事务的binlog在主备库之间的状态：</p>
+<ol>
+<li><p>主库执行完成，写入binlog，并反馈给客户端；</p>
+</li>
+<li><p>binlog被从主库发送给备库，备库收到；</p>
+</li>
+<li><p>在备库执行binlog完成。我们上面判断主备无延迟的逻辑，是“备库收到的日志都执行完成了”。但是，从binlog在主备之</p>
+</li>
+</ol>
+<p>间状态的分析中，不难看出还有一部分日志，处于客户端已经收到提交确认，而备库还没收到日</p>
+<p>志的状态。如图4所示就是这样的一个状态。图4 备库还没收到trx3</p>
+<p>这时，主库上执行完成了三个事务trx1、trx2和trx3，其中：</p>
+<ol>
+<li><p>trx1和trx2已经传到从库，并且已经执行完成了；</p>
+</li>
+<li><p>trx3在主库执行完成，并且已经回复给客户端，但是还没有传到从库中。如果这时候你在从库B上执行查询请求，按照我们上面的逻辑，从库认为已经没有同步延迟，但</p>
+</li>
+</ol>
+<p>还是查不到trx3的。严格地说，就是出现了过期读。那么，这个问题有没有办法解决呢？配合semi-sync</p>
+<p>要解决这个问题，就要引入半同步复制，也就是semi-sync replication。semi-sync做了这样的设计：</p>
+<ol>
+<li><p>事务提交的时候，主库把binlog发给从库；</p>
+</li>
+<li><p>从库收到binlog以后，发回给主库一个ack，表示收到了；</p>
+</li>
+<li><p>主库收到这个ack以后，才能给客户端返回“事务完成”的确认。也就是说，如果启用了semi-sync，就表示所有给客户端发送过确认的事务，都确保了备库已经</p>
+</li>
+</ol>
+<p>收到了这个日志。在第25篇文章的评论区，有同学问到：如果主库掉电的时候，有些binlog还来不及发给从库，会</p>
+<p>不会导致系统数据丢失？答案是，如果使用的是普通的异步复制模式，就可能会丢失，但semi-sync就可以解决这个问</p>
+<p>题。这样，semi-sync配合前面关于位点的判断，就能够确定在从库上执行的查询请求，可以避免过</p>
+<p>期读。但是，semi-sync+位点判断的方案，只对一主一备的场景是成立的。在一主多从场景中，主库只</p>
+<p>要等到一个从库的ack，就开始给客户端返回确认。这时，在从库上执行查询请求，就有两种情</p>
+<p>况：</p>
+<ol>
+<li><p>如果查询是落在这个响应了ack的从库上，是能够确保读到最新数据；</p>
+</li>
+<li><p>但如果是查询落到其他从库上，它们可能还没有收到最新的日志，就会产生过期读的问题。其实，判断同步位点的方案还有另外一个潜在的问题，即：如果在业务更新的高峰期，主库的位</p>
+</li>
+</ol>
+<p>点或者GTID集合更新很快，那么上面的两个位点等值判断就会一直不成立，很可能出现从库上</p>
+<p>迟迟无法响应查询请求的情况。实际上，回到我们最初的业务逻辑里，当发起一个查询请求以后，我们要得到准确的结果，其实</p>
+<p>并不需要等到“主备完全同步”。为什么这么说呢？我们来看一下这个时序图。图5 主备持续延迟一个事务</p>
+<p>图5所示，就是等待位点方案的一个bad case。图中备库B下的虚线框，分别表示relaylog和</p>
+<p>binlog中的事务。可以看到，图5中从状态1 到状态4，一直处于延迟一个事务的状态。备库B一直到状态4都和主库A存在延迟，如果用上面必须等到无延迟才能查询的方案，select语</p>
+<p>句直到状态4都不能被执行。但是，其实客户端是在发完trx1更新后发起的select语句，我们只需要确保trx1已经执行完成就可</p>
+<p>以执行select语句了。也就是说，如果在状态3执行查询请求，得到的就是预期结果了。到这里，我们小结一下，semi-sync配合判断主备无延迟的方案，存在两个问题：</p>
+<ol>
+<li><p>一主多从的时候，在某些从库执行查询请求会存在过期读的现象；</p>
+</li>
+<li><p>在持续延迟的情况下，可能出现过度等待的问题。接下来，我要和你介绍的等主库位点方案，就可以解决这两个问题。等主库位点方案</p>
+</li>
+</ol>
+<p>要理解等主库位点方案，我需要先和你介绍一条命令：</p>
+<p>这条命令的逻辑如下：</p>
+<ol>
+<li><p>它是在从库执行的；</p>
+</li>
+<li><p>参数file和pos指的是主库上的文件名和位置；</p>
+</li>
+<li><p>timeout可选，设置为正整数N表示这个函数最多等待N秒。这个命令正常返回的结果是一个正整数M，表示从命令开始执行，到应用完file和pos表示的</p>
+</li>
+</ol>
+<p>binlog位置，执行了多少事务。当然，除了正常返回一个正整数M外，这条命令还会返回一些其他结果，包括：</p>
+<ol>
+<li><p>如果执行期间，备库同步线程发生异常，则返回NULL；</p>
+</li>
+<li><p>如果等待超过N秒，就返回-1；</p>
+</li>
+<li><p>如果刚开始执行的时候，就发现已经执行过这个位置了，则返回0。对于图5中先执行trx1，再执行一个查询请求的逻辑，要保证能够查到正确的数据，我们可以使</p>
+</li>
+</ol>
+<p>用这个逻辑：</p>
+<ol>
+<li><p>trx1事务更新完成后，马上执行show master status得到当前主库执行到的File和Position；</p>
+</li>
+<li><p>选定一个从库执行查询语句；</p>
+</li>
+<li><p>在从库上执行select master_pos_wait(File, Position, 1)；</p>
+</li>
+<li><p>如果返回值是&gt;&#x3D;0的正整数，则在这个从库执行查询语句；</p>
+</li>
+<li><p>否则，到主库执行查询语句。我把上面这个流程画出来。select master_pos_wait(file, pos[, timeout]);</p>
+</li>
+</ol>
+<p>图6 master_pos_wait方案</p>
+<p>这里我们假设，这条select查询最多在从库上等待1秒。那么，如果1秒内master_pos_wait返回</p>
+<p>一个大于等于0的整数，就确保了从库上执行的这个查询结果一定包含了trx1的数据。步骤5到主库执行查询语句，是这类方案常用的退化机制。因为从库的延迟时间不可控，不能无</p>
+<p>限等待，所以如果等待超时，就应该放弃，然后到主库去查。你可能会说，如果所有的从库都延迟超过1秒了，那查询压力不就都跑到主库上了吗？确实是这</p>
+<p>样。但是，按照我们设定不允许过期读的要求，就只有两种选择，一种是超时放弃，一种是转到主库</p>
+<p>查询。具体怎么选择，就需要业务开发同学做好限流策略了。GTID方案</p>
+<p>如果你的数据库开启了GTID模式，对应的也有等待GTID的方案。MySQL中同样提供了一个类似的命令：</p>
+<p> select wait_for_executed_gtid_set(gtid_set, 1);</p>
+<p>这条命令的逻辑是：</p>
+<ol>
+<li><p>等待，直到这个库执行的事务中包含传入的gtid_set，返回0；</p>
+</li>
+<li><p>超时返回1。在前面等位点的方案中，我们执行完事务后，还要主动去主库执行show master status。而</p>
+</li>
+</ol>
+<p>MySQL 5.7.6版本开始，允许在执行完更新类事务后，把这个事务的GTID返回给客户端，这样</p>
+<p>等GTID的方案就可以减少一次查询。这时，等GTID的执行流程就变成了：</p>
+<ol>
+<li><p>trx1事务更新完成后，从返回包直接获取这个事务的GTID，记为gtid1；</p>
+</li>
+<li><p>选定一个从库执行查询语句；</p>
+</li>
+<li><p>在从库上执行 select wait_for_executed_gtid_set(gtid1, 1)；</p>
+</li>
+<li><p>如果返回值是0，则在这个从库执行查询语句；</p>
+</li>
+<li><p>否则，到主库执行查询语句。跟等主库位点的方案一样，等待超时后是否直接到主库查询，需要业务开发同学来做限流考虑。我把这个流程图画出来。图7 wait_for_executed_gtid_set方案</p>
+</li>
+</ol>
+<p>在上面的第一步中，trx1事务更新完成后，从返回包直接获取这个事务的GTID。问题是，怎么能</p>
+<p>够让MySQL在执行事务后，返回包中带上GTID呢？你只需要将参数session_track_gtids设置为OWN_GTID，然后通过API接口</p>
+<p>mysql_session_track_get_first从返回包解析出GTID的值即可。在专栏的第一篇文章中，我介绍mysql_reset_connection的时候，评论区有同学留言问这类接口</p>
+<p>应该怎么使用。这里我再回答一下。其实，MySQL并没有提供这类接口的SQL用法，是提供给程序的</p>
+<p>API(<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/c-api-functions.html)%E3%80%82%E6%AF%94%E5%A6%82%EF%BC%8C%E4%B8%BA%E4%BA%86%E8%AE%A9%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9C%A8%E4%BA%8B%E5%8A%A1%E6%8F%90%E4%BA%A4%E5%90%8E%EF%BC%8C%E8%BF%94%E5%9B%9E%E7%9A%84GITD%E8%83%BD%E5%A4%9F%E5%9C%A8%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%98%BE%E7%A4%BA%E5%87%BA%E6%9D%A5%EF%BC%8C%E6%88%91%E5%AF%B9MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%A3">https://dev.mysql.com/doc/refman/5.7/en/c-api-functions.html)。比如，为了让客户端在事务提交后，返回的GITD能够在客户端显示出来，我对MySQL客户端代</a></p>
+<p>码做了点修改，如下所示：</p>
+<p>图8 显示更新事务的GTID–代码</p>
+<p>这样，就可以看到语句执行完成，显示出GITD的值。图9 显示更新事务的GTID–效果</p>
+<p>当然了，这只是一个例子。你要使用这个方案的时候，还是应该在你的客户端代码中调用</p>
+<p>mysql_session_track_get_first这个函数。小结</p>
+<p>在今天这篇文章中，我跟你介绍了一主多从做读写分离时，可能碰到过期读的原因，以及几种应</p>
+<p>对的方案。这几种方案中，有的方案看上去是做了妥协，有的方案看上去不那么靠谱儿，但都是有实际应用</p>
+<p>场景的，你需要根据业务需求选择。即使是最后等待位点和等待GTID这两个方案，虽然看上去比较靠谱儿，但仍然存在需要权衡的</p>
+<p>情况。如果所有的从库都延迟，那么请求就会全部落到主库上，这时候会不会由于压力突然增</p>
+<p>大，把主库打挂了呢？其实，在实际应用中，这几个方案是可以混合使用的。比如，先在客户端对请求做分类，区分哪些请求可以接受过期读，而哪些请求完全不能接受过期</p>
+<p>读；然后，对于不能接受过期读的语句，再使用等GTID或等位点的方案。但话说回来，过期读在本质上是由一写多读导致的。在实际应用中，可能会有别的不需要等待就</p>
+<p>可以水平扩展的数据库方案，但这往往是用牺牲写性能换来的，也就是需要在读性能和写性能中</p>
+<p>取权衡。最后 ，我给你留下一个问题吧。假设你的系统采用了我们文中介绍的最后一个方案，也就是等GTID的方案，现在你要对主库的</p>
+<p>一张大表做DDL，可能会出现什么情况呢？为了避免这种情况，你会怎么做呢？你可以把你的分析和方案设计写在评论区，我会在下一篇文章跟你讨论这个问题。感谢你的收</p>
+<p>听，也欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
+<p>上期给你留的问题是，在GTID模式下，如果一个新的从库接上主库，但是需要的binlog已经没</p>
+<p>了，要怎么做？@某、人同学给了很详细的分析，我把他的回答略做修改贴过来。1. 如果业务允许主从不一致的情况，那么可以在主库上先执行show global variables like</p>
+<p>‘gtid_purged’，得到主库已经删除的GTID集合，假设是gtid_purged1；然后先在从库上执行</p>
+<p>reset master，再执行set global gtid_purged &#x3D;‘gtid_purged1’；最后执行start slave，就会从</p>
+<p>主库现存的binlog开始同步。binlog缺失的那一部分，数据在从库上就可能会有丢失，造成</p>
+<p>主从不一致。2. 如果需要主从数据一致的话，最好还是通过重新搭建从库来做。3. 如果有其他的从库保留有全量的binlog的话，可以把新的从库先接到这个保留了全量binlog</p>
+<p>的从库，追上日志以后，如果有需要，再接回主库。4. 如果binlog有备份的情况，可以先在从库上应用缺失的binlog，然后再执行start slave。评论区留言点赞板：</p>
+<p>@悟空 同学级联实验，验证了seconds_behind_master的计算逻辑。@_CountingStars 问了一个好问题：MySQL是怎么快速定位binlog里面的某一个GTID位置</p>
+<p>的？答案是，在binlog文件头部的Previous_gtids可以解决这个问题。@王朋飞 同学问了一个好问题，sql_slave_skip_counter跳过的是一个event，由于MySQL总</p>
+<p>不能执行一半的事务，所以既然跳过了一个event，就会跳到这个事务的末尾，因此set global</p>
+<p>sql_slave_skip_counter&#x3D;1;start slave是可以跳过整个事务的。有铭   6</p>
+<p>这专栏真的是干货满满，每看一篇我都有“我发现我真的不会使用MySQL”和“我原来把MySQL</p>
+<p>用错了”的挫败感</p>
+<p>2019-01-16</p>
+<p> 作者回复</p>
+<p>这样我觉得你和我的时间都值了 </p>
+<p>把你更新了认识的点发到评论区，这样会印象更深哈 </p>
+<p>2019-01-16</p>
+<p>某、人   3</p>
+<p>老师我先请教两个问题(估计大多数同学都有这个疑惑) :</p>
+<p>1.现在的中间件可以说是乱花渐欲迷人眼,请问老师哪一款中间件适合大多数不分库分表,只是做</p>
+<p>读写分离业务的proxy,能推荐一款嘛?毕竟大多数公司都没有专门做中间件开发的团队</p>
+<p>2.如果是业务上进行了分库分表,老师能推荐一款分库分表的proxy嘛？我目前了解到的针对分库</p>
+<p>分表的proxy都或多或少有些问题。不过分布式数据库是一个趋势也是一个难点。2019-01-16</p>
+<p> 作者回复</p>
+<p>额，这个最难回答了</p>
+<p>精选留言</p>
+<p>说实话因为我原来团队是团队自己做的proxy（没有开源），所以我对其他proxy用得并不多，</p>
+<p>实在不敢随便指一个。如果我说个比较熟悉的话，可能MariaDB MaxScale还不错</p>
+<p>2019-01-17</p>
+<p>曾剑   2</p>
+<p>老师写的每一篇文章都能让我获益良多。每一篇都值得看好几遍。今天的问题，大表做DDL的时候可能会出现主从延迟，导致等 GTID 的方案可能会导致这部分</p>
+<p>流量全打到主库，或者全部超时。如果这部分流量太大的话，我会选择上一篇文章介绍的两种方法：</p>
+<p>1.在各个从库先SET sql_log_bin &#x3D; OFF，然后做DDL，所有从库及备主全做完之后，做主从切</p>
+<p>换，最后在原来的主库用同样的方式做DDL。2.从库上执行DDL；将从库上执行DDL产生的GTID在主库上利用生成一个空事务GTID的方式将</p>
+<p>这个GTID在主库上生成出来。各个从库做完之后再主从切换，然后再在原来的主库上同样做一次。需要注意的是如果有MM架构的情况下，承担写职责的主库上的slave需要先停掉。2019-01-16</p>
+<p> 作者回复</p>
+<p>  表示这两篇文章你都get到了</p>
+<p>2019-01-16</p>
+<p>二马   2</p>
+<p>最近做性能测试时发现当并发用户达到一定量(比如500)，部分用户连接不上，能否介绍下MyS</p>
+<p>QL连接相关问题，谢谢！</p>
+<p>2019-01-16</p>
+<p> 作者回复</p>
+<p>修改max_connections参数</p>
+<p>2019-01-16</p>
+<p>IceGeek17   1</p>
+<p>老师，能不能分析下，如果去实现一个做读写分离的proxy，有哪些重要的点要考虑，比如：连</p>
+<p>接管理、流量分配管理、proxy自己的高可用，等等。因为老师原来的团队自己开发过proxy，肯定有相关的经验，也趟过很多坑，能不能从如何实现</p>
+<p>一个proxy需要考虑哪些关键点，在架构上做一个分析和梳理</p>
+<p>2019-01-29</p>
+<p> 作者回复</p>
+<p>额，这个问题有点大… 你提一个具体问题我们来讨论吧</p>
+<p>2019-01-31</p>
+<p>猪哥哥   1</p>
+<p>老师, 你真棒, 我公司的生产环境解决过期读使用的就是强制走主库方案, 看了这篇文章, 困惑了</p>
+<p>很久的问题迎刃而解！很感谢!</p>
+<p>2019-01-17</p>
+<p>易翔   1</p>
+<p>为老师一句你的时间和我的时间都值了。点赞</p>
+<p>2019-01-16</p>
+<p>Mr.Strive.Z.H.L   0</p>
+<p>老师您好：</p>
+<p>关于主库大表的DDL操作，我看了问题答案，有两种方案。第一种是读写请求转到主库，在主</p>
+<p>库上做DDL。第二种是从库上做DDL，完成后进行主从切换。关于第二种，有一个疑惑：</p>
+<p>从库上做DDL，读写请求走主库，等到从库完成后，从库必须要同步DDL期间，主库完成的事</p>
+<p>务后才能进行主从切换。而如果DDL操作是删除一列，那么在同步过程中会出错呀？（比如抛</p>
+<p>出这一列不存在的错误）。2019-01-21</p>
+<p> 作者回复</p>
+<p>你说得对，这种方案下能支持的DDL只有以下几种：</p>
+<p>创建&amp;#47;删除索引、新增最后一列、删除最后一列</p>
+<p>其中DBA会认为“合理”的DDL需求就是： “创建&amp;#47;删除索引、新增最后一列”</p>
+<p>新春快乐~</p>
+<p>2019-02-04</p>
+<p>black_mirror   0</p>
+<p>林老师 您好</p>
+<p>1.mysql_session_track_get_fitst这个函数，从github下载mysql源码后怎么尝试简单编译，如图</p>
+<p>8？2. mysql_session_track_get_fitst这个函数貌似不支持python语言，我想模拟文中等gtid方法，</p>
+<p>不会java怎么办？2019-01-21</p>
+<p>black_mirror   0</p>
+<p>林老师 您好</p>
+<p>请问mysql_session_track_get_fitst这个函数查询了官方资料都需要可以修改源码</p>
+<p>1.在不懂c++情况下，github上下载源码后怎么尝试简单编译使用，如图8代码</p>
+<ol start="2">
+<li>mysql_session_track_get_fitst函数貌似没有python语言api，不会java，想在代码层面模拟整</li>
+</ol>
+<p>个过程，还有木有解决方法？2019-01-21</p>
+<p> 作者回复</p>
+<p>不知道python是不是有方法可以把c代码作为扩展模块 </p>
+<p>2019-01-21</p>
+<p>辣椒   0</p>
+<p>辣椒   0</p>
+<p>老师，mysql_session_track_get_first是c的，有没有java的？2019-01-18</p>
+<p> 作者回复</p>
+<p>额，这个我还真不知道 ，抱歉哈。2019-01-18</p>
+<p>信信   0</p>
+<p>老师您好，文中判断主备无延迟方案的第二种和第三种方法，都是对比了主从执行完的日志是</p>
+<p>否相同。因为不会出现图4下方说的：“从库认为已经没有同步延迟，但还是查不到 trx3 的。”因</p>
+<p>为如果从库未执行trx3的话，第二，第三种方法都是不通过的。2019-01-18</p>
+<p> 作者回复</p>
+<p>不会哦</p>
+<p>如果trx3还没传到备库，备库是会认为已经同步完成了</p>
+<p>2019-01-18</p>
+<p>Max   0</p>
+<p>我一般是先是在从库上设置 set_log_bin&#x3D;off，然后执行ddl,语句。然后完成以后，主从做一下切换。然后在主库上在执行一下set_log_bin&#x3D;off,执行ddl语句。然后在做一下主从切换。个人对pt-online-scheman-change不是很推荐使用，它的原理基本是创建触发器，然后创建和</p>
+<p>旧表一样结构的数据表，</p>
+<p>把旧表的数据复制过去。最后删除旧表。以前做个一个测试，如果旧表一直在被select,删除过</p>
+<p>程会一直会等待。所以个人不是很建议。万一不小心变成从删库到路步，那就得不偿失了。老师，有个问题想请教一下，一主多从可以多到什么地步，以前我们CTO解决的方案就是加机</p>
+<p>器，一主十三从。当时我是反对的，其实个人建议还是从SQL，业务上面去优化。而不是一味的加机器。如果加</p>
+<p>机器解决的话，还要DBA做什么呢？2019-01-17</p>
+<p> 作者回复</p>
+<p>前面的分析很好哈</p>
+<p>然后一主13从有点多了，否则主库生成binlog太快的话，主库的网卡会被打爆。要这么多的话</p>
+<p>，得做级联。DBA解决不能靠加机器解决的事情^_^ 而且如果通过优化，可以把13变成3，那也是DBA的价值</p>
+<p>2019-01-17</p>
+<p>coderfocus   0</p>
+<p>一步一步 循序渐渐 讲的太棒了 感谢老师</p>
+<p>2019-01-17</p>
+<p>ThinkingQuest   0</p>
+<p>楼上有人提到8小时自动断开连接的问题。 </p>
+<p>mysql中有wait_timeout和interactive_timeout两个参数。 </p>
+<p>这俩参数挺容易混淆的，往上博客文章说的很多，但是不敢相信他们。官方的解释在这里：</p>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_interactive_time">https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_interactive_time</a></p>
+<p>out</p>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_wait_timeout">https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_wait_timeout</a></p>
+<p>只说用这两个参数中的哪个，取决于客户端调用mysql_real_connect()的时候传递的options中</p>
+<p>是否使用了CLIENT_INTERACTIVE选项。但是很多做java开发的同学，想必并不知道JDBC的connector用的是哪一个。 </p>
+<p>我倾向于认为是interactive_timeout。 mysql client cli大概是wait_timeout吧。其实做一个实验就可以知道结果。 但是不阅读mysql代码，大概不能理解mysql为什么设计这么</p>
+<p>两个timeout，是出于什么考虑的。2019-01-17</p>
+<p> 作者回复</p>
+<p>JDBC的connector我也没研究过，不过我认为应该是非interactive模式。需要这两个的原因，还是因为有不同的使用模式，给MySQL客户端和一些其他的可视化工具客</p>
+<p>户端使用。2019-01-17</p>
+<p>不停   0</p>
+<p>高手，你这现在在哪里上班了，有兴趣来我们公司耍耍么？2019-01-16</p>
+<p>万勇   0</p>
+<p>老师，请教下。1.对大表做ddl，是可以采用先在备库上set global log_bin&#x3D;off，先做完ddl，然后切换主备库。为了保证数据一致性，在切主备的时候，数据库会有个不可用的时间段，对业务会造成影响。现在的架构方式，中间层还有proxy，意味着proxy也需要修改主备配置，做reload。这样做的话</p>
+<p>，感觉成本太高，在真正的生产环境中，这种方法适用吗？2.目前我们常采用的是对几百万以上的表用pt-online-schema-change，这种方式会产生大量的b</p>
+<p>inlog，业务高峰期不能做，会引起主备延迟。在生产业务中，我觉得等主库节点或者等gtid这</p>
+<p>种方案挺不错，至少能保证业务，但也会增加主库的压力。3.5.7版本出的group_replication多写模式性能不知道如何？架构变动太大，还不敢上。2019-01-16</p>
+<p> 作者回复</p>
+<ol>
+<li>是这样的，我们说的是，如果非紧急情况下，还是尽量用gh-ost，在“紧急”的情况下，才这么</li>
+</ol>
+<p>做；确实是要绕过proxy的，也就是说，这事儿是要负责运维的同学做；</p>
+<ol start="2">
+<li>pt工具是有这个问题，试一下gh-ost哈；group_replication多写模式国内我还没有听到国内有</li>
+</ol>
+<p>公司在生产上大规模用的，如果你有使用经验，分享一下哈</p>
+<p>2019-01-16</p>
+<p>永恒记忆   0</p>
+<p>老师好，有几个问题想请教下，</p>
+<p>1.如果不想有过期读，用等GTID的方案，那么每次查询都要有等GTID的相关操作，增加的这部</p>
+<p>分对性能有多少影响；</p>
+<p>2.我们用的读写分离proxy不支持等GTID，那是不是自己要在客户端实现这部分逻辑，等于读写</p>
+<p>分离的架构既用了proxy，又在客户端做了相关策略，感觉这方案更适合有能力自研proxy的公</p>
+<p>司啊；</p>
+<p>3.感觉目前大多数生产环境还是用的读主库这种方式避免过期读，如果只能用这种方案的话该</p>
+<p>怎么扩展mysql架构来避免主库压力太大呢。我们是项目上线很久然后加的读写分离，好多service层代码写的不好，可以读从库的sql被写到</p>
+<p>了事务中，这样会被proxy转到主库上读，所以导致主库负担了好多读的sql，感觉读写分离不</p>
+<p>仅对mysql这块要掌握，整体的代码结构上也要有所调整吧。2019-01-16</p>
+<p> 作者回复</p>
+<ol>
+<li><p>这个等待时间其实就基本上是主备延迟的时间</p>
+</li>
+<li><p>用了proxy这事情就得proxy做了，就不要客户端做了。没有gtid，可以用倒数第二种方法呀：</p>
+</li>
+</ol>
+<p>）</p>
+<ol start="3">
+<li>是的，其实“走主库”这种做法还挺多的。我之前看到有的公司的做法，就是直接拆库了。等</li>
+</ol>
+<p>于一套“一主多从”拆成多套。2019-01-16</p>
+<p>HuaMax   0</p>
+<p>课后题。对大表做ddl是一个大事务，等待从库执行，基本就会超时，最后都返回到主库执行，</p>
+<p>这样的话不如跳过等待从库这一步，但是像老师文中提到需要做好限流。从另一个角度，对于</p>
+<p>主库的ddl操作，从业务场景去考虑，一般随后到来的查询不会被这个ddl影响，而是对新的业务</p>
+<p>变更有影响，这样的话，也可以跳过等待从库这一步，直接让从库执行即可。不知道理解是否</p>
+<p>正确？2019-01-16</p>
+<p> 作者回复</p>
+<p>核心是要处理延迟问题，比如怎么操作可以不会产生延迟</p>
+<p>2019-01-16</p>
+<ul>
+<li>晓 *   0</li>
+</ul>
+<p>老师好，如果用MGR或InnoDB cluster方案做读写分离的话可以替代文中提到的方案吗？这两</p>
+<p>个方案建议在生产中大量使用吗？2019-01-16</p>
+<p> 作者回复</p>
+<p>MGR开始有国内公司在使用了</p>
+<p>InnoDB cluster也可以的，但是一般就是平时一写多读，只在主备切换的时候，短暂允许多写</p>
+<p>2019-01-16</p>
+<pre><code>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/fc93d163.html" rel="prev" title="mysql-主库出问题了从库怎么办">
+      <i class="fa fa-chevron-left"></i> mysql-主库出问题了从库怎么办
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/e5c71a8.html" rel="next" title="mysql-如何判断一个数据库是不是出问题了">
+      mysql-如何判断一个数据库是不是出问题了 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">390k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:40</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题解析34 | 到底可不可以使用join？2019-01-30 林晓斌 在实际生产中，关于join语句使用的问题，一般会集中在以下两类：  我们DBA不让使用join，使用join有什么问题呢？2. 如果有两个大小不同的表做join，应该用哪个表做驱动表呢？今天这篇文章，我就先跟你说说join语句到底是怎么执行的，然后再来回答这两个问题。为了便于量化分析，我还是创建两个表t1和t2来和你说明。可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql-到底可不可以使用join">
+<meta property="og:url" content="https://www.fastolf.com/posts/db4372f3.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="问题解析34 | 到底可不可以使用join？2019-01-30 林晓斌 在实际生产中，关于join语句使用的问题，一般会集中在以下两类：  我们DBA不让使用join，使用join有什么问题呢？2. 如果有两个大小不同的表做join，应该用哪个表做驱动表呢？今天这篇文章，我就先跟你说说join语句到底是怎么执行的，然后再来回答这两个问题。为了便于量化分析，我还是创建两个表t1和t2来和你说明。可">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-08T22:12:07.000Z">
+<meta property="article:modified_time" content="2023-01-06T09:44:03.183Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/db4372f3.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>mysql-到底可不可以使用join | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/db4372f3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql-到底可不可以使用join
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-09 06:12:07" itemprop="dateCreated datePublished" datetime="2019-12-09T06:12:07+08:00">2019-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>25 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>34 | 到底可不可以使用join？2019-01-30 林晓斌</p>
+<p>在实际生产中，关于join语句使用的问题，一般会集中在以下两类：</p>
+<ol>
+<li>我们DBA不让使用join，使用join有什么问题呢？2. 如果有两个大小不同的表做join，应该用哪个表做驱动表呢？今天这篇文章，我就先跟你说说join语句到底是怎么执行的，然后再来回答这两个问题。为了便于量化分析，我还是创建两个表t1和t2来和你说明。可以看到，这两个表都有一个主键索引id和一个索引a，字段b上无索引。存储过程idata()往表t2</li>
+</ol>
+<p>里插入了1000行数据，在表t1里插入的是100行数据。Index Nested-Loop Join</p>
+<p>我们来看一下这个语句：</p>
+<p>如果直接使用join语句，MySQL优化器可能会选择表t1或t2作为驱动表，这样会影响我们分析</p>
+<p>SQL语句的执行过程。所以，为了便于分析执行过程中的性能问题，我改用straight_join让</p>
+<p>MySQL使用固定的连接方式执行查询，这样优化器只会按照我们指定的方式去join。在这个语句</p>
+<p>CREATE TABLE t̀2  ̀(</p>
+<p>  ìd  ̀int(11) NOT NULL,</p>
+<p>  &#96;a  ̀int(11) DEFAULT NULL,</p>
+<p>  &#96;b  ̀int(11) DEFAULT NULL,</p>
+<p>  PRIMARY KEY (̀ id )̀,</p>
+<p>  KEY &#96;a  ̀(̀ a )̀</p>
+<p>) ENGINE&#x3D;InnoDB;</p>
+<p>drop procedure idata;</p>
+<p>delimiter ;;</p>
+<p>create procedure idata()</p>
+<p>begin</p>
+<p>  declare i int;</p>
+<p>  set i&#x3D;1;</p>
+<p>  while(i&lt;&#x3D;1000)do</p>
+<pre><code>insert into t2 values(i, i, i);
+
+set i=i+1;
+</code></pre>
+<p>  end while;</p>
+<p>end;;</p>
+<p>delimiter ;</p>
+<p>call idata();</p>
+<p>create table t1 like t2;</p>
+<p>insert into t1 (select * from t2 where id&lt;&#x3D;100)</p>
+<p>select * from t1 straight_join t2 on (t1.a&#x3D;t2.a);</p>
+<p>里，t1 是驱动表，t2是被驱动表。现在，我们来看一下这条语句的explain结果。图1 使用索引字段join的 explain结果</p>
+<p>可以看到，在这条语句里，被驱动表t2的字段a上有索引，join过程用上了这个索引，因此这个语</p>
+<p>句的执行流程是这样的：</p>
+<ol>
+<li><p>从表t1中读入一行数据 R；</p>
+</li>
+<li><p>从数据行R中，取出a字段到表t2里去查找；</p>
+</li>
+<li><p>取出表t2中满足条件的行，跟R组成一行，作为结果集的一部分；</p>
+</li>
+<li><p>重复执行步骤1到3，直到表t1的末尾循环结束。这个过程是先遍历表t1，然后根据从表t1中取出的每行数据中的a值，去表t2中查找满足条件的</p>
+</li>
+</ol>
+<p>记录。在形式上，这个过程就跟我们写程序时的嵌套查询类似，并且可以用上被驱动表的索引，</p>
+<p>所以我们称之为“Index Nested-Loop Join”，简称NLJ。它对应的流程图如下所示：</p>
+<p>图2 Index Nested-Loop Join算法的执行流程</p>
+<p>在这个流程里：</p>
+<ol>
+<li><p>对驱动表t1做了全表扫描，这个过程需要扫描100行；</p>
+</li>
+<li><p>而对于每一行R，根据a字段去表t2查找，走的是树搜索过程。由于我们构造的数据都是一一</p>
+</li>
+</ol>
+<p>对应的，因此每次的搜索过程都只扫描一行，也是总共扫描100行；</p>
+<ol start="3">
+<li>所以，整个执行流程，总扫描行数是200。现在我们知道了这个过程，再试着回答一下文章开头的两个问题。先看第一个问题：能不能使用join?</li>
+</ol>
+<p>假设不使用join，那我们就只能用单表查询。我们看看上面这条语句的需求，用单表查询怎么实</p>
+<p>现。1. 执行select * from t1，查出表t1的所有数据，这里有100行；</p>
+<ol start="2">
+<li>循环遍历这100行数据：</li>
+</ol>
+<p>从每一行R取出字段a的值$R.a；</p>
+<p>执行select * from t2 where a&#x3D;$R.a；</p>
+<p>把返回的结果和R构成结果集的一行。可以看到，在这个查询过程，也是扫描了200行，但是总共执行了101条语句，比直接join多了</p>
+<p>100次交互。除此之外，客户端还要自己拼接SQL语句和结果。显然，这么做还不如直接join好。我们再来看看第二个问题：怎么选择驱动表？在这个join语句执行过程中，驱动表是走全表扫描，而被驱动表是走树搜索。假设被驱动表的行数是M。每次在被驱动表查一行数据，要先搜索索引a，再搜索主键索引。每</p>
+<p>次搜索一棵树近似复杂度是以2为底的M的对数，记为log M，所以在被驱动表上查一行的时间复</p>
+<p>杂度是 2*log M。假设驱动表的行数是N，执行过程就要扫描驱动表N行，然后对于每一行，到被驱动表上匹配一</p>
+<p>次。因此整个执行过程，近似复杂度是 N + N<em>2</em>log M。显然，N对扫描行数的影响更大，因此应该让小表来做驱动表。到这里小结一下，通过上面的分析我们得到了两个结论：</p>
+<ol>
+<li><p>使用join语句，性能比强行拆成多个单表执行SQL语句的性能要好；</p>
+</li>
+<li><p>如果使用join语句的话，需要让小表做驱动表。但是，你需要注意，这个结论的前提是“可以使用被驱动表的索引”。接下来，我们再看看被驱动表用不上索引的情况。Simple Nested-Loop Join</p>
+</li>
+</ol>
+<p>现在，我们把SQL语句改成这样：</p>
+<p>由于表t2的字段b上没有索引，因此再用图2的执行流程时，每次到t2去匹配的时候，就要做一次</p>
+<p>2</p>
+<p>2</p>
+<p>2</p>
+<p>如果你没觉得这个影响有那么“显然”， 可以这么理解：N扩大1000倍的话，扫描行数就会扩大</p>
+<p>1000倍；而M扩大1000倍，扫描行数扩大不到10倍。select * from t1 straight_join t2 on (t1.a&#x3D;t2.b);</p>
+<p>全表扫描。你可以先设想一下这个问题，继续使用图2的算法，是不是可以得到正确的结果呢？如果只看结</p>
+<p>果的话，这个算法是正确的，而且这个算法也有一个名字，叫做“Simple Nested-Loop Join”。但是，这样算来，这个SQL请求就要扫描表t2多达100次，总共扫描100*1000&#x3D;10万行。这还只是两个小表，如果t1和t2都是10万行的表（当然了，这也还是属于小表的范围），就要扫</p>
+<p>描100亿行，这个算法看上去太“笨重”了。当然，MySQL也没有使用这个Simple Nested-Loop Join算法，而是使用了另一个叫作“Block</p>
+<p>Nested-Loop Join”的算法，简称BNL。Block Nested-Loop Join</p>
+<p>这时候，被驱动表上没有可用的索引，算法的流程是这样的：</p>
+<ol>
+<li>把表t1的数据读入线程内存join_buffer中，由于我们这个语句中写的是select *，因此是把整</li>
+</ol>
+<p>个表t1放入了内存；</p>
+<ol start="2">
+<li>扫描表t2，把表t2中的每一行取出来，跟join_buffer中的数据做对比，满足join条件的，作为</li>
+</ol>
+<p>结果集的一部分返回。这个过程的流程图如下：</p>
+<p>图3 Block Nested-Loop Join 算法的执行流程</p>
+<p>对应地，这条SQL语句的explain结果如下所示：</p>
+<p>图4 不使用索引字段join的 explain结果</p>
+<p>可以看到，在这个过程中，对表t1和t2都做了一次全表扫描，因此总的扫描行数是1100。由于</p>
+<p>join_buffer是以无序数组的方式组织的，因此对表t2中的每一行，都要做100次判断，总共需要</p>
+<p>在内存中做的判断次数是：100*1000&#x3D;10万次。前面我们说过，如果使用Simple Nested-Loop Join算法进行查询，扫描行数也是10万行。因</p>
+<p>此，从时间复杂度上来说，这两个算法是一样的。但是，Block Nested-Loop Join算法的这10万</p>
+<p>次判断是内存操作，速度上会快很多，性能也更好。接下来，我们来看一下，在这种情况下，应该选择哪个表做驱动表。假设小表的行数是N，大表的行数是M，那么在这个算法里：</p>
+<ol>
+<li><p>两个表都做一次全表扫描，所以总的扫描行数是M+N；</p>
+</li>
+<li><p>内存中的判断次数是M*N。可以看到，调换这两个算式中的M和N没差别，因此这时候选择大表还是小表做驱动表，执行耗</p>
+</li>
+</ol>
+<p>时是一样的。然后，你可能马上就会问了，这个例子里表t1才100行，要是表t1是一个大表，join_buffer放不</p>
+<p>下怎么办呢？join_buffer的大小是由参数join_buffer_size设定的，默认值是256k。如果放不下表t1的所有数</p>
+<p>据话，策略很简单，就是分段放。我把join_buffer_size改成1200，再执行：</p>
+<p>执行过程就变成了：</p>
+<ol>
+<li><p>扫描表t1，顺序读取数据行放入join_buffer中，放完第88行join_buffer满了，继续第2步；</p>
+</li>
+<li><p>扫描表t2，把t2中的每一行取出来，跟join_buffer中的数据做对比，满足join条件的，作为结</p>
+</li>
+</ol>
+<p>果集的一部分返回；</p>
+<ol start="3">
+<li><p>清空join_buffer；</p>
+</li>
+<li><p>继续扫描表t1，顺序读取最后的12行数据放入join_buffer中，继续执行第2步。执行流程图也就变成这样：</p>
+</li>
+</ol>
+<p>select * from t1 straight_join t2 on (t1.a&#x3D;t2.b);</p>
+<p>图5 Block Nested-Loop Join – 两段</p>
+<p>图中的步骤4和5，表示清空join_buffer再复用。这个流程才体现出了这个算法名字中“Block”的由来，表示“分块去join”。可以看到，这时候由于表t1被分成了两次放入join_buffer中，导致表t2会被扫描两次。虽然分成</p>
+<p>两次放入join_buffer，但是判断等值条件的次数还是不变的，依然是(88+12)<em>1000&#x3D;10万次。我们再来看下，在这种情况下驱动表的选择问题。假设，驱动表的数据行数是N，需要分K段才能完成算法流程，被驱动表的数据行数是M。注意，这里的K不是常数，N越大K就会越大，因此把K表示为λ</em>N，显然λ的取值范围是(0,1)。所以，在这个算法的执行过程中：</p>
+<ol>
+<li><p>扫描行数是 N+λ<em>N</em>M；</p>
+</li>
+<li><p>内存判断 N*M次。显然，内存判断次数是不受选择哪个表作为驱动表影响的。而考虑到扫描行数，在M和N大小确</p>
+</li>
+</ol>
+<p>定的情况下，N小一些，整个算式的结果会更小。所以结论是，应该让小表当驱动表。当然，你会发现，在N+λ<em>N</em>M这个式子里，λ才是影响扫描行数的关键因素，这个值越小越好。刚刚我们说了N越大，分段数K越大。那么，N固定的时候，什么参数会影响K的大小呢？（也就</p>
+<p>是λ的大小）答案是join_buffer_size。join_buffer_size越大，一次可以放入的行越多，分成的段</p>
+<p>数也就越少，对被驱动表的全表扫描次数就越少。这就是为什么，你可能会看到一些建议告诉你，如果你的join语句很慢，就把join_buffer_size改</p>
+<p>大。理解了MySQL执行join的两种算法，现在我们再来试着回答文章开头的两个问题。第一个问题：能不能使用join语句？1. 如果可以使用Index Nested-Loop Join算法，也就是说可以用上被驱动表上的索引，其实是</p>
+<p>没问题的；</p>
+<ol start="2">
+<li>如果使用Block Nested-Loop Join算法，扫描行数就会过多。尤其是在大表上的join操作，这</li>
+</ol>
+<p>样可能要扫描被驱动表很多次，会占用大量的系统资源。所以这种join尽量不要用。所以你在判断要不要使用join语句时，就是看explain结果里面，Extra字段里面有没有出现“Block</p>
+<p>Nested Loop”字样。第二个问题是：如果要使用join，应该选择大表做驱动表还是选择小表做驱动表？1. 如果是Index Nested-Loop Join算法，应该选择小表做驱动表；</p>
+<ol start="2">
+<li>如果是Block Nested-Loop Join算法：</li>
+</ol>
+<p>在join_buffer_size足够大的时候，是一样的；</p>
+<p>在join_buffer_size不够大的时候（这种情况更常见），应该选择小表做驱动表。所以，这个问题的结论就是，总是应该使用小表做驱动表。当然了，这里我需要说明下，什么叫作“小表”。我们前面的例子是没有加条件的。如果我在语句的where条件加上 t2.id&lt;&#x3D;50这个限定条件，再来</p>
+<p>看下这两条语句：</p>
+<p>select * from t1 straight_join t2 on (t1.b&#x3D;t2.b) where t2.id&lt;&#x3D;50;</p>
+<p>select * from t2 straight_join t1 on (t1.b&#x3D;t2.b) where t2.id&lt;&#x3D;50;</p>
+<p>注意，为了让两条语句的被驱动表都用不上索引，所以join字段都使用了没有索引的字段b。但如果是用第二个语句的话，join_buffer只需要放入t2的前50行，显然是更好的。所以这里，“t2</p>
+<p>的前50行”是那个相对小的表，也就是“小表”。我们再来看另外一组例子：</p>
+<p>这个例子里，表t1 和 t2都是只有100行参加join。但是，这两条语句每次查询放入join_buffer中</p>
+<p>的数据是不一样的：</p>
+<p>表t1只查字段b，因此如果把t1放到join_buffer中，则join_buffer中只需要放入b的值；</p>
+<p>表t2需要查所有的字段，因此如果把表t2放到join_buffer中的话，就需要放入三个字段id、a和</p>
+<p>b。这里，我们应该选择表t1作为驱动表。也就是说在这个例子里，“只需要一列参与join的表t1”是那</p>
+<p>个相对小的表。所以，更准确地说，在决定哪个表做驱动表的时候，应该是两个表按照各自的条件过滤，过</p>
+<p>滤完成之后，计算参与join的各个字段的总数据量，数据量小的那个表，就是“小表”，应该</p>
+<p>作为驱动表。小结</p>
+<p>今天，我和你介绍了MySQL执行join语句的两种可能算法，这两种算法是由能否使用被驱动表的</p>
+<p>索引决定的。而能否用上被驱动表的索引，对join语句的性能影响很大。通过对Index Nested-Loop Join和Block Nested-Loop Join两个算法执行过程的分析，我们也得到</p>
+<p>了文章开头两个问题的答案：</p>
+<ol>
+<li><p>如果可以使用被驱动表的索引，join语句还是有其优势的；</p>
+</li>
+<li><p>不能使用被驱动表的索引，只能使用Block Nested-Loop Join算法，这样的语句就尽量不要</p>
+</li>
+</ol>
+<p>使用；</p>
+<ol start="3">
+<li>在使用join的时候，应该让小表做驱动表。最后，又到了今天的问题时间。我们在上文说到，使用Block Nested-Loop Join算法，可能会因为join_buffer不够大，需要对被</li>
+</ol>
+<p>select t1.b,t2.* from  t1  straight_join t2 on (t1.b&#x3D;t2.b) where t2.id&lt;&#x3D;100;</p>
+<p>select t1.b,t2.* from  t2  straight_join t1 on (t1.b&#x3D;t2.b) where t2.id&lt;&#x3D;100;</p>
+<p>驱动表做多次全表扫描。我的问题是，如果被驱动表是一个大表，并且是一个冷数据表，除了查询过程中可能会导致IO压</p>
+<p>力大以外，你觉得对这个MySQL服务还有什么更严重的影响吗？（这个问题需要结合上一篇文</p>
+<p>章的知识点）</p>
+<p>你可以把你的结论和分析写在留言区，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收</p>
+<p>听，也欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
+<p>我在上一篇文章最后留下的问题是，如果客户端由于压力过大，迟迟不能接收数据，会对服务端</p>
+<p>造成什么严重的影响。这个问题的核心是，造成了“长事务”。至于长事务的影响，就要结合我们前面文章中提到的锁、MVCC的知识点了。如果前面的语句有更新，意味着它们在占用着行锁，会导致别的语句更新被锁住；</p>
+<p>当然读的事务也有问题，就是会导致undo log不能被回收，导致回滚段空间膨胀。评论区留言点赞板：</p>
+<p>@老杨同志 提到了更新之间会互相等锁的问题。同一个事务，更新之后要尽快提交，不要做</p>
+<p>没必要的查询，尤其是不要执行需要返回大量数据的查询；</p>
+<p>@长杰 同学提到了undo表空间变大，db服务堵塞，服务端磁盘空间不足的例子。没时间了ngu   0</p>
+<p>join这种用的多的，看完还是有很大收获的。像之前讲的锁之类，感觉好抽象，老是记不住，唉</p>
+<p>。2019-01-30</p>
+<p> 作者回复</p>
+<p>嗯嗯，因为其实每个同学的只是背景不一样。这45讲里，每个同学都能从部分文章感觉到有收获，我觉得也很好了 </p>
+<p>不过 锁其实用得也多的。。我以前负责业务库的时候，被开发同学问最多的问题之一就是，为啥死锁了^_^</p>
+<p>2019-01-30</p>
+<p>抽离の    8</p>
+<p>早上听老师一节课感觉获益匪浅</p>
+<p>2019-01-30</p>
+<p> 作者回复</p>
+<p>好早呀 </p>
+<p>2019-01-30</p>
+<p>信信   6</p>
+<p>老师好，回答本期问题：如果驱动表分段，那么被驱动表就被多次读，而被驱动表又是大表，</p>
+<p>循环读取的间隔肯定得超1秒，这就会导致上篇文章提到的：“数据页在LRU_old的存在时间超</p>
+<p>过1秒，就会移到young区”。最终结果就是把大部分热点数据都淘汰了，导致“Buffer pool hit rat</p>
+<p>e”命中率极低，其他请求需要读磁盘，因此系统响应变慢，大部分请求阻塞。2019-01-30</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-01-30</p>
+<p>老杨同志   3</p>
+<p>对被驱动表进行全表扫描，会把冷数据的page加入到buffer pool.,并且block nested-loop要扫描</p>
+<p>多次，两次扫描的时间可能会超过1秒，使lru的那个优化失效，把热点数据从buffer pool中淘汰</p>
+<p>掉，影响正常业务的查询效率</p>
+<p>2019-01-30</p>
+<p> 作者回复</p>
+<p>漂亮 </p>
+<p>2019-01-30</p>
+<p>萤火虫   3</p>
+<p>精选留言</p>
+<p>萤火虫   3</p>
+<p>年底了有一种想跳槽的冲动 身在武汉的我想出去看看 可一想到自身的能力和学历 又不敢去了 </p>
+<p>苦恼…</p>
+<p>2019-01-30</p>
+<p> 作者回复</p>
+<p>今年这情况还是要先克制一下^_^ </p>
+<p>先把内功练起来 </p>
+<p>2019-01-30</p>
+<p>清风浊酒   2</p>
+<p>老师您好，left join 和 right join 会固定驱动表吗？2019-01-30</p>
+<p> 作者回复</p>
+<p>不会强制，但是由于语义的关系，大概率上是按照语句上写的关系去驱动，效率是比较高的</p>
+<p>2019-01-30</p>
+<p>柚子   2</p>
+<p>join在热点表操作中，join查询是一次给两张表同时加锁吧，会不会增大锁冲突的几率？业务中肯定要使用被驱动表的索引，通常我们是先在驱动表查出结果集，然后再通过in被驱动</p>
+<p>表索引字段，分两步查询，这样是否比直接join委托点？2019-01-30</p>
+<p> 作者回复</p>
+<p>join也是普通查询，都不需要加锁哦，参考下MVCC那篇；</p>
+<p>就是我们文中说的，“分两步查询，先查驱动表，然后查多个in”，如果可以用上被驱动表的索引</p>
+<p>，我觉得可以用上Index Nested-Loop Join算法，其实效果是跟拆开写类似的</p>
+<p>2019-01-30</p>
+<p>郝攀刚จุ๊บ   1</p>
+<p>业务逻辑关系，一个SQL中left join7，8个表。这我该怎么优化。每次看到这些脑壳就大！</p>
+<p>2019-01-30</p>
+<p> 作者回复</p>
+<p> </p>
+<p>Explain下，没用用index nested-loop 的全要优化</p>
+<p>2019-01-31</p>
+<p>Zzz   1</p>
+<p>林老师，我没想清楚为什么会进入young区域。假设大表t大小是M页&gt;old区域N页，由于Block </p>
+<p>Nested-Loop Join需要对t进行k次全表扫描。第一次扫描时，1~N页依次被放入old区域，访问</p>
+<p>N+1页时淘汰1页，放入N+1页，以此类推，第一次扫描结束后old区域存放的是M-N+1~M页。第二次扫描开始，访问1页，淘汰M-N+1页，放入1页。可以把M页想象成一个环，N页想象成</p>
+<p>在这个环上滑动的窗口，由于M&gt;N，不管是哪次扫描，需要访问的页都不会在滑动窗口上，所</p>
+<p>以不会存在“被访问的时候数据页在 LRU 链表中存在的时间超过了 1 秒“而被放入young的情况</p>
+<p>。我能想到的会被放入young区域的情况是，在当次扫描中，由于一页上有多行数据，需要对</p>
+<p>该页访问多次，超过了1s，不管这种情况就和t大小没关系了，而是由于page size太大，而一行</p>
+<p>数据太少。2019-01-30</p>
+<p> 作者回复</p>
+<p>你说得对，分两类情况，</p>
+<p>小于bp 3&#x2F;8的情况会跑到young，</p>
+<p>大于3&#x2F;8的会影响young部分的更新</p>
+<p>2019-01-30</p>
+<p>700   1</p>
+<p>老师，您好。看完文章后有如下问题请教：</p>
+<p>1）文章内容「可以看到，在这个查询过程，也是扫描了 200 行，但是总共执行了 101 条语句</p>
+<p>，比直接 join 多了 100 次交互。除此之外，客户端还要自己拼接 SQL 语句和结果。」</p>
+<p>这个有没有啥方法来仅通过1次交互就将这101条语句发到服务端执行？2）文章内容「每次搜索一棵树近似复杂度是以 2 为底的 M 的对数，记为 log2M，所以在被驱</p>
+<p>动表上查一行的时间复杂度是 2*log2M。」</p>
+<p>这个复杂度的计算难理解，为什么是这么计算？假设 M &#x3D; 256，则搜索树的复杂度为8？3）文章内容「因此整个执行过程，近似复杂度是 N + N<em>2</em>log2M。」</p>
+<p>驱动表的复杂度直接记为 N？4）文中提到索引扫描需扫1行数据，全表扫描需扫1000行数据。这是由统计信息决定的？提前感谢老师！</p>
+<p>2019-01-30</p>
+<p> 作者回复</p>
+<ol>
+<li><p>用 in，但是不建议语句太长</p>
+</li>
+<li><p>看一下前面我们介绍索引的文章哈</p>
+</li>
+<li><p>因为是在叶子索引上直接顺序扫描，是一个大致值哈</p>
+</li>
+<li><p>不是呀，因为表t2是1000行哦</p>
+</li>
+</ol>
+<p>2019-01-30</p>
+<p>Ryoma   1</p>
+<p>前提：冷数据表 &amp; 大表</p>
+<p>buffer pool 中的old区会被持续刷新，并且基本没有升级到young区的可能性。一定程度上会降低hit rate</p>
+<p>2019-01-30</p>
+<p>403   0</p>
+<p>用那个作为驱动表，mysql会自己优化么？2019-02-09</p>
+<p> 作者回复</p>
+<p>会的</p>
+<p>2019-02-10</p>
+<p>陈华应   0</p>
+<p>老师，放完88行就满了，88是怎么计算得来的呢？2019-02-02</p>
+<p> 作者回复</p>
+<p>这个是实际跑出来的效果</p>
+<p>如果说计算的话，每一行固定长度，你用1024除一下 </p>
+<p>2019-02-02</p>
+<p>库淘淘   0</p>
+<p>set optimizer_switch&#x3D;’mrr&#x3D;on,mrr_cost_based&#x3D;off,batched_key_access&#x3D;on’;</p>
+<p>create index idx_c on t2(c);</p>
+<p>create index idx_a_c on t1(a,c);</p>
+<p>create index idx_b_c on t3(b,c);</p>
+<p>mysql&gt; explain select * from t2 </p>
+<p>-&gt; straight_join t1 on(t1.a&#x3D;t2.a)</p>
+<p>-&gt; straight_join t3 on(t2.b&#x3D;t3.b) </p>
+<p>-&gt; where t1.c&gt; 800 and t2.c&gt;&#x3D;600 and t3.c&gt;&#x3D;500;</p>
+<p>+—-+————-+——-+————+——-+—————+———+———+———–+——+———-+</p>
+<p>—————————————————————+</p>
+<p>| id | select_type | table | partitions | type | possible_keys | key | key_len | ref | rows | filtered | </p>
+<p>Extra |</p>
+<p>+—-+————-+——-+————+——-+—————+———+———+———–+——+———-+</p>
+<p>—————————————————————+</p>
+<p>| 1 | SIMPLE | t2 | NULL | range | idx_c | idx_c | 5 | NULL | 401 | 100.00 | Using index condition</p>
+<p>; Using where; Using MRR |</p>
+<p>| 1 | SIMPLE | t1 | NULL | ref | idx_a_c | idx_a_c | 5 | test.t2.a | 1 | 33.33 | Using index conditio</p>
+<p>n; Using join buffer (Batched Key Access) |</p>
+<p>| 1 | SIMPLE | t3 | NULL | ref | idx_b_c | idx_b_c | 5 | test.t2.b | 1 | 33.33 | Using index conditio</p>
+<p>n; Using join buffer (Batched Key Access) |</p>
+<p>+—-+————-+——-+————+——-+—————+———+———+———–+——+———-+</p>
+<p>—————————————————————+</p>
+<p>3 rows in set, 1 warning (0.00 sec)</p>
+<p>以自己理解考虑如下，有问题请老师能够指出</p>
+<p>1.根据查询因是select * 肯定回表的，其中在表t2创建索引idx_c,为了能够使用ICP,MRR，如果c</p>
+<p>字段重复率高或取值行数多，可以考虑不建索引</p>
+<p>2.已t2 作为驱动表，一方面考虑其他两表都有关联,t2表放入join buffer后关联t1后，再关联t2 得</p>
+<p>出结果 再各回t2,t3表取出 得到结果集（之前理解都是t1和t2join得结果集再与t3join，本次理解</p>
+<p>太确定）</p>
+<p>3.t2、t3表建立联合查询目的能够使用ICP</p>
+<p>2019-02-01</p>
+<p> 作者回复</p>
+<p>“2.已t2 作为驱动表，一方面考虑其他两表都有关联,t2表放入join buffer后关联t1后，再关联t2 得</p>
+<p>出结果 再各回t2,t3表取出 得到结果集”</p>
+<p>即使是用t1做驱动表，也是可能可以都用上BKA的哈</p>
+<p>新春快乐~</p>
+<p>2019-02-04</p>
+<p>郭健   0</p>
+<p>老师，太棒了！！终于讲join了！！！作为一个实际开发人员，索引了解是必须得，单表索引有</p>
+<p>所掌握，始终对join没法理解，这节课对我的帮助是最大的。谢谢老师</p>
+<p>2019-02-01</p>
+<p> 作者回复</p>
+<p> </p>
+<p>2019-02-01</p>
+<p>辣椒   0</p>
+<p>我是开发，但是看了老师的专栏，对怎么写数据库应用更有心得了</p>
+<p>2019-01-31</p>
+<p> 作者回复</p>
+<p> ，如果有有趣的经验也放到这里跟大家分享哦</p>
+<p>2019-02-01</p>
+<p>泡泡爱dota   0</p>
+<p>explain select * from t1 straight_join t2 on (t1.a&#x3D;t2.a) where t1.a &lt; 50; </p>
+<p>老师, 这条sql为什么t1.a的索引没有用上, t1还是走全表</p>
+<p>2019-01-31</p>
+<p> 作者回复</p>
+<p>如果数据量不够多，并且满足a&lt;50的行，占比比较高的话，优化器有可能会认为“还要回表，还</p>
+<p>不如直接扫主键id”</p>
+<p>2019-01-31</p>
+<p>剃刀吗啡   0</p>
+<p>我们某个业务使用infobright这种列式存储，字段没用索引。我在想这种引擎在join的时候是否也</p>
+<p>会遵守类似的规则？但列式存储并不是按行扫描，所以有点困惑。2019-01-31</p>
+<p> 作者回复</p>
+<p>是的，只是获取数据的时候，不会去读整行。但是没有索引就也只能用BNL，可以explain看看</p>
+<p>2019-01-31</p>
+<p>一大只    0</p>
+<p>老师，我想问下，如果使用的是Index Nested-Loop Join，是不是就不会使用join_buffer了？直</p>
+<p>接将循环结果放到net_buffer_length中，边读边发哈？2019-01-31</p>
+<p> 作者回复</p>
+<p>是的，Index Nested-Loop Join没有用到join buffer</p>
+<p>不过35篇马上会介绍到一个优化，把join buffer用上，晚上关注下哦 </p>
+<p>2019-01-31</p>
+<p>斜面镜子 Bill   0</p>
+<p>因为 join_buffer 不够大，需要对被驱动表做多次全表扫描，也就造成了“长事务”。除了老师上</p>
+<p>节课提到的导致undo log 不能被回收，导致回滚段空间膨胀问题，还会出现：1. 长期占用DML</p>
+<p>锁，引发DDL拿不到锁堵慢连接池； 2. SQL执行socket_timeout超时后业务接口重复发起，导</p>
+<p>致实例IO负载上升出现雪崩；3. 实例异常后，DBA kill SQL因繁杂的回滚执行时间过长，不能</p>
+<p>快速恢复可用；4. 如果业务采用select *作为结果集返回，极大可能出现网络拥堵，整体拖慢服</p>
+<p>务端的处理；5. 冷数据污染buffer pool，block nested-loop多次扫描，其中间隔很有可能超过1</p>
+<p>s，从而污染到lru 头部，影响整体的查询体验。2019-01-31</p>
+<p> 作者回复</p>
+<p> 很赞</p>
+<p>之前知识点的也都加进来啦</p>
+<p>2019-01-31</p>
+<pre><code>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/f0491e2a.html" rel="prev" title="mysql-我查这么多数据会不会把数据库内存打爆">
+      <i class="fa fa-chevron-left"></i> mysql-我查这么多数据会不会把数据库内存打爆
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/6651e679.html" rel="next" title="mysql-join语句怎么优化">
+      mysql-join语句怎么优化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">390k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:40</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
