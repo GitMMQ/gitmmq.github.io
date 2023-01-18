@@ -1049,7 +1049,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:26:04" itemprop="dateModified" datetime="2023-01-18T23:26:04+08:00">2023-01-18</time>
+                <time title="修改时间：2023-01-18 23:46:13" itemprop="dateModified" datetime="2023-01-18T23:46:13+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1084,7 +1084,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析在MySQL里面，grant语句是用来给用户赋权的。"><a href="#问题解析在MySQL里面，grant语句是用来给用户赋权的。" class="headerlink" title="问题解析在MySQL里面，grant语句是用来给用户赋权的。"></a>问题解析在MySQL里面，grant语句是用来给用户赋权的。</h1><p>不知道你有没有见过一些操作文档里面提到，grant之后要马上跟着执行一个flush privileges命令，才能使赋权语句生效。</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>在MySQL里面，grant语句是用来给用户赋权的。</p>
+<p>不知道你有没有见过一些操作文档里面提到，grant之后要马上跟着执行一个flush privileges命令，才能使赋权语句生效。</p>
 <p>如果没有执行这个flush命令的话，赋权语句真的不能生效吗？接下来，我就先和你介绍一下grant语句和flush privileges语句分别做了什么事情，然后再一起来 分析这个问题。</p>
 <p>为了便于说明，我先创建一个用户：</p>
 <p>这条语句的逻辑是创建一个用户’ua’@’%’，密码是pa。</p>
@@ -1506,7 +1507,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:26:04" itemprop="dateModified" datetime="2023-01-18T23:26:04+08:00">2023-01-18</time>
+                <time title="修改时间：2023-01-18 23:46:13" itemprop="dateModified" datetime="2023-01-18T23:46:13+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1541,13 +1542,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析insert语句的锁为什么这么多？MySQL对自增主键锁做了优化，尽量在申请到自增id以后，就释放自增锁。"><a href="#问题解析insert语句的锁为什么这么多？MySQL对自增主键锁做了优化，尽量在申请到自增id以后，就释放自增锁。" class="headerlink" title="问题解析insert语句的锁为什么这么多？MySQL对自增主键锁做了优化，尽量在申请到自增id以后，就释放自增锁。"></a>问题解析insert语句的锁为什么这么多？MySQL对自增主键锁做了优化，尽量在申请到自增id以后，就释放自增锁。</h1><p>因此，大部分insert语句是一个很轻量的操作。</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>insert语句的锁为什么这么多？</p>
+<p>MySQL对自增主键锁做了优化，尽量在申请到自增id以后，就释放自增锁。</p>
+<p>因此，大部分insert语句是一个很轻量的操作。</p>
 <p> 不过，也有些insert语句在执行过程中需要给其他资源加锁，或者无法在申请到自增id以后就立马释放自增锁。</p>
 <p>如，insert … select 语句在可重复读隔离级别下，binlog_format&#x3D;statement时执行SQL语句时，需要对表所有行和间隙加锁。</p>
 <p>保证并发insert时日志和数据的一致性。</p>
 <p>如果session B先执行，由于这个语句对表t主键索引加了(-∞,1]这个next-key lock，会在语句执行完成后，才允许session A的insert语句执行。</p>
 <p>但如果没有锁的话，就可能出现session B的insert语句先执行，但是后写入binlog的情况。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t̀  ̀(  ìd  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,  `c  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,  `d  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,  <span class="keyword">PRIMARY</span> KEY (̀ id )̀,  <span class="keyword">UNIQUE</span> KEY `c  ̀(̀ c )̀) ENGINE<span class="operator">=</span>InnoDB;<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">1</span>,<span class="number">1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">2</span>,<span class="number">2</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">3</span>,<span class="number">3</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">4</span>,<span class="number">4</span>);<span class="keyword">create</span> <span class="keyword">table</span> t2 <span class="keyword">like</span> t<span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="number">-1</span>,<span class="number">-1</span>,<span class="number">-1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;</span><br><span class="line">```这个语句到了备库执行，就会把id<span class="operator">=</span><span class="number">-1</span>这一行也写到表t2中，出现主备不一致。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当然了，执行<span class="keyword">insert</span> … <span class="keyword">select</span> 的时候，对目标表也不是锁全表，而是只锁住需要访问的资源。</span><br><span class="line"></span><br><span class="line">如果现在有这么一个需求：要往表t2中插入一行数据，这一行的c值是表t中c值的最大值加<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">此时，我们可以这么写这条<span class="keyword">SQL</span>语句 ：</span><br><span class="line"></span><br><span class="line">这个语句的加锁范围，就是表t索引c上的(<span class="number">3</span>,<span class="number">4</span>]和(<span class="number">4</span>,supremum]这两个next<span class="operator">-</span>key lock，以及主键索引上id<span class="operator">=</span><span class="number">4</span>这一行。</span><br><span class="line"></span><br><span class="line">它的执行流程也比较简单，从表t中按照索引c倒序，扫描第一行，拿到结果写入到表t2中。</span><br><span class="line"></span><br><span class="line">因此整条语句的扫描行数是<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">这个语句执行的慢查询日志（slow log）通过这个慢查询日志，我们看到Rows_examined<span class="operator">=</span><span class="number">1</span>，正好验证了执行这条语句的扫描行数为<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">那么，如果我们是要把这样的一行数据插入到表t中，语句的执行流程是怎样的？扫描行数又是多少呢？这时候，我们再看慢查询日志就会发现不对了。</span><br><span class="line"></span><br><span class="line">这时候的Rows_examined的值是<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d)  (<span class="keyword">select</span> c<span class="operator">+</span><span class="number">1</span>, d <span class="keyword">from</span> t force index(c) <span class="keyword">order</span> <span class="keyword">by</span> c <span class="keyword">desc</span> limit <span class="number">1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t(c,d)  (<span class="keyword">select</span> c<span class="operator">+</span><span class="number">1</span>, d <span class="keyword">from</span> t force index(c) <span class="keyword">order</span> <span class="keyword">by</span> c <span class="keyword">desc</span> limit <span class="number">1</span>);explain结果，从Extra字段可以看到“<span class="keyword">Using</span> temporary”字样，表示这个语句用到了临时表。</span><br><span class="line"></span><br><span class="line">也就是说，执行过程中，需要把表t的内容读出来，写入临时表。</span><br><span class="line"></span><br><span class="line"><span class="keyword">rows</span>显示的是<span class="number">1</span>，我们不妨先对这个语句的执行流程做一个猜测：如果说是把子查询的结果读出来（扫描<span class="number">1</span>行），写入临时表，然后再从临时表读出来（扫描<span class="number">1</span>行），写回表t中。</span><br><span class="line"></span><br><span class="line">那么，这个语句的扫描行数就应该是<span class="number">2</span>，而不是<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line">所以，这个猜测不对。</span><br><span class="line"></span><br><span class="line">实际上，Explain结果里的<span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span>是因为受到了limit <span class="number">1</span> 的影响。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">从另一个角度考虑的话，我们可以看看InnoDB扫描了多少行。</span><br><span class="line"></span><br><span class="line">如图<span class="number">5</span>所示，是在执行这个语句前后查看Innodb_rows_read的结果，这个语句执行前后，Innodb_rows_read的值增加了<span class="number">4</span>。</span><br><span class="line"></span><br><span class="line">因为默认临时表是使用Memory引擎的，所以这<span class="number">4</span>行查的都是表t，也就是说对表t做了全表扫描。</span><br><span class="line"></span><br><span class="line">这样，我们就把整个执行过程理清楚了：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> 创建临时表，表里有两个字段c和d。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"><span class="number">2.</span> 按照索引c扫描表t，依次取c<span class="operator">=</span><span class="number">4</span>、<span class="number">3</span>、<span class="number">2</span>、<span class="number">1</span>，然后回表，读到c和d的值写入临时表。</span><br><span class="line"></span><br><span class="line">这时，Rows_examined<span class="operator">=</span><span class="number">4</span>。</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> 由于语义里面有limit <span class="number">1</span>，所以只取了临时表的第一行，再插入到表t中。</span><br><span class="line"></span><br><span class="line">这时，Rows_examined的值加<span class="number">1</span>，变成了<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line">也就是说，这个语句会导致在表t上做全表扫描，并且会给索引c上的所有间隙都加上共享的next<span class="operator">-</span>key lock。</span><br><span class="line"></span><br><span class="line">所以，这个语句执行期间，其他事务不能在这个表上插入数据。</span><br><span class="line"></span><br><span class="line">至于这个语句的执行为什么需要临时表，原因是这类一边遍历数据，一边更新数据的情况，如果读出来的数据直接写回原表，就可能在遍历过程中，读到刚刚插入的记录，新插入的记录如果参与计算逻辑，就跟语义不符。</span><br><span class="line"></span><br><span class="line">由于实现上这个语句没有在子查询中就直接使用limit <span class="number">1</span>，从而导致了这个语句的执行需要遍历整个表t。</span><br><span class="line"></span><br><span class="line">它的优化方法也比较简单，就是用前面介绍的方法，先<span class="keyword">insert</span> <span class="keyword">into</span>到临时表temp_t，这样就只需要扫描一行；然后再从表temp_t里面取出这行数据插入表t1。</span><br><span class="line"></span><br><span class="line">当然，由于这个语句涉及的数据量很小，你可以考虑使用内存临时表来做这个优化。</span><br><span class="line"></span><br><span class="line">使用内存临时表优化时，语句序列的写法如下：</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> 唯一键冲突前面的两个例子是使用<span class="keyword">insert</span> … <span class="keyword">select</span>的情况，接下来我要介绍的这个例子就是最常见的<span class="keyword">insert</span>语句出现唯一键冲突的情况。</span><br><span class="line"></span><br><span class="line">对于有唯一键的表，插入数据时出现唯一键冲突也是常见的情况了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t̀  ̀(  ìd  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,  `c  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,  `d  ̀<span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,  <span class="keyword">PRIMARY</span> KEY (̀ id )̀,  <span class="keyword">UNIQUE</span> KEY `c  ̀(̀ c )̀) ENGINE<span class="operator">=</span>InnoDB;<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">1</span>,<span class="number">1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">2</span>,<span class="number">2</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">3</span>,<span class="number">3</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="keyword">null</span>, <span class="number">4</span>,<span class="number">4</span>);<span class="keyword">create</span> <span class="keyword">table</span> t2 <span class="keyword">like</span> t<span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;<span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="number">-1</span>,<span class="number">-1</span>,<span class="number">-1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d) <span class="keyword">select</span> c,d <span class="keyword">from</span> t;</span><br><span class="line">```这个语句到了备库执行，就会把id<span class="operator">=</span><span class="number">-1</span>这一行也写到表t2中，出现主备不一致。</span><br><span class="line"></span><br><span class="line">当然了，执行<span class="keyword">insert</span> … <span class="keyword">select</span> 的时候，对目标表也不是锁全表，而是只锁住需要访问的资源。</span><br><span class="line"></span><br><span class="line">如果现在有这么一个需求：要往表t2中插入一行数据，这一行的c值是表t中c值的最大值加<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">此时，我们可以这么写这条<span class="keyword">SQL</span>语句 ：</span><br><span class="line"></span><br><span class="line">这个语句的加锁范围，就是表t索引c上的(<span class="number">3</span>,<span class="number">4</span>]和(<span class="number">4</span>,supremum]这两个next<span class="operator">-</span>key lock，以及主键索引上id<span class="operator">=</span><span class="number">4</span>这一行。</span><br><span class="line"></span><br><span class="line">它的执行流程也比较简单，从表t中按照索引c倒序，扫描第一行，拿到结果写入到表t2中。</span><br><span class="line"></span><br><span class="line">因此整条语句的扫描行数是<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">这个语句执行的慢查询日志（slow log）通过这个慢查询日志，我们看到Rows_examined<span class="operator">=</span><span class="number">1</span>，正好验证了执行这条语句的扫描行数为<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">那么，如果我们是要把这样的一行数据插入到表t中，语句的执行流程是怎样的？扫描行数又是多少呢？这时候，我们再看慢查询日志就会发现不对了。</span><br><span class="line"></span><br><span class="line">这时候的Rows_examined的值是<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t2(c,d)  (<span class="keyword">select</span> c<span class="operator">+</span><span class="number">1</span>, d <span class="keyword">from</span> t force index(c) <span class="keyword">order</span> <span class="keyword">by</span> c <span class="keyword">desc</span> limit <span class="number">1</span>);<span class="keyword">insert</span> <span class="keyword">into</span> t(c,d)  (<span class="keyword">select</span> c<span class="operator">+</span><span class="number">1</span>, d <span class="keyword">from</span> t force index(c) <span class="keyword">order</span> <span class="keyword">by</span> c <span class="keyword">desc</span> limit <span class="number">1</span>);explain结果，从Extra字段可以看到“<span class="keyword">Using</span> temporary”字样，表示这个语句用到了临时表。</span><br><span class="line"></span><br><span class="line">也就是说，执行过程中，需要把表t的内容读出来，写入临时表。</span><br><span class="line"></span><br><span class="line"><span class="keyword">rows</span>显示的是<span class="number">1</span>，我们不妨先对这个语句的执行流程做一个猜测：如果说是把子查询的结果读出来（扫描<span class="number">1</span>行），写入临时表，然后再从临时表读出来（扫描<span class="number">1</span>行），写回表t中。</span><br><span class="line"></span><br><span class="line">那么，这个语句的扫描行数就应该是<span class="number">2</span>，而不是<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line">所以，这个猜测不对。</span><br><span class="line"></span><br><span class="line">实际上，Explain结果里的<span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span>是因为受到了limit <span class="number">1</span> 的影响。</span><br><span class="line"></span><br><span class="line">从另一个角度考虑的话，我们可以看看InnoDB扫描了多少行。</span><br><span class="line"></span><br><span class="line">如图<span class="number">5</span>所示，是在执行这个语句前后查看Innodb_rows_read的结果，这个语句执行前后，Innodb_rows_read的值增加了<span class="number">4</span>。</span><br><span class="line"></span><br><span class="line">因为默认临时表是使用Memory引擎的，所以这<span class="number">4</span>行查的都是表t，也就是说对表t做了全表扫描。</span><br><span class="line"></span><br><span class="line">这样，我们就把整个执行过程理清楚了：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> 创建临时表，表里有两个字段c和d。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"><span class="number">2.</span> 按照索引c扫描表t，依次取c<span class="operator">=</span><span class="number">4</span>、<span class="number">3</span>、<span class="number">2</span>、<span class="number">1</span>，然后回表，读到c和d的值写入临时表。</span><br><span class="line"></span><br><span class="line">这时，Rows_examined<span class="operator">=</span><span class="number">4</span>。</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> 由于语义里面有limit <span class="number">1</span>，所以只取了临时表的第一行，再插入到表t中。</span><br><span class="line"></span><br><span class="line">这时，Rows_examined的值加<span class="number">1</span>，变成了<span class="number">5</span>。</span><br><span class="line"></span><br><span class="line">也就是说，这个语句会导致在表t上做全表扫描，并且会给索引c上的所有间隙都加上共享的next<span class="operator">-</span>key lock。</span><br><span class="line"></span><br><span class="line">所以，这个语句执行期间，其他事务不能在这个表上插入数据。</span><br><span class="line"></span><br><span class="line">至于这个语句的执行为什么需要临时表，原因是这类一边遍历数据，一边更新数据的情况，如果读出来的数据直接写回原表，就可能在遍历过程中，读到刚刚插入的记录，新插入的记录如果参与计算逻辑，就跟语义不符。</span><br><span class="line"></span><br><span class="line">由于实现上这个语句没有在子查询中就直接使用limit <span class="number">1</span>，从而导致了这个语句的执行需要遍历整个表t。</span><br><span class="line"></span><br><span class="line">它的优化方法也比较简单，就是用前面介绍的方法，先<span class="keyword">insert</span> <span class="keyword">into</span>到临时表temp_t，这样就只需要扫描一行；然后再从表temp_t里面取出这行数据插入表t1。</span><br><span class="line"></span><br><span class="line">当然，由于这个语句涉及的数据量很小，你可以考虑使用内存临时表来做这个优化。</span><br><span class="line"></span><br><span class="line">使用内存临时表优化时，语句序列的写法如下：</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> 唯一键冲突前面的两个例子是使用<span class="keyword">insert</span> … <span class="keyword">select</span>的情况，接下来我要介绍的这个例子就是最常见的<span class="keyword">insert</span>语句出现唯一键冲突的情况。</span><br><span class="line"></span><br><span class="line">对于有唯一键的表，插入数据时出现唯一键冲突也是常见的情况了。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <p>create temporary table temp_t(c int,d int) engine&#x3D;memory;insert into temp_t  (select c+1, d from t force index(c) order by c desc limit 1);insert into t select * from temp_t;drop table temp_t;</p>
 <pre><code>唯一键冲突加锁这个例子也是在可重复读（repeatable read）隔离级别下执行的。
 
@@ -1557,21 +1560,15 @@
 
 我们前面说过，一个next-key lock就是由它右边界的值定义的。
 
-
-
 这时候，session A持有索引c上的(5,10]共享next-key lock（读锁）。
 
 至于为什么要加这个读锁，其实我也没有找到合理的解释。
 
 从作用上来看，这样做可以避免这一行被别的事务删掉。
 
-
-
 这里官方文档有一个描述错误，认为如果冲突的是主键索引，就加记录锁，唯一索引才加next-key lock。
 
 但实际上，这两类索引冲突加的都是next-key lock。
-
-
 
 唯一键冲突--死锁在session A执行rollback语句回滚的时候，session C几乎同时发现死锁并返回。
 
@@ -1581,9 +1578,7 @@
 
 注意，这个索引是唯一索引，因此退化为记录锁。
 
-
 2. 在T2时刻，session B要执行相同的insert语句，发现了唯一键冲突，加上读锁；同样 ，session C也在索引c上，c=5这一个记录上，加了读锁。
-
 
 3. T3时刻，session A回滚。
 
@@ -1595,21 +1590,13 @@
 
 图8 状态变化图--死锁insert into … on duplicate key update语义的逻辑是，插入一行数据，如果碰到唯一键约束，就执行后面的更新语句。
 
-
-
 insert into t values(11,10,10) on duplicate key update d=100; 如果有多个列违反了唯一性约束，就会按照索引的顺序，修改跟第一个索引冲突的行。
 
-
-
 可以看到，主键id是先判断的，MySQL认为这个语句跟id=2这一行冲突，所以修改的是id=2的行。
-
-
 
 需要注意的是，执行这条语句的affected rows返回的是2，很容易造成误解。
 
 实际上，真正更新的只有一行，只是在代码实现上，insert和update都认为自己成功了，update计数加了1， insert 计数也加了1。
-
-
 
 今天这篇文章，我和你介绍了几种特殊情况下的insert语句。
 
@@ -1617,18 +1604,13 @@ insert … select 是很常见的在两个表之间拷贝数据的方法。
 
 在可重复读隔离级别下，这个语句会给select的表里扫描到的记录和间隙加读锁。
 
-
-
 而如果insert和select的对象是同一个表，则有可能会造成循环写入。
 
 这种情况下，我们需要引入用户临时表来做优化。
 
 insert 语句如果出现唯一键冲突，会在冲突的唯一值上加共享的next-key lock(S锁)。
 
-
-
 因此，碰到由于唯一键约束导致报错后，要尽快提交或回滚事务，避免加锁时间过长。
-
 </code></pre>
 
       
@@ -2430,7 +2412,7 @@ insert 语句如果出现唯一键冲突，会在冲突的唯一值上加共享�
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
