@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="问题解析41 | 怎么最快地复制一张表？2019-02-15 林晓斌 我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。如果可以控制对源表的扫描 行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标 表。这时，有两种常用的方法。接下来的内容，我会和你详细展开一下这两种方法。为">
+  <meta name="description" content="问题解析怎么最快地复制一张表我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。 如果可以控制对源表的扫描行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。 当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标表。 这时，有两种常用的方法。 接下来的内容，我会和你详细展开一下这两种方法。 为了便于说明，我还是先创建一个表db1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql-怎么最快地复制一张表">
 <meta property="og:url" content="https://www.fastolf.com/posts/be046cd8.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="问题解析41 | 怎么最快地复制一张表？2019-02-15 林晓斌 我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。如果可以控制对源表的扫描 行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标 表。这时，有两种常用的方法。接下来的内容，我会和你详细展开一下这两种方法。为">
+<meta property="og:description" content="问题解析怎么最快地复制一张表我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。 如果可以控制对源表的扫描行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。 当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标表。 这时，有两种常用的方法。 接下来的内容，我会和你详细展开一下这两种方法。 为了便于说明，我还是先创建一个表db1">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-12-15T22:07:23.000Z">
-<meta property="article:modified_time" content="2023-01-06T09:44:03.194Z">
+<meta property="article:modified_time" content="2023-01-18T15:26:05.052Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+                <time title="修改时间：2023-01-18 23:26:05" itemprop="dateModified" datetime="2023-01-18T23:26:05+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>6.2k</span>
+              <span>6.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>23 分钟</span>
+              <span>22 分钟</span>
             </span>
 
         </div>
@@ -267,115 +267,113 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>41 | 怎么最快地复制一张表？2019-02-15 林晓斌</p>
-<p>我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。如果可以控制对源表的扫描</p>
-<p>行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标</p>
-<p>表。这时，有两种常用的方法。接下来的内容，我会和你详细展开一下这两种方法。为了便于说明，我还是先创建一个表db1.t，并插入1000行数据，同时创建一个相同结构的表</p>
-<p>db2.t。假设，我们要把db1.t里面a&gt;900的数据行导出来，插入到db2.t中。mysqldump方法</p>
-<p>一种方法是，使用mysqldump命令将数据导出成一组INSERT语句。你可以使用下面的命令：</p>
-<p>把结果输出到临时文件。这条命令中，主要参数含义如下：</p>
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>怎么最快地复制一张表我在上一篇文章最后，给你留下的问题是怎么在两张表中拷贝数据。</p>
+<p>如果可以控制对源表的扫描行数和加锁范围很小的话，我们简单地使用insert … select 语句即可实现。</p>
+<p>当然，为了避免对源表加读锁，更稳妥的方案是先将数据写到外部文本文件，然后再写回目标表。</p>
+<p>这时，有两种常用的方法。</p>
+<p>接下来的内容，我会和你详细展开一下这两种方法。</p>
+<p>为了便于说明，我还是先创建一个表db1.t，并插入1000行数据，同时创建一个相同结构的表db2.t。</p>
+<p>假设，我们要把db1.t里面a&gt;900的数据行导出来，插入到db2.t中。</p>
+<p>mysqldump方法一种方法是，使用mysqldump命令将数据导出成一组INSERT语句。</p>
+<p>你可以使用下面的命令：</p>
+<p>把结果输出到临时文件。</p>
+<p>这条命令中，主要参数含义如下：</p>
 <ol>
-<li>–single-transaction的作用是，在导出数据的时候不需要对表db1.t加表锁，而是使用START</li>
-</ol>
-<p>TRANSACTION WITH CONSISTENT SNAPSHOT的方法；</p>
-<ol start="2">
+<li><p>–single-transaction的作用是，在导出数据的时候不需要对表db1.t加表锁，而是使用STARTTRANSACTION WITH CONSISTENT SNAPSHOT的方法；</p>
+</li>
 <li><p>–add-locks设置为0，表示在输出的文件结果里，不增加” LOCK TABLES t WRITE;” ；</p>
 </li>
 <li><p>–no-create-info的意思是，不需要导出表结构；</p>
 </li>
 </ol>
-<p>create database db1;</p>
-<p>use db1;</p>
-<p>create table t(id int primary key, a int, b int, index(a))engine&#x3D;innodb;</p>
-<p>delimiter ;;</p>
-<p>  create procedure idata()</p>
-<p>  begin</p>
-<pre><code>declare i int;
-
-set i=1;
-
-while(i&lt;=1000)do
-
-  insert into t values(i,i,i);
-
-  set i=i+1;
-
-end while;
-</code></pre>
-<p>  end;;</p>
-<p>delimiter ;</p>
-<p>call idata();</p>
-<p>create database db2;</p>
-<p>create table db2.t like db1.t</p>
-<p>mysqldump -h$host -P$port -u$user –add-locks&#x3D;0 –no-create-info –single-transaction  –set-gtid-purged&#x3D;OFF db1 t –where&#x3D;”a&gt;900” –result-file&#x3D;&#x2F;client_tmp&#x2F;t.sql</p>
-<ol start="4">
-<li><p>–set-gtid-purged&#x3D;off表示的是，不输出跟GTID相关的信息；</p>
-</li>
-<li><p>–result-file指定了输出文件的路径，其中client表示生成的文件是在客户端机器上的。通过这条mysqldump命令生成的t.sql文件中就包含了如图1所示的INSERT语句。图1 mysqldump输出文件的部分结果</p>
-</li>
+<p>create database db1;use db1;create table t(id int primary key, a int, b int, index(a))engine&#x3D;innodb;delimiter ;;  create procedure idata()  begin    declare i int;    set i&#x3D;1;    while(i&lt;&#x3D;1000)do      insert into t values(i,i,i);      set i&#x3D;i+1;    end while;  end;;delimiter ;call idata();create database db2;create table db2.t like db1.tmysqldump -h$host -P$port -u$user –add-locks&#x3D;0 –no-create-info –single-transaction  –set-gtid-purged&#x3D;OFF db1 t –where&#x3D;”a&gt;900” –result-file&#x3D;&#x2F;client_tmp&#x2F;t.sql4. –set-gtid-purged&#x3D;off表示的是，不输出跟GTID相关的信息；</p>
+<ol start="5">
+<li>–result-file指定了输出文件的路径，其中client表示生成的文件是在客户端机器上的。</li>
 </ol>
-<p>可以看到，一条INSERT语句里面会包含多个value对，这是为了后续用这个文件来写入数据的时</p>
-<p>候，执行速度可以更快。如果你希望生成的文件中一条INSERT语句只插入一行数据的话，可以在执行mysqldump命令</p>
-<p>时，加上参数–skip-extended-insert。然后，你可以通过下面这条命令，将这些INSERT语句放到db2库里去执行。需要说明的是，source并不是一条SQL语句，而是一个客户端命令。mysql客户端执行这个命令</p>
-<p>的流程是这样的：</p>
+<p>通过这条mysqldump命令生成的t.sql文件中就包含了如图1所示的INSERT语句。</p>
+<p>图1 mysqldump输出文件的部分结果可以看到，一条INSERT语句里面会包含多个value对，这是为了后续用这个文件来写入数据的时候，执行速度可以更快。</p>
+<p>如果你希望生成的文件中一条INSERT语句只插入一行数据的话，可以在执行mysqldump命令时，加上参数–skip-extended-insert。</p>
+<p>然后，你可以通过下面这条命令，将这些INSERT语句放到db2库里去执行。</p>
+<p>需要说明的是，source并不是一条SQL语句，而是一个客户端命令。</p>
+<p>mysql客户端执行这个命令的流程是这样的：</p>
 <ol>
 <li><p>打开文件，默认以分号为结尾读取一条条的SQL语句；</p>
 </li>
-<li><p>将SQL语句发送到服务端执行。也就是说，服务端执行的并不是这个“source t.sql”语句，而是INSERT语句。所以，不论是在慢</p>
+<li><p>将SQL语句发送到服务端执行。</p>
 </li>
 </ol>
-<p>查询日志（slow log），还是在binlog，记录的都是这些要被真正执行的INSERT语句。导出CSV文件</p>
-<p>另一种方法是直接将结果导出成.csv文件。MySQL提供了下面的语法，用来将查询结果导出到服</p>
-<p>务端本地目录：</p>
-<p>我们在使用这条语句时，需要注意如下几点。1. 这条语句会将结果保存在服务端。如果你执行命令的客户端和MySQL服务端不在同一个机</p>
-<p>器上，客户端机器的临时目录下是不会生成t.csv文件的。mysql -h127.0.0.1 -P13000  -uroot db2 -e “source &#x2F;client_tmp&#x2F;t.sql”</p>
-<p>select * from db1.t where a&gt;900 into outfile ‘&#x2F;server_tmp&#x2F;t.csv’;</p>
-<ol start="2">
-<li>into outfile指定了文件的生成位置（&#x2F;server_tmp&#x2F;），这个位置必须受参数secure_file_priv的</li>
+<p>也就是说，服务端执行的并不是这个“source t.sql”语句，而是INSERT语句。</p>
+<p>所以，不论是在慢查询日志（slow log），还是在binlog，记录的都是这些要被真正执行的INSERT语句。</p>
+<p>导出CSV文件另一种方法是直接将结果导出成.csv文件。</p>
+<p>MySQL提供了下面的语法，用来将查询结果导出到服务端本地目录：</p>
+<p>我们在使用这条语句时，需要注意如下几点。</p>
+<ol>
+<li>这条语句会将结果保存在服务端。</li>
 </ol>
-<p>限制。参数secure_file_priv的可选值和作用分别是：</p>
+<p>如果你执行命令的客户端和MySQL服务端不在同一个机器上，客户端机器的临时目录下是不会生成t.csv文件的。</p>
+<p>mysql -h127.0.0.1 -P13000  -uroot db2 -e “source &#x2F;client_tmp&#x2F;t.sql”select * from db1.t where a&gt;900 into outfile ‘&#x2F;server_tmp&#x2F;t.csv’;2. into outfile指定了文件的生成位置（&#x2F;server_tmp&#x2F;），这个位置必须受参数secure_file_priv的限制。</p>
+<p>参数secure_file_priv的可选值和作用分别是：</p>
 <p>如果设置为empty，表示不限制文件生成的位置，这是不安全的设置；</p>
-<p>如果设置为一个表示路径的字符串，就要求生成的文件只能放在这个指定的目录，或者</p>
-<p>它的子目录；</p>
-<p>如果设置为NULL，就表示禁止在这个MySQL实例上执行select … into outfile 操作。3. 这条命令不会帮你覆盖文件，因此你需要确保&#x2F;server_tmp&#x2F;t.csv这个文件不存在，否则执行</p>
-<p>语句时就会因为有同名文件的存在而报错。4. 这条命令生成的文本文件中，原则上一个数据行对应文本文件的一行。但是，如果字段中包</p>
-<p>含换行符，在生成的文本中也会有换行符。不过类似换行符、制表符这类符号，前面都会跟</p>
-<p>上“\”这个转义符，这样就可以跟字段之间、数据行之间的分隔符区分开。得到.csv导出文件后，你就可以用下面的load data命令将数据导入到目标表db2.t中。这条语句的执行流程如下所示。1. 打开文件&#x2F;server_tmp&#x2F;t.csv，以制表符(\t)作为字段间的分隔符，以换行符（\n）作为记录之</p>
-<p>间的分隔符，进行数据读取；</p>
-<ol start="2">
-<li>启动事务。3. 判断每一行的字段数与表db2.t是否相同：</li>
+<p>如果设置为一个表示路径的字符串，就要求生成的文件只能放在这个指定的目录，或者它的子目录；</p>
+<p>如果设置为NULL，就表示禁止在这个MySQL实例上执行select … into outfile 操作。</p>
+<ol start="3">
+<li><p>这条命令不会帮你覆盖文件，因此你需要确保&#x2F;server_tmp&#x2F;t.csv这个文件不存在，否则执行语句时就会因为有同名文件的存在而报错。</p>
+</li>
+<li><p>这条命令生成的文本文件中，原则上一个数据行对应文本文件的一行。</p>
+</li>
+</ol>
+<p>但是，如果字段中包含换行符，在生成的文本中也会有换行符。</p>
+<p>不过类似换行符、制表符这类符号，前面都会跟上“\”这个转义符，这样就可以跟字段之间、数据行之间的分隔符区分开。</p>
+<p>得到.csv导出文件后，你就可以用下面的load data命令将数据导入到目标表db2.t中。</p>
+<p>这条语句的执行流程如下所示。</p>
+<ol>
+<li><p>打开文件&#x2F;server_tmp&#x2F;t.csv，以制表符(\t)作为字段间的分隔符，以换行符（\n）作为记录之间的分隔符，进行数据读取；</p>
+</li>
+<li><p>启动事务。</p>
+</li>
+<li><p>判断每一行的字段数与表db2.t是否相同：</p>
+</li>
 </ol>
 <p>若不相同，则直接报错，事务回滚；</p>
-<p>若相同，则构造成一行，调用InnoDB引擎接口，写入到表中。4. 重复步骤3，直到&#x2F;server_tmp&#x2F;t.csv整个文件读入完成，提交事务。你可能有一个疑问，如果binlog_format&#x3D;statement，这个load语句记录到binlog里以后，</p>
-<p>怎么在备库重放呢？由于&#x2F;server_tmp&#x2F;t.csv文件只保存在主库所在的主机上，如果只是把这条语句原文写到binlog中，</p>
-<p>在备库执行的时候，备库的本地机器上没有这个文件，就会导致主备同步停止。所以，这条语句执行的完整流程，其实是下面这样的。1. 主库执行完成后，将&#x2F;server_tmp&#x2F;t.csv文件的内容直接写到binlog文件中。load data infile ‘&#x2F;server_tmp&#x2F;t.csv’ into table db2.t;</p>
-<ol start="2">
-<li>往binlog文件中写入语句load data local infile ‘&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0’ INTO TABLE</li>
+<p>若相同，则构造成一行，调用InnoDB引擎接口，写入到表中。</p>
+<ol start="4">
+<li>重复步骤3，直到&#x2F;server_tmp&#x2F;t.csv整个文件读入完成，提交事务。</li>
 </ol>
-<p><code>db2 .̀̀ t</code>。3. 把这个binlog日志传到备库。4. 备库的apply线程在执行这个事务日志时：</p>
-<p>a. 先将binlog中t.csv文件的内容读出来，写入到本地临时目录&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0</p>
-<p>中；</p>
-<p>b. 再执行load data语句，往备库的db2.t表中插入跟主库相同的数据。执行流程如图2所示：</p>
-<p>图2 load data的同步流程</p>
-<p>注意，这里备库执行的load data语句里面，多了一个“local”。它的意思是“将执行这条命令的客</p>
-<p>户端所在机器的本地文件&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0的内容，加载到目标表db2.t中”。也就是说，load data命令有两种用法：</p>
+<p>你可能有一个疑问，如果binlog_format&#x3D;statement，这个load语句记录到binlog里以后，怎么在备库重放呢？由于&#x2F;server_tmp&#x2F;t.csv文件只保存在主库所在的主机上，如果只是把这条语句原文写到binlog中，在备库执行的时候，备库的本地机器上没有这个文件，就会导致主备同步停止。</p>
+<p>所以，这条语句执行的完整流程，其实是下面这样的。</p>
 <ol>
-<li>不加“local”，是读取服务端的文件，这个文件必须在secure_file_priv指定的目录或子目录</li>
+<li>主库执行完成后，将&#x2F;server_tmp&#x2F;t.csv文件的内容直接写到binlog文件中。</li>
 </ol>
-<p>下；</p>
-<ol start="2">
-<li>加上“local”，读取的是客户端的文件，只要mysql客户端有访问这个文件的权限即可。这时</li>
+<p>load data infile ‘&#x2F;server_tmp&#x2F;t.csv’ into table db2.t;2. 往binlog文件中写入语句load data local infile ‘&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0’ INTO TABLE<code>db2 .̀̀ t</code>。</p>
+<ol start="3">
+<li><p>把这个binlog日志传到备库。</p>
+</li>
+<li><p>备库的apply线程在执行这个事务日志时：</p>
+</li>
 </ol>
-<p>候，MySQL客户端会先把本地文件传给服务端，然后执行上述的load data流程。另外需要注意的是，select …into outfile方法不会生成表结构文件, 所以我们导数据时还需要</p>
-<p>单独的命令得到表结构定义。mysqldump提供了一个–tab参数，可以同时导出表结构定义文件和</p>
-<p>csv数据文件。这条命令的使用方法如下：</p>
-<p>这条命令会在$secure_file_priv定义的目录下，创建一个t.sql文件保存建表语句，同时创建一个</p>
-<p>t.txt文件保存CSV数据。物理拷贝方法</p>
-<p>前面我们提到的mysqldump方法和导出CSV文件的方法，都是逻辑导数据的方法，也就是将数据</p>
-<p>从表db1.t中读出来，生成文本，然后再写入目标表db2.t中。你可能会问，有物理导数据的方法吗？比如，直接把db1.t表的.frm文件和.ibd文件拷贝到db2目</p>
-<p>录下，是否可行呢？答案是不行的。因为，一个InnoDB表，除了包含这两个物理文件外，还需要在数据字典中注册。直接拷贝这两</p>
-<p>个文件的话，因为数据字典中没有db2.t这个表，系统是不会识别和接受它们的。不过，在MySQL 5.6版本引入了可传输表空间(transportable tablespace)的方法，可以通过导出</p>
-<p>+导入表空间的方式，实现物理拷贝表的功能。假设我们现在的目标是在db1库下，复制一个跟表t相同的表r，具体的执行步骤如下：</p>
+<p>a. 先将binlog中t.csv文件的内容读出来，写入到本地临时目录&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0中；</p>
+<p>b. 再执行load data语句，往备库的db2.t表中插入跟主库相同的数据。</p>
+<p>执行流程如图2所示：</p>
+<p>图2 load data的同步流程注意，这里备库执行的load data语句里面，多了一个“local”。</p>
+<p>它的意思是“将执行这条命令的客户端所在机器的本地文件&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0的内容，加载到目标表db2.t中”。</p>
+<p>也就是说，load data命令有两种用法：</p>
+<ol>
+<li><p>不加“local”，是读取服务端的文件，这个文件必须在secure_file_priv指定的目录或子目录下；</p>
+</li>
+<li><p>加上“local”，读取的是客户端的文件，只要mysql客户端有访问这个文件的权限即可。</p>
+</li>
+</ol>
+<p>这时候，MySQL客户端会先把本地文件传给服务端，然后执行上述的load data流程。</p>
+<p>另外需要注意的是，select …into outfile方法不会生成表结构文件, 所以我们导数据时还需要单独的命令得到表结构定义。</p>
+<p>mysqldump提供了一个–tab参数，可以同时导出表结构定义文件和csv数据文件。</p>
+<p>这条命令的使用方法如下：</p>
+<p>这条命令会在$secure_file_priv定义的目录下，创建一个t.sql文件保存建表语句，同时创建一个t.txt文件保存CSV数据。</p>
+<p>物理拷贝方法前面我们提到的mysqldump方法和导出CSV文件的方法，都是逻辑导数据的方法，也就是将数据从表db1.t中读出来，生成文本，然后再写入目标表db2.t中。</p>
+<p>你可能会问，有物理导数据的方法吗？比如，直接把db1.t表的.frm文件和.ibd文件拷贝到db2目录下，是否可行呢？答案是不行的。</p>
+<p>因为，一个InnoDB表，除了包含这两个物理文件外，还需要在数据字典中注册。</p>
+<p>直接拷贝这两个文件的话，因为数据字典中没有db2.t这个表，系统是不会识别和接受它们的。</p>
+<p>不过，在MySQL 5.6版本引入了可传输表空间(transportable tablespace)的方法，可以通过导出+导入表空间的方式，实现物理拷贝表的功能。</p>
+<p>假设我们现在的目标是在db1库下，复制一个跟表t相同的表r，具体的执行步骤如下：</p>
 <ol>
 <li><p>执行 create table r like t，创建一个相同表结构的空表；</p>
 </li>
@@ -383,372 +381,84 @@ end while;
 </li>
 <li><p>执行flush table t for export，这时候db1目录下会生成一个t.cfg文件；</p>
 </li>
-<li><p>在db1目录下执行cp t.cfg r.cfg; cp t.ibd r.ibd；这两个命令（这里需要注意的是，拷贝得到的</p>
+<li><p>在db1目录下执行cp t.cfg r.cfg; cp t.ibd r.ibd；这两个命令（这里需要注意的是，拷贝得到的两个文件，MySQL进程要有读写权限）；</p>
 </li>
-</ol>
-<p>两个文件，MySQL进程要有读写权限）；</p>
-<ol start="5">
 <li><p>执行unlock tables，这时候t.cfg文件会被删除；</p>
 </li>
-<li><p>执行alter table r import tablespace，将这个r.ibd文件作为表r的新的表空间，由于这个文件</p>
+<li><p>执行alter table r import tablespace，将这个r.ibd文件作为表r的新的表空间，由于这个文件mysqldump -h$host -P$port -u$user —single-transaction  –set-gtid-purged&#x3D;OFF db1 t –where&#x3D;”a&gt;900” –tab&#x3D;$secure_file_priv的数据内容和t.ibd是相同的，所以表r中就有了和表t相同的数据。</p>
 </li>
 </ol>
-<p>mysqldump -h$host -P$port -u$user —single-transaction  –set-gtid-purged&#x3D;OFF db1 t –where&#x3D;”a&gt;900” –tab&#x3D;$secure_file_priv</p>
-<p>的数据内容和t.ibd是相同的，所以表r中就有了和表t相同的数据。至此，拷贝表数据的操作就完成了。这个流程的执行过程图如下：</p>
-<p>图3 物理拷贝表</p>
-<p>关于拷贝表的这个流程，有以下几个注意点：</p>
+<p>至此，拷贝表数据的操作就完成了。</p>
+<p>这个流程的执行过程图如下：</p>
+<p>图3 物理拷贝表关于拷贝表的这个流程，有以下几个注意点：</p>
 <ol>
-<li>在第3步执行完flsuh table命令之后，db1.t整个表处于只读状态，直到执行unlock tables命令</li>
+<li><p>在第3步执行完flsuh table命令之后，db1.t整个表处于只读状态，直到执行unlock tables命令后才释放读锁；</p>
+</li>
+<li><p>在执行import tablespace的时候，为了让文件里的表空间id和数据字典中的一致，会修改r.ibd的表空间id。</p>
+</li>
 </ol>
-<p>后才释放读锁；</p>
-<ol start="2">
-<li>在执行import tablespace的时候，为了让文件里的表空间id和数据字典中的一致，会修改</li>
+<p>而这个表空间id存在于每一个数据页中。</p>
+<p>因此，如果是一个很大的文件（比如TB级别），每个数据页都需要修改，所以你会看到这个import语句的执行是需要一些时间的。</p>
+<p>当然，如果是相比于逻辑导入的方法，import语句的耗时是非常短的。</p>
+<p>小结今天这篇文章，我和你介绍了三种将一个表的数据导入到另外一个表中的方法。</p>
+<p>我们来对比一下这三种方法的优缺点。</p>
+<ol>
+<li>物理拷贝的方式速度最快，尤其对于大表拷贝来说是最快的方法。</li>
 </ol>
-<p>r.ibd的表空间id。而这个表空间id存在于每一个数据页中。因此，如果是一个很大的文件</p>
-<p>（比如TB级别），每个数据页都需要修改，所以你会看到这个import语句的执行是需要一些</p>
-<p>时间的。当然，如果是相比于逻辑导入的方法，import语句的耗时是非常短的。小结</p>
-<p>今天这篇文章，我和你介绍了三种将一个表的数据导入到另外一个表中的方法。我们来对比一下这三种方法的优缺点。1. 物理拷贝的方式速度最快，尤其对于大表拷贝来说是最快的方法。如果出现误删表的情况，</p>
-<p>用备份恢复出误删之前的临时库，然后再把临时库中的表拷贝到生产库上，是恢复数据最快</p>
-<p>的方法。但是，这种方法的使用也有一定的局限性：</p>
+<p>如果出现误删表的情况，用备份恢复出误删之前的临时库，然后再把临时库中的表拷贝到生产库上，是恢复数据最快的方法。</p>
+<p>但是，这种方法的使用也有一定的局限性：</p>
 <p>必须是全表拷贝，不能只拷贝部分数据；</p>
 <p>需要到服务器上拷贝数据，在用户无法登录数据库主机的场景下无法使用；</p>
-<p>由于是通过拷贝物理文件实现的，源表和目标表都是使用InnoDB引擎时才能使用。2. 用mysqldump生成包含INSERT语句文件的方法，可以在where参数增加过滤条件，来实现</p>
-<p>只导出部分数据。这个方式的不足之一是，不能使用join这种比较复杂的where条件写法。3. 用select … into outfile的方法是最灵活的，支持所有的SQL写法。但，这个方法的缺点之一就</p>
-<p>是，每次只能导出一张表的数据，而且表结构也需要另外的语句单独备份。后两种方式都是逻辑备份方式，是可以跨引擎使用的。最后，我给你留下一个思考题吧。我们前面介绍binlog_format&#x3D;statement的时候，binlog记录的load data命令是带local的。既然这</p>
-<p>条命令是发送到备库去执行的，那么备库执行的时候也是本地执行，为什么需要这个local呢？如</p>
-<p>果写到binlog中的命令不带local，又会出现什么问题呢？你可以把你的分析写在评论区，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收听，也</p>
-<p>欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
-<p>我在上篇文章最后给你留下的思考题，已经在今天这篇文章的正文部分做了回答。上篇文章的评论区有几个非常好的留言，我在这里和你分享一下。@huolang 同学提了一个问题：如果sessionA拿到c&#x3D;5的记录锁是写锁，那为什么sessionB和</p>
-<p>sessionC还能加c&#x3D;5的读锁呢？这是因为next-key lock是先加间隙锁，再加记录锁的。加间隙锁成功了，加记录锁就会被堵住。如果你对这个过程有疑问的话，可以再复习一下第30篇文章中的相关内容。@一大只 同学做了一个实验，验证了主键冲突以后，insert语句加间隙锁的效果。比我在上篇文</p>
-<p>章正文中提的那个回滚导致死锁的例子更直观，体现了他对这个知识点非常好的理解和思考，很</p>
-<p>赞。@roaming 同学验证了在MySQL 8.0版本中，已经能够用临时表处理insert … select写入原表的语</p>
-<p>句了。@老杨同志 的回答提到了我们本文中说到的几个方法。poppy   4</p>
-<p>关于思考题，我理解是备库的同步线程其实相当于备库的一个客户端，由于备库的会把binlog</p>
-<p>中t.csv的内容写到&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0中，如果load data命令不加’local’表示读取服务端</p>
-<p>的文件，文件必须在secure_file_priv指定的目录或子目录，此时可能找不到该文件，主备同步</p>
-<p>执行会失败。而加上local的话，表示读取客户端的文件，既然备份线程都能在该目录下创建临</p>
-<p>时文件&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0,必然也有权限访问，把该文件传给服务端执行。2019-02-15</p>
-<p> 作者回复</p>
-<p> 这是其中一个原因</p>
-<p>2019-02-16</p>
-<p>☆appleう   3</p>
-<p>通知对方更新数据的意思是: 针对事务内的3个操作:插入和更新两个都是本地操作，第三个操作</p>
-<p>是远程调用，这里远程调用其实是想把本地操作的那两条通知对方(对方:远程调用)，让对方把</p>
-<p>数据更新，这样双方(我和远程调用方)的数据达到一致，如果对方操作失败，事务的前两个操</p>
-<p>作也会回滚，主要是想保证双方数据的一致性，因为远程调用可能会出现网络延迟超时等因素</p>
-<p>，极端情况会导致事务10s左右才能处理完毕，想问的是这样耗时的事务会带来哪些影响呢？设计的初衷是想这三个操作能原子执行，只要有不成功就可以回滚，保证两方数据的一致性</p>
-<p>精选留言</p>
-<p>耗时长的远程调用不放在事务中执行，会出现我这面数据完成了，而对方那面由于网络等问题</p>
-<p>，并没有更新，这样两方的数据就出现不一致了</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>嗯 了解了</p>
-<p>这种设计我觉得就是会对并发性有比较大的影响。一般如果网络状态不好的，会建议把这个更新操作放到消息队列。就是说</p>
-<ol>
-<li><p>先本地提交事务。2. 把通知这个动作放到消息队列，失败了可以重试；</p>
+<p>由于是通过拷贝物理文件实现的，源表和目标表都是使用InnoDB引擎时才能使用。</p>
+<ol start="2">
+<li>用mysqldump生成包含INSERT语句文件的方法，可以在where参数增加过滤条件，来实现只导出部分数据。</li>
+</ol>
+<p>这个方式的不足之一是，不能使用join这种比较复杂的where条件写法。</p>
+<ol start="3">
+<li>用select … into outfile的方法是最灵活的，支持所有的SQL写法。</li>
+</ol>
+<p>但，这个方法的缺点之一就是，每次只能导出一张表的数据，而且表结构也需要另外的语句单独备份。</p>
+<p>后两种方式都是逻辑备份方式，是可以跨引擎使用的。</p>
+<p>最后，我给你留下一个思考题吧。</p>
+<p>我们前面介绍binlog_format&#x3D;statement的时候，binlog记录的load data命令是带local的。</p>
+<p>既然这条命令是发送到备库去执行的，那么备库执行的时候也是本地执行，为什么需要这个local呢？如果写到binlog中的命令不带local，又会出现什么问题呢？你可以把你的分析写在评论区，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间我在上篇文章最后给你留下的思考题，已经在今天这篇文章的正文部分做了回答。</p>
+<p>上篇文章的评论区有几个非常好的留言，我在这里和你分享一下。</p>
+<p>@huolang 同学提了一个问题：如果sessionA拿到c&#x3D;5的记录锁是写锁，那为什么sessionB和sessionC还能加c&#x3D;5的读锁呢？这是因为next-key lock是先加间隙锁，再加记录锁的。</p>
+<p>加间隙锁成功了，加记录锁就会被堵住。</p>
+<p>如果你对这个过程有疑问的话，可以再复习一下第30篇文章中的相关内容。</p>
+<p>@一大只 同学做了一个实验，验证了主键冲突以后，insert语句加间隙锁的效果。</p>
+<p>比我在上篇文章正文中提的那个回滚导致死锁的例子更直观，体现了他对这个知识点非常好的理解和思考，很赞。</p>
+<p>@roaming 同学验证了在MySQL 8.0版本中，已经能够用临时表处理insert … select写入原表的语句了。</p>
+<p>@老杨同志 的回答提到了我们本文中说到的几个方法。</p>
+<p>poppy   4关于思考题，我理解是备库的同步线程其实相当于备库的一个客户端，由于备库的会把binlog中t.csv的内容写到&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0中，如果load data命令不加’local’表示读取服务端的文件，文件必须在secure_file_priv指定的目录或子目录，此时可能找不到该文件，主备同步执行会失败。</p>
+<p>而加上local的话，表示读取客户端的文件，既然备份线程都能在该目录下创建临时文件&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0,必然也有权限访问，把该文件传给服务端执行。</p>
+<p>2019-02-15 作者回复 这是其中一个原因2019-02-16☆appleう   3通知对方更新数据的意思是: 针对事务内的3个操作:插入和更新两个都是本地操作，第三个操作是远程调用，这里远程调用其实是想把本地操作的那两条通知对方(对方:远程调用)，让对方把数据更新，这样双方(我和远程调用方)的数据达到一致，如果对方操作失败，事务的前两个操作也会回滚，主要是想保证双方数据的一致性，因为远程调用可能会出现网络延迟超时等因素，极端情况会导致事务10s左右才能处理完毕，想问的是这样耗时的事务会带来哪些影响呢？设计的初衷是想这三个操作能原子执行，只要有不成功就可以回滚，保证两方数据的一致性精选留言耗时长的远程调用不放在事务中执行，会出现我这面数据完成了，而对方那面由于网络等问题，并没有更新，这样两方的数据就出现不一致了2019-02-15 作者回复嗯 了解了这种设计我觉得就是会对并发性有比较大的影响。</p>
+<p>一般如果网络状态不好的，会建议把这个更新操作放到消息队列。</p>
+<p>就是说1. 先本地提交事务。</p>
+<ol start="2">
+<li><p>把通知这个动作放到消息队列，失败了可以重试；</p>
 </li>
-<li><p>远端接收事件要设置成可重入的，就是即使同一个消息收到两次，也跟收到一次是相同的效</p>
+<li><p>远端接收事件要设置成可重入的，就是即使同一个消息收到两次，也跟收到一次是相同的效果。</p>
 </li>
 </ol>
-<p>果。2 和3 配合起来保证最终一致性。这种设计我见到得比较多，你评估下是否符合你们业务的需求哈</p>
-<p>2019-02-15</p>
-<p>undifined   3</p>
-<p>老师，用物理导入的方式执行 alter table r import tablespace 时 提示ERROR 1812 (HY000): Ta</p>
-<p>blespace is missing for table <code>db1</code>.<code>r</code>. 此时 db1&#x2F; 下面的文件有 db.opt r.cfg r.frm r.ibd t.frm t.ibd</p>
-<p>；这个该怎么处理</p>
-<p>执行步骤：</p>
-<p>mysql&gt; create table r like t;</p>
-<p>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; alter table r discard tablespace;</p>
-<p>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; flush table t for export;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>cp t.cfg r.cfg</p>
-<p>cp t.ibd r.ibd</p>
-<p>mysql&gt; unlock tables;</p>
-<p>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; alter table r import tablespace;</p>
-<p>ERROR 1812 (HY000): Tablespace is missing for table <code>db1</code>.<code>r</code>.</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>应该就是评论区其他同学帮忙回复的权限问题了吧？2019-02-15</p>
-<p>lionetes   2</p>
-<p>mysql&gt; select * from t;</p>
-<p>+—-+——+</p>
-<p>| id | name |</p>
-<p>+—-+——+</p>
-<p>| 1 | Bob |</p>
-<p>| 2 | Mary |</p>
-<p>| 3 | Jane |</p>
-<p>| 4 | Lisa |</p>
-<p>| 5 | Mary |</p>
-<p>| 6 | Jane |</p>
-<p>| 7 | Lisa |</p>
-<p>+—-+——+</p>
-<p>7 rows in set (0.00 sec)</p>
-<p>mysql&gt; create table tt like t;</p>
-<p>Query OK, 0 rows affected (0.03 sec)</p>
-<p>mysql&gt; alter table tt discard tablespace;</p>
-<p>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; flush table t for export;</p>
-<p>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; unlock tables;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>mysql&gt; alter table tt import tablespace;</p>
-<p>Query OK, 0 rows affected (0.03 sec)</p>
-<p>mysql&gt; show tables;</p>
-<p>+—————-+</p>
-<p>| Tables_in_test |</p>
-<p>+—————-+</p>
-<p>| t |</p>
-<p>| t2 |</p>
-<p>| tt |</p>
-<p>+—————-+</p>
-<p>3 rows in set (0.00 sec)</p>
-<p>mysql&gt; select * from t;</p>
-<p>+—-+——+</p>
-<p>| id | name |</p>
-<p>+—-+——+</p>
-<p>| 1 | Bob |</p>
-<p>| 2 | Mary |</p>
-<p>| 3 | Jane |</p>
-<p>| 4 | Lisa |</p>
-<p>| 5 | Mary |</p>
-<p>| 6 | Jane |</p>
-<p>| 7 | Lisa |</p>
-<p>+—-+——+</p>
-<p>7 rows in set (0.00 sec)</p>
-<p>mysql&gt; select * from tt;</p>
-<p>+—-+——+</p>
-<p>| id | name |</p>
-<p>+—-+——+</p>
-<p>| 1 | Bob |</p>
-<p>| 2 | Mary |</p>
-<p>| 3 | Jane |</p>
-<p>| 4 | Lisa |</p>
-<p>| 5 | Mary |</p>
-<p>| 6 | Jane |</p>
-<p>| 7 | Lisa |</p>
-<p>+—-+——+</p>
-<p>7 rows in set (0.00 sec)</p>
-<p>ll 后 查看 tt.cfg 文件没有自动删除 5.7mysql</p>
-<p>-rw-r—–. 1 mysql mysql 380 2月 15 09:51 tt.cfg</p>
-<p>-rw-r—–. 1 mysql mysql 8586 2月 15 09:49 tt.frm</p>
-<p>-rw-r—–. 1 mysql mysql 98304 2月 15 09:51 tt.ibd</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>你说得对， 细致</p>
-<p>import动作 不会自动删除cfg文件，我图改一下</p>
-<p>2019-02-15</p>
-<p>☆appleう   2</p>
-<p>老师，我想问一个关于事务的问题，一个事务中有3个操作，插入一条数据(本地操作),更新一条</p>
-<p>数据(本地操作)，然后远程调用，通知对方更新上面数据(如果远程调用失败会重试，最多3次，</p>
-<p>如果遇到网络等问题，远程调用时间会达到5s,极端情况3次会达到15s)，那么极端情况事务将</p>
-<p>长达5-15s，这样会带来什么影响吗？2019-02-15</p>
-<p> 作者回复</p>
-<p>“通知对方更新上面数据” 是啥概念，如果你这个事务没提交，其他线程也看不到前两个操作的</p>
-<p>结果的。设计上不建议留这么长的事务哈，最好是可以先把事务提交了，再去做耗时的操作。2019-02-15</p>
-<p>AstonPutting   1</p>
-<p>老师，mysqlpump能否在平时代替mysqldump的使用？2019-02-22</p>
-<p> 作者回复</p>
-<p>我觉得是</p>
-<p>2019-02-23</p>
-<p>PengfeiWang   1</p>
-<p>老师，您好：</p>
-<p>文中“–add-locks 设置为 0，表示在输出的文件结果里，不增加” LOCK TABLES t WRITE;” 是否</p>
-<p>是笔误，–add-locks应该是在insert语句前后添加锁，我的理解此处应该是–skip-add-locks，不</p>
-<p>知道是否是这样？2019-02-18</p>
-<p> 作者回复</p>
-<p>嗯嗯，命令中写错了，是–add-locks&#x3D;0，</p>
-<p>效果上跟–skip-add-locks是一样的哈</p>
-<p> 细致</p>
-<p>2019-02-19</p>
-<p>长杰   1</p>
-<p>课后题答案</p>
-<p>不加“local”，是读取服务端的文件，这个文件必须在 secure_file_priv 指定的目录或子目录下；</p>
-<p>而备库的apply线程执行时先讲csv内容读出生成tmp目录下的临时文件，这个目录容易受secure</p>
-<p>_file_priv的影响，如果备库改参数设置为Null或指定的目录，可能导致load操作失败，加local则</p>
-<p>不受这个影响。2019-02-17</p>
-<p> 作者回复</p>
-<p> </p>
-<p>2019-02-18</p>
-<p>尘封   1</p>
-<p>老师mysqldump导出的文件里，单条sql里的value值有什么限制吗默认情况下，假如一个表有</p>
-<p>几百万，那mysql会分为多少个sql导出？问题：因为从库可能没有load的权限，所以local</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>好问题，</p>
-<p>会控制单行不会超过参数net_buffer_length，这个参数是可以通过–net_buffer_length 传给mysql</p>
-<p>dump 工具的</p>
-<p>2019-02-28</p>
-<p>佳   0</p>
-<p>老师好，这个&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0 是应该在主库上面，还是备库上面？为啥我执行完是在</p>
-<p>主库上面出现了这个文件呢？2019-03-14</p>
-<p> 作者回复</p>
-<p>就是在MySQL的运行进程所在的主机上</p>
-<p>2019-03-16</p>
-<p>xxj123go   0</p>
-<p>传输表空间方式对主从同步会有影响么</p>
-<p>2019-03-12</p>
-<p> 作者回复</p>
-<p>你可以看下执行以后，进不进binlog  </p>
-<p>2019-03-13</p>
-<p>王显伟   0</p>
-<p>第一位留言的朋友报错我也复现了，原因是用root复制的文件，没有修改属组导致的</p>
-<p>2019-02-16</p>
-<p> 作者回复</p>
-<p> </p>
-<p>2019-02-17</p>
-<p>夜空中最亮的星（华仔）   0</p>
-<p>学习完老师的课都想做dba了</p>
-<p>2019-02-15</p>
-<p>undifined   0</p>
-<p>老师 错误信息的截屏 <a target="_blank" rel="noopener" href="https://www.dropbox.com/s/8wyet4bt9yfjsau/mysqlerror.png?dl=0">https://www.dropbox.com/s/8wyet4bt9yfjsau/mysqlerror.png?dl=0</a></p>
-<p>MySQL 5.7，Mac 上的 Docker 容器里面跑的，版本是 5.7.17</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>额，打不开。。可否发个微博贴图 </p>
-<p>2019-02-16</p>
-<p>晨思暮语   0</p>
-<p>不好意思，第一条留言中，实验三的最后一天语句还是少了，在这里贴一下，</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 3 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>2019-02-15</p>
-<p>晨思暮语   0</p>
-<p>老师好，由于字数限制，分两条：</p>
-<p>我用的是percona数据库，问题是第15章中的思考题。根据我做的实验，结论应该是：</p>
-<p>MySQL 调用了 InnoDB 引擎提供的“修改为 (1,2)”这个接口，但是引擎发现值与原来相同，不更</p>
-<p>新，直接返回</p>
-<p>一直没有想明白，老师再帮忙看看，谢谢！</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>我两个留言连在一起看没看明白你对哪个步骤的哪个结果有疑虑，</p>
-<p>可以写在现象里面（用注释即可）哈</p>
-<p>2019-02-16</p>
-<p>晨思暮语   0</p>
-<p>mysql&gt; select version();</p>
-<p>+————+</p>
-<p>| version() |</p>
-<p>+————+</p>
-<p>| 5.7.22-log |</p>
-<p>+————+</p>
-<p>实验1:</p>
-<p>SESSION A:</p>
-<p>mysql&gt; begin;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 2 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>SESSION B:</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 1 row affected (0.01 sec)</p>
-<p>Rows matched: 1 Changed: 1 Warnings: 0</p>
-<p>SESSION A:</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>Rows matched: 1 Changed: 0 Warnings: 0</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 2 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>实验2:</p>
-<p>SESSION A:</p>
-<p>mysql&gt; begin;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 2 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>SESSION B:</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 1 row affected (0.00 sec)</p>
-<p>Rows matched: 1 Changed: 1 Warnings: 0</p>
-<p>SESSION A:</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>BLOCKED</p>
-<p>SESSION B:</p>
-<p>mysql&gt; commit;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>SESSION A:UPDATE</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 0 rows affected (5.43 sec)</p>
-<p>Rows matched: 1 Changed: 0 Warnings: 0</p>
-<p>mysql&gt; </p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 2 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>实验3:</p>
-<p>SESSION A:</p>
-<p>mysql&gt; begin;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>+—-+——+</p>
-<p>| id | a |</p>
-<p>+—-+——+</p>
-<p>| 1 | 2 |</p>
-<p>+—-+——+</p>
-<p>1 row in set (0.00 sec)</p>
-<p>SESSION B:</p>
-<p>mysql&gt; begin;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 1 row affected (0.00 sec)</p>
-<p>Rows matched: 1 Changed: 1 Warnings: 0</p>
-<p>SESSION A:</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>blocked</p>
-<p>SESSION B:</p>
-<p>mysql&gt; rollback;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>SESSION A:UPDATE</p>
-<p>mysql&gt; update t set a&#x3D;3 where id&#x3D;1;</p>
-<p>Query OK, 1 row affected (5.21 sec)</p>
-<p>Rows matched: 1 C</p>
-<p>2019-02-15</p>
-<p>库淘淘   0</p>
-<p>如果不加local 如secure_file_priv 设置为null 或者路径 可能就不能成功,这样加了之后可以保证</p>
-<p>执行成功率不受参数secure_file_priv影响。 还有发现物理拷贝文件后，权限所属用户还得改下</p>
-<p>，不然import tablespace 会报错找不到文件，老师是不是应该补充上去，不然容易踩坑。2019-02-15</p>
-<p> 作者回复</p>
-<p>嗯嗯，有同学已经踩了，</p>
-<p>我加个说明进去，多谢提醒</p>
-<p>2019-02-15</p>
-<p>lionetes   0</p>
-<p>@undifined 看下是否是 权限问题引起的 cp 完后 是不是mysql 权限</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>  经验丰富</p>
-<p>如果进程用mysql用户启动，命令行是在root账号下，确实会出现这种情况</p>
-<p>2019-02-15</p>
-<p>Ryoma   0</p>
-<p>问老师一个主题无关的问题：现有数据库中有个表字段为text类型，但是目前发现text中的数据</p>
-<p>有点不太对。请问在MySQL中有没有办法确认在插入时是否发生截断数据的情况么？（因为该字段被修改过</p>
-<p>，我现在不方便恢复当时的现场）</p>
-<p>2019-02-15</p>
-<p> 作者回复</p>
-<p>看那个语句的binlog （是row吧？）  </p>
-<p>2019-02-15</p>
-<pre><code>
-</code></pre>
+<p>2 和3 配合起来保证最终一致性。</p>
+<p>这种设计我见到得比较多，你评估下是否符合你们业务的需求哈2019-02-15undifined   3老师，用物理导入的方式执行 alter table r import tablespace 时 提示ERROR 1812 (HY000): Tablespace is missing for table <code>db1</code>.<code>r</code>. 此时 db1&#x2F; 下面的文件有 db.opt r.cfg r.frm r.ibd t.frm t.ibd；这个该怎么处理执行步骤：</p>
+<p>mysql&gt; create table r like t;Query OK, 0 rows affected (0.01 sec)mysql&gt; alter table r discard tablespace;Query OK, 0 rows affected (0.01 sec)mysql&gt; flush table t for export;Query OK, 0 rows affected (0.00 sec)cp t.cfg r.cfgcp t.ibd r.ibdmysql&gt; unlock tables;Query OK, 0 rows affected (0.01 sec)mysql&gt; alter table r import tablespace;ERROR 1812 (HY000): Tablespace is missing for table <code>db1</code>.<code>r</code>.2019-02-15 作者回复应该就是评论区其他同学帮忙回复的权限问题了吧？2019-02-15lionetes   2mysql&gt; select * from t;+—-+——+| id | name |+—-+——+| 1 | Bob || 2 | Mary || 3 | Jane || 4 | Lisa || 5 | Mary || 6 | Jane || 7 | Lisa |+—-+——+7 rows in set (0.00 sec)mysql&gt; create table tt like t;Query OK, 0 rows affected (0.03 sec)mysql&gt; alter table tt discard tablespace;Query OK, 0 rows affected (0.01 sec)mysql&gt; flush table t for export;Query OK, 0 rows affected (0.01 sec)mysql&gt; unlock tables;Query OK, 0 rows affected (0.00 sec)mysql&gt; alter table tt import tablespace;Query OK, 0 rows affected (0.03 sec)mysql&gt; show tables;+—————-+| Tables_in_test |+—————-+| t || t2 || tt |+—————-+3 rows in set (0.00 sec)mysql&gt; select * from t;+—-+——+| id | name |+—-+——+| 1 | Bob || 2 | Mary || 3 | Jane || 4 | Lisa || 5 | Mary || 6 | Jane || 7 | Lisa |+—-+——+7 rows in set (0.00 sec)mysql&gt; select * from tt;+—-+——+| id | name |+—-+——+| 1 | Bob || 2 | Mary || 3 | Jane || 4 | Lisa || 5 | Mary || 6 | Jane || 7 | Lisa |+—-+——+7 rows in set (0.00 sec)ll 后 查看 tt.cfg 文件没有自动删除 5.7mysql-rw-r—–. 1 mysql mysql 380 2月 15 09:51 tt.cfg-rw-r—–. 1 mysql mysql 8586 2月 15 09:49 tt.frm-rw-r—–. 1 mysql mysql 98304 2月 15 09:51 tt.ibd2019-02-15 作者回复你说得对， 细致import动作 不会自动删除cfg文件，我图改一下2019-02-15☆appleう   2老师，我想问一个关于事务的问题，一个事务中有3个操作，插入一条数据(本地操作),更新一条数据(本地操作)，然后远程调用，通知对方更新上面数据(如果远程调用失败会重试，最多3次，如果遇到网络等问题，远程调用时间会达到5s,极端情况3次会达到15s)，那么极端情况事务将长达5-15s，这样会带来什么影响吗？2019-02-15 作者回复“通知对方更新上面数据” 是啥概念，如果你这个事务没提交，其他线程也看不到前两个操作的结果的。</p>
+<p>设计上不建议留这么长的事务哈，最好是可以先把事务提交了，再去做耗时的操作。</p>
+<p>2019-02-15AstonPutting   1老师，mysqlpump能否在平时代替mysqldump的使用？2019-02-22 作者回复我觉得是2019-02-23PengfeiWang   1老师，您好：</p>
+<p>文中“–add-locks 设置为 0，表示在输出的文件结果里，不增加” LOCK TABLES t WRITE;” 是否是笔误，–add-locks应该是在insert语句前后添加锁，我的理解此处应该是–skip-add-locks，不知道是否是这样？2019-02-18 作者回复嗯嗯，命令中写错了，是–add-locks&#x3D;0，效果上跟–skip-add-locks是一样的哈 细致2019-02-19长杰   1课后题答案不加“local”，是读取服务端的文件，这个文件必须在 secure_file_priv 指定的目录或子目录下；</p>
+<p>而备库的apply线程执行时先讲csv内容读出生成tmp目录下的临时文件，这个目录容易受secure_file_priv的影响，如果备库改参数设置为Null或指定的目录，可能导致load操作失败，加local则不受这个影响。</p>
+<p>2019-02-17 作者回复 2019-02-18尘封   1老师mysqldump导出的文件里，单条sql里的value值有什么限制吗默认情况下，假如一个表有几百万，那mysql会分为多少个sql导出？问题：因为从库可能没有load的权限，所以local2019-02-15 作者回复好问题，会控制单行不会超过参数net_buffer_length，这个参数是可以通过–net_buffer_length 传给mysqldump 工具的2019-02-28佳   0老师好，这个&#x2F;tmp&#x2F;SQL_LOAD_MB-1-0 是应该在主库上面，还是备库上面？为啥我执行完是在主库上面出现了这个文件呢？2019-03-14 作者回复就是在MySQL的运行进程所在的主机上2019-03-16xxj123go   0传输表空间方式对主从同步会有影响么2019-03-12 作者回复你可以看下执行以后，进不进binlog  2019-03-13王显伟   0第一位留言的朋友报错我也复现了，原因是用root复制的文件，没有修改属组导致的2019-02-16 作者回复 2019-02-17夜空中最亮的星（华仔）   0学习完老师的课都想做dba了2019-02-15undifined   0老师 错误信息的截屏 <a target="_blank" rel="noopener" href="https://www.dropbox.com/s/8wyet4bt9yfjsau/mysqlerror.png?dl=0MySQL">https://www.dropbox.com/s/8wyet4bt9yfjsau/mysqlerror.png?dl=0MySQL</a> 5.7，Mac 上的 Docker 容器里面跑的，版本是 5.7.172019-02-15 作者回复额，打不开。</p>
+<p>。</p>
+<p>可否发个微博贴图 2019-02-16晨思暮语   0不好意思，第一条留言中，实验三的最后一天语句还是少了，在这里贴一下，mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 3 |+—-+——+1 row in set (0.00 sec)2019-02-15晨思暮语   0老师好，由于字数限制，分两条：</p>
+<p>我用的是percona数据库，问题是第15章中的思考题。</p>
+<p>根据我做的实验，结论应该是：</p>
+<p>MySQL 调用了 InnoDB 引擎提供的“修改为 (1,2)”这个接口，但是引擎发现值与原来相同，不更新，直接返回一直没有想明白，老师再帮忙看看，谢谢！2019-02-15 作者回复我两个留言连在一起看没看明白你对哪个步骤的哪个结果有疑虑，可以写在现象里面（用注释即可）哈2019-02-16晨思暮语   0mysql&gt; select version();+————+| version() |+————+| 5.7.22-log |+————+实验1:SESSION A:mysql&gt; begin;Query OK, 0 rows affected (0.00 sec)mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 2 |+—-+——+1 row in set (0.00 sec)SESSION B:mysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 1 row affected (0.01 sec)Rows matched: 1 Changed: 1 Warnings: 0SESSION A:mysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 0 rows affected (0.00 sec)Rows matched: 1 Changed: 0 Warnings: 0mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 2 |+—-+——+1 row in set (0.00 sec)实验2:SESSION A:mysql&gt; begin;Query OK, 0 rows affected (0.00 sec)mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 2 |+—-+——+1 row in set (0.00 sec)SESSION B:mysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 1 row affected (0.00 sec)Rows matched: 1 Changed: 1 Warnings: 0SESSION A:mysql&gt; update t set a&#x3D;3 where id&#x3D;1;BLOCKEDSESSION B:mysql&gt; commit;Query OK, 0 rows affected (0.00 sec)SESSION A:UPDATEmysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 0 rows affected (5.43 sec)Rows matched: 1 Changed: 0 Warnings: 0mysql&gt; mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 2 |+—-+——+1 row in set (0.00 sec)实验3:SESSION A:mysql&gt; begin;Query OK, 0 rows affected (0.00 sec)mysql&gt; select * from t where id&#x3D;1;+—-+——+| id | a |+—-+——+| 1 | 2 |+—-+——+1 row in set (0.00 sec)SESSION B:mysql&gt; begin;Query OK, 0 rows affected (0.00 sec)mysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 1 row affected (0.00 sec)Rows matched: 1 Changed: 1 Warnings: 0SESSION A:mysql&gt; update t set a&#x3D;3 where id&#x3D;1;blockedSESSION B:mysql&gt; rollback;Query OK, 0 rows affected (0.00 sec)SESSION A:UPDATEmysql&gt; update t set a&#x3D;3 where id&#x3D;1;Query OK, 1 row affected (5.21 sec)Rows matched: 1 C2019-02-15库淘淘   0如果不加local 如secure_file_priv 设置为null 或者路径 可能就不能成功,这样加了之后可以保证执行成功率不受参数secure_file_priv影响。</p>
+<p> 还有发现物理拷贝文件后，权限所属用户还得改下，不然import tablespace 会报错找不到文件，老师是不是应该补充上去，不然容易踩坑。</p>
+<p>2019-02-15 作者回复嗯嗯，有同学已经踩了，我加个说明进去，多谢提醒2019-02-15lionetes   0@undifined 看下是否是 权限问题引起的 cp 完后 是不是mysql 权限2019-02-15 作者回复  经验丰富如果进程用mysql用户启动，命令行是在root账号下，确实会出现这种情况2019-02-15Ryoma   0问老师一个主题无关的问题：现有数据库中有个表字段为text类型，但是目前发现text中的数据有点不太对。</p>
+<p>请问在MySQL中有没有办法确认在插入时是否发生截断数据的情况么？（因为该字段被修改过，我现在不方便恢复当时的现场）2019-02-15 作者回复看那个语句的binlog （是row吧？）  2019-02-15&#96;&#96;&#96;</p>
 
     </div>
 
@@ -846,14 +556,14 @@ end while;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-count">337</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -895,12 +605,12 @@ end while;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">390k</span>
+    <span title="站点总字数">288k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:40</span>
+    <span title="站点阅读时长">17:26</span>
 </div>
 
 <!--

@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="问题解析19 | 为什么我只查一行的语句，也执行这么慢？2018-12-26 林晓斌 一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大 量的数据。但有些情况下，“查一行”，也会执行得特别慢。今天，我就跟你聊聊这个有趣的话 题，看看什么情况下，会出现这个现象。需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或 ioutil（I">
+  <meta name="description" content="问题解析为什么我只查一行的语句，也执行这么慢一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大量的数据。 但有些情况下，“查一行”，也会执行得特别慢。 今天，我就跟你聊聊这个有趣的话题，看看什么情况下，会出现这个现象。 需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或ioutil（IO利用率）很高，这种情况下所有语句的执行都">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql-为什么我只查一行的语句也执行这么慢">
 <meta property="og:url" content="https://www.fastolf.com/posts/f5203c05.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="问题解析19 | 为什么我只查一行的语句，也执行这么慢？2018-12-26 林晓斌 一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大 量的数据。但有些情况下，“查一行”，也会执行得特别慢。今天，我就跟你聊聊这个有趣的话 题，看看什么情况下，会出现这个现象。需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或 ioutil（I">
+<meta property="og:description" content="问题解析为什么我只查一行的语句，也执行这么慢一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大量的数据。 但有些情况下，“查一行”，也会执行得特别慢。 今天，我就跟你聊聊这个有趣的话题，看看什么情况下，会出现这个现象。 需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或ioutil（IO利用率）很高，这种情况下所有语句的执行都">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-11-22T22:15:35.000Z">
-<meta property="article:modified_time" content="2023-01-06T09:44:03.165Z">
+<meta property="article:modified_time" content="2023-01-18T15:26:04.968Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+                <time title="修改时间：2023-01-18 23:26:04" itemprop="dateModified" datetime="2023-01-18T23:26:04+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>6.4k</span>
+              <span>3.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>23 分钟</span>
+              <span>12 分钟</span>
             </span>
 
         </div>
@@ -267,363 +267,120 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>19 | 为什么我只查一行的语句，也执行这么慢？2018-12-26 林晓斌</p>
-<p>一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大</p>
-<p>量的数据。但有些情况下，“查一行”，也会执行得特别慢。今天，我就跟你聊聊这个有趣的话</p>
-<p>题，看看什么情况下，会出现这个现象。需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或</p>
-<p>ioutil（IO利用率）很高，这种情况下所有语句的执行都有可能变慢，不属于我们今天的讨论范</p>
-<p>围。为了便于描述，我还是构造一个表，基于这个表来说明今天的问题。这个表有两个字段id和c，</p>
-<p>并且我在里面插入了10万行记录。接下来，我会用几个不同的场景来举例，有些是前面的文章中我们已经介绍过的知识点，你看看</p>
-<p>能不能一眼看穿，来检验一下吧。第一类：查询长时间不返回</p>
-<p>如图1所示，在表t执行下面的SQL语句：</p>
-<p>查询结果长时间不返回。图1 查询长时间不返回</p>
-<p>一般碰到这种情况的话，大概率是表t被锁住了。接下来分析原因的时候，一般都是首先执行一</p>
-<p>下show processlist命令，看看当前语句处于什么状态。mysql&gt; CREATE TABLE t̀  ̀(</p>
-<p>  ìd  ̀int(11) NOT NULL,</p>
-<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
-<p>  PRIMARY KEY (̀ id )̀</p>
-<p>) ENGINE&#x3D;InnoDB;</p>
-<p>delimiter ;;</p>
-<p>create procedure idata()</p>
-<p>begin</p>
-<p>  declare i int;</p>
-<p>  set i&#x3D;1;</p>
-<p>  while(i&lt;&#x3D;100000)do</p>
-<pre><code>insert into t values(i,i);
-
-set i=i+1;
-</code></pre>
-<p>  end while;</p>
-<p>end;;</p>
-<p>delimiter ;</p>
-<p>call idata();</p>
-<p>mysql&gt; select * from t where id&#x3D;1;</p>
-<p>然后我们再针对每种状态，去分析它们产生的原因、如何复现，以及如何处理。等MDL锁</p>
-<p>如图2所示，就是使用show processlist命令查看Waiting for table metadata lock的示意图。图2 Waiting for table metadata lock状态示意图</p>
-<p>出现这个状态表示的是，现在有一个线程正在表t上请求或者持有MDL写锁，把select语句</p>
-<p>堵住了。在第6篇文章《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》中，我给你介绍过一种复现</p>
-<p>方法。但需要说明的是，那个复现过程是基于MySQL 5.6版本的。而MySQL 5.7版本修改了MDL</p>
-<p>的加锁策略，所以就不能复现这个场景了。不过，在MySQL 5.7版本下复现这个场景，也很容易。如图3所示，我给出了简单的复现步骤。图3 MySQL 5.7中Waiting for table metadata lock的复现步骤</p>
-<p>session A 通过lock table命令持有表t的MDL写锁，而session B的查询需要获取MDL读锁。所</p>
-<p>以，session B进入等待状态。这类问题的处理方式，就是找到谁持有MDL写锁，然后把它kill掉。但是，由于在show processlist的结果里面，session A的Command列是“Sleep”，导致查找起来</p>
-<p>很不方便。不过有了performance_schema和sys系统库以后，就方便多了。（MySQL启动时需</p>
-<p>要设置performance_schema&#x3D;on，相比于设置为off会有10%左右的性能损失)</p>
-<p>通过查询sys.schema_table_lock_waits这张表，我们就可以直接找出造成阻塞的process id，把</p>
-<p>这个连接用kill 命令断开即可。图4 查获加表锁的线程id</p>
-<p>等flush</p>
-<p>接下来，我给你举另外一种查询被堵住的情况。我在表t上，执行下面的SQL语句：</p>
-<p>这里，我先卖个关子。你可以看一下图5。我查出来这个线程的状态是Waiting for table flush，你可以设想一下这是什</p>
-<p>么原因。图5 Waiting for table flush状态示意图</p>
-<p>这个状态表示的是，现在有一个线程正要对表t做flush操作。MySQL里面对表做flush操作的用</p>
-<p>法，一般有以下两个：</p>
-<p>这两个flush语句，如果指定表t的话，代表的是只关闭表t；如果没有指定具体的表名，则表示关</p>
-<p>闭MySQL里所有打开的表。但是正常这两个语句执行起来都很快，除非它们也被别的线程堵住了。所以，出现Waiting for table flush状态的可能情况是：有一个flush tables命令被别的语句堵住</p>
-<p>mysql&gt; select * from information_schema.processlist where id&#x3D;1;</p>
-<p>flush tables t with read lock;</p>
-<p>flush tables with read lock;</p>
-<p>了，然后它又堵住了我们的select语句。现在，我们一起来复现一下这种情况，复现步骤如图6所示：</p>
-<p>图6 Waiting for table flush的复现步骤</p>
-<p>在session A中，我故意每行都调用一次sleep(1)，这样这个语句默认要执行10万秒，在这期间表</p>
-<p>t一直是被session A“打开”着。然后，session B的flush tables t命令再要去关闭表t，就需要等</p>
-<p>session A的查询结束。这样，session C要再次查询的话，就会被flush 命令堵住了。图7是这个复现步骤的show processlist结果。这个例子的排查也很简单，你看到这个show</p>
-<p>processlist的结果，肯定就知道应该怎么做了。图 7 Waiting for table flush的show processlist 结果</p>
-<p>等行锁</p>
-<p>现在，经过了表级锁的考验，我们的select 语句终于来到引擎里了。上面这条语句的用法你也很熟悉了，我们在第8篇《事务到底是隔离的还是不隔离的？》文章介</p>
-<p>绍当前读时提到过。由于访问id&#x3D;1这个记录时要加读锁，如果这时候已经有一个事务在这行记录上持有一个写锁，我</p>
-<p>们的select语句就会被堵住。复现步骤和现场如下：</p>
-<p>mysql&gt; select * from t where id&#x3D;1 lock in share mode; </p>
-<p>图 8 行锁复现</p>
-<p>图 9 行锁show processlist 现场</p>
-<p>显然，session A启动了事务，占有写锁，还不提交，是导致session B被堵住的原因。这个问题并不难分析，但问题是怎么查出是谁占着这个写锁。如果你用的是MySQL 5.7版本，可</p>
-<p>以通过sys.innodb_lock_waits 表查到。查询方法是：</p>
-<p>mysql&gt; select * from t sys.innodb_lock_waits where locked_table&#x3D; ‘̀test’.’t’̀ \G</p>
-<p>图10 通过sys.innodb_lock_waits 查行锁</p>
-<p>可以看到，这个信息很全，4号线程是造成堵塞的罪魁祸首。而干掉这个罪魁祸首的方式，就是</p>
-<p>KILL QUERY 4或KILL 4。不过，这里不应该显示“KILL QUERY 4”。这个命令表示停止4号线程当前正在执行的语句，而这</p>
-<p>个方法其实是没有用的。因为占有行锁的是update语句，这个语句已经是之前执行完成了的，</p>
-<p>现在执行KILL QUERY，无法让这个事务去掉id&#x3D;1上的行锁。实际上，KILL 4才有效，也就是说直接断开这个连接。这里隐含的一个逻辑就是，连接被断开的</p>
-<p>时候，会自动回滚这个连接里面正在执行的线程，也就释放了id&#x3D;1上的行锁。第二类：查询慢</p>
-<p>经过了重重封“锁”，我们再来看看一些查询慢的例子。先来看一条你一定知道原因的SQL语句：</p>
-<p>mysql&gt; select * from t where c&#x3D;50000 limit 1;</p>
-<p>由于字段c上没有索引，这个语句只能走id主键顺序扫描，因此需要扫描5万行。作为确认，你可以看一下慢查询日志。注意，这里为了把所有语句记录到slow log里，我在连接</p>
-<p>后先执行了 set long_query_time&#x3D;0，将慢查询日志的时间阈值设置为0。图11 全表扫描5万行的slow log</p>
-<p>Rows_examined显示扫描了50000行。你可能会说，不是很慢呀，11.5毫秒就返回了，我们线上</p>
-<p>一般都配置超过1秒才算慢查询。但你要记住：坏查询不一定是慢查询。我们这个例子里面只</p>
-<p>有10万行记录，数据量大起来的话，执行时间就线性涨上去了。扫描行数多，所以执行慢，这个很好理解。但是接下来，我们再看一个只扫描一行，但是执行很慢的语句。如图12所示，是这个例子的slow log。可以看到，执行的语句是</p>
-<p>虽然扫描行数是1，但执行时间却长达800毫秒。图12 扫描一行却执行得很慢</p>
-<p>是不是有点奇怪呢，这些时间都花在哪里了？如果我把这个slow log的截图再往下拉一点，你可以看到下一个语句，select * from t where id&#x3D;1</p>
-<p>lock in share mode，执行时扫描行数也是1行，执行时间是0.2毫秒。图 13 加上lock in share mode的slow log</p>
-<p>看上去是不是更奇怪了？按理说lock in share mode还要加锁，时间应该更长才对啊。可能有的同学已经有答案了。如果你还没有答案的话，我再给你一个提示信息，图14是这两个</p>
-<p>mysql&gt; select * from t where id&#x3D;1；</p>
-<p>语句的执行输出结果。图14 两个语句的输出结果</p>
-<p>第一个语句的查询结果里c&#x3D;1，带lock in share mode的语句返回的是c&#x3D;1000001。看到这里应该</p>
-<p>有更多的同学知道原因了。如果你还是没有头绪的话，也别着急。我先跟你说明一下复现步骤，</p>
-<p>再分析原因。图15 复现步骤</p>
-<p>你看到了，session A先用start transaction with consistent snapshot命令启动了一个事务，之后</p>
-<p>session B才开始执行update 语句。session B执行完100万次update语句后，id&#x3D;1这一行处于什么状态呢？你可以从图16中找到答</p>
-<p>案。图16 id&#x3D;1的数据状态</p>
-<p>session B更新完100万次，生成了100万个回滚日志(undo log)。带lock in share mode的SQL语句，是当前读，因此会直接读到1000001这个结果，所以速度很</p>
-<p>快；而select * from t where id&#x3D;1这个语句，是一致性读，因此需要从1000001开始，依次执行</p>
-<p>undo log，执行了100万次以后，才将1这个结果返回。注意，undo log里记录的其实是“把2改成1”，“把3改成2”这样的操作逻辑，画成减1的目的是方</p>
-<p>便你看图。小结</p>
-<p>今天我给你举了在一个简单的表上，执行“查一行”，可能会出现的被锁住和执行慢的例子。这其</p>
-<p>中涉及到了表锁、行锁和一致性读的概念。在实际使用中，碰到的场景会更复杂。但大同小异，你可以按照我在文章中介绍的定位方法，来</p>
-<p>定位并解决问题。最后，我给你留一个问题吧。我们在举例加锁读的时候，用的是这个语句，select * from t where id&#x3D;1 lock in share mode。由</p>
-<p>于id上有索引，所以可以直接定位到id&#x3D;1这一行，因此读锁也是只加在了这一行上。但如果是下面的SQL语句，</p>
-<p>这个语句序列是怎么加锁的呢？加的锁又是什么时候释放呢？你可以把你的观点和验证方法写在留言区里，我会在下一篇文章的末尾给出我的参考答案。感谢</p>
-<p>你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
-<p>在上一篇文章最后，我留给你的问题是，希望你可以分享一下之前碰到过的、与文章中类似的场</p>
-<p>景。@封建的风 提到一个有趣的场景，值得一说。我把他的问题重写一下，表结构如下：</p>
-<p>假设现在表里面，有100万行数据，其中有10万行数据的b的值是’1234567890’， 假设现在执行</p>
-<p>语句是这么写的:</p>
-<p>这时候，MySQL会怎么执行呢？最理想的情况是，MySQL看到字段b定义的是varchar(10)，那肯定返回空呀。可惜，MySQL并没</p>
-<p>有这么做。那要不，就是把’1234567890abcd’拿到索引里面去做匹配，肯定也没能够快速判断出索引树b上</p>
-<p>并没有这个值，也很快就能返回空结果。begin;</p>
-<p>select * from t where c&#x3D;5 for update;</p>
-<p>commit;</p>
-<p>mysql&gt; CREATE TABLE t̀able_a  ̀(</p>
-<p>  ìd  ̀int(11) NOT NULL,</p>
-<p>  &#96;b  ̀varchar(10) DEFAULT NULL,</p>
-<p>  PRIMARY KEY (̀ id )̀,</p>
-<p>  KEY &#96;b  ̀(̀ b )̀</p>
-<p>) ENGINE&#x3D;InnoDB;</p>
-<p>mysql&gt; select * from table_a where b&#x3D;’1234567890abcd’;</p>
-<p>但实际上，MySQL也不是这么做的。这条SQL语句的执行很慢，流程是这样的：</p>
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>为什么我只查一行的语句，也执行这么慢一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大量的数据。</p>
+<p>但有些情况下，“查一行”，也会执行得特别慢。</p>
+<p>今天，我就跟你聊聊这个有趣的话题，看看什么情况下，会出现这个现象。</p>
+<p>需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或ioutil（IO利用率）很高，这种情况下所有语句的执行都有可能变慢，不属于我们今天的讨论范围。</p>
+<p>为了便于描述，我还是构造一个表，基于这个表来说明今天的问题。</p>
+<p>这个表有两个字段id和c，并且我在里面插入了10万行记录。</p>
+<p>接下来，我会用几个不同的场景来举例，有些是前面的文章中我们已经介绍过的知识点，你看看能不能一眼看穿，来检验一下吧。</p>
+<p>第一类：查询长时间不返回如图1所示，在表t执行下面的SQL语句：</p>
+<p>查询结果长时间不返回。</p>
+<p>图1 查询长时间不返回一般碰到这种情况的话，大概率是表t被锁住了。</p>
+<p>接下来分析原因的时候，一般都是首先执行一下show processlist命令，看看当前语句处于什么状态。</p>
+<p>mysql&gt; CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  &#96;c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀) ENGINE&#x3D;InnoDB;delimiter ;;create procedure idata()begin  declare i int;  set i&#x3D;1;  while(i&lt;&#x3D;100000)do    insert into t values(i,i);    set i&#x3D;i+1;  end while;end;;delimiter ;call idata();mysql&gt; select * from t where id&#x3D;1;然后我们再针对每种状态，去分析它们产生的原因、如何复现，以及如何处理。</p>
+<p>等MDL锁如图2所示，就是使用show processlist命令查看Waiting for table metadata lock的示意图。</p>
+<p>图2 Waiting for table metadata lock状态示意图出现这个状态表示的是，现在有一个线程正在表t上请求或者持有MDL写锁，把select语句堵住了。</p>
+<p>在第6篇文章《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》中，我给你介绍过一种复现方法。</p>
+<p>但需要说明的是，那个复现过程是基于MySQL 5.6版本的。</p>
+<p>而MySQL 5.7版本修改了MDL的加锁策略，所以就不能复现这个场景了。</p>
+<p>不过，在MySQL 5.7版本下复现这个场景，也很容易。</p>
+<p>如图3所示，我给出了简单的复现步骤。</p>
+<p>图3 MySQL 5.7中Waiting for table metadata lock的复现步骤session A 通过lock table命令持有表t的MDL写锁，而session B的查询需要获取MDL读锁。</p>
+<p>所以，session B进入等待状态。</p>
+<p>这类问题的处理方式，就是找到谁持有MDL写锁，然后把它kill掉。</p>
+<p>但是，由于在show processlist的结果里面，session A的Command列是“Sleep”，导致查找起来很不方便。</p>
+<p>不过有了performance_schema和sys系统库以后，就方便多了。</p>
+<p>（MySQL启动时需要设置performance_schema&#x3D;on，相比于设置为off会有10%左右的性能损失)通过查询sys.schema_table_lock_waits这张表，我们就可以直接找出造成阻塞的process id，把这个连接用kill 命令断开即可。</p>
+<p>图4 查获加表锁的线程id等flush接下来，我给你举另外一种查询被堵住的情况。</p>
+<p>我在表t上，执行下面的SQL语句：</p>
+<p>这里，我先卖个关子。</p>
+<p>你可以看一下图5。</p>
+<p>我查出来这个线程的状态是Waiting for table flush，你可以设想一下这是什么原因。</p>
+<p>图5 Waiting for table flush状态示意图这个状态表示的是，现在有一个线程正要对表t做flush操作。</p>
+<p>MySQL里面对表做flush操作的用法，一般有以下两个：</p>
+<p>这两个flush语句，如果指定表t的话，代表的是只关闭表t；如果没有指定具体的表名，则表示关闭MySQL里所有打开的表。</p>
+<p>但是正常这两个语句执行起来都很快，除非它们也被别的线程堵住了。</p>
+<p>所以，出现Waiting for table flush状态的可能情况是：有一个flush tables命令被别的语句堵住mysql&gt; select * from information_schema.processlist where id&#x3D;1;flush tables t with read lock;flush tables with read lock;了，然后它又堵住了我们的select语句。</p>
+<p>现在，我们一起来复现一下这种情况，复现步骤如图6所示：</p>
+<p>图6 Waiting for table flush的复现步骤在session A中，我故意每行都调用一次sleep(1)，这样这个语句默认要执行10万秒，在这期间表t一直是被session A“打开”着。</p>
+<p>然后，session B的flush tables t命令再要去关闭表t，就需要等session A的查询结束。</p>
+<p>这样，session C要再次查询的话，就会被flush 命令堵住了。</p>
+<p>图7是这个复现步骤的show processlist结果。</p>
+<p>这个例子的排查也很简单，你看到这个showprocesslist的结果，肯定就知道应该怎么做了。</p>
+<p>图 7 Waiting for table flush的show processlist 结果等行锁现在，经过了表级锁的考验，我们的select 语句终于来到引擎里了。</p>
+<p>上面这条语句的用法你也很熟悉了，我们在第8篇《事务到底是隔离的还是不隔离的？》文章介绍当前读时提到过。</p>
+<p>由于访问id&#x3D;1这个记录时要加读锁，如果这时候已经有一个事务在这行记录上持有一个写锁，我们的select语句就会被堵住。</p>
+<p>复现步骤和现场如下：</p>
+<p>mysql&gt; select * from t where id&#x3D;1 lock in share mode; 图 8 行锁复现图 9 行锁show processlist 现场显然，session A启动了事务，占有写锁，还不提交，是导致session B被堵住的原因。</p>
+<p>这个问题并不难分析，但问题是怎么查出是谁占着这个写锁。</p>
+<p>如果你用的是MySQL 5.7版本，可以通过sys.innodb_lock_waits 表查到。</p>
+<p>查询方法是：</p>
+<p>mysql&gt; select * from t sys.innodb_lock_waits where locked_table&#x3D; ‘̀test’.’t’̀ \G图10 通过sys.innodb_lock_waits 查行锁可以看到，这个信息很全，4号线程是造成堵塞的罪魁祸首。</p>
+<p>而干掉这个罪魁祸首的方式，就是KILL QUERY 4或KILL 4。</p>
+<p>不过，这里不应该显示“KILL QUERY 4”。</p>
+<p>这个命令表示停止4号线程当前正在执行的语句，而这个方法其实是没有用的。</p>
+<p>因为占有行锁的是update语句，这个语句已经是之前执行完成了的，现在执行KILL QUERY，无法让这个事务去掉id&#x3D;1上的行锁。</p>
+<p>实际上，KILL 4才有效，也就是说直接断开这个连接。</p>
+<p>这里隐含的一个逻辑就是，连接被断开的时候，会自动回滚这个连接里面正在执行的线程，也就释放了id&#x3D;1上的行锁。</p>
+<p>第二类：查询慢经过了重重封“锁”，我们再来看看一些查询慢的例子。</p>
+<p>先来看一条你一定知道原因的SQL语句：</p>
+<p>mysql&gt; select * from t where c&#x3D;50000 limit 1;由于字段c上没有索引，这个语句只能走id主键顺序扫描，因此需要扫描5万行。</p>
+<p>作为确认，你可以看一下慢查询日志。</p>
+<p>注意，这里为了把所有语句记录到slow log里，我在连接后先执行了 set long_query_time&#x3D;0，将慢查询日志的时间阈值设置为0。</p>
+<p>图11 全表扫描5万行的slow logRows_examined显示扫描了50000行。</p>
+<p>你可能会说，不是很慢呀，11.5毫秒就返回了，我们线上一般都配置超过1秒才算慢查询。</p>
+<p>但你要记住：坏查询不一定是慢查询。</p>
+<p>我们这个例子里面只有10万行记录，数据量大起来的话，执行时间就线性涨上去了。</p>
+<p>扫描行数多，所以执行慢，这个很好理解。</p>
+<p>但是接下来，我们再看一个只扫描一行，但是执行很慢的语句。</p>
+<p>如图12所示，是这个例子的slow log。</p>
+<p>可以看到，执行的语句是虽然扫描行数是1，但执行时间却长达800毫秒。</p>
+<p>图12 扫描一行却执行得很慢是不是有点奇怪呢，这些时间都花在哪里了？如果我把这个slow log的截图再往下拉一点，你可以看到下一个语句，select * from t where id&#x3D;1lock in share mode，执行时扫描行数也是1行，执行时间是0.2毫秒。</p>
+<p>图 13 加上lock in share mode的slow log看上去是不是更奇怪了？按理说lock in share mode还要加锁，时间应该更长才对啊。</p>
+<p>可能有的同学已经有答案了。</p>
+<p>如果你还没有答案的话，我再给你一个提示信息，图14是这两个mysql&gt; select * from t where id&#x3D;1；</p>
+<p>语句的执行输出结果。</p>
+<p>图14 两个语句的输出结果第一个语句的查询结果里c&#x3D;1，带lock in share mode的语句返回的是c&#x3D;1000001。</p>
+<p>看到这里应该有更多的同学知道原因了。</p>
+<p>如果你还是没有头绪的话，也别着急。</p>
+<p>我先跟你说明一下复现步骤，再分析原因。</p>
+<p>图15 复现步骤你看到了，session A先用start transaction with consistent snapshot命令启动了一个事务，之后session B才开始执行update 语句。</p>
+<p>session B执行完100万次update语句后，id&#x3D;1这一行处于什么状态呢？你可以从图16中找到答案。</p>
+<p>图16 id&#x3D;1的数据状态session B更新完100万次，生成了100万个回滚日志(undo log)。</p>
+<p>带lock in share mode的SQL语句，是当前读，因此会直接读到1000001这个结果，所以速度很快；而select * from t where id&#x3D;1这个语句，是一致性读，因此需要从1000001开始，依次执行undo log，执行了100万次以后，才将1这个结果返回。</p>
+<p>注意，undo log里记录的其实是“把2改成1”，“把3改成2”这样的操作逻辑，画成减1的目的是方便你看图。</p>
+<p>小结今天我给你举了在一个简单的表上，执行“查一行”，可能会出现的被锁住和执行慢的例子。</p>
+<p>这其中涉及到了表锁、行锁和一致性读的概念。</p>
+<p>在实际使用中，碰到的场景会更复杂。</p>
+<p>但大同小异，你可以按照我在文章中介绍的定位方法，来定位并解决问题。</p>
+<p>最后，我给你留一个问题吧。</p>
+<p>我们在举例加锁读的时候，用的是这个语句，select * from t where id&#x3D;1 lock in share mode。</p>
+<p>由于id上有索引，所以可以直接定位到id&#x3D;1这一行，因此读锁也是只加在了这一行上。</p>
+<p>但如果是下面的SQL语句，这个语句序列是怎么加锁的呢？加的锁又是什么时候释放呢？你可以把你的观点和验证方法写在留言区里，我会在下一篇文章的末尾给出我的参考答案。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间在上一篇文章最后，我留给你的问题是，希望你可以分享一下之前碰到过的、与文章中类似的场景。</p>
+<p>@封建的风 提到一个有趣的场景，值得一说。</p>
+<p>我把他的问题重写一下，表结构如下：</p>
+<p>假设现在表里面，有100万行数据，其中有10万行数据的b的值是’1234567890’， 假设现在执行语句是这么写的:这时候，MySQL会怎么执行呢？最理想的情况是，MySQL看到字段b定义的是varchar(10)，那肯定返回空呀。</p>
+<p>可惜，MySQL并没有这么做。</p>
+<p>那要不，就是把’1234567890abcd’拿到索引里面去做匹配，肯定也没能够快速判断出索引树b上并没有这个值，也很快就能返回空结果。</p>
+<p>begin;select * from t where c&#x3D;5 for update;commit;mysql&gt; CREATE TABLE t̀able_a  ̀(  ìd  ̀int(11) NOT NULL,  <code>b  ̀varchar(10) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY </code>b  ̀(̀ b )̀) ENGINE&#x3D;InnoDB;mysql&gt; select * from table_a where b&#x3D;’1234567890abcd’;但实际上，MySQL也不是这么做的。</p>
+<p>这条SQL语句的执行很慢，流程是这样的：</p>
 <ol>
-<li>在传给引擎执行的时候，做了字符截断。因为引擎里面这个行只定义了长度是10，所以只截</li>
+<li>在传给引擎执行的时候，做了字符截断。</li>
 </ol>
-<p>了前10个字节，就是’1234567890’进去做匹配；</p>
+<p>因为引擎里面这个行只定义了长度是10，所以只截了前10个字节，就是’1234567890’进去做匹配；</p>
 <ol start="2">
 <li><p>这样满足条件的数据有10万行；</p>
 </li>
 <li><p>因为是select *， 所以要做10万次回表；</p>
 </li>
-<li><p>但是每次回表以后查出整行，到server层一判断，b的值都不是’1234567890abcd’;</p>
-</li>
-<li><p>返回结果是空。这个例子，是我们文章内容的一个很好的补充。虽然执行过程中可能经过函数操作，但是最终在</p>
+<li><p>但是每次回表以后查出整行，到server层一判断，b的值都不是’1234567890abcd’;5. 返回结果是空。</p>
 </li>
 </ol>
-<p>拿到结果后，server层还是要做一轮判断的。评论区留言点赞板：</p>
-<p>@赖阿甘 提到了等号顺序问题，时间上MySQL优化器执行过程中，where 条件部分， a&#x3D;b和</p>
-<p>b&#x3D;a的写法是一样的。@沙漠里的骆驼 提到了一个常见的问题。相同的模板语句，但是匹配行数不同，语句执行时</p>
-<p>间相差很大。这种情况，在语句里面有order by这样的操作时会更明显。@Justin 回答了我们正文中的问题，如果id 的类型是整数，传入的参数类型是字符串的时候，</p>
-<p>可以用上索引。某、人   15</p>
-<p>最近几张干货越来越多了,很实用,收获不少.先回答今天的问题</p>
-<p>版本5.7.13</p>
-<p>rc模式下:</p>
-<p>session 1:</p>
-<p>begin;</p>
-<p>select * from t where c&#x3D;5 for update; </p>
-<p>session 2:</p>
-<p>delete from t where c&#x3D;10 –等待</p>
-<p>session 3:</p>
-<p>insert into t values(100001,8) –成功</p>
-<p>session 1:</p>
-<p>commit</p>
-<p>session 2:事务执行成功</p>
-<p>rr模式下:</p>
-<p>begin;</p>
-<p>select * from t where c&#x3D;5 for update; </p>
-<p>session 2:</p>
-<p>delete from t where c&#x3D;10 –等待</p>
-<p>session 3:</p>
-<p>insert into t values(100001,8) –等待</p>
-<p>session 1:</p>
-<p>commit</p>
-<p>session 2:事务执行成功</p>
-<p>session 3：事务执行成功</p>
-<p>从上面这两个简单的例子,可以大概看出上锁的流程.</p>
-<p>不管是rr模式还是rc模式,这条语句都会先在server层对表加上MDL S锁,然后进入到引擎层。rc模式下,由于数据量不大只有10W。通过实验可以证明session 1上来就把该表的所有行都锁住</p>
-<p>了。导致其他事务要对该表的所有现有记录做更新,是阻塞状态。为什么insert又能成功?</p>
-<p>说明rc模式下for update语句没有上gap锁,所以不阻塞insert对范围加插入意向锁,所以更新成功</p>
-<p>。session 1commit后,session 2执行成功。表明所有行的x锁是在事务提交完成以后才释放。rr模式下,session 1和session 2与rc模式下都一样,说明rr模式下也对所有行上了X锁。唯一的区别是insert也等待了,是因为rr模式下对没有索引的更新,聚簇索引上的所有记录，都被</p>
-<p>加上了X锁。其次，聚簇索引每条记录间的间隙(GAP)，也同时被加上了GAP锁。由于gap锁阻</p>
-<p>精选留言</p>
-<p>塞了insert要加的插入意向锁,导致insert也处于等待状态。只有当session 1 commit完成以后。s</p>
-<p>ession 1上的所有锁才会释放,S2,S3执行成功</p>
-<p>由于例子中的数据量还比较小,如果数据量达到千万级别,就比较直观的能看出,上锁是逐行上锁</p>
-<p>的一个过程.扫描一条上一条,直到所有行扫描完,rc模式下对所有行上x锁。rr模式下不仅对所有</p>
-<p>行上X锁,还对所有区间上gap锁.直到事务提交或者回滚完成后,上的锁才会被释放。2018-12-26</p>
-<p> 作者回复</p>
-<p>分析得非常好。两个模式下，各增加一个session 4 : update t set c&#x3D;100 where id&#x3D;10看看哦</p>
-<p>基本就全了  </p>
-<p>2018-12-26</p>
-<p>薛畅   9</p>
-<p>回来老师的问题：</p>
-<p>在 Read Committed 隔离级别下，会锁上聚簇索引中的所有记录；</p>
-<p>在 Repeatable Read 隔离级别下，会锁上聚簇索引中的所有记录，并且会锁上聚簇索引内的所</p>
-<p>有 GAP；</p>
-<p>在上面两个隔离级别的情况下，如果设置了 innodb_locks_unsafe_for_binlog 开启 semi-consis</p>
-<p>tent read 的话，对于不满足查询条件的记录，MySQL 会提前放锁，不过加锁的过程是不可避</p>
-<p>免的。2018-12-26</p>
-<p>似水流年   4</p>
-<p>请问老师，为什么select blocking_pid from sys.schema_table_lock_waits;查不到mdl锁的进程i</p>
-<p>d，显示为空。2018-12-28</p>
-<p>沙漠里的骆驼   4</p>
-<p>@高枕</p>
-<p>这里有些资料提供给你参考: </p>
-<ol>
-<li><p>何登成的技术博客: 加锁分析 <a target="_blank" rel="noopener" href="http://hedengcheng.com/?p=771">http://hedengcheng.com/?p=771</a></p>
-</li>
-<li><p>锁的常见种类: <a target="_blank" rel="noopener" href="http://www.aneasystone.com/archives/2017/11/solving-dead-locks-two.html">http://www.aneasystone.com/archives/2017/11/solving-dead-locks-two.html</a></p>
-</li>
-</ol>
-<p>2018-12-26</p>
-<p>尘封   3</p>
-<p>课后问题：d这一列不存在，但是还是要加MDL锁，释放时间应该是事务提交时。2018-12-26</p>
-<p> 作者回复</p>
-<p>抱歉，是要写成where c&#x3D;5 , 发起堪误了</p>
-<p>2018-12-26</p>
-<p>尘封   3</p>
-<p>尘封   3</p>
-<p>老师，有没有遇到过select语句一直处于killed状态的情况？2018-12-26</p>
-<p> 作者回复</p>
-<p>有  这个是在后面的文章中会用到的例子</p>
-<p>2018-12-26</p>
-<p>蠢蠢欲动的腹肌   2</p>
-<p>老师，您好</p>
-<p>我的mysql版本5.7.24，尝试的时候发现了如下问题</p>
-<p>锁住了表T</p>
-<p>mysql&gt; lock table T write;</p>
-<p>Query OK, 0 rows affected (0.00 sec)</p>
-<p>另一个terminal查询时被阻塞，但是查不到blocking_pid ，这是什么情况呢</p>
-<p>mysql&gt; select blocking_pid from sys.schema_table_lock_waits;</p>
-<p>Empty set (0.00 sec)</p>
-<p>ps:发现查询schema_table_lock_waits表与lock table的语句不能放在一个terminal执行，否则会</p>
-<p>报</p>
-<p>Table ‘schema_table_lock_waits’ was not locked with LOCK TABLES</p>
-<p>自行尝试的同学要注意下，老师有空的话也可以帮看看为什么。。。2018-12-28</p>
-<p>小李子   2</p>
-<p>老师，为什么session B 执行了 select in share mode ，在等行锁的时候，session C 执行 </p>
-<p>select * from sys.innodb_lock_waits where locked_table&#x3D;’<code>test</code>.<code>t</code>‘ 会报这个错 </p>
-<p>[Err] 1356 - View ‘sys.innodb_lock_waits’ references invalid table(s) or column(s) or function(s) </p>
-<p>or definer&#x2F;invoker of view lack rights to use them，而超时之后，又可以查了？另外，\G 参数会</p>
-<p>报语法错误？2018-12-27</p>
-<p>Tony Du   2</p>
-<p>对于课后问题，select * from t where c&#x3D;5 for update，</p>
-<p>当级别为RR时，因为字段c上没有索引，会扫主键索引，这时会把表中的记录都加上X锁。同</p>
-<p>时，因为对于innodb来说，当级别为RR时，是可以解决幻读的，此时对于每条记录的间隙还要</p>
-<p>加上GAP锁。也就是说，表上每一条记录和每一个间隙都锁上了。当级别为RC时，因为字段c上没有索引，会扫主键索引，这时会把表中的记录都加上X锁。另外，之前看过相关文章，MySQL在实际实现中有些优化措施，比如当RC时，在MySQL serv</p>
-<p>er过滤条件，发现不满足后，会把不满足条件的记录释放锁（这里就是把 c!&#x3D;5的记录释放锁）</p>
-<p>，这里会违背两阶段的约束。当然，之前每条记录的加锁操作还是不能省略的。还有，对于semi consistent read开启的情况下，也会提前释放锁。2018-12-27</p>
-<p>信信   2</p>
-<p>老师你好，图3上方提到MySQL 5.7 版本修改了 MDL 的加锁策略，不能复现第六章的场景。但</p>
-<p>我认为只要仍然满足：DML操作加MDL读锁，DDL操作加MDL写锁，并且事务提交才释放锁，</p>
-<p>那么就可以复现啊。。。所以5.7到底是改了什么导致无法复现的呢？2018-12-27</p>
-<p>某、人   2</p>
-<p>老师我请教一个问题:</p>
-<p>flush tables中close table的意思是说的把open_tables里的表全部关闭掉?下次如果有关于某张表</p>
-<p>的操作</p>
-<p>又把frm file缓存进Open_table_definitions,把表名缓存到open_tables,还是open_table只是一个计</p>
-<p>数?</p>
-<p>不是特别明白flush table和打开表是个什么流程</p>
-<p>2018-12-26</p>
-<p> 作者回复</p>
-<p>Flush tables是会关掉表，然后下次请求重新读表信息的</p>
-<p>第一次打开表其实就是open_table_definitions，包括读表信息一类的</p>
-<p>之后再有查询就是拷贝一个对象，加一个计数这样的</p>
-<p>2018-12-26</p>
-<p>老杨同志   2</p>
-<p>愉快的做一下思考题</p>
-<p>begin;</p>
-<p>select * from t where c&#x3D;5 for update;</p>
-<p>commit;</p>
-<p>历史知识的结论是，innodb先锁全表的所有行，返回server层，判断c是否等于5，然后释放c！</p>
-<p>&#x3D;5的行锁。验证方法：</p>
-<p>事务A执行 锁住一行c！&#x3D;5的记录 比如id &#x3D;3 c&#x3D;3</p>
-<p>select * from t where id &#x3D; 3 for update 或者 update t set c&#x3D;4 where id &#x3D;3</p>
-<p>然后启动新事务B执行上面的语句select * from t where c&#x3D;5 for update; 看看有没有被阻塞。用于判断事务B的语句会不会试图锁不满足条件的记录。然后把事务A和事务B的执行顺序对调一下，也就是先执行B在执行A。看看有没有阻塞，</p>
-<p>判断在事务B加锁成功的情况下会不会释放不满足查询条件记录的行锁。2018-12-26</p>
-<p> 作者回复</p>
-<p>   思路清晰</p>
-<p>隔离级别再愉快地改成RR试试 </p>
-<p>2018-12-26</p>
-<p>小确幸   1</p>
-<p>问一下：索引扫描与全表扫描，有什么异同点？2018-12-26</p>
-<p> 作者回复</p>
-<p>一般说全表扫描默认是值“扫瞄主键索引”</p>
-<p>2018-12-26</p>
-<p>陈旭   1</p>
-<p>老师，最近遇到了一个问题，看您有什么建议。业务场景是这样的：</p>
-<p>1.开启事务</p>
-<p>2.在表a插入一条记录</p>
-<p>3.在表b更新一条记录</p>
-<p>4.在表c更新一条记录</p>
-<p>5.提交事务</p>
-<p>看程序日志所有sql都没问题（没看数据库日志），但是结果是2的那条插入了，3和4都没更新</p>
-<p>，这个问题有哪几种情况？2018-12-26</p>
-<p> 作者回复</p>
-<p>这是被别的并发事务又改回去了吗 </p>
-<p>要么是update的值跟原值相同</p>
-<p>要么是update条件没有匹配到行</p>
-<p>额，最好给一下每个语句执行后的affacted rows , 还有binlog里的日志内容，才好分析</p>
-<p>2018-12-26</p>
-<p>杰之7   0</p>
-<p>通过这一节的阅读学习，老师讲述了一个查询语句被锁住和查询慢的两种情况。在被锁住中，通过等MDL锁，堵住了select查询语句，可以通过kiss掉持有MDL写锁。第二种</p>
-<p>是flush被别的语句堵住，然后flush堵住select语句。第三种是等行锁，通过sys.innodb_lock_w</p>
-<p>ait查到，然后kill。在查询慢中，lock in sharde mode直接读1000001</p>
-<p>而select * from t where id&#x3D;1需要从1000001执行100百万行，所以查询就慢了。老师昨天给我了学习的建议，每个事例在Mysql中去运行做，有不懂的问老师。真的非常感动</p>
-<p>，也给我了会一直跟随老师学习的动力和勇气。学了专栏的一半，需要把之前学的内容复习，</p>
-<p>接下来我会跟进老师的课程同时动手做之前的案例，不懂有我的思考之后，会及时请教老师。2019-01-21</p>
-<p>唐名之   0</p>
-<p>show VARIABLES LIKE ‘performance%’;</p>
-<p>performance_schema ON</p>
-<p>配置已经是打开的</p>
-<p>2019-01-11</p>
-<p> 作者回复</p>
-<p>诶。。那奇怪了</p>
-<p>执行</p>
-<p>select * from performance_schema.metadata_locks; 看看？2019-01-11</p>
-<p>唐名之   0</p>
-<p>环境：mysql-5.7.24</p>
-<p>show VARIABLES LIKE ‘performance%’;</p>
-<p>performance_schema ON</p>
-<p>A窗口执行：lock table t WRITE;</p>
-<p>B窗口执行：select * from t where id&#x3D;1;</p>
-<p>C窗口执行：show PROCESSLIST;</p>
-<p>53 slave_user DESKTOP-00HHFO4:63064 Binlog Dump 3027 Master has sent all binlog to sla</p>
-<p>ve; waiting for more updates </p>
-<p>54 root localhost:64572 Sleep 157 </p>
-<p>55 root localhost:64573 mysql_action Sleep 158 </p>
-<p>56 root localhost:64575 mysql_action Sleep 156 </p>
-<p>57 root localhost:64576 mysql_action Sleep 156 </p>
-<p>58 root localhost:64577 mysql_action Sleep 156 </p>
-<p>59 root localhost:64578 mysql_action Sleep 156 </p>
-<p>60 root localhost:64579 mysql_action Sleep 144 </p>
-<p>61 root localhost:64581 mysql_action Query 140 Waiting for table metadata lock select * from t</p>
-<p>where id&#x3D;1</p>
-<p>62 root localhost:64583 mysql_action Query 0 starting </p>
-<p>show PROCESSLIST</p>
-<p>已出现：“Waiting for table metadata ” 但这三张表都查不出数据，求解；</p>
-<p>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;</p>
-<p>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS；</p>
-<p>SELECT * from sys.schema_table_lock_waits;</p>
-<p>2019-01-11</p>
-<p> 作者回复</p>
-<p>SELECT * from sys.schema_table_lock_waits; 是需要配置里面把performance_schema打开的</p>
-<p>；</p>
-<p>前面两个语句是只会显示跟innodb的行锁相关的，表级的锁不会显示在这两个表</p>
-<p>2019-01-11</p>
-<p>M   0</p>
-<p>老师讲的很好</p>
-<p>2019-01-09</p>
-<p> 作者回复</p>
-<p>多谢鼓励</p>
-<p>看文章的同学都很细致，不敢不认真 </p>
-<p>2019-01-09</p>
-<p>alias cd&#x3D;rm -rf   0</p>
-<p>思考题</p>
-<p>c无索引x锁应该是锁表。解锁我觉得应该是sessionb的事物提交之后</p>
-<p>2019-01-08</p>
-<p> 作者回复</p>
-<p>不是锁表哈，innodb里面除非明确写lock table，不会锁表；</p>
-<p>解锁时机对的</p>
-<p>2019-01-10</p>
-<p>ʘᴗʘ小白帽ʘᴗʘ   0</p>
-<p>涨知识了</p>
-<p>2019-01-04</p>
-<pre><code>
-</code></pre>
+<p>这个例子，是我们文章内容的一个很好的补充。</p>
+<p>虽然执行过程中可能经过函数操作，但是最终在拿到结果后，server层还是要做一轮判断的。</p>
 
     </div>
 
@@ -642,12 +399,12 @@ set i=i+1;
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/fbe10c45.html" rel="prev" title="mysql-为什么这些SQL语句逻辑相同，性能却差异巨大">
-      <i class="fa fa-chevron-left"></i> mysql-为什么这些SQL语句逻辑相同，性能却差异巨大
+    <a href="/posts/ca522c4d.html" rel="prev" title="mysql-为什么这些SQL语句逻辑相同性能却差异巨大">
+      <i class="fa fa-chevron-left"></i> mysql-为什么这些SQL语句逻辑相同性能却差异巨大
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/649145f1.html" rel="next" title="mysql-为什么我只查一行的语句，也执行这么慢">
-      mysql-为什么我只查一行的语句，也执行这么慢 <i class="fa fa-chevron-right"></i>
+    <a href="/posts/97b6038b.html" rel="next" title="mysql-幻读是什么幻读有什么问题">
+      mysql-幻读是什么幻读有什么问题 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -721,14 +478,14 @@ set i=i+1;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-count">337</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -770,12 +527,12 @@ set i=i+1;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">390k</span>
+    <span title="站点总字数">288k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:40</span>
+    <span title="站点阅读时长">17:26</span>
 </div>
 
 <!--

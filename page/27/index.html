@@ -192,436 +192,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ba47caa2.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/ba47caa2.html" class="post-title-link" itemprop="url">leetcode 24 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-01-22 06:09:15" itemprop="dateCreated datePublished" datetime="2016-01-22T06:09:15+08:00">2016-01-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>170</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s24;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 两两交换链表中的节点</span></span><br><span class="line"><span class="comment"> * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode next;</span><br><span class="line">    ListNode() &#123;&#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">swapPairs</span><span class="params">(ListNode head)</span> &#123;</span><br><span class="line">        <span class="comment">//新建哑巴节点，存放头结点</span></span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">dummyHead</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ListNode</span>(<span class="number">0</span>);</span><br><span class="line">        dummyHead.next = head;</span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">temp</span> <span class="operator">=</span> dummyHead;</span><br><span class="line">        <span class="comment">//从哑巴节点开始 往后找到后两个节点</span></span><br><span class="line">        <span class="keyword">while</span> (temp.next != <span class="literal">null</span> &amp;&amp; temp.next.next != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">ListNode</span> <span class="variable">node1</span> <span class="operator">=</span> temp.next;</span><br><span class="line">            <span class="type">ListNode</span> <span class="variable">node2</span> <span class="operator">=</span> temp.next.next;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//交换节点</span></span><br><span class="line">            temp.next = node2;</span><br><span class="line">            node1.next = node2.next;</span><br><span class="line">            node2.next = node1;</span><br><span class="line">            temp = node1;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dummyHead.next;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/3e128290.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/3e128290.html" class="post-title-link" itemprop="url">leetcode 239 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-01-21 06:19:47" itemprop="dateCreated datePublished" datetime="2016-01-21T06:19:47+08:00">2016-01-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>297</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s239;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回 滑动窗口中的最大值 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/sliding-window-maximum</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span>[] maxSlidingWindow(<span class="type">int</span>[] nums, <span class="type">int</span> k) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        Deque&lt;Integer&gt; deque = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; k; ++i) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; nums[i] &gt;= nums[deque.peekLast()]) &#123;</span><br><span class="line">                <span class="comment">//非最大值出队列</span></span><br><span class="line">                deque.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//找到k个最大值 对应的下标放到队列中</span></span><br><span class="line">            deque.offerLast(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//定义结果数组</span></span><br><span class="line">        <span class="type">int</span>[] ans = <span class="keyword">new</span> <span class="title class_">int</span>[n - k + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">//前面找到的那个第一次窗口k个最大值 放入数组</span></span><br><span class="line">        ans[<span class="number">0</span>] = nums[deque.peekFirst()];</span><br><span class="line">        <span class="comment">//继续遍历数组</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> k; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; nums[i] &gt;= nums[deque.peekLast()]) &#123;</span><br><span class="line">                deque.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line">            deque.offerLast(i);</span><br><span class="line">            <span class="comment">//如果超过当前窗口范围 移出窗口</span></span><br><span class="line">            <span class="keyword">while</span> (deque.peekFirst() &lt;= i - k) &#123;</span><br><span class="line">                deque.pollFirst();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//把窗口最后一次的最大值放到结果数组中</span></span><br><span class="line">            ans[i - k + <span class="number">1</span>] = nums[deque.peekFirst()];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/cf19d91d.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cf19d91d.html" class="post-title-link" itemprop="url">leetcode 236 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-01-20 06:14:16" itemprop="dateCreated datePublished" datetime="2016-01-20T06:14:16+08:00">2016-01-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>324</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s236;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 null 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 图示两个链表在节点 c1 开始相交：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 题目数据 保证 整个链式结构中不存在环。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 注意，函数返回结果后，链表必须 保持其原始结构 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 自定义评测：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 评测系统 的输入如下（你设计的程序 不适用 此输入）：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * intersectVal - 相交的起始节点的值。如果不存在相交节点，这一值为 0</span></span><br><span class="line"><span class="comment"> * listA - 第一个链表</span></span><br><span class="line"><span class="comment"> * listB - 第二个链表</span></span><br><span class="line"><span class="comment"> * skipA - 在 listA 中（从头节点开始）跳到交叉节点的节点数</span></span><br><span class="line"><span class="comment"> * skipB - 在 listB 中（从头节点开始）跳到交叉节点的节点数</span></span><br><span class="line"><span class="comment"> * 评测系统将根据这些输入创建链式数据结构，并将两个头节点 headA 和 headB 传递给你的程序。如果程序能够正确返回相交节点，那么你的解决方案将被 视作正确答案 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/intersection-of-two-linked-lists</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/cbec0920.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cbec0920.html" class="post-title-link" itemprop="url">leetcode 234 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-01-19 06:17:06" itemprop="dateCreated datePublished" datetime="2016-01-19T06:17:06+08:00">2016-01-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>125</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s234;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode next;</span><br><span class="line">    ListNode() &#123;&#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isPalindrome</span><span class="params">(ListNode head)</span> &#123;</span><br><span class="line">                <span class="keyword">if</span>(head == <span class="literal">null</span> || head.next == <span class="literal">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="type">ListNode</span> <span class="variable">slow</span> <span class="operator">=</span> head, fast = head;</span><br><span class="line">                <span class="type">ListNode</span> <span class="variable">pre</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">while</span>(fast != <span class="literal">null</span> &amp;&amp; fast.next != <span class="literal">null</span>) &#123;</span><br><span class="line">                        <span class="type">ListNode</span> <span class="variable">tmp</span> <span class="operator">=</span> slow;</span><br><span class="line">                        slow = slow.next;</span><br><span class="line">                        fast = fast.next.next;</span><br><span class="line">                        tmp.next = pre;</span><br><span class="line">                        pre = tmp;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(fast != <span class="literal">null</span>) &#123;</span><br><span class="line">                        slow = slow.next;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">while</span>(pre != <span class="literal">null</span> &amp;&amp; slow != <span class="literal">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span>(pre.val != slow.val) &#123;</span><br><span class="line">                                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        pre = pre.next;</span><br><span class="line">                        slow = slow.next;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c6f27967.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/c6f27967.html" class="post-title-link" itemprop="url">leetcode 232 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-01-18 06:15:19" itemprop="dateCreated datePublished" datetime="2016-01-18T06:15:19+08:00">2016-01-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>362</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s232;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 请你仅使用两个栈实现先入先出队列。队列应当支持一般队列支持的所有操作（push、pop、peek、empty）：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 实现 MyQueue 类：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * void push(int x) 将元素 x 推到队列的末尾</span></span><br><span class="line"><span class="comment"> * int pop() 从队列的开头移除并返回元素</span></span><br><span class="line"><span class="comment"> * int peek() 返回队列开头的元素</span></span><br><span class="line"><span class="comment"> * boolean empty() 如果队列为空，返回 true ；否则，返回 false</span></span><br><span class="line"><span class="comment"> * 说明：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 你 只能 使用标准的栈操作 —— 也就是只有 push to top, peek/pop from top, size, 和 is empty 操作是合法的。</span></span><br><span class="line"><span class="comment"> * 你所使用的语言也许不支持栈。你可以使用 list 或者 deque（双端队列）来模拟一个栈，只要是标准的栈操作即可。</span></span><br><span class="line"><span class="comment"> *  </span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/implement-queue-using-stacks</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQueue</span> &#123;</span><br><span class="line">    <span class="comment">//两个栈 一个入栈</span></span><br><span class="line">    Deque&lt;Integer&gt; inStack;</span><br><span class="line">    <span class="comment">//两个栈 一个出栈</span></span><br><span class="line">    Deque&lt;Integer&gt; outStack;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyQueue</span><span class="params">()</span> &#123;</span><br><span class="line">        inStack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;Integer&gt;();</span><br><span class="line">        outStack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;Integer&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="comment">//push进inStack</span></span><br><span class="line">        inStack.push(x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">pop</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">//如果outStack为空</span></span><br><span class="line">        <span class="keyword">if</span> (outStack.isEmpty()) &#123;</span><br><span class="line">            <span class="comment">//将inStack写入到outStack</span></span><br><span class="line">            in2out();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//从outStack读出</span></span><br><span class="line">        <span class="keyword">return</span> outStack.pop();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">peek</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (outStack.isEmpty()) &#123;</span><br><span class="line">            in2out();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//从outStack取栈顶元素</span></span><br><span class="line">        <span class="keyword">return</span> outStack.peek();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">empty</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">//inStack、outStack都为空</span></span><br><span class="line">        <span class="keyword">return</span> inStack.isEmpty() &amp;&amp; outStack.isEmpty();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">in2out</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">//inStack写入outStack</span></span><br><span class="line">        <span class="keyword">while</span> (!inStack.isEmpty()) &#123;</span><br><span class="line">            outStack.push(inStack.pop());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your MyQueue object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * MyQueue obj = new MyQueue();</span></span><br><span class="line"><span class="comment"> * obj.push(x);</span></span><br><span class="line"><span class="comment"> * int param_2 = obj.pop();</span></span><br><span class="line"><span class="comment"> * int param_3 = obj.peek();</span></span><br><span class="line"><span class="comment"> * boolean param_4 = obj.empty();</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/589bd1db.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1048,10 +618,440 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5c6e01e6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/5c6e01e6.html" class="post-title-link" itemprop="url">leetcode 21 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-01-12 06:11:27" itemprop="dateCreated datePublished" datetime="2016-01-12T06:11:27+08:00">2016-01-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>145</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s21;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 合并两个有序链表</span></span><br><span class="line"><span class="comment"> * 将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode next;</span><br><span class="line">    ListNode() &#123;&#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">mergeTwoLists</span><span class="params">(ListNode list1, ListNode list2)</span> &#123;</span><br><span class="line">        <span class="comment">//递归终止条件</span></span><br><span class="line">        <span class="keyword">if</span>(list1 == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> list2;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//递归终止条件</span></span><br><span class="line">        <span class="keyword">if</span>(list2 == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> list1;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//从小到大排列</span></span><br><span class="line">        <span class="keyword">if</span>(list1.val &lt;= list2.val) &#123;</span><br><span class="line">            <span class="comment">//合并子链表</span></span><br><span class="line">            list1.next = mergeTwoLists(list1.next, list2);</span><br><span class="line">            <span class="keyword">return</span> list1;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            list2.next = mergeTwoLists(list2.next, list1);</span><br><span class="line">            <span class="keyword">return</span> list2;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/56fbbf1c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/56fbbf1c.html" class="post-title-link" itemprop="url">leetcode 206 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-01-11 06:19:00" itemprop="dateCreated datePublished" datetime="2016-01-11T06:19:00+08:00">2016-01-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>169</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s206;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 206. 反转链表</span></span><br><span class="line"><span class="comment"> * 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode next;</span><br><span class="line">    ListNode() &#123;&#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">reverseList</span><span class="params">(ListNode head)</span> &#123;</span><br><span class="line">        <span class="comment">//前置节点 后一个节点指向的节点，初始的前置节点为null</span></span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">pre</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">//当前节点，从head开始遍历</span></span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">cur</span> <span class="operator">=</span> head;</span><br><span class="line">        <span class="comment">//当前节点不为null</span></span><br><span class="line">        <span class="keyword">while</span>(cur != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">//下一个节点先存中间变量</span></span><br><span class="line">            <span class="type">ListNode</span> <span class="variable">t</span> <span class="operator">=</span> cur.next;</span><br><span class="line">            <span class="comment">//下一个节点指向前一个节点</span></span><br><span class="line">            cur.next = pre;</span><br><span class="line">            <span class="comment">//当前节点称为前置节点</span></span><br><span class="line">            pre = cur;</span><br><span class="line">            <span class="comment">//下一个节点为当前节点</span></span><br><span class="line">            cur = t;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pre;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5be5cf5b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/5be5cf5b.html" class="post-title-link" itemprop="url">leetcode 200 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-01-10 06:15:24" itemprop="dateCreated datePublished" datetime="2016-01-10T06:15:24+08:00">2016-01-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s200;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/b3ac6ad8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/b3ac6ad8.html" class="post-title-link" itemprop="url">leetcode 20 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-01-09 06:02:06" itemprop="dateCreated datePublished" datetime="2016-01-09T06:02:06+08:00">2016-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>258</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s20;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 有效的括号</span></span><br><span class="line"><span class="comment"> * 给定一个只包括 &#x27;(&#x27;，&#x27;)&#x27;，&#x27;&#123;&#x27;，&#x27;&#125;&#x27;，&#x27;[&#x27;，&#x27;]&#x27; 的字符串 s ，判断字符串是否有效。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 有效字符串需满足：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 左括号必须用相同类型的右括号闭合。</span></span><br><span class="line"><span class="comment"> * 左括号必须以正确的顺序闭合。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/valid-parentheses</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isValid</span><span class="params">(String s)</span> &#123;</span><br><span class="line">        <span class="comment">//根据入参判断 不能为奇数</span></span><br><span class="line">        <span class="keyword">if</span>(s.length() % <span class="number">2</span> != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//符号对</span></span><br><span class="line">        Map&lt;Character, Character&gt; pairs = <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        pairs.put(<span class="string">&#x27;(&#x27;</span>, <span class="string">&#x27;)&#x27;</span>);</span><br><span class="line">        pairs.put(<span class="string">&#x27;[&#x27;</span>, <span class="string">&#x27;]&#x27;</span>);</span><br><span class="line">        pairs.put(<span class="string">&#x27;&#123;&#x27;</span>, <span class="string">&#x27;&#125;&#x27;</span>);</span><br><span class="line">        <span class="comment">//字符串转字符数组</span></span><br><span class="line">        <span class="type">char</span>[] charr =s.toCharArray();</span><br><span class="line">        <span class="comment">//放入栈中判断</span></span><br><span class="line">        Deque&lt;Character&gt; stack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i&lt; charr.length ; i++) &#123;</span><br><span class="line">            <span class="comment">//如果为左侧符号， 符号对key中一定存在，则压栈</span></span><br><span class="line">            <span class="keyword">if</span>(pairs.containsKey(charr[i])) &#123;</span><br><span class="line">                stack.push(pairs.get(charr[i]));</span><br><span class="line">                <span class="comment">//如果符号对key中不存在，栈中有元素，且栈顶符号等于当前符号，则弹栈</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(stack.size()!=<span class="number">0</span> &amp;&amp; stack.peek() == charr[i])&#123;</span><br><span class="line">                stack.pop();</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stack.size() == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/42ddda9f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/42ddda9f.html" class="post-title-link" itemprop="url">leetcode 2 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-01-08 06:16:28" itemprop="dateCreated datePublished" datetime="2016-01-08T06:16:28+08:00">2016-01-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>367</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s2;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 给你两个非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 请你将两个数相加，并以相同形式返回一个表示和的链表。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 你可以假设除了数字 0 之外，这两个数都不会以 0 开头。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/add-two-numbers</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">        <span class="type">int</span> val;</span><br><span class="line">        ListNode next;</span><br><span class="line">        ListNode() &#123;&#125;</span><br><span class="line">        ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">        ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">addTwoNumbers</span><span class="params">(ListNode l1, ListNode l2)</span> &#123;</span><br><span class="line">        <span class="comment">//新建结果链表</span></span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">head</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ListNode</span>();</span><br><span class="line">        <span class="comment">//记录当前节点 方便后面移动</span></span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">cur</span> <span class="operator">=</span> head;</span><br><span class="line">        <span class="comment">//相加 &gt; 10 进一位 进位的值</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">carray</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//判断结束条件</span></span><br><span class="line">        <span class="keyword">while</span>(l1 != <span class="literal">null</span> || l2 != <span class="literal">null</span> || carray!=<span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// 对应位相加的和</span></span><br><span class="line">            <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="comment">//l1各位已经加完了， l2 还没有结束</span></span><br><span class="line">            <span class="keyword">if</span>(l1 == <span class="literal">null</span> &amp;&amp; l2 != <span class="literal">null</span>) &#123;</span><br><span class="line">                sum = l2.val;</span><br><span class="line">                l2 = l2.next;</span><br><span class="line">                <span class="comment">//l2各位已经加完了， l1 还没有结束</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(l2 == <span class="literal">null</span> &amp;&amp; l1 != <span class="literal">null</span>) &#123;</span><br><span class="line">                sum = l1.val;</span><br><span class="line">                l1 = l1.next;</span><br><span class="line">                <span class="comment">//l1 l2 对应位置有值则相加</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(l2 != <span class="literal">null</span> &amp;&amp; l1 != <span class="literal">null</span>)&#123;</span><br><span class="line">                sum = l1.val + l2.val;</span><br><span class="line">                l1 = l1.next;</span><br><span class="line">                l2 = l2.next;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//接到结果链表链表后面</span></span><br><span class="line">            cur.next = <span class="keyword">new</span> <span class="title class_">ListNode</span>((sum + carray) % <span class="number">10</span>);</span><br><span class="line">            <span class="comment">//需要进一位的保存在变量carray</span></span><br><span class="line">            carray = (sum + carray) / <span class="number">10</span>;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head.next;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/26/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><span class="page-number current">27</span><a class="page-number" href="/page/28/">28</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/28/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/26/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><span class="page-number current">27</span><a class="page-number" href="/page/28/">28</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/28/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1117,14 +1117,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-count">337</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1166,12 +1166,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">390k</span>
+    <span title="站点总字数">288k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:40</span>
+    <span title="站点阅读时长">17:26</span>
 </div>
 
 <!--

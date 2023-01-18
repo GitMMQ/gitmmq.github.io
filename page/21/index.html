@@ -192,436 +192,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c60e16a7.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/c60e16a7.html" class="post-title-link" itemprop="url">leetcode 72 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-03-22 06:02:22" itemprop="dateCreated datePublished" datetime="2016-03-22T06:02:22+08:00">2016-03-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>195</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s72;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 编辑距离</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">minDistance</span><span class="params">(String word1, String word2)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> word1.length();</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> word2.length();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(m == <span class="number">0</span> || n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> m + n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m + <span class="number">1</span>][n + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">//j == 0 也就是 words2 长度为0时，编辑距离 完全取决于words1长度</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i&lt; m + <span class="number">1</span>; i++) &#123;</span><br><span class="line">            dp[i][<span class="number">0</span>] = i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//i == 0 也就是 words1 长度为0时，编辑距离 完全取决于words2长度</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j&lt; n + <span class="number">1</span>; j++) &#123;</span><br><span class="line">            dp[<span class="number">0</span>][j] = j;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i&lt;= m; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j&lt;= n; j++) &#123;</span><br><span class="line">                <span class="comment">//字符相等 则编辑距离不变</span></span><br><span class="line">                <span class="keyword">if</span>(word1.charAt(i-<span class="number">1</span>) == word2.charAt(j-<span class="number">1</span>)) &#123;</span><br><span class="line">                    dp[i][j] = dp[i-<span class="number">1</span>][j-<span class="number">1</span>];</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//取决于前者编辑距离的最小值 + 1</span></span><br><span class="line">                    dp[i][j] = Math.min(dp[i-<span class="number">1</span>][j], Math.min(dp[i][j-<span class="number">1</span>], dp[i-<span class="number">1</span>][j-<span class="number">1</span>])) + <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[m][n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/111f277f.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/111f277f.html" class="post-title-link" itemprop="url">leetcode 718 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-03-21 06:12:37" itemprop="dateCreated datePublished" datetime="2016-03-21T06:12:37+08:00">2016-03-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>173</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s718;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findLength</span><span class="params">(<span class="type">int</span>[] A, <span class="type">int</span>[] B)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> A.length &lt; B.length ? findMax(A, B) : findMax(B, A);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="title function_">findMax</span><span class="params">(<span class="type">int</span>[] A, <span class="type">int</span>[] B)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">an</span> <span class="operator">=</span> A.length, bn = B.length;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">1</span>; len &lt;= an; len++) &#123;</span><br><span class="line">            max = Math.max(max, maxLen(A, <span class="number">0</span>, B, bn - len, len));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=bn-an; j &gt;= <span class="number">0</span>;j--) &#123;</span><br><span class="line">            max = Math.max(max, maxLen(A, <span class="number">0</span>, B, j, an));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;an;i++) &#123;</span><br><span class="line">            max = Math.max(max, maxLen(A, i, B, <span class="number">0</span>, an - i));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="title function_">maxLen</span><span class="params">(<span class="type">int</span>[] a, <span class="type">int</span> i, <span class="type">int</span>[] b, <span class="type">int</span> j, <span class="type">int</span> len)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">0</span>, max = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">0</span>; k &lt; len; k++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(a[i+k] == b[j+k]) &#123;</span><br><span class="line">                count++;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                max = Math.max(max, count);</span><br><span class="line">                count = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> count &gt; <span class="number">0</span> ? Math.max(max, count) : max;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2d39ada4.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/2d39ada4.html" class="post-title-link" itemprop="url">leetcode 71 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-03-20 06:09:09" itemprop="dateCreated datePublished" datetime="2016-03-20T06:09:09+08:00">2016-03-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>371</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s71;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 简化路径</span></span><br><span class="line"><span class="comment"> * 给你一个字符串 path ，表示指向某一文件或目录的 Unix 风格 绝对路径 （以 &#x27;/&#x27; 开头），请你将其转化为更加简洁的规范路径。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。任意多个连续的斜杠（即，&#x27;//&#x27;）都被视为单个斜杠 &#x27;/&#x27; 。 对于此问题，任何其他格式的点（例如，&#x27;...&#x27;）均被视为文件/目录名称。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 请注意，返回的 规范路径 必须遵循下述格式：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 始终以斜杠 &#x27;/&#x27; 开头。</span></span><br><span class="line"><span class="comment"> * 两个目录名之间必须只有一个斜杠 &#x27;/&#x27; 。</span></span><br><span class="line"><span class="comment"> * 最后一个目录名（如果存在）不能 以 &#x27;/&#x27; 结尾。</span></span><br><span class="line"><span class="comment"> * 此外，路径仅包含从根目录到目标文件或目录的路径上的目录（即，不含 &#x27;.&#x27; 或 &#x27;..&#x27;）。</span></span><br><span class="line"><span class="comment"> * 返回简化后得到的 规范路径 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/simplify-path</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">simplifyPath</span><span class="params">(String path)</span> &#123;</span><br><span class="line">        <span class="comment">// 双端队列</span></span><br><span class="line">        Deque&lt;String&gt; queue = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">        <span class="comment">// 分割字符</span></span><br><span class="line">        String[] res = path.split(<span class="string">&quot;/&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; res.length; i++)&#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> res[i];</span><br><span class="line">            <span class="keyword">if</span>(s.equals(<span class="string">&quot;.&quot;</span>) || s.equals(<span class="string">&quot;&quot;</span>)) <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (s.equals(<span class="string">&quot;..&quot;</span>))&#123;</span><br><span class="line">                <span class="keyword">if</span>(!queue.isEmpty())&#123;</span><br><span class="line">                    queue.pollLast();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                queue.offer(s);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 拼接</span></span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>(<span class="string">&quot;/&quot;</span>);</span><br><span class="line">        <span class="keyword">while</span>(!queue.isEmpty())&#123;</span><br><span class="line">            sb.append(queue.poll());</span><br><span class="line">            <span class="keyword">if</span>(!queue.isEmpty())&#123;</span><br><span class="line">                sb.append(<span class="string">&quot;/&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 判空</span></span><br><span class="line">        <span class="keyword">return</span> sb.toString().equals(<span class="string">&quot;&quot;</span>) ? <span class="string">&quot;/&quot;</span> : sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/caad1831.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/caad1831.html" class="post-title-link" itemprop="url">leetcode 704 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-03-19 06:02:36" itemprop="dateCreated datePublished" datetime="2016-03-19T06:02:36+08:00">2016-03-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>300</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s704;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  </span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/add-strings</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">addStrings</span><span class="params">(String num1, String num2)</span> &#123;</span><br><span class="line">        <span class="comment">//字符串拼接 StringBuilder</span></span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> num1.length();</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> num2.length();</span><br><span class="line">        <span class="comment">//num1 遍历 下标</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span><span class="number">1</span>;</span><br><span class="line">        <span class="comment">//num2 遍历 下标</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span><span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">carray</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(i + j &lt;= m + n + <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">numa</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="comment">//补0对齐位数</span></span><br><span class="line">            <span class="keyword">if</span>(i &gt; m) &#123;</span><br><span class="line">                numa = <span class="number">0</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">//字符转数字 从右向左 取值</span></span><br><span class="line">                numa = num1.charAt(m - i++) - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">int</span> <span class="variable">numb</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="comment">//补0对齐位数</span></span><br><span class="line">            <span class="keyword">if</span>(j &gt; n) &#123;</span><br><span class="line">                numb = <span class="number">0</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">//字符转数字 从右向左 取值</span></span><br><span class="line">                numb = num2.charAt(n - j++) - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//从右向左 逐位数字相加</span></span><br><span class="line">            <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> numa + numb + carray;</span><br><span class="line">            <span class="comment">//满10 进一位</span></span><br><span class="line">            carray = sum / <span class="number">10</span>;</span><br><span class="line">            builder.append(sum % <span class="number">10</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//最后一次相加后 如果有进位 则拼接到字符串</span></span><br><span class="line">        <span class="keyword">if</span>(carray != <span class="number">0</span>) &#123;</span><br><span class="line">            builder.append(carray);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//翻转字符串</span></span><br><span class="line">        <span class="keyword">return</span> builder.reverse().toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c2fbc69a.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/c2fbc69a.html" class="post-title-link" itemprop="url">leetcode 70 Solution</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-03-18 06:12:39" itemprop="dateCreated datePublished" datetime="2016-03-18T06:12:39+08:00">2016-03-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>118</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s70;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 爬楼梯</span></span><br><span class="line"><span class="comment"> * 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">climbStairs</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">        <span class="comment">//倒推 func(n) = func(n-1) + func(n-2)</span></span><br><span class="line">        <span class="comment">//边界 func(3) = func(2) + func(1)</span></span><br><span class="line">        <span class="comment">// func(2) = 2</span></span><br><span class="line">        <span class="comment">// func(1) = 1</span></span><br><span class="line">        <span class="comment">// func(0) = 0</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">p</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">q</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">r</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span><span class="number">0</span>; i&lt; n; i++) &#123;</span><br><span class="line">            p = q;</span><br><span class="line">            q = r;</span><br><span class="line">            r = p + q;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a4f411db.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1048,10 +618,440 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e55cd21e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/e55cd21e.html" class="post-title-link" itemprop="url">leetcode 65 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-12 06:06:15" itemprop="dateCreated datePublished" datetime="2016-03-12T06:06:15+08:00">2016-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>537</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s65;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 有效数字</span></span><br><span class="line"><span class="comment"> * 有效数字（按顺序）可以分成以下几个部分：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 一个 小数 或者 整数</span></span><br><span class="line"><span class="comment"> * （可选）一个 &#x27;e&#x27; 或 &#x27;E&#x27; ，后面跟着一个 整数</span></span><br><span class="line"><span class="comment"> * 小数（按顺序）可以分成以下几个部分：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * （可选）一个符号字符（&#x27;+&#x27; 或 &#x27;-&#x27;）</span></span><br><span class="line"><span class="comment"> * 下述格式之一：</span></span><br><span class="line"><span class="comment"> * 至少一位数字，后面跟着一个点 &#x27;.&#x27;</span></span><br><span class="line"><span class="comment"> * 至少一位数字，后面跟着一个点 &#x27;.&#x27; ，后面再跟着至少一位数字</span></span><br><span class="line"><span class="comment"> * 一个点 &#x27;.&#x27; ，后面跟着至少一位数字</span></span><br><span class="line"><span class="comment"> * 整数（按顺序）可以分成以下几个部分：</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * （可选）一个符号字符（&#x27;+&#x27; 或 &#x27;-&#x27;）</span></span><br><span class="line"><span class="comment"> * 至少一位数字</span></span><br><span class="line"><span class="comment"> * 部分有效数字列举如下：[&quot;2&quot;, &quot;0089&quot;, &quot;-0.1&quot;, &quot;+3.14&quot;, &quot;4.&quot;, &quot;-.9&quot;, &quot;2e10&quot;, &quot;-90E3&quot;, &quot;3e+7&quot;, &quot;+6e-1&quot;, &quot;53.5e93&quot;, &quot;-123.456e789&quot;]</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 部分无效数字列举如下：[&quot;abc&quot;, &quot;1a&quot;, &quot;1e&quot;, &quot;e3&quot;, &quot;99e2.5&quot;, &quot;--6&quot;, &quot;-+3&quot;, &quot;95a54e53&quot;]</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 给你一个字符串 s ，如果 s 是一个 有效数字 ，请返回 true 。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/valid-number</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isNumber</span><span class="params">(String s)</span> &#123;</span><br><span class="line">        Map&lt;State, Map&lt;CharType, State&gt;&gt; transfer = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;State, Map&lt;CharType, State&gt;&gt;();</span><br><span class="line">        Map&lt;CharType, State&gt; initialMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT_WITHOUT_INT);</span><br><span class="line">            put(CharType.CHAR_SIGN, State.STATE_INT_SIGN);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INITIAL, initialMap);</span><br><span class="line">        Map&lt;CharType, State&gt; intSignMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT_WITHOUT_INT);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INT_SIGN, intSignMap);</span><br><span class="line">        Map&lt;CharType, State&gt; integerMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INTEGER, integerMap);</span><br><span class="line">        Map&lt;CharType, State&gt; pointMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_POINT, pointMap);</span><br><span class="line">        Map&lt;CharType, State&gt; pointWithoutIntMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_POINT_WITHOUT_INT, pointWithoutIntMap);</span><br><span class="line">        Map&lt;CharType, State&gt; fractionMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_FRACTION, fractionMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">            put(CharType.CHAR_SIGN, State.STATE_EXP_SIGN);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP, expMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expSignMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP_SIGN, expSignMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expNumberMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP_NUMBER, expNumberMap);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> s.length();</span><br><span class="line">        <span class="type">State</span> <span class="variable">state</span> <span class="operator">=</span> State.STATE_INITIAL;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            <span class="type">CharType</span> <span class="variable">type</span> <span class="operator">=</span> toCharType(s.charAt(i));</span><br><span class="line">            <span class="keyword">if</span> (!transfer.get(state).containsKey(type)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                state = transfer.get(state).get(type);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> state == State.STATE_INTEGER || state == State.STATE_POINT || state == State.STATE_FRACTION || state == State.STATE_EXP_NUMBER || state == State.STATE_END;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> CharType <span class="title function_">toCharType</span><span class="params">(<span class="type">char</span> ch)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (ch &gt;= <span class="string">&#x27;0&#x27;</span> &amp;&amp; ch &lt;= <span class="string">&#x27;9&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_NUMBER;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;e&#x27;</span> || ch == <span class="string">&#x27;E&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_EXP;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_POINT;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;+&#x27;</span> || ch == <span class="string">&#x27;-&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_SIGN;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_ILLEGAL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">enum</span> <span class="title class_">State</span> &#123;</span><br><span class="line">        STATE_INITIAL,</span><br><span class="line">        STATE_INT_SIGN,</span><br><span class="line">        STATE_INTEGER,</span><br><span class="line">        STATE_POINT,</span><br><span class="line">        STATE_POINT_WITHOUT_INT,</span><br><span class="line">        STATE_FRACTION,</span><br><span class="line">        STATE_EXP,</span><br><span class="line">        STATE_EXP_SIGN,</span><br><span class="line">        STATE_EXP_NUMBER,</span><br><span class="line">        STATE_END</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">enum</span> <span class="title class_">CharType</span> &#123;</span><br><span class="line">        CHAR_NUMBER,</span><br><span class="line">        CHAR_EXP,</span><br><span class="line">        CHAR_POINT,</span><br><span class="line">        CHAR_SIGN,</span><br><span class="line">        CHAR_ILLEGAL</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a9eb920.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/a9eb920.html" class="post-title-link" itemprop="url">leetcode 64 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-11 06:14:26" itemprop="dateCreated datePublished" datetime="2016-03-11T06:14:26+08:00">2016-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>225</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s64;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 最小路径和</span></span><br><span class="line"><span class="comment"> * 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 说明：每次只能向下或者向右移动一步。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/minimum-path-sum</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">minPathSum</span><span class="params">(<span class="type">int</span>[][] grid)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (grid == <span class="literal">null</span> || grid.length == <span class="number">0</span> || grid[<span class="number">0</span>].length == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> <span class="variable">rows</span> <span class="operator">=</span> grid.length, columns = grid[<span class="number">0</span>].length;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[rows][columns];</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = grid[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; rows; i++) &#123;</span><br><span class="line">            dp[i][<span class="number">0</span>] = dp[i - <span class="number">1</span>][<span class="number">0</span>] + grid[i][<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt; columns; j++) &#123;</span><br><span class="line">            dp[<span class="number">0</span>][j] = dp[<span class="number">0</span>][j - <span class="number">1</span>] + grid[<span class="number">0</span>][j];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; rows; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt; columns; j++) &#123;</span><br><span class="line">                dp[i][j] = Math.min(dp[i - <span class="number">1</span>][j], dp[i][j - <span class="number">1</span>]) + grid[i][j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[rows - <span class="number">1</span>][columns - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e842a259.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/e842a259.html" class="post-title-link" itemprop="url">leetcode 63 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-10 06:01:14" itemprop="dateCreated datePublished" datetime="2016-03-10T06:01:14+08:00">2016-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>244</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s63;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 不同路径 II</span></span><br><span class="line"><span class="comment"> * 一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish”）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 网格中的障碍物和空位置分别用 1 和 0 来表示。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/unique-paths-ii</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">uniquePathsWithObstacles</span><span class="params">(<span class="type">int</span>[][] obstacleGrid)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> obstacleGrid.length, m = obstacleGrid[<span class="number">0</span>].length;</span><br><span class="line">        <span class="type">int</span>[] f = <span class="keyword">new</span> <span class="title class_">int</span>[m];</span><br><span class="line"></span><br><span class="line">        f[<span class="number">0</span>] = obstacleGrid[<span class="number">0</span>][<span class="number">0</span>] == <span class="number">0</span> ? <span class="number">1</span> : <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; m; ++j) &#123;</span><br><span class="line">                <span class="keyword">if</span> (obstacleGrid[i][j] == <span class="number">1</span>) &#123;</span><br><span class="line">                    f[j] = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (j - <span class="number">1</span> &gt;= <span class="number">0</span> &amp;&amp; obstacleGrid[i][j - <span class="number">1</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">                    f[j] += f[j - <span class="number">1</span>];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> f[m - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/780c967.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/780c967.html" class="post-title-link" itemprop="url">leetcode 62 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-09 06:15:33" itemprop="dateCreated datePublished" datetime="2016-03-09T06:15:33+08:00">2016-03-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>238</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s62;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 不同路径</span></span><br><span class="line"><span class="comment"> * 一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 问总共有多少条不同的路径？</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/unique-paths</span></span><br><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">uniquePaths</span><span class="params">(<span class="type">int</span> m, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">        <span class="comment">//新建dp二维数组，记录每步状态</span></span><br><span class="line">        <span class="type">int</span>[][] f = <span class="keyword">new</span> <span class="title class_">int</span>[m][n];</span><br><span class="line">        <span class="comment">//初始化边界情况</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; m; ++i) &#123;</span><br><span class="line">            f[i][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; ++j) &#123;</span><br><span class="line">            f[<span class="number">0</span>][j] = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//遍历行列，补全其他状态</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; m; ++i) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt; n; ++j) &#123;</span><br><span class="line">                <span class="comment">//动态转移方程</span></span><br><span class="line">                f[i][j] = f[i - <span class="number">1</span>][j] + f[i][j - <span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> f[m - <span class="number">1</span>][n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ecb77264.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/ecb77264.html" class="post-title-link" itemprop="url">leetcode 61 Solution</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-08 06:10:16" itemprop="dateCreated datePublished" datetime="2016-03-08T06:10:16+08:00">2016-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-06 16:17:38" itemprop="dateModified" datetime="2023-01-06T16:17:38+08:00">2023-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>160</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s61;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 旋转链表</span></span><br><span class="line"><span class="comment"> * 给你一个链表的头节点 head ，旋转链表，将链表每个节点向右移动 k 个位置。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode next;</span><br><span class="line">    ListNode() &#123;&#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val) &#123; <span class="built_in">this</span>.val = val; &#125;</span><br><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) &#123; <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">rotateRight</span><span class="params">(ListNode head, <span class="type">int</span> k)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">ListNode</span> <span class="variable">cur</span> <span class="operator">=</span>  head;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="comment">//计算链表长度</span></span><br><span class="line">        <span class="keyword">while</span>(cur.next != <span class="literal">null</span>) &#123;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">            n++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//计算断开的位置</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> n - k % n;</span><br><span class="line">        <span class="comment">//特殊情况也就是链表不变的情况</span></span><br><span class="line">        <span class="keyword">if</span>(y == n) &#123;</span><br><span class="line">            <span class="keyword">return</span> head;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//尾部连接到链表头</span></span><br><span class="line">        cur.next = head;</span><br><span class="line">        <span class="keyword">while</span>(y -- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//按照计算的断开位置断开链表</span></span><br><span class="line">        head = cur.next;</span><br><span class="line">        cur.next = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/22/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/22/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1117,14 +1117,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-count">337</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1166,12 +1166,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">390k</span>
+    <span title="站点总字数">288k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:40</span>
+    <span title="站点阅读时长">17:26</span>
 </div>
 
 <!--

@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="问题解析39 | 自增主键为什么不是连续的？2019-02-11 林晓斌 在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插 入，避免了页分裂，因此索引更紧凑。之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续 的。但实际上，这样的假设是错的，因为自增主键不能保证连续递增。今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出">
+  <meta name="description" content="问题解析自增主键为什么不是连续的？在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插入，避免了页分裂，因此索引更紧凑。 之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续的。 但实际上，这样的假设是错的，因为自增主键不能保证连续递增。 今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出现 “空洞”？为了便于说明，我们创建一">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql-自增主键为什么不是连续的">
 <meta property="og:url" content="https://www.fastolf.com/posts/1cc9aec2.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="问题解析39 | 自增主键为什么不是连续的？2019-02-11 林晓斌 在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插 入，避免了页分裂，因此索引更紧凑。之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续 的。但实际上，这样的假设是错的，因为自增主键不能保证连续递增。今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出">
+<meta property="og:description" content="问题解析自增主键为什么不是连续的？在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插入，避免了页分裂，因此索引更紧凑。 之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续的。 但实际上，这样的假设是错的，因为自增主键不能保证连续递增。 今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出现 “空洞”？为了便于说明，我们创建一">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-12-13T22:15:28.000Z">
-<meta property="article:modified_time" content="2023-01-06T09:44:03.218Z">
+<meta property="article:modified_time" content="2023-01-18T15:34:38.821Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 17:44:03" itemprop="dateModified" datetime="2023-01-06T17:44:03+08:00">2023-01-06</time>
+                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>6.7k</span>
+              <span>4.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>24 分钟</span>
+              <span>17 分钟</span>
             </span>
 
         </div>
@@ -267,134 +267,151 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>39 | 自增主键为什么不是连续的？2019-02-11 林晓斌</p>
-<p>在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插</p>
-<p>入，避免了页分裂，因此索引更紧凑。之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续</p>
-<p>的。但实际上，这样的假设是错的，因为自增主键不能保证连续递增。今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出现 “空洞”？为了便于说明，我们创建一个表t，其中id是自增主键字段、c是唯一索引。自增值保存在哪儿？在这个空表t里面执行insert into t values(null, 1, 1);插入一行数据，再执行show create table命</p>
-<p>CREATE TABLE t̀  ̀(</p>
-<p>  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,</p>
-<p>  &#96;c  ̀int(11) DEFAULT NULL,</p>
-<p>  &#96;d  ̀int(11) DEFAULT NULL,</p>
-<p>  PRIMARY KEY (̀ id )̀,</p>
-<p>  UNIQUE KEY &#96;c  ̀(̀ c )̀</p>
-<p>) ENGINE&#x3D;InnoDB;</p>
-<p>令，就可以看到如下图所示的结果：</p>
-<p>图1 自动生成的AUTO_INCREMENT值</p>
-<p>可以看到，表定义里面出现了一个AUTO_INCREMENT&#x3D;2，表示下一次插入数据时，如果需要</p>
-<p>自动生成自增值，会生成id&#x3D;2。其实，这个输出结果容易引起这样的误解：自增值是保存在表结构定义里的。实际上，表的结</p>
-<p>构定义存放在后缀名为.frm的文件中，但是并不会保存自增值。不同的引擎对于自增值的保存策略不同。MyISAM引擎的自增值保存在数据文件中。InnoDB引擎的自增值，其实是保存在了内存里，并且到了MySQL 8.0版本后，才有了“自增值</p>
-<p>持久化”的能力，也就是才实现了“如果发生重启，表的自增值可以恢复为MySQL重启前的</p>
-<p>值”，具体情况是：</p>
-<p>在MySQL 5.7及之前的版本，自增值保存在内存里，并没有持久化。每次重启后，第一</p>
-<p>次打开表的时候，都会去找自增值的最大值max(id)，然后将max(id)+1作为这个表当前的</p>
-<p>自增值。举例来说，如果一个表当前数据行里最大的id是10，AUTO_INCREMENT&#x3D;11。这时候，</p>
-<p>我们删除id&#x3D;10的行，AUTO_INCREMENT还是11。但如果马上重启实例，重启后这个表</p>
-<p>的AUTO_INCREMENT就会变成10。也就是说，MySQL重启可能会修改一个表的AUTO_INCREMENT的值。在MySQL 8.0版本，将自增值的变更记录在了redo log中，重启的时候依靠redo log恢复</p>
-<p>重启之前的值。理解了MySQL对自增值的保存策略以后，我们再看看自增值修改机制。自增值修改机制</p>
-<p>在MySQL里面，如果字段id被定义为AUTO_INCREMENT，在插入一行数据的时候，自增值的</p>
-<p>行为如下：</p>
+        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>自增主键为什么不是连续的？在第4篇文章中，我们提到过自增主键，由于自增主键可以让主键索引尽量地保持递增顺序插入，避免了页分裂，因此索引更紧凑。</p>
+<p>之前我见过有的业务设计依赖于自增主键的连续性，也就是说，这个设计假设自增主键是连续的。</p>
+<p>但实际上，这样的假设是错的，因为自增主键不能保证连续递增。</p>
+<p>今天这篇文章，我们就来说说这个问题，看看什么情况下自增主键会出现 “空洞”？为了便于说明，我们创建一个表t，其中id是自增主键字段、c是唯一索引。</p>
+<p>自增值保存在哪儿？在这个空表t里面执行insert into t values(null, 1, 1);插入一行数据，再执行show create table命CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  UNIQUE KEY &#96;c  ̀(̀ c )̀) ENGINE&#x3D;InnoDB;令，就可以看到如下图所示的结果：</p>
+<p>图1 自动生成的AUTO_INCREMENT值可以看到，表定义里面出现了一个AUTO_INCREMENT&#x3D;2，表示下一次插入数据时，如果需要自动生成自增值，会生成id&#x3D;2。</p>
+<p>其实，这个输出结果容易引起这样的误解：自增值是保存在表结构定义里的。</p>
+<p>实际上，表的结构定义存放在后缀名为.frm的文件中，但是并不会保存自增值。</p>
+<p>不同的引擎对于自增值的保存策略不同。</p>
+<p>MyISAM引擎的自增值保存在数据文件中。</p>
+<p>InnoDB引擎的自增值，其实是保存在了内存里，并且到了MySQL 8.0版本后，才有了“自增值持久化”的能力，也就是才实现了“如果发生重启，表的自增值可以恢复为MySQL重启前的值”，具体情况是：</p>
+<p>在MySQL 5.7及之前的版本，自增值保存在内存里，并没有持久化。</p>
+<p>每次重启后，第一次打开表的时候，都会去找自增值的最大值max(id)，然后将max(id)+1作为这个表当前的自增值。</p>
+<p>举例来说，如果一个表当前数据行里最大的id是10，AUTO_INCREMENT&#x3D;11。</p>
+<p>这时候，我们删除id&#x3D;10的行，AUTO_INCREMENT还是11。</p>
+<p>但如果马上重启实例，重启后这个表的AUTO_INCREMENT就会变成10。</p>
+<p>也就是说，MySQL重启可能会修改一个表的AUTO_INCREMENT的值。</p>
+<p>在MySQL 8.0版本，将自增值的变更记录在了redo log中，重启的时候依靠redo log恢复重启之前的值。</p>
+<p>理解了MySQL对自增值的保存策略以后，我们再看看自增值修改机制。</p>
+<p>自增值修改机制在MySQL里面，如果字段id被定义为AUTO_INCREMENT，在插入一行数据的时候，自增值的行为如下：</p>
 <ol>
-<li>如果插入数据时id字段指定为0、null 或未指定值，那么就把这个表当前的</li>
+<li><p>如果插入数据时id字段指定为0、null 或未指定值，那么就把这个表当前的AUTO_INCREMENT值填到自增字段；</p>
+</li>
+<li><p>如果插入数据时id字段指定了具体的值，就直接使用语句里指定的值。</p>
+</li>
 </ol>
-<p>AUTO_INCREMENT值填到自增字段；</p>
-<ol start="2">
-<li>如果插入数据时id字段指定了具体的值，就直接使用语句里指定的值。根据要插入的值和当前自增值的大小关系，自增值的变更结果也会有所不同。假设，某次要插入</li>
+<p>根据要插入的值和当前自增值的大小关系，自增值的变更结果也会有所不同。</p>
+<p>假设，某次要插入的值是X，当前的自增值是Y。</p>
+<ol>
+<li><p>如果X&lt;Y，那么这个表的自增值不变；</p>
+</li>
+<li><p>如果X≥Y，就需要把当前自增值修改为新的自增值。</p>
+</li>
 </ol>
-<p>的值是X，当前的自增值是Y。1. 如果X&lt;Y，那么这个表的自增值不变；</p>
-<ol start="2">
-<li>如果X≥Y，就需要把当前自增值修改为新的自增值。新的自增值生成算法是：从auto_increment_offset开始，以auto_increment_increment为步</li>
-</ol>
-<p>长，持续叠加，直到找到第一个大于X的值，作为新的自增值。其中，auto_increment_offset 和 auto_increment_increment是两个系统参数，分别用来表示自</p>
-<p>增的初始值和步长，默认值都是1。当auto_increment_offset和auto_increment_increment都是1的时候，新的自增值生成逻辑很简</p>
-<p>单，就是：</p>
+<p>新的自增值生成算法是：从auto_increment_offset开始，以auto_increment_increment为步长，持续叠加，直到找到第一个大于X的值，作为新的自增值。</p>
+<p>其中，auto_increment_offset 和 auto_increment_increment是两个系统参数，分别用来表示自增的初始值和步长，默认值都是1。</p>
+<p>当auto_increment_offset和auto_increment_increment都是1的时候，新的自增值生成逻辑很简单，就是：</p>
 <ol>
 <li><p>如果准备插入的值&gt;&#x3D;当前自增值，新的自增值就是“准备插入的值+1”；</p>
 </li>
-<li><p>否则，自增值不变。这就引入了我们文章开头提到的问题，在这两个参数都设置为1的时候，自增主键id却不能保证</p>
+<li><p>否则，自增值不变。</p>
 </li>
 </ol>
-<p>是连续的，这是什么原因呢？自增值的修改时机</p>
-<p>要回答这个问题，我们就要看一下自增值的修改时机。假设，表t里面已经有了(1,1,1)这条记录，这时我再执行一条插入数据命令：</p>
+<p>这就引入了我们文章开头提到的问题，在这两个参数都设置为1的时候，自增主键id却不能保证是连续的，这是什么原因呢？自增值的修改时机要回答这个问题，我们就要看一下自增值的修改时机。</p>
+<p>假设，表t里面已经有了(1,1,1)这条记录，这时我再执行一条插入数据命令：</p>
 <p>这个语句的执行流程就是：</p>
-<p>备注：在一些场景下，使用的就不全是默认值。比如，双M的主备结构里要求双写的时候，我</p>
-<p>们就可能会设置成auto_increment_increment&#x3D;2，让一个库的自增id都是奇数，另一个库的自</p>
-<p>增id都是偶数，避免两个库生成的主键发生冲突。insert into t values(null, 1, 1); </p>
-<ol>
-<li><p>执行器调用InnoDB引擎接口写入一行，传入的这一行的值是(0,1,1);</p>
+<p>备注：在一些场景下，使用的就不全是默认值。</p>
+<p>比如，双M的主备结构里要求双写的时候，我们就可能会设置成auto_increment_increment&#x3D;2，让一个库的自增id都是奇数，另一个库的自增id都是偶数，避免两个库生成的主键发生冲突。</p>
+<p>insert into t values(null, 1, 1); 1. 执行器调用InnoDB引擎接口写入一行，传入的这一行的值是(0,1,1);2. InnoDB发现用户没有指定自增id的值，获取表t当前的自增值2；</p>
+<ol start="3">
+<li><p>将传入的行的值改成(2,1,1);4. 将表的自增值改成3；</p>
 </li>
-<li><p>InnoDB发现用户没有指定自增id的值，获取表t当前的自增值2；</p>
-</li>
-<li><p>将传入的行的值改成(2,1,1);</p>
-</li>
-<li><p>将表的自增值改成3；</p>
-</li>
-<li><p>继续执行插入数据操作，由于已经存在c&#x3D;1的记录，所以报Duplicate key error，语句返回。对应的执行流程图如下：</p>
+<li><p>继续执行插入数据操作，由于已经存在c&#x3D;1的记录，所以报Duplicate key error，语句返回。</p>
 </li>
 </ol>
-<p>图2 insert(null, 1,1)唯一键冲突</p>
-<p>可以看到，这个表的自增值改成3，是在真正执行插入数据的操作之前。这个语句真正执行的时</p>
-<p>候，因为碰到唯一键c冲突，所以id&#x3D;2这一行并没有插入成功，但也没有将自增值再改回去。所以，在这之后，再插入新的数据行时，拿到的自增id就是3。也就是说，出现了自增主键不连</p>
-<p>续的情况。如图3所示就是完整的演示结果。图3 一个自增主键id不连续的复现步骤</p>
-<p>可以看到，这个操作序列复现了一个自增主键id不连续的现场(没有id&#x3D;2的行）。可见，唯一键</p>
-<p>冲突是导致自增主键id不连续的第一种原因。同样地，事务回滚也会产生类似的现象，这就是第二种原因。下面这个语句序列就可以构造不连续的自增id，你可以自己验证一下。你可能会问，为什么在出现唯一键冲突或者回滚的时候，MySQL没有把表t的自增值改回去呢？如果把表t的当前自增值从3改回2，再插入新数据的时候，不就可以生成id&#x3D;2的一行数据了吗？其实，MySQL这么设计是为了提升性能。接下来，我就跟你分析一下这个设计思路，看看自增</p>
-<p>值为什么不能回退。假设有两个并行执行的事务，在申请自增值的时候，为了避免两个事务申请到相同的自增id，肯</p>
-<p>定要加锁，然后顺序申请。1. 假设事务A申请到了id&#x3D;2， 事务B申请到id&#x3D;3，那么这时候表t的自增值是4，之后继续执</p>
-<p>行。2. 事务B正确提交了，但事务A出现了唯一键冲突。3. 如果允许事务A把自增id回退，也就是把表t的当前自增值改回2，那么就会出现这样的情</p>
-<p>况：表里面已经有id&#x3D;3的行，而当前的自增id值是2。4. 接下来，继续执行的其他事务就会申请到id&#x3D;2，然后再申请到id&#x3D;3。这时，就会出现插入语</p>
-<p>句报错“主键冲突”。而为了解决这个主键冲突，有两种方法：</p>
+<p>对应的执行流程图如下：</p>
+<p>图2 insert(null, 1,1)唯一键冲突可以看到，这个表的自增值改成3，是在真正执行插入数据的操作之前。</p>
+<p>这个语句真正执行的时候，因为碰到唯一键c冲突，所以id&#x3D;2这一行并没有插入成功，但也没有将自增值再改回去。</p>
+<p>所以，在这之后，再插入新的数据行时，拿到的自增id就是3。</p>
+<p>也就是说，出现了自增主键不连续的情况。</p>
+<p>如图3所示就是完整的演示结果。</p>
+<p>图3 一个自增主键id不连续的复现步骤可以看到，这个操作序列复现了一个自增主键id不连续的现场(没有id&#x3D;2的行）。</p>
+<p>可见，唯一键冲突是导致自增主键id不连续的第一种原因。</p>
+<p>同样地，事务回滚也会产生类似的现象，这就是第二种原因。</p>
+<p>下面这个语句序列就可以构造不连续的自增id，你可以自己验证一下。</p>
+<p>你可能会问，为什么在出现唯一键冲突或者回滚的时候，MySQL没有把表t的自增值改回去呢？如果把表t的当前自增值从3改回2，再插入新数据的时候，不就可以生成id&#x3D;2的一行数据了吗？其实，MySQL这么设计是为了提升性能。</p>
+<p>接下来，我就跟你分析一下这个设计思路，看看自增值为什么不能回退。</p>
+<p>假设有两个并行执行的事务，在申请自增值的时候，为了避免两个事务申请到相同的自增id，肯定要加锁，然后顺序申请。</p>
 <ol>
-<li>每次申请id之前，先判断表里面是否已经存在这个id。如果存在，就跳过这个id。但是，这</li>
+<li><p>假设事务A申请到了id&#x3D;2， 事务B申请到id&#x3D;3，那么这时候表t的自增值是4，之后继续执行。</p>
+</li>
+<li><p>事务B正确提交了，但事务A出现了唯一键冲突。</p>
+</li>
+<li><p>如果允许事务A把自增id回退，也就是把表t的当前自增值改回2，那么就会出现这样的情况：表里面已经有id&#x3D;3的行，而当前的自增id值是2。</p>
+</li>
+<li><p>接下来，继续执行的其他事务就会申请到id&#x3D;2，然后再申请到id&#x3D;3。</p>
+</li>
 </ol>
-<p>个方法的成本很高。因为，本来申请id是一个很快的操作，现在还要再去主键索引树上判断</p>
-<p>id是否存在。2. 把自增id的锁范围扩大，必须等到一个事务执行完成并提交，下一个事务才能再申请自增</p>
-<p>id。这个方法的问题，就是锁的粒度太大，系统并发能力大大下降。可见，这两个方法都会导致性能问题。造成这些麻烦的罪魁祸首，就是我们假设的这个“允许自</p>
-<p>增id回退”的前提导致的。因此，InnoDB放弃了这个设计，语句执行失败也不回退自增id。也正是因为这样，所以才只保</p>
-<p>证了自增id是递增的，但不保证是连续的。insert into t values(null,1,1);</p>
-<p>begin;</p>
-<p>insert into t values(null,2,2);</p>
-<p>rollback;</p>
-<p>insert into t values(null,2,2);</p>
-<p>&#x2F;&#x2F;插入的行是(3,2,2)</p>
-<p>自增锁的优化</p>
-<p>可以看到，自增id锁并不是一个事务锁，而是每次申请完就马上释放，以便允许别的事务再申</p>
-<p>请。其实，在MySQL 5.1版本之前，并不是这样的。接下来，我会先给你介绍下自增锁设计的历史，这样有助于你分析接下来的一个问题。在MySQL 5.0版本的时候，自增锁的范围是语句级别。也就是说，如果一个语句申请了一个表自</p>
-<p>增锁，这个锁会等语句执行结束以后才释放。显然，这样设计会影响并发度。MySQL 5.1.22版本引入了一个新策略，新增参数innodb_autoinc_lock_mode，默认值是1。1. 这个参数的值被设置为0时，表示采用之前MySQL 5.0版本的策略，即语句执行结束后才释</p>
-<p>放锁；</p>
+<p>这时，就会出现插入语句报错“主键冲突”。</p>
+<p>而为了解决这个主键冲突，有两种方法：</p>
+<ol>
+<li>每次申请id之前，先判断表里面是否已经存在这个id。</li>
+</ol>
+<p>如果存在，就跳过这个id。</p>
+<p>但是，这个方法的成本很高。</p>
+<p>因为，本来申请id是一个很快的操作，现在还要再去主键索引树上判断id是否存在。</p>
 <ol start="2">
-<li>这个参数的值被设置为1时：</li>
+<li>把自增id的锁范围扩大，必须等到一个事务执行完成并提交，下一个事务才能再申请自增id。</li>
+</ol>
+<p>这个方法的问题，就是锁的粒度太大，系统并发能力大大下降。</p>
+<p>可见，这两个方法都会导致性能问题。</p>
+<p>造成这些麻烦的罪魁祸首，就是我们假设的这个“允许自增id回退”的前提导致的。</p>
+<p>因此，InnoDB放弃了这个设计，语句执行失败也不回退自增id。</p>
+<p>也正是因为这样，所以才只保证了自增id是递增的，但不保证是连续的。</p>
+<p>insert into t values(null,1,1);begin;insert into t values(null,2,2);rollback;insert into t values(null,2,2);&#x2F;&#x2F;插入的行是(3,2,2)自增锁的优化可以看到，自增id锁并不是一个事务锁，而是每次申请完就马上释放，以便允许别的事务再申请。</p>
+<p>其实，在MySQL 5.1版本之前，并不是这样的。</p>
+<p>接下来，我会先给你介绍下自增锁设计的历史，这样有助于你分析接下来的一个问题。</p>
+<p>在MySQL 5.0版本的时候，自增锁的范围是语句级别。</p>
+<p>也就是说，如果一个语句申请了一个表自增锁，这个锁会等语句执行结束以后才释放。</p>
+<p>显然，这样设计会影响并发度。</p>
+<p>MySQL 5.1.22版本引入了一个新策略，新增参数innodb_autoinc_lock_mode，默认值是1。</p>
+<ol>
+<li><p>这个参数的值被设置为0时，表示采用之前MySQL 5.0版本的策略，即语句执行结束后才释放锁；</p>
+</li>
+<li><p>这个参数的值被设置为1时：</p>
+</li>
 </ol>
 <p>普通insert语句，自增锁在申请之后就马上释放；</p>
 <p>类似insert … select这样的批量插入数据的语句，自增锁还是要等语句结束后才被释放；</p>
 <ol start="3">
-<li>这个参数的值被设置为2时，所有的申请自增主键的动作都是申请后就释放锁。你一定有两个疑问：为什么默认设置下，insert … select 要使用语句级的锁？为什么这个参</li>
+<li>这个参数的值被设置为2时，所有的申请自增主键的动作都是申请后就释放锁。</li>
 </ol>
-<p>数的默认值不是2？答案是，这么设计还是为了数据的一致性。我们一起来看一下这个场景：</p>
-<p>图4 批量插入数据的自增锁</p>
-<p>在这个例子里，我往表t1中插入了4行数据，然后创建了一个相同结构的表t2，然后两个session</p>
-<p>同时执行向表t2中插入数据的操作。你可以设想一下，如果session B是申请了自增值以后马上就释放自增锁，那么就可能出现这样</p>
-<p>的情况：</p>
+<p>你一定有两个疑问：为什么默认设置下，insert … select 要使用语句级的锁？为什么这个参数的默认值不是2？答案是，这么设计还是为了数据的一致性。</p>
+<p>我们一起来看一下这个场景：</p>
+<p>图4 批量插入数据的自增锁在这个例子里，我往表t1中插入了4行数据，然后创建了一个相同结构的表t2，然后两个session同时执行向表t2中插入数据的操作。</p>
+<p>你可以设想一下，如果session B是申请了自增值以后马上就释放自增锁，那么就可能出现这样的情况：</p>
 <p>session B先插入了两个记录，(1,1,1)、(2,2,2)；</p>
 <p>然后，session A来申请自增id得到id&#x3D;3，插入了（3,5,5)；</p>
-<p>之后，session B继续执行，插入两条记录(4,3,3)、 (5,4,4)。你可能会说，这也没关系吧，毕竟session B的语义本身就没有要求表t2的所有行的数据都跟</p>
-<p>session A相同。是的，从数据逻辑上看是对的。但是，如果我们现在的binlog_format&#x3D;statement，你可以设想</p>
-<p>下，binlog会怎么记录呢？由于两个session是同时执行插入数据命令的，所以binlog里面对表t2的更新日志只有两种情况：</p>
-<p>要么先记session A的，要么先记session B的。但不论是哪一种，这个binlog拿去从库执行，或者用来恢复临时实例，备库和临时实例里</p>
-<p>面，session B这个语句执行出来，生成的结果里面，id都是连续的。这时，这个库就发生了数据</p>
-<p>不一致。你可以分析一下，出现这个问题的原因是什么？其实，这是因为原库session B的insert语句，生成的id不连续。这个不连续的id，用statement格</p>
-<p>式的binlog来串行执行，是执行不出来的。而要解决这个问题，有两种思路：</p>
+<p>之后，session B继续执行，插入两条记录(4,3,3)、 (5,4,4)。</p>
+<p>你可能会说，这也没关系吧，毕竟session B的语义本身就没有要求表t2的所有行的数据都跟session A相同。</p>
+<p>是的，从数据逻辑上看是对的。</p>
+<p>但是，如果我们现在的binlog_format&#x3D;statement，你可以设想下，binlog会怎么记录呢？由于两个session是同时执行插入数据命令的，所以binlog里面对表t2的更新日志只有两种情况：</p>
+<p>要么先记session A的，要么先记session B的。</p>
+<p>但不论是哪一种，这个binlog拿去从库执行，或者用来恢复临时实例，备库和临时实例里面，session B这个语句执行出来，生成的结果里面，id都是连续的。</p>
+<p>这时，这个库就发生了数据不一致。</p>
+<p>你可以分析一下，出现这个问题的原因是什么？其实，这是因为原库session B的insert语句，生成的id不连续。</p>
+<p>这个不连续的id，用statement格式的binlog来串行执行，是执行不出来的。</p>
+<p>而要解决这个问题，有两种思路：</p>
 <ol>
-<li>一种思路是，让原库的批量插入数据语句，固定生成连续的id值。所以，自增锁直到语句执</li>
+<li>一种思路是，让原库的批量插入数据语句，固定生成连续的id值。</li>
 </ol>
-<p>行结束才释放，就是为了达到这个目的。2. 另一种思路是，在binlog里面把插入数据的操作都如实记录进来，到备库执行的时候，不再</p>
-<p>依赖于自增主键去生成。这种情况，其实就是innodb_autoinc_lock_mode设置为2，同时</p>
-<p>binlog_format设置为row。因此，在生产上，尤其是有insert … select这种批量插入数据的场景时，从并发插入数据性</p>
-<p>能的角度考虑，我建议你这样设置：innodb_autoinc_lock_mode&#x3D;2 ，并且</p>
-<p>binlog_format&#x3D;row.这样做，既能提升并发性，又不会出现数据一致性问题。需要注意的是，我这里说的批量插入数据，包含的语句类型是insert … select、replace …</p>
-<p>select和load data语句。但是，在普通的insert语句里面包含多个value值的情况下，即使innodb_autoinc_lock_mode设置</p>
-<p>为1，也不会等语句执行完成才释放锁。因为这类语句在申请自增id的时候，是可以精确计算出</p>
-<p>需要多少个id的，然后一次性申请，申请完成后锁就可以释放了。也就是说，批量插入数据的语句，之所以需要这么设置，是因为“不知道要预先申请多少个id”。既然预先不知道要申请多少个自增id，那么一种直接的想法就是需要一个时申请一个。但如果一</p>
-<p>个select … insert语句要插入10万行数据，按照这个逻辑的话就要申请10万次。显然，这种申请</p>
-<p>自增id的策略，在大批量插入数据的情况下，不但速度慢，还会影响并发插入的性能。因此，对于批量插入数据的语句，MySQL有一个批量申请自增id的策略：</p>
+<p>所以，自增锁直到语句执行结束才释放，就是为了达到这个目的。</p>
+<ol start="2">
+<li>另一种思路是，在binlog里面把插入数据的操作都如实记录进来，到备库执行的时候，不再依赖于自增主键去生成。</li>
+</ol>
+<p>这种情况，其实就是innodb_autoinc_lock_mode设置为2，同时binlog_format设置为row。</p>
+<p>因此，在生产上，尤其是有insert … select这种批量插入数据的场景时，从并发插入数据性能的角度考虑，我建议你这样设置：innodb_autoinc_lock_mode&#x3D;2 ，并且binlog_format&#x3D;row.这样做，既能提升并发性，又不会出现数据一致性问题。</p>
+<p>需要注意的是，我这里说的批量插入数据，包含的语句类型是insert … select、replace …select和load data语句。</p>
+<p>但是，在普通的insert语句里面包含多个value值的情况下，即使innodb_autoinc_lock_mode设置为1，也不会等语句执行完成才释放锁。</p>
+<p>因为这类语句在申请自增id的时候，是可以精确计算出需要多少个id的，然后一次性申请，申请完成后锁就可以释放了。</p>
+<p>也就是说，批量插入数据的语句，之所以需要这么设置，是因为“不知道要预先申请多少个id”。</p>
+<p>既然预先不知道要申请多少个自增id，那么一种直接的想法就是需要一个时申请一个。</p>
+<p>但如果一个select … insert语句要插入10万行数据，按照这个逻辑的话就要申请10万次。</p>
+<p>显然，这种申请自增id的策略，在大批量插入数据的情况下，不但速度慢，还会影响并发插入的性能。</p>
+<p>因此，对于批量插入数据的语句，MySQL有一个批量申请自增id的策略：</p>
 <ol>
 <li><p>语句执行过程中，第一次申请自增id，会分配1个；</p>
 </li>
@@ -402,177 +419,39 @@
 </li>
 <li><p>2个用完以后，还是这个语句，第三次申请自增id，会分配4个；</p>
 </li>
-<li><p>依此类推，同一个语句去申请自增id，每次申请到的自增id个数都是上一次的两倍。举个例子，我们一起看看下面的这个语句序列：</p>
+<li><p>依此类推，同一个语句去申请自增id，每次申请到的自增id个数都是上一次的两倍。</p>
 </li>
 </ol>
-<p>insert…select，实际上往表t2中插入了4行数据。但是，这四行数据是分三次申请的自增id，第一</p>
-<p>次申请到了id&#x3D;1，第二次被分配了id&#x3D;2和id&#x3D;3， 第三次被分配到id&#x3D;4到id&#x3D;7。由于这条语句实际只用上了4个id，所以id&#x3D;5到id&#x3D;7就被浪费掉了。之后，再执行insert into t2</p>
-<p>values(null, 5,5)，实际上插入的数据就是（8,5,5)。这是主键id出现自增id不连续的第三种原因。小结</p>
-<p>今天，我们从“自增主键为什么会出现不连续的值”这个问题开始，首先讨论了自增值的存储。在MyISAM引擎里面，自增值是被写在数据文件上的。而在InnoDB中，自增值是被记录在内存</p>
-<p>的。MySQL直到8.0版本，才给InnoDB表的自增值加上了持久化的能力，确保重启前后一个表的</p>
-<p>自增值不变。然后，我和你分享了在一个语句执行过程中，自增值改变的时机，分析了为什么MySQL在事务</p>
-<p>回滚的时候不能回收自增id。insert into t values(null, 1,1);</p>
-<p>insert into t values(null, 2,2);</p>
-<p>insert into t values(null, 3,3);</p>
-<p>insert into t values(null, 4,4);</p>
-<p>create table t2 like t;</p>
-<p>insert into t2(c,d) select c,d from t;</p>
-<p>insert into t2 values(null, 5,5);</p>
-<p>MySQL 5.1.22版本开始引入的参数innodb_autoinc_lock_mode，控制了自增值申请时的锁范</p>
-<p>围。从并发性能的角度考虑，我建议你将其设置为2，同时将binlog_format设置为row。我在前</p>
-<p>面的文章中其实多次提到，binlog_format设置为row，是很有必要的。今天的例子给这个结论多</p>
-<p>了一个理由。最后，我给你留一个思考题吧。在最后一个例子中，执行insert into t2(c,d) select c,d from t;这个语句的时候，如果隔离级别是可</p>
-<p>重复读（repeatable read），binlog_format&#x3D;statement。这个语句会对表t的所有记录和间隙加</p>
-<p>锁。你觉得为什么需要这么做呢？你可以把你的思考和分析写在评论区，我会在下一篇文章和你讨论这个问题。感谢你的收听，也</p>
-<p>欢迎你把这篇文章分享给更多的朋友一起阅读。上期问题时间</p>
-<p>上期的问题是，如果你维护的MySQL系统里有内存表，怎么避免内存表突然丢数据，然后导致</p>
-<p>主备同步停止的情况。我们假设的是主库暂时不能修改引擎，那么就把备库的内存表引擎先都改成InnoDB。对于每个</p>
-<p>内存表，执行</p>
-<p>这样就能避免备库重启的时候，数据丢失的问题。由于主库重启后，会往binlog里面写“delete from tbl_name”，这个命令传到备库，备库的同名的</p>
-<p>表数据也会被清空。因此，就不会出现主备同步停止的问题。如果由于主库异常重启，触发了HA，这时候我们之前修改过引擎的备库变成了主库。而原来的</p>
-<p>主库变成了新备库，在新备库上把所有的内存表（这时候表里没数据）都改成InnoDB表。所以，如果我们不能直接修改主库上的表引擎，可以配置一个自动巡检的工具，在备库上发现内</p>
-<p>存表就把引擎改了。同时，跟业务开发同学约定好建表规则，避免创建新的内存表。set sql_log_bin&#x3D;off;</p>
-<p>alter table tbl_name engine&#x3D;innodb;</p>
-<p>评论区留言点赞板：</p>
-<p>长杰   6</p>
-<p>在最后一个例子中，执行 insert into t2(c,d) select c,d from t; 这个语句的时候，如果隔离级别是</p>
-<p>可重复读（repeatable read），binlog_format&#x3D;statement。这个语句会对表 t 的所有记录和间隙</p>
-<p>加锁。你觉得为什么需要这么做呢？假如原库不对t表所有记录和间隙加锁，如果有其他事物新增数据并先与这个批量操作提交，由</p>
-<p>于事物的隔离级别是可重复读，t2是看不到新增的数据的。但是记录的binlog是statement格式</p>
-<p>，备库或基于binlog恢复的临时库，t2会看到新增的数据，出现数据不一致的情况。2019-02-11</p>
-<p> 作者回复</p>
-<p>  这是一个典型的场景</p>
-<p>2019-02-11</p>
-<p>大家在春节期间还坚持看专栏，并且深入地思考和回复，给大家点赞。@长杰 同学提到的将数据保存到InnoDB表用来持久化，也是一个方法。不过，我还是建议釜</p>
-<p>底抽薪，直接修改备库的内存表的引擎。@老杨同志 提到的是主库异常重启的场景，这时候是不会报主备不一致的，因为主库重启的</p>
-<p>时候写了delete from tbl_name，主备的内存表都清空了。精选留言</p>
-<p>aliang   1</p>
-<p>老师，我们这边有的开发不喜欢用mysql自带的主键自增功能，而是在程序中控制主键（时间+</p>
-<p>业务+机器+序列，bigint类型，实际长度有17位，其中序列保存在内存中，每次递增，主键值不</p>
-<p>连续）。理由是</p>
-<p>（1）通过这样的主键可以直接定位数据，减少索引（2）如果自增，必须先存数据得到主键才</p>
-<p>可继续下面的程序，如果自己计算主键，可以在入库前进行异步处理</p>
-<p>（3）a表要insert得到主键，然后处理b表，然后根据条件还要update a表。如果程序自己控制</p>
-<p>，就不用先insert a表，数据可以在内存中，直到最后一次提交。（对于a表，本来是insert+upd</p>
-<p>ate，最后只是一条insert，少一次数据库操作）</p>
-<p>我想请问的是：</p>
-<p>（1）针对理由1，是否可以用组合索引替代？（2）针对理由2，是否mysql自身的主键自增分配逻辑就已经能实现了？（3）针对理由3，主键更长意味着更大的索引（主键索引和普通索引），你觉得怎样做会更好</p>
-<p>呢</p>
-<p>2019-02-12</p>
-<p> 作者回复</p>
-<p>“（时间+业务+机器+序列，bigint类型，实际长度有17位，其中序列保存在内存中，每次递增，</p>
-<p>主键值不连续）。” —-bigint就是8位，这个你需要确定一下。如果是8位的还好，如果是17位的</p>
-<p>字符串，就比较耗费空间；</p>
-<p>（1）如果“序列”是递增的，还是不能直接用来体现业务逻辑吧？ 创建有业务意义的字段索引估</p>
-<p>计还是省不了的 ？（2）mysql确实做不到“插入之前就先算好接下来的id是多少”，一般都是insert执行完成后，再</p>
-<p>执行select last_insert_id</p>
-<p>(3) 先insert a再update b再update a，确实看上去比较奇怪，不过感觉这个逻辑应该是可以优化</p>
-<p>的，不应该作为“主键选择”的一个依据。你可否脱敏一下，把模拟的表结构和业务逻辑说下，</p>
-<p>看看是不是可以优化的。总之，按照你说的“时间+业务+机器+序列”这种模式，有点像用uuid，主要的问题还是，如果这</p>
-<p>个表的索引多，占用的空间比较大</p>
-<p>2019-02-12</p>
-<p>进阶的码农   0</p>
-<p>上期问题解答，有点疑问</p>
-<p>set sql_log_bin&#x3D;off;</p>
-<p>alter table tbl_name engine&#x3D;innodb;</p>
-<p>为什么备库需要执行set sql_log_bin&#x3D;off这一句</p>
-<p>把表的引擎改成innodb不就能解决重启后内存表被删除的问题吗？2019-03-12</p>
-<p>进阶的码农   0</p>
-<p>课后题</p>
-<p>在最后一个例子中，执行 insert into t2(c,d) select c,d from t; 这个语句的时候，如果隔离级别是</p>
-<p>可重复读（repeatable read），binlog_format&#x3D;statement会加记录锁和间隙锁。啥我的binlog_f</p>
-<p>ormat&#x3D;row也加锁了</p>
-<p>2019-03-12</p>
-<p>hetiu   0</p>
-<p>老师，请问下innodb_autoinc_lock_mode配置是库级别的还是实例级别的？2019-03-05</p>
-<p> 作者回复</p>
-<p>全局的</p>
-<p>2019-03-06</p>
-<p>二十四桥仍在   0</p>
-<p>UUID生成主键</p>
-<p>2019-03-05</p>
-<p>唐名之   0</p>
-<p>老师，如果我业务场景必须需要一个带有序自增值，设业务为表A，另外添加一张表记录自增</p>
-<p>为表B，表B包含3个字段（自增主键，表A唯一键，自增列）；伪代码如下；这样能实现吗？或</p>
-<p>者有其他什么好的方案？begin；</p>
-<p>insert into A values（字段1, 唯一键）；</p>
-<p>insert into B value (表A唯一键，自增列)；</p>
-<p>commit；</p>
-<p>2019-02-25</p>
-<p> 作者回复</p>
-<p>这样思路上是ok的，</p>
-<p>不过表b怎么有两个自增列？一个表只能有一个自增列。2019-02-25</p>
-<p>AstonPutting   0</p>
-<p>老师，innodb_autoinc_lock_mode &#x3D; 2，binlog_format &#x3D; statement 不也会出现数据不一致的问</p>
-<p>题吗？不是很理解 binlog_format &#x3D; statement 的情况下，1 与 2 的区别。2019-02-21</p>
-<p> 作者回复</p>
-<p>innodb_autoinc_lock_mode &#x3D; 2的时候就要binlog_format &#x3D; row才好</p>
-<p>2019-02-21</p>
-<p>Ryoma   0</p>
-<p>在8.0.3版本后，innodb_autoinc_lock_mode默认值已是2，在binlog_format默认值为row的前提</p>
-<p>下，想来也是为了增加并发。 </p>
-<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_autoinc_lock">https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_autoinc_lock</a></p>
-<p>_mode</p>
-<p>2019-02-14</p>
-<p> 作者回复</p>
-<p>  大势所趋 </p>
-<p>2019-02-16</p>
-<p>帽子掉了   0</p>
-<p>老师您好，我有一个时序问题，想请教一下。从这篇文章的介绍来看，获取自增id和写binlog是有先后顺序的。那么在binlog为statement的情况下。语句A先获取id&#x3D;1，然后B获取id&#x3D;2，接着B提交，写binlog，再A写binlog。这个时候如果binlog重放，是不是会发生B的id为1，而A的id为2的不一致的情况？2019-02-13</p>
-<p> 作者回复</p>
-<p>好问题，不会</p>
-<p>因为binlog在记录这种带自增值的语句之前，会在前面多一句，用于指定“接下来这个语句要需</p>
-<p>要的 自增ID值是多少”，而这个值，是在主库上这一行插入成功后对应的自增值，所以是一致的</p>
-<p>2019-02-14</p>
-<p>郭烊千玺   0</p>
-<p>请教老师个额外话题 select concat(truncate(sum(data_length)&#x2F;1024&#x2F;1024,2),’MB’) as data_size,</p>
-<p>concat(truncate(sum(max_data_length)&#x2F;1024&#x2F;1024,2),’MB’) as max_data_size,</p>
-<p>concat(truncate(sum(data_free)&#x2F;1024&#x2F;1024,2),’MB’) as data_free,</p>
-<p>concat(truncate(sum(index_length)&#x2F;1024&#x2F;1024,2),’MB’) as index_size</p>
-<p>from information_schema.tables where TABLE_SCHEMA &#x3D; ‘databasename’; 网上广为流传的</p>
-<p>这个统计的表大小的方法准确吗 mysql内部是怎么统计的？并且data_free这个mydql内部又是怎</p>
-<p>么统计的 是采样8个页来评估整表吗 并且实验总感觉这样统计不准啊 到底靠谱吗 求赐教求赐</p>
-<p>教啊 困惑好久了</p>
-<p>2019-02-12</p>
-<p>悟空   0</p>
-<p>赶上了进度，把春节期间的补回来了</p>
-<p>2019-02-12</p>
-<p> 作者回复</p>
-<p> </p>
-<p>2019-02-12</p>
-<p>we   0</p>
-<p>insert into t values(null,1,1);</p>
-<p>begin;</p>
-<p>insert into t values(null,2,2);</p>
-<p>rolllack;</p>
-<p>insert into t values(null,2,2);</p>
-<p>&#x2F;&#x2F; 插入的行是 (3,2,2)</p>
-<p>老师 里面是 rollback 吧</p>
-<p>2019-02-12</p>
-<p> 作者回复</p>
-<p>是的，我手残了。。多谢指出，发起勘误了哈</p>
-<p>2019-02-12</p>
-<p>牛在天上飞   0</p>
-<p>老师，请问产生大量的event事件会对mysql服务器有什么影响？主要是哪几个方面的影响？2019-02-12</p>
-<p> 作者回复</p>
-<p>也没啥，主要就是不好管理。。毕竟event是写在MySQL里的，写程序的同学不一定会记得。比较建议将这类逻辑写在应用程序里面</p>
-<p>2019-02-12</p>
-<p>aliang   0</p>
-<p>老师，执行SELECT <code>ID</code>, <code>USER</code>, <code>HOST</code>, <code>DB</code>, <code>COMMAND</code>, <code>TIME</code>, <code>STATE</code>, LEFT(&#96;INF</p>
-<p>O<code>, 51200) AS </code>Info<code>FROM</code>information_schema<code>.</code>PROCESSLIST&#96;;后不时有COMMAND为kill</p>
-<p>ed但info为null的进程，请问是怎么回事呢</p>
-<p>2019-02-11</p>
-<p> 作者回复</p>
-<p>就表示还在“killed”状态，看一下32篇哈</p>
-<p>2019-02-11</p>
-<p>陈华应   0</p>
-<p>防止insert语句执行过程中，原表有新增数据，进而导致的插入新表的数据比原表少</p>
-<p>2019-02-11</p>
-<p> 作者回复</p>
-<p>确实是考虑并发 , 不过并不会有这个现象哦，因为一个语句执行期间还是有一致性视图的。把binlog加进去考虑下哈</p>
-<p>2019-02-11</p>
-<pre><code>
-</code></pre>
+<p>举个例子，我们一起看看下面的这个语句序列：</p>
+<p>insert…select，实际上往表t2中插入了4行数据。</p>
+<p>但是，这四行数据是分三次申请的自增id，第一次申请到了id&#x3D;1，第二次被分配了id&#x3D;2和id&#x3D;3， 第三次被分配到id&#x3D;4到id&#x3D;7。</p>
+<p>由于这条语句实际只用上了4个id，所以id&#x3D;5到id&#x3D;7就被浪费掉了。</p>
+<p>之后，再执行insert into t2values(null, 5,5)，实际上插入的数据就是（8,5,5)。</p>
+<p>这是主键id出现自增id不连续的第三种原因。</p>
+<p>小结今天，我们从“自增主键为什么会出现不连续的值”这个问题开始，首先讨论了自增值的存储。</p>
+<p>在MyISAM引擎里面，自增值是被写在数据文件上的。</p>
+<p>而在InnoDB中，自增值是被记录在内存的。</p>
+<p>MySQL直到8.0版本，才给InnoDB表的自增值加上了持久化的能力，确保重启前后一个表的自增值不变。</p>
+<p>然后，我和你分享了在一个语句执行过程中，自增值改变的时机，分析了为什么MySQL在事务回滚的时候不能回收自增id。</p>
+<p>insert into t values(null, 1,1);insert into t values(null, 2,2);insert into t values(null, 3,3);insert into t values(null, 4,4);create table t2 like t;insert into t2(c,d) select c,d from t;insert into t2 values(null, 5,5);MySQL 5.1.22版本开始引入的参数innodb_autoinc_lock_mode，控制了自增值申请时的锁范围。</p>
+<p>从并发性能的角度考虑，我建议你将其设置为2，同时将binlog_format设置为row。</p>
+<p>我在前面的文章中其实多次提到，binlog_format设置为row，是很有必要的。</p>
+<p>今天的例子给这个结论多了一个理由。</p>
+<p>最后，我给你留一个思考题吧。</p>
+<p>在最后一个例子中，执行insert into t2(c,d) select c,d from t;这个语句的时候，如果隔离级别是可重复读（repeatable read），binlog_format&#x3D;statement。</p>
+<p>这个语句会对表t的所有记录和间隙加锁。</p>
+<p>你觉得为什么需要这么做呢？你可以把你的思考和分析写在评论区，我会在下一篇文章和你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期的问题是，如果你维护的MySQL系统里有内存表，怎么避免内存表突然丢数据，然后导致主备同步停止的情况。</p>
+<p>我们假设的是主库暂时不能修改引擎，那么就把备库的内存表引擎先都改成InnoDB。</p>
+<p>对于每个内存表，执行这样就能避免备库重启的时候，数据丢失的问题。</p>
+<p>由于主库重启后，会往binlog里面写“delete from tbl_name”，这个命令传到备库，备库的同名的表数据也会被清空。</p>
+<p>因此，就不会出现主备同步停止的问题。</p>
+<p>如果由于主库异常重启，触发了HA，这时候我们之前修改过引擎的备库变成了主库。</p>
+<p>而原来的主库变成了新备库，在新备库上把所有的内存表（这时候表里没数据）都改成InnoDB表。</p>
+<p>所以，如果我们不能直接修改主库上的表引擎，可以配置一个自动巡检的工具，在备库上发现内存表就把引擎改了。</p>
+<p>同时，跟业务开发同学约定好建表规则，避免创建新的内存表。</p>
+<p>set sql_log_bin&#x3D;off;alter table tbl_name engine&#x3D;innodb;</p>
 
     </div>
 
@@ -670,14 +549,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">342</span>
+          <span class="site-state-item-count">337</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -719,12 +598,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">390k</span>
+    <span title="站点总字数">288k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:40</span>
+    <span title="站点阅读时长">17:26</span>
 </div>
 
 <!--
