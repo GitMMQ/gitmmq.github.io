@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 21:51:16" itemprop="dateModified" datetime="2023-08-09T21:51:16+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,13 +240,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>431</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -258,7 +258,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>Trie 树，也称为字典树或前缀树，是一种用于存储和检索字符串集合的数据结构。它的主要优势是可以高效地进行字符串的插入、删除和搜索操作，特别适用于大量字符串的快速查找。Trie 树的基本思想是将字符串按照字符逐层存储，每个节点代表一个字符，从根节点到叶子节点的路径表示一个完整的字符串。</p>
+<p>以下是一个简单的 Java 实现示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TrieNode</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ALPHABET_SIZE</span> <span class="operator">=</span> <span class="number">26</span>;</span><br><span class="line">    TrieNode[] children;</span><br><span class="line">    <span class="type">boolean</span> isEndOfWord;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TrieNode</span><span class="params">()</span> &#123;</span><br><span class="line">        children = <span class="keyword">new</span> <span class="title class_">TrieNode</span>[ALPHABET_SIZE];</span><br><span class="line">        isEndOfWord = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Trie</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> TrieNode root;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Trie</span><span class="params">()</span> &#123;</span><br><span class="line">        root = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">insert</span><span class="params">(String word)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                current.children[index] = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        current.isEndOfWord = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">search</span><span class="params">(String word)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> current.isEndOfWord;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">startsWith</span><span class="params">(String prefix)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : prefix.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Trie</span> <span class="variable">trie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Trie</span>();</span><br><span class="line">        trie.insert(<span class="string">&quot;apple&quot;</span>);</span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;apple&quot;</span>));   <span class="comment">// 输出 true</span></span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;app&quot;</span>));     <span class="comment">// 输出 false</span></span><br><span class="line">        System.out.println(trie.startsWith(<span class="string">&quot;app&quot;</span>)); <span class="comment">// 输出 true</span></span><br><span class="line">        trie.insert(<span class="string">&quot;app&quot;</span>);</span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;app&quot;</span>));     <span class="comment">// 输出 true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们创建了一个 <code>TrieNode</code> 类来表示 Trie 树的节点。每个节点都包含一个字符数组作为子节点，并有一个标志来指示当前节点是否是一个单词的结尾。然后，我们创建了一个 <code>Trie</code> 类来实现 Trie 树的插入、搜索和前缀搜索功能。</p>
+<p>请注意，这只是 Trie 树的一个简单实现示例。在实际应用中，您可能需要进行更多的优化和功能扩展，以适应特定的需求。</p>
+
       
     </div>
 
@@ -454,7 +460,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 21:50:53" itemprop="dateModified" datetime="2023-08-09T21:50:53+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -471,13 +477,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>746</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -489,7 +495,33 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>Java 8 是 Java 编程语言的一个重要版本，引入了许多新特性和语法改进，使得编写代码更加简洁和高效。以下是一些 Java 8 中的重要语法特性的详细解释：</p>
+<ol>
+<li><p><strong>Lambda 表达式</strong>：Lambda 表达式是一种更简洁的方法来表示匿名函数。它们可以用于替代需要单一抽象方法的接口实现。Lambda 表达式的语法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(parameters) -&gt; expression</span><br><span class="line">或</span><br><span class="line">(parameters) -&gt; &#123; statements; &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>函数式接口</strong>：函数式接口是只包含一个抽象方法的接口。Java 8 中的 Lambda 表达式常常与函数式接口一起使用。例如，<code>Runnable</code> 和 <code>Callable</code> 接口就是函数式接口的例子。</p>
+</li>
+<li><p><strong>Stream API</strong>：Stream 是一种处理集合数据的新方式，它提供了一种流式处理元素的方法。Stream API 可以极大地简化集合操作，例如过滤、映射、聚合等。以下是一个使用 Stream 进行过滤的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">List&lt;Integer&gt; evenNumbers = numbers.stream()</span><br><span class="line">                                   .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">                                   .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>方法引用</strong>：方法引用是一种更简洁地调用已存在方法的方式，可以使代码更易读。方法引用可以用于静态方法、实例方法以及构造函数。以下是一些方法引用的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态方法引用</span></span><br><span class="line">Function&lt;String, Integer&gt; parseInt = Integer::parseInt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实例方法引用</span></span><br><span class="line">List&lt;String&gt; names = Arrays.asList(<span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Charlie&quot;</span>);</span><br><span class="line">names.forEach(System.out::println);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造函数引用</span></span><br><span class="line">Supplier&lt;List&lt;String&gt;&gt; listSupplier = ArrayList::<span class="keyword">new</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>默认方法和静态方法</strong>：Java 8 允许在接口中定义默认方法和静态方法。默认方法允许在不破坏实现类的情况下向接口添加新方法。静态方法可以直接通过接口名调用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">MyInterface</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">doSomethingElse</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 默认实现</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">staticMethod</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 静态方法实现</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Optional 类</strong>：Optional 是一个容器类，可以用来处理可能为空的值，避免空指针异常。它鼓励程序员显式处理可能为空的情况。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; optionalValue = Optional.ofNullable(getValue());</span><br><span class="line"><span class="keyword">if</span> (optionalValue.isPresent()) &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> optionalValue.get();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 值为空的处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>新的日期和时间 API</strong>：Java 8 引入了新的日期和时间 API，解决了旧的 <code>Date</code> 和 <code>Calendar</code> 类的问题。新的 API 提供了更好的可读性和易用性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">formatter</span> <span class="operator">=</span> DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">formattedDateTime</span> <span class="operator">=</span> now.format(formatter);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>默认方法的解决冲突</strong>：当一个类实现了多个接口，这些接口有相同的默认方法时，编译器会要求显示指定调用哪个接口的方法，或者在实现类中重写该方法。</p>
+</li>
+</ol>
+<p>这些是 Java 8 中的一些重要语法特性。它们使得代码更加简洁、可读性更高，并且提供了更多的灵活性和功能。在使用这些特性时，要注意充分了解它们的用法和适用场景，以便编写出高质量的代码。</p>
+
       
     </div>
 
@@ -1300,7 +1332,7 @@ private Environment environment;
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1342,12 +1374,12 @@ private Environment environment;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

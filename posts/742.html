@@ -28,7 +28,7 @@
 <meta property="og:description" content="分类 基于字典、词库匹配 基于词频度统计 基于知识理解  字典、词库匹配中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理  逐词遍历法：全字典遍历一遍，效率低，不适用于大系统 机械分词法  最大正向匹配法假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成 逆向最大匹配法文档逆序处理，">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.193Z">
-<meta property="article:modified_time" content="2022-12-28T06:40:43.812Z">
+<meta property="article:modified_time" content="2023-08-09T14:23:00.129Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:23:00" itemprop="dateModified" datetime="2023-08-09T22:23:00+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>1.2k</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>4 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -296,6 +296,15 @@
 <p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
 <h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
 <h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+<p>在Python中，有许多库可以用于中文分词，其中最常用的是<code>jieba</code>库。以下是一个使用<code>jieba</code>库进行中文分词的示例代码：</p>
+<p>首先，确保已安装 <code>jieba</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install jieba</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输入文本</span></span><br><span class="line">text = <span class="string">&quot;今天天气不错，适合出去玩。&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用jieba分词</span></span><br><span class="line">seg_list = jieba.cut(text, cut_all=<span class="literal">False</span>)  <span class="comment"># cut_all=False表示精确模式分词</span></span><br><span class="line">seg_result = <span class="string">&quot; &quot;</span>.join(seg_list)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;分词结果:&quot;</span>, seg_result)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用了<code>jieba.cut</code>函数对输入文本进行中文分词。设置<code>cut_all=False</code>表示使用精确模式进行分词。然后，将分词结果用空格连接起来并打印出来。</p>
+<p><code>jieba</code>库支持更多的分词模式、自定义词典、停用词过滤等功能，以及支持并行分词，适用于不同的应用场景。在实际应用中，您可以根据需求对分词结果进行后续处理，比如进行文本分析、情感分析等。</p>
 
     </div>
 
@@ -397,7 +406,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -439,12 +448,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

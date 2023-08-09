@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:49:10" itemprop="dateModified" datetime="2023-08-09T22:49:10+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,13 +240,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>89</span>
+              <span>510</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -258,7 +258,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h2><p>当从模型总体随机抽取n组样本观测值后，最合理的参数估计量应该使得从模型中抽取该n组样本观测值的概率最大，而不是像最小二乘估计法旨在得到使得模型能最好地拟合样本数据的参数估计量。</p>
+          <h2 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h2><p>当从模型总体随机抽取n组样本观测值后，最合理的参数估计量应该使得从模型中抽取该n组样本观测值的概率最大，而不是像最小二乘估计法旨在得到使得模型能最好地拟合样本数据的参数估计量。<br>最大似然估计（Maximum Likelihood Estimation，MLE）是一种常用的参数估计方法，用于根据观测数据来估计模型的参数，使得观测数据在该模型下的概率最大化。在统计学和机器学习中广泛应用。</p>
+<p>以下是一个使用Python实现最大似然估计的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成服从正态分布的随机样本</span></span><br><span class="line">np.random.seed(<span class="number">0</span>)</span><br><span class="line">mu_true = <span class="number">2.0</span></span><br><span class="line">sigma_true = <span class="number">1.5</span></span><br><span class="line">data = np.random.normal(mu_true, sigma_true, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义似然函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">likelihood</span>(<span class="params">params, data</span>):</span><br><span class="line">    mu, sigma = params</span><br><span class="line">    log_likelihood = np.<span class="built_in">sum</span>(np.log(norm.pdf(data, loc=mu, scale=sigma)))</span><br><span class="line">    <span class="keyword">return</span> log_likelihood</span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过最大化似然函数来估计参数</span></span><br><span class="line"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> minimize</span><br><span class="line"></span><br><span class="line">initial_params = [<span class="number">0</span>, <span class="number">1</span>]  <span class="comment"># 初始参数猜测</span></span><br><span class="line">result = minimize(<span class="keyword">lambda</span> params: -likelihood(params, data), initial_params, method=<span class="string">&#x27;Nelder-Mead&#x27;</span>)</span><br><span class="line"></span><br><span class="line">estimated_mu, estimated_sigma = result.x</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Estimated mu:&quot;</span>, estimated_mu)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Estimated sigma:&quot;</span>, estimated_sigma)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制原始数据和拟合的正态分布</span></span><br><span class="line">plt.hist(data, bins=<span class="number">20</span>, density=<span class="literal">True</span>, alpha=<span class="number">0.6</span>, label=<span class="string">&#x27;Data&#x27;</span>)</span><br><span class="line">x = np.linspace(-<span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>)</span><br><span class="line">plt.plot(x, norm.pdf(x, loc=estimated_mu, scale=estimated_sigma), <span class="string">&#x27;r&#x27;</span>, label=<span class="string">&#x27;MLE Fit&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Value&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Probability Density&#x27;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们首先生成了服从正态分布的随机样本数据。然后，定义了似然函数，该函数计算给定参数下观测数据的似然。接着，我们使用<code>scipy.optimize.minimize</code>函数来最大化似然函数，从而估计模型参数。</p>
+<p>通过最大似然估计，我们得到了估计的均值和标准差，然后绘制了原始数据的直方图以及拟合的正态分布。这个示例展示了如何使用最大似然估计来拟合一个简单的正态分布模型。在实际应用中，您可能会遇到更复杂的模型和数据。</p>
 
       
     </div>
@@ -309,7 +314,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:46:33" itemprop="dateModified" datetime="2023-08-09T22:46:33+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -326,13 +331,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>32</span>
+              <span>453</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -344,7 +349,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="自相关性"><a href="#自相关性" class="headerlink" title="自相关性"></a>自相关性</h2><p>协方差矩阵和相关系数主要研究两个连续变量的相似程度（相关性）</p>
+          <h2 id="自相关性"><a href="#自相关性" class="headerlink" title="自相关性"></a>自相关性</h2><p>数据清洗是数据预处理的重要步骤，用于识别和处理数据集中的错误、缺失值、重复值等问题，以确保数据的质量和可用性。以下是一些常见的数据清洗方法以及使用Python的示例代码：</p>
+<ol>
+<li><strong>处理缺失值</strong>：</li>
+</ol>
+<p>缺失值可能会影响模型性能，需要进行处理。常见的方法包括删除带有缺失值的行、使用均值或中位数填充缺失值等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">1</span>, <span class="number">2</span>, np.nan, <span class="number">4</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, np.nan, <span class="number">7</span>, <span class="number">8</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除包含缺失值的行</span></span><br><span class="line">cleaned_df = df.dropna()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用均值填充缺失值</span></span><br><span class="line">mean_fill_df = df.fillna(df.mean())</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after dropping rows with missing values:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(cleaned_df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after filling missing values with mean:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(mean_fill_df)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>处理重复值</strong>：</li>
+</ol>
+<p>重复值可能会导致分析结果失真，需要对其进行处理。可以使用<code>drop_duplicates</code>函数删除重复行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">4</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">8</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除重复行</span></span><br><span class="line">deduplicated_df = df.drop_duplicates()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after removing duplicate rows:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(deduplicated_df)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>异常值处理</strong>：</li>
+</ol>
+<p>异常值可能会影响模型的稳定性和预测性能。一种方法是使用统计方法识别和处理异常值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">200</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, <span class="number">15</span>, <span class="number">25</span>, <span class="number">50</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 标准差方法识别和处理异常值</span></span><br><span class="line">mean = df[<span class="string">&#x27;A&#x27;</span>].mean()</span><br><span class="line">std = df[<span class="string">&#x27;A&#x27;</span>].std()</span><br><span class="line">threshold = <span class="number">2</span>  <span class="comment"># 可根据需求调整</span></span><br><span class="line">df[<span class="string">&#x27;A&#x27;</span>] = np.where(np.<span class="built_in">abs</span>(df[<span class="string">&#x27;A&#x27;</span>] - mean) &gt; threshold * std, mean, df[<span class="string">&#x27;A&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br></pre></td></tr></table></figure>
+
+<p>以上只是数据清洗的一些常见方法示例，实际应用中根据问题的性质和数据的特点，可能需要采用不同的处理方式。</p>
 
       
     </div>
@@ -395,7 +419,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:46:33" itemprop="dateModified" datetime="2023-08-09T22:46:33+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -412,13 +436,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>449</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -430,7 +454,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>数据清洗是数据预处理的重要步骤，用于识别和处理数据集中的错误、缺失值、重复值等问题，以确保数据的质量和可用性。以下是一些常见的数据清洗方法以及使用Python的示例代码：</p>
+<ol>
+<li><strong>处理缺失值</strong>：</li>
+</ol>
+<p>缺失值可能会影响模型性能，需要进行处理。常见的方法包括删除带有缺失值的行、使用均值或中位数填充缺失值等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">1</span>, <span class="number">2</span>, np.nan, <span class="number">4</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, np.nan, <span class="number">7</span>, <span class="number">8</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除包含缺失值的行</span></span><br><span class="line">cleaned_df = df.dropna()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用均值填充缺失值</span></span><br><span class="line">mean_fill_df = df.fillna(df.mean())</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after dropping rows with missing values:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(cleaned_df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after filling missing values with mean:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(mean_fill_df)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>处理重复值</strong>：</li>
+</ol>
+<p>重复值可能会导致分析结果失真，需要对其进行处理。可以使用<code>drop_duplicates</code>函数删除重复行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">4</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">8</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除重复行</span></span><br><span class="line">deduplicated_df = df.drop_duplicates()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nDataFrame after removing duplicate rows:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(deduplicated_df)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>异常值处理</strong>：</li>
+</ol>
+<p>异常值可能会影响模型的稳定性和预测性能。一种方法是使用统计方法识别和处理异常值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建示例数据帧</span></span><br><span class="line">data = &#123;<span class="string">&#x27;A&#x27;</span>: [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">200</span>],</span><br><span class="line">        <span class="string">&#x27;B&#x27;</span>: [<span class="number">5</span>, <span class="number">15</span>, <span class="number">25</span>, <span class="number">50</span>]&#125;</span><br><span class="line">df = pd.DataFrame(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 标准差方法识别和处理异常值</span></span><br><span class="line">mean = df[<span class="string">&#x27;A&#x27;</span>].mean()</span><br><span class="line">std = df[<span class="string">&#x27;A&#x27;</span>].std()</span><br><span class="line">threshold = <span class="number">2</span>  <span class="comment"># 可根据需求调整</span></span><br><span class="line">df[<span class="string">&#x27;A&#x27;</span>] = np.where(np.<span class="built_in">abs</span>(df[<span class="string">&#x27;A&#x27;</span>] - mean) &gt; threshold * std, mean, df[<span class="string">&#x27;A&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original DataFrame:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(df)</span><br></pre></td></tr></table></figure>
+
+<p>以上只是数据清洗的一些常见方法示例，实际应用中根据问题的性质和数据的特点，可能需要采用不同的处理方式。</p>
+
       
     </div>
 
@@ -463,7 +507,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/13744.html" class="post-title-link" itemprop="url">特征选择</a>
+            <a href="/posts/13744.html" class="post-title-link" itemprop="url">奇异值分解</a>
         </h2>
 
         <div class="post-meta">
@@ -480,7 +524,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:45:46" itemprop="dateModified" datetime="2023-08-09T22:45:46+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -497,7 +541,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>365</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -515,7 +559,23 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>奇异值分解（Singular Value Decomposition，SVD）是一种常用的矩阵分解方法，将一个矩阵分解成三个矩阵的乘积。SVD在降维、矩阵逆、推荐系统等领域有广泛应用。</p>
+<p>SVD将一个矩阵 ( A ) 分解为三个矩阵的乘积：( A &#x3D; U \Sigma V^T )，其中：</p>
+<ul>
+<li>( U ) 是一个正交矩阵，它的列向量是 ( A A^T ) 的特征向量。</li>
+<li>( \Sigma ) 是一个对角矩阵，其对角线上的元素是 ( A A^T ) 特征值的平方根。</li>
+<li>( V^T ) 是另一个正交矩阵，它的列向量是 ( A^T A ) 的特征向量。</li>
+</ul>
+<p>以下是一个使用Python实现奇异值分解的示例代码，使用了<code>numpy</code>库：</p>
+<p>首先，确保已安装 <code>numpy</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个示例矩阵</span></span><br><span class="line">A = np.array([[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line">              [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>],</span><br><span class="line">              [<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行奇异值分解</span></span><br><span class="line">U, S, VT = np.linalg.svd(A)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;U matrix:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(U)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nS matrix (diagonal values):&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(np.diag(S))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nVT matrix:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(VT)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们首先创建了一个示例矩阵 ( A )，然后使用<code>np.linalg.svd</code>函数进行奇异值分解。分别得到了矩阵 ( U )，对角矩阵 ( \Sigma ) 的对角线元素和矩阵 ( V^T )。</p>
+<p>奇异值分解的一个常见应用是主成分分析（PCA），它通过对数据矩阵进行奇异值分解来实现数据降维。</p>
+
       
     </div>
 
@@ -565,7 +625,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:39:13" itemprop="dateModified" datetime="2023-08-09T22:39:13+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -582,13 +642,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>473</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -600,7 +660,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>多元线性回归是一种用于建模和预测多个自变量与一个因变量之间关系的统计方法。它是线性回归的扩展，适用于多个自变量的情况。在多元线性回归中，我们试图找到一个线性关系，使得自变量的线性组合能够较好地预测因变量。</p>
+<p>以下是一个使用Python实现多元线性回归的示例代码，使用了<code>numpy</code>和<code>scikit-learn</code>库：</p>
+<p>首先，确保已安装 <code>numpy</code> 和 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy scikit-learn</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> mean_squared_error</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成示例数据</span></span><br><span class="line">np.random.seed(<span class="number">0</span>)</span><br><span class="line">X = np.random.rand(<span class="number">100</span>, <span class="number">3</span>)  <span class="comment"># 100个样本，3个特征</span></span><br><span class="line">y = <span class="number">2</span> * X[:, <span class="number">0</span>] + <span class="number">3</span> * X[:, <span class="number">1</span>] + <span class="number">4</span> * X[:, <span class="number">2</span>] + <span class="number">1</span> + np.random.randn(<span class="number">100</span>)  <span class="comment"># 使用线性关系生成因变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建多元线性回归模型</span></span><br><span class="line">model = LinearRegression()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算均方误差</span></span><br><span class="line">mse = mean_squared_error(y_test, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Mean Squared Error:&quot;</span>, mse)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印模型参数（系数和截距）</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Coefficients:&quot;</span>, model.coef_)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Intercept:&quot;</span>, model.intercept_)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们首先生成了一个示例数据集，其中包含3个特征和一个因变量。然后，我们使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，我们创建了一个多元线性回归模型，并使用<code>fit</code>方法训练模型。在测试集上进行预测，并计算均方误差来衡量模型性能。</p>
+<p>请注意，这只是一个简单的多元线性回归示例。在实际应用中，您可能需要考虑特征选择、模型评估、特征缩放等问题，以获得更好的回归模型。</p>
+
       
     </div>
 
@@ -993,7 +1063,7 @@ plt.show()
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:38:28" itemprop="dateModified" datetime="2023-08-09T22:38:28+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1010,7 +1080,7 @@ plt.show()
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>53</span>
+              <span>393</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1030,6 +1100,15 @@ plt.show()
       
           <p>不确定性程度的物理量</p>
 <p>自封闭系统的运动向均匀分布—熵总是增加的</p>
+<p>信息熵（Entropy）是一种用于衡量随机变量不确定性的度量。在信息论中，熵表示一个随机变量的不确定性或信息量。对于分类问题，熵越高，表示随机变量的不确定性越大，即数据分布越均匀。</p>
+<p>信息熵的计算公式如下：</p>
+<p>[ H(X) &#x3D; -\sum_{i&#x3D;1}^{n} P(x_i) \cdot \log_2(P(x_i)) ]</p>
+<p>其中，( n ) 是类别数，( P(x_i) ) 是随机变量 ( X ) 取值为 ( x_i ) 的概率。</p>
+<p>以下是一个使用Python实现信息熵计算的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">entropy</span>(<span class="params">probabilities</span>):</span><br><span class="line">    <span class="comment"># 避免概率为0时取对数导致无限大</span></span><br><span class="line">    epsilon = <span class="number">1e-15</span></span><br><span class="line">    probabilities = np.clip(probabilities, epsilon, <span class="number">1</span> - epsilon)</span><br><span class="line">    entropy = -np.<span class="built_in">sum</span>(probabilities * np.log2(probabilities))</span><br><span class="line">    <span class="keyword">return</span> entropy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例概率分布</span></span><br><span class="line">probabilities = np.array([<span class="number">0.2</span>, <span class="number">0.3</span>, <span class="number">0.5</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算信息熵</span></span><br><span class="line">entropy_value = entropy(probabilities)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Entropy:&quot;</span>, entropy_value)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们定义了一个<code>entropy</code>函数，接受概率分布作为输入，并计算信息熵。为了避免取对数时出现无限大，我们使用了一个小的epsilon值进行裁剪。然后，通过对概率分布与对数化后的概率分布进行元素级相乘，最后取负数并求和，得到信息熵值。</p>
+<p>信息熵可以用于决策树等算法中，用于选择合适的特征进行数据分割，从而达到更好的分类效果。</p>
 <h2 id="联合熵"><a href="#联合熵" class="headerlink" title="联合熵"></a>联合熵</h2><h2 id="条件熵"><a href="#条件熵" class="headerlink" title="条件熵"></a>条件熵</h2><h2 id="信息增益"><a href="#信息增益" class="headerlink" title="信息增益"></a>信息增益</h2><p>ID3</p>
 <h2 id="信息增益率"><a href="#信息增益率" class="headerlink" title="信息增益率"></a>信息增益率</h2><p>C4.5</p>
 <h2 id="gini系数"><a href="#gini系数" class="headerlink" title="gini系数"></a>gini系数</h2><p>CART</p>
@@ -1083,7 +1162,7 @@ plt.show()
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:38:09" itemprop="dateModified" datetime="2023-08-09T22:38:09+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1100,7 +1179,7 @@ plt.show()
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>388</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1118,7 +1197,14 @@ plt.show()
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>交叉验证（Cross-Validation）是一种评估机器学习模型性能的方法，通过将数据集分成训练集和验证集来进行多次训练和测试。它有助于更准确地估计模型在未见过数据上的性能，并避免对单一验证集的过度拟合。</p>
+<p>常见的交叉验证方法包括K折交叉验证和留一交叉验证。其中，K折交叉验证将数据集分成K个子集，依次将每个子集作为验证集，其余作为训练集，重复K次；留一交叉验证是K折交叉验证的特例，其中K等于数据集大小。交叉验证的结果通常是各次验证的平均性能。</p>
+<p>以下是一个使用Python实现K折交叉验证的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建SVM分类器</span></span><br><span class="line">svm_model = SVC(kernel=<span class="string">&#x27;linear&#x27;</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行5折交叉验证</span></span><br><span class="line">scores = cross_val_score(svm_model, X, y, cv=<span class="number">5</span>)  <span class="comment"># cv参数指定折数</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Cross-Validation Scores:&quot;</span>, scores)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Mean Score:&quot;</span>, scores.mean())</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用<code>load_iris</code>函数加载鸢尾花数据集，并创建了一个线性SVM分类器。然后，使用<code>cross_val_score</code>函数进行5折交叉验证，得到每次验证的性能分数。最后，我们打印出各次分数和平均分数。</p>
+<p>通过交叉验证，可以更准确地估计模型的性能，并对模型进行调参。</p>
+
       
     </div>
 
@@ -1168,7 +1254,7 @@ plt.show()
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:23:33" itemprop="dateModified" datetime="2023-08-09T22:23:33+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1185,7 +1271,7 @@ plt.show()
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>384</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1203,7 +1289,13 @@ plt.show()
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>交叉熵（Cross-Entropy）是一种常用的损失函数，用于衡量实际概率分布与预测概率分布之间的差异。在分类问题中，交叉熵可以用于衡量模型预测结果与真实标签之间的距离，从而进行模型的优化。</p>
+<p>以下是一个使用Python实现交叉熵计算的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy</span>(<span class="params">y_true, y_pred</span>):</span><br><span class="line">    epsilon = <span class="number">1e-15</span>  <span class="comment"># 用于避免取对数时出现无限大</span></span><br><span class="line">    y_pred = np.clip(y_pred, epsilon, <span class="number">1</span> - epsilon)  <span class="comment"># 对预测结果进行裁剪</span></span><br><span class="line">    ce = -np.<span class="built_in">sum</span>(y_true * np.log(y_pred))</span><br><span class="line">    <span class="keyword">return</span> ce</span><br><span class="line"></span><br><span class="line"><span class="comment"># 真实标签和预测概率分布</span></span><br><span class="line">y_true = np.array([<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">y_pred = np.array([<span class="number">0.1</span>, <span class="number">0.6</span>, <span class="number">0.2</span>, <span class="number">0.1</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算交叉熵</span></span><br><span class="line">ce = cross_entropy(y_true, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Cross-Entropy:&quot;</span>, ce)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们定义了一个<code>cross_entropy</code>函数，接受真实标签和预测概率分布作为输入，并计算交叉熵。为了避免取对数时出现无限大，我们使用了一个小的epsilon值进行裁剪。然后，通过对真实标签与对数化后的预测概率分布进行元素级相乘，最后对结果取负数并求和，得到交叉熵值。</p>
+<p>请注意，上述代码示例只是一个简单的交叉熵计算实现。在实际应用中，您可能需要处理更多情况，例如多类别问题、批量计算等。在深度学习中，交叉熵常作为损失函数，在优化过程中用于衡量预测结果与真实标签之间的误差。</p>
+
       
     </div>
 
@@ -1294,7 +1386,7 @@ plt.show()
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1336,12 +1428,12 @@ plt.show()
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

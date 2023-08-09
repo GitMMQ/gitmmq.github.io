@@ -28,7 +28,7 @@
 <meta property="og:description" content="title:机器学习-GANGenerative Adversarial Network，就是大家耳熟能详的 GAN，由 Ian Goodfellow 首先提出，在这两年更是深度学习中最热门的东西，仿佛什么东西都能由 GAN 做出来。我最近刚入门 GAN，看了些资料，做一些笔记。 1.Generation什么是生成（generation）？就是模型通过学习一些数据，然后生成类似的数据。让机器看一">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.110Z">
-<meta property="article:modified_time" content="2022-12-28T06:40:43.812Z">
+<meta property="article:modified_time" content="2023-08-09T14:00:43.212Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:00:43" itemprop="dateModified" datetime="2023-08-09T22:00:43+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>374</span>
+              <span>937</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -274,6 +274,15 @@
 <p>你训练一个 encoder，把 input 转换成 code，然后训练一个 decoder，把 code 转换成一个 image，然后计算得到的 image 和 input 之间的 MSE（mean square error），训练完这个 model 之后，取出后半部分 NN Decoder，输入一个随机的 code，就能 generate 一个 image。</p>
 <p>但是 auto-encoder 生成 image 的效果，当然看着很别扭啦，一眼就能看出真假。所以后来还提出了比如VAE这样的生成模型，我对此也不是很了解，在这就不细说。</p>
 <p>上述的这些生成模型，其实有一个非常严重的弊端。比如 VAE，它生成的 image 是希望和 input 越相似越好，但是 model 是如何来衡量这个相似呢？model 会计算一个 loss，采用的大多是 MSE，即每一个像素上的均方差。loss 小真的表示相似嘛？</p>
+<p>生成对抗网络（Generative Adversarial Network，GAN）是一种深度学习模型，用于生成与训练数据相似的新数据。GAN 包括两个主要组件：生成器（Generator）和判别器（Discriminator）。生成器试图生成类似于真实数据的样本，而判别器试图区分生成的样本和真实样本。这两个组件通过对抗性训练相互竞争，最终生成具有高质量的新数据。</p>
+<p>以下是一个使用 Python 的 TensorFlow 库实现简单 GAN 的示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Dense, Flatten, Reshape</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成器模型</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_generator</span>(<span class="params">latent_dim, output_shape</span>):</span><br><span class="line">    model = Sequential([</span><br><span class="line">        Dense(<span class="number">128</span>, input_dim=latent_dim, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">256</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(np.prod(output_shape), activation=<span class="string">&#x27;sigmoid&#x27;</span>),</span><br><span class="line">        Reshape(output_shape)</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判别器模型</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_discriminator</span>(<span class="params">input_shape</span>):</span><br><span class="line">    model = Sequential([</span><br><span class="line">        Flatten(input_shape=input_shape),</span><br><span class="line">        Dense(<span class="number">256</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">128</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">1</span>, activation=<span class="string">&#x27;sigmoid&#x27;</span>)</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成器和判别器的参数</span></span><br><span class="line">latent_dim = <span class="number">100</span></span><br><span class="line">input_shape = (<span class="number">28</span>, <span class="number">28</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建生成器和判别器</span></span><br><span class="line">generator = build_generator(latent_dim, input_shape)</span><br><span class="line">discriminator = build_discriminator(input_shape)</span><br><span class="line">discriminator.<span class="built_in">compile</span>(loss=<span class="string">&#x27;binary_crossentropy&#x27;</span>, optimizer=<span class="string">&#x27;adam&#x27;</span>, metrics=[<span class="string">&#x27;accuracy&#x27;</span>])</span><br><span class="line">discriminator.trainable = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建 GAN 模型</span></span><br><span class="line">gan_input = tf.keras.Input(shape=(latent_dim,))</span><br><span class="line">gan_output = discriminator(generator(gan_input))</span><br><span class="line">gan = tf.keras.Model(gan_input, gan_output)</span><br><span class="line">gan.<span class="built_in">compile</span>(loss=<span class="string">&#x27;binary_crossentropy&#x27;</span>, optimizer=<span class="string">&#x27;adam&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载 MNIST 数据集</span></span><br><span class="line">(x_train, _), (_, _) = tf.keras.datasets.mnist.load_data()</span><br><span class="line">x_train = x_train / <span class="number">255.0</span></span><br><span class="line">x_train = np.expand_dims(x_train, axis=-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练 GAN</span></span><br><span class="line">epochs = <span class="number">10000</span></span><br><span class="line">batch_size = <span class="number">32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="comment"># 生成随机噪声作为输入</span></span><br><span class="line">    noise = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, (batch_size, latent_dim))</span><br><span class="line">    <span class="comment"># 生成假图片</span></span><br><span class="line">    generated_images = generator.predict(noise)</span><br><span class="line">    <span class="comment"># 随机选择真实图片</span></span><br><span class="line">    real_images = x_train[np.random.randint(<span class="number">0</span>, x_train.shape[<span class="number">0</span>], batch_size)]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 训练判别器</span></span><br><span class="line">    d_loss_real = discriminator.train_on_batch(real_images, np.ones((batch_size, <span class="number">1</span>)))</span><br><span class="line">    d_loss_fake = discriminator.train_on_batch(generated_images, np.zeros((batch_size, <span class="number">1</span>)))</span><br><span class="line">    d_loss = <span class="number">0.5</span> * np.add(d_loss_real, d_loss_fake)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 训练生成器</span></span><br><span class="line">    noise = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, (batch_size, latent_dim))</span><br><span class="line">    g_loss = gan.train_on_batch(noise, np.ones((batch_size, <span class="number">1</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 打印损失</span></span><br><span class="line">    <span class="keyword">if</span> epoch % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;epoch&#125;</span>, D Loss: <span class="subst">&#123;d_loss[<span class="number">0</span>]&#125;</span>, G Loss: <span class="subst">&#123;g_loss&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 绘制生成的图片</span></span><br><span class="line">        <span class="keyword">if</span> epoch % <span class="number">1000</span> == <span class="number">0</span>:</span><br><span class="line">            generated_images = generated_images * <span class="number">255.0</span></span><br><span class="line">            generated_images = generated_images.astype(np.uint8)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">                plt.subplot(<span class="number">2</span>, <span class="number">2</span>, i+<span class="number">1</span>)</span><br><span class="line">                plt.imshow(generated_images[i].reshape(<span class="number">28</span>, <span class="number">28</span>), cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">            plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了如何使用 TensorFlow 实现简单的 GAN，生成手写数字图片。代码中首先定义了生成器和判别器模型，然后构建 GAN 模型。通过循环训练生成器和判别器，使它们相互竞争和优化，最终生成具有相似特征的新图片。</p>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bonelee/p/9166084.html" title="gan">gan</a></p>
 
     </div>
@@ -376,7 +385,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -418,12 +427,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

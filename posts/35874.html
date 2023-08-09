@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="高斯混合模型是一种混合模型，混合的基本分布是高斯分布 参考《统计学习方法》 链接：浅显易懂的GMM模型及其训练过程">
+  <meta name="description" content="高斯混合模型是一种混合模型，混合的基本分布是高斯分布 参考《统计学习方法》 高斯混合模型（Gaussian Mixture Model，GMM）是一种用于对数据进行建模的概率模型。它假设数据是由多个高斯分布（正态分布）组成的混合体，每个分布代表一个潜在的子群。GMM 在聚类、密度估计和异常检测等领域具有广泛的应用。 以下是一个使用 Python 的 scikit-learn 库实现 GMM 的示例">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GMM模型">
 <meta property="og:url" content="https://www.fastolf.com/posts/35874.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="高斯混合模型是一种混合模型，混合的基本分布是高斯分布 参考《统计学习方法》 链接：浅显易懂的GMM模型及其训练过程">
+<meta property="og:description" content="高斯混合模型是一种混合模型，混合的基本分布是高斯分布 参考《统计学习方法》 高斯混合模型（Gaussian Mixture Model，GMM）是一种用于对数据进行建模的概率模型。它假设数据是由多个高斯分布（正态分布）组成的混合体，每个分布代表一个潜在的子群。GMM 在聚类、密度估计和异常检测等领域具有广泛的应用。 以下是一个使用 Python 的 scikit-learn 库实现 GMM 的示例">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.132Z">
-<meta property="article:modified_time" content="2022-12-28T06:40:43.812Z">
+<meta property="article:modified_time" content="2023-08-09T14:03:23.626Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:03:23" itemprop="dateModified" datetime="2023-08-09T22:03:23+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,7 +249,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>49</span>
+              <span>385</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -269,6 +269,15 @@
       
         <p>高斯混合模型是一种混合模型，混合的基本分布是高斯分布</p>
 <p>参考《统计学习方法》</p>
+<p>高斯混合模型（Gaussian Mixture Model，GMM）是一种用于对数据进行建模的概率模型。它假设数据是由多个高斯分布（正态分布）组成的混合体，每个分布代表一个潜在的子群。GMM 在聚类、密度估计和异常检测等领域具有广泛的应用。</p>
+<p>以下是一个使用 Python 的 <code>scikit-learn</code> 库实现 GMM 的示例代码：</p>
+<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> sklearn.mixture <span class="keyword">import</span> GaussianMixture</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_blobs</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成示例数据</span></span><br><span class="line">n_samples = <span class="number">300</span></span><br><span class="line">X, y_true = make_blobs(n_samples=n_samples, centers=<span class="number">3</span>, cluster_std=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 GMM 模型</span></span><br><span class="line">gmm = GaussianMixture(n_components=<span class="number">3</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">gmm.fit(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预测每个样本所属的分布</span></span><br><span class="line">y_pred = gmm.predict(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制原始数据和 GMM 聚类结果</span></span><br><span class="line">plt.scatter(X[:, <span class="number">0</span>], X[:, <span class="number">1</span>], c=y_pred, s=<span class="number">40</span>, cmap=<span class="string">&#x27;viridis&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Feature 1&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Feature 2&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&#x27;GMM Clustering&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们首先使用 <code>make_blobs</code> 函数生成一个示例数据集，用于演示 GMM 的聚类效果。然后，我们创建了一个 GMM 模型，指定了期望的分布数量（<code>n_components</code>），并使用 <code>fit</code> 方法训练模型。最后，我们根据 GMM 模型的预测结果绘制了原始数据和聚类效果。</p>
 <p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmziscoming/p/5750849.html">浅显易懂的GMM模型及其训练过程</a></p>
 
     </div>
@@ -370,7 +379,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -412,12 +421,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件 从经验来看，网络的深度对模型的性能至关重要，当增加网络层数后，网络可以进行更加复杂的特征模式的提取，所以当模型更深时理论上可以取得更好的结果，从图2中也可以看出网络越深而效果越好的一个实践证据。但是更深的网络其性能一定会更好吗？实验发现深度网络出现了退化问题（Degradation p">
+  <meta name="description" content="ResNet（Residual Network）是一个深度卷积神经网络架构，由Kaiming He等人在2015年提出。它通过使用残差块（Residual Block）来解决深层网络的退化问题，允许在训练更深的神经网络时仍然能够获得更好的性能。 ResNet引入了”跳跃连接”或”残差连接”的概念，即通过将前一层的输出直接添加到后续层的输出中，以便网络能够学习残差（剩余部分）。这种结构有助于避免梯度">
 <meta property="og:type" content="article">
 <meta property="og:title" content="机器学习-ResNet">
 <meta property="og:url" content="https://www.fastolf.com/posts/28677.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件 从经验来看，网络的深度对模型的性能至关重要，当增加网络层数后，网络可以进行更加复杂的特征模式的提取，所以当模型更深时理论上可以取得更好的结果，从图2中也可以看出网络越深而效果越好的一个实践证据。但是更深的网络其性能一定会更好吗？实验发现深度网络出现了退化问题（Degradation p">
+<meta property="og:description" content="ResNet（Residual Network）是一个深度卷积神经网络架构，由Kaiming He等人在2015年提出。它通过使用残差块（Residual Block）来解决深层网络的退化问题，允许在训练更深的神经网络时仍然能够获得更好的性能。 ResNet引入了”跳跃连接”或”残差连接”的概念，即通过将前一层的输出直接添加到后续层的输出中，以便网络能够学习残差（剩余部分）。这种结构有助于避免梯度">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.152Z">
-<meta property="article:modified_time" content="2022-12-28T06:40:43.812Z">
+<meta property="article:modified_time" content="2023-08-09T14:19:29.031Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 22:19:29" itemprop="dateModified" datetime="2023-08-09T22:19:29+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,7 +249,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>694</span>
+              <span>943</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -267,10 +267,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件</p>
-<p>从经验来看，网络的深度对模型的性能至关重要，当增加网络层数后，网络可以进行更加复杂的特征模式的提取，所以当模型更深时理论上可以取得更好的结果，从图2中也可以看出网络越深而效果越好的一个实践证据。但是更深的网络其性能一定会更好吗？实验发现深度网络出现了退化问题（Degradation problem）：网络深度增加时，网络准确度出现饱和，甚至出现下降。这个现象可以在图3中直观看出来：56层的网络比20层网络效果还要差。这不会是过拟合问题，因为56层网络的训练误差同样高。我们知道深层网络存在着梯度消失或者爆炸的问题，这使得深度学习模型很难训练。但是现在已经存在一些技术手段如BatchNorm来缓解这个问题。因此，出现深度网络的退化问题是非常令人诧异的。</p>
+        <p>ResNet（Residual Network）是一个深度卷积神经网络架构，由Kaiming He等人在2015年提出。它通过使用残差块（Residual Block）来解决深层网络的退化问题，允许在训练更深的神经网络时仍然能够获得更好的性能。</p>
+<p>ResNet引入了”跳跃连接”或”残差连接”的概念，即通过将前一层的输出直接添加到后续层的输出中，以便网络能够学习残差（剩余部分）。这种结构有助于避免梯度消失和梯度爆炸问题，使网络更容易优化。ResNet的核心思想是：通过层与层之间的直接捷径，网络可以学习原始输入和残差之间的映射，从而更轻松地适应更深的层次。</p>
 <p>深度网络的退化问题至少说明深度网络不容易训练。但是我们考虑这样一个事实：现在你有一个浅层网络，你想通过向上堆积新层来建立深层网络，一个极端情况是这些增加的层什么也不学习，仅仅复制浅层网络的特征，即这样新层是恒等映射（Identity mapping）。在这种情况下，深层网络应该至少和浅层网络性能一样，也不应该出现退化现象。好吧，你不得不承认肯定是目前的训练方法有问题，才使得深层网络很难去找到一个好的参数。</p>
 <p>这个有趣的假设让何博士灵感爆发，他提出了残差学习来解决退化问题。对于一个堆积层结构（几层堆积而成）当输入为时其学习到的特征记为，现在我们希望其可以学习到残差，这样其实原始的学习特征是。之所以这样是因为残差学习相比原始特征直接学习更容易。当残差为0时，此时堆积层仅仅做了恒等映射，至少网络性能不会下降，实际上残差不会为0，这也会使得堆积层在输入特征基础上学习到新的特征，从而拥有更好的性能。残差学习的结构如图4所示。这有点类似与电路中的“短路”，所以是一种短路连接（shortcutconnection）。</p>
+<p>以下是一个使用Python和TensorFlow库实现ResNet的简化版本的示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Input, Conv2D, BatchNormalization, ReLU, Add, GlobalAveragePooling2D, Dense</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Model</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">residual_block</span>(<span class="params">x, filters, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span></span>):</span><br><span class="line">    shortcut = x</span><br><span class="line">    <span class="comment"># 第一个卷积层</span></span><br><span class="line">    x = Conv2D(filters, kernel_size, strides=stride, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    <span class="comment"># 第二个卷积层</span></span><br><span class="line">    x = Conv2D(filters, kernel_size, strides=<span class="number">1</span>, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    <span class="comment"># 添加残差连接</span></span><br><span class="line">    <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> shortcut.shape[-<span class="number">1</span>] != filters:</span><br><span class="line">        shortcut = Conv2D(filters, kernel_size=<span class="number">1</span>, strides=stride, padding=<span class="string">&#x27;valid&#x27;</span>)(shortcut)</span><br><span class="line">        shortcut = BatchNormalization()(shortcut)</span><br><span class="line">    x = Add()([x, shortcut])</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_resnet</span>(<span class="params">input_shape, num_classes, num_blocks_list</span>):</span><br><span class="line">    input_layer = Input(shape=input_shape)</span><br><span class="line">    x = Conv2D(<span class="number">64</span>, <span class="number">7</span>, strides=<span class="number">2</span>, padding=<span class="string">&#x27;same&#x27;</span>)(input_layer)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    x = tf.keras.layers.MaxPooling2D(pool_size=<span class="number">3</span>, strides=<span class="number">2</span>, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> num_blocks <span class="keyword">in</span> num_blocks_list:</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(num_blocks):</span><br><span class="line">            x = residual_block(x, <span class="number">64</span>)</span><br><span class="line">    </span><br><span class="line">    x = GlobalAveragePooling2D()(x)</span><br><span class="line">    x = Dense(num_classes, activation=<span class="string">&#x27;softmax&#x27;</span>)(x)</span><br><span class="line">    </span><br><span class="line">    model = Model(inputs=input_layer, outputs=x)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建ResNet模型</span></span><br><span class="line">input_shape = (<span class="number">224</span>, <span class="number">224</span>, <span class="number">3</span>)  <span class="comment"># 输入图像大小</span></span><br><span class="line">num_classes = <span class="number">1000</span>  <span class="comment"># 分类类别数</span></span><br><span class="line">num_blocks_list = [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>]  <span class="comment"># 每个stage的残差块数量</span></span><br><span class="line">resnet_model = build_resnet(input_shape, num_classes, num_blocks_list)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印模型结构</span></span><br><span class="line">resnet_model.summary()</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们定义了一个<code>residual_block</code>函数来实现残差块的构建，然后使用<code>build_resnet</code>函数来构建简化版本的ResNet模型。通过设置不同的<code>num_blocks_list</code>，可以调整每个stage中的残差块数量。最终，我们打印出ResNet模型的结构概要。</p>
 
     </div>
 
@@ -371,7 +379,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -413,12 +421,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--

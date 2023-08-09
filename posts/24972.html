@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="recording">
+  <meta name="description" content="哈希表（HashMap）是一种常见的数据结构，用于存储键值对。它提供了基于键的快速查找和插入操作，具有高效的查找性能。在 Java 中，HashMap 是基于哈希表实现的，用于存储键值对的无序集合。 下面将分别介绍 Java 1.7 和 Java 1.8 中 HashMap 的实现原理： Java 1.7 中的 HashMap 实现原理：在 Java 1.7 中，HashMap 使用拉链法解决哈希">
 <meta property="og:type" content="article">
 <meta property="og:title" content="哈希表HashMap">
 <meta property="og:url" content="https://www.fastolf.com/posts/24972.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="recording">
+<meta property="og:description" content="哈希表（HashMap）是一种常见的数据结构，用于存储键值对。它提供了基于键的快速查找和插入操作，具有高效的查找性能。在 Java 中，HashMap 是基于哈希表实现的，用于存储键值对的无序集合。 下面将分别介绍 Java 1.7 和 Java 1.8 中 HashMap 的实现原理： Java 1.7 中的 HashMap 实现原理：在 Java 1.7 中，HashMap 使用拉链法解决哈希">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:26.708Z">
-<meta property="article:modified_time" content="2022-12-28T06:35:54.124Z">
+<meta property="article:modified_time" content="2023-08-09T13:53:14.549Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 21:53:14" itemprop="dateModified" datetime="2023-08-09T21:53:14+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,13 +249,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>634</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -267,7 +267,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>哈希表（HashMap）是一种常见的数据结构，用于存储键值对。它提供了基于键的快速查找和插入操作，具有高效的查找性能。在 Java 中，HashMap 是基于哈希表实现的，用于存储键值对的无序集合。</p>
+<p>下面将分别介绍 Java 1.7 和 Java 1.8 中 HashMap 的实现原理：</p>
+<h3 id="Java-1-7-中的-HashMap-实现原理："><a href="#Java-1-7-中的-HashMap-实现原理：" class="headerlink" title="Java 1.7 中的 HashMap 实现原理："></a>Java 1.7 中的 HashMap 实现原理：</h3><p>在 Java 1.7 中，HashMap 使用<strong>拉链法</strong>解决哈希冲突。拉链法是一种处理冲突的方法，每个哈希桶（bucket）实际上是一个链表，相同哈希值的元素被放入同一个桶中。</p>
+<p>HashMap 由一个哈希桶数组和哈希表的加载因子组成。加载因子是一个浮点数，表示哈希表在填满之前可以容纳的元素数量与当前桶数的比值。当元素数量超过加载因子与桶数的乘积时，HashMap 会自动进行扩容。</p>
+<p>在 Java 1.7 的 HashMap 中，哈希值通过调用键对象的 <code>hashCode()</code> 方法得到，然后使用一个散列函数将哈希值映射到桶索引。每个桶中都是一个链表，存储具有相同哈希值的键值对。</p>
+<h3 id="Java-1-8-中的-HashMap-实现原理："><a href="#Java-1-8-中的-HashMap-实现原理：" class="headerlink" title="Java 1.8 中的 HashMap 实现原理："></a>Java 1.8 中的 HashMap 实现原理：</h3><p>Java 1.8 中的 HashMap 在处理哈希冲突时引入了<strong>红黑树</strong>，以提高性能。当链表长度超过一定阈值时，链表会被转换为红黑树，这样可以减少查找操作的时间复杂度。</p>
+<p>Java 1.8 的 HashMap 也引入了<strong>桶位</strong>（Node 数组和 TreeNode 数组）的概念，将链表和红黑树存储在同一个数组中。HashMap 在插入、删除和查找操作时，会根据桶位的类型（链表或红黑树）选择不同的操作方式，以提高性能。</p>
+<p>此外，Java 1.8 的 HashMap 在遇到哈希冲突时会采用<strong>扰动函数</strong>，将哈希值再次散列，以减少冲突概率。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 1.8 中的 HashMap 源码片段</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : hash(key.hashCode());</span><br><span class="line"><span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> (n - <span class="number">1</span>) &amp; hash;</span><br></pre></td></tr></table></figure>
+
+<p>这是 Java 1.8 中的 HashMap 根据哈希值计算桶索引的代码片段，其中 n 是哈希桶数组的大小。</p>
+<p>综上所述，Java 的 HashMap 在不同版本中采用了不同的优化策略，包括拉链法、红黑树、扰动函数等，以提供高效的查找和插入操作。当选择使用 HashMap 时，要考虑到哈希冲突、加载因子、性能等因素，以便正确使用和配置该数据结构。</p>
+
     </div>
 
     
@@ -347,6 +359,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-1-7-%E4%B8%AD%E7%9A%84-HashMap-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">Java 1.7 中的 HashMap 实现原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-1-8-%E4%B8%AD%E7%9A%84-HashMap-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">Java 1.8 中的 HashMap 实现原理：</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -367,7 +380,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -409,12 +422,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">288k</span>
+    <span title="站点总字数">302k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">17:26</span>
+    <span title="站点阅读时长">18:19</span>
 </div>
 
 <!--
