@@ -16461,7 +16461,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper快速入门</title>
-    <url>/posts/0.html</url>
+    <url>/posts/daad87b1.html</url>
     <content><![CDATA[<p>Apache ZooKeeper是一个分布式的开源协调服务，用于管理大规模分布式系统中的配置、同步、命名等任务。它提供了一组简单而强大的API，用于处理复杂的分布式系统的协调问题。以下是一些典型的ZooKeeper应用场景实战示例：</p>
 <ol>
 <li><p><strong>分布式配置管理：</strong><br>ZooKeeper可用于管理分布式系统的配置信息。例如，你可以将数据库连接字符串、缓存配置等保存在ZooKeeper节点中，并在分布式应用中动态获取这些配置信息。</p>
@@ -16487,7 +16487,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper服务注册与订阅</title>
-    <url>/posts/0.html</url>
+    <url>/posts/3c17bf11.html</url>
     <content><![CDATA[<p>ZooKeeper在服务注册与订阅（服务发现）方面，通常会使用有序临时节点来实现。当一个服务实例启动时，它会在ZooKeeper中创建一个临时节点来表示自己的存在。其他服务可以通过监听这些节点的变化来实现实时的服务发现。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper实现服务注册与订阅的基本逻辑。</p>
 <p>首先，确保你的项目中引入了ZooKeeper客户端库依赖。常用的ZooKeeper客户端库包括<code>zookeeper</code>和<code>curator</code>。</p>
 <p>示例代码基于<code>curator</code>库来实现服务注册与订阅：</p>
@@ -16506,7 +16506,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper分布式锁</title>
-    <url>/posts/0.html</url>
+    <url>/posts/7b1c422a.html</url>
     <content><![CDATA[<p>分布式配置中心是ZooKeeper的一个常见应用场景，它允许在分布式系统中集中管理配置信息，使得配置的变更能够实时生效，而无需重新部署应用。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper来实现一个基本的分布式配置中心。</p>
 <p>示例代码基于<code>curator</code>库来实现，确保你的项目中引入了<code>curator</code>的依赖。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.NodeCache;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DistributedConfigCenter</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String configPath;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">DistributedConfigCenter</span><span class="params">(String connectString, String configPath)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br><span class="line">        <span class="built_in">this</span>.configPath = configPath;</span><br><span class="line">        client.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getConfigValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">byte</span>[] data = client.getData().forPath(configPath);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">watchConfigChanges</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">NodeCache</span> <span class="variable">nodeCache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NodeCache</span>(client, configPath);</span><br><span class="line">        nodeCache.getListenable().addListener(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (nodeCache.getCurrentData() != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">newValue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(nodeCache.getCurrentData().getData());</span><br><span class="line">                System.out.println(<span class="string">&quot;Config changed: &quot;</span> + newValue);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        nodeCache.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> &#123;</span><br><span class="line">        CloseableUtils.closeQuietly(client);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">connectString</span> <span class="operator">=</span> <span class="string">&quot;localhost:2181&quot;</span>;  <span class="comment">// ZooKeeper连接地址</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">configPath</span> <span class="operator">=</span> <span class="string">&quot;/myApp/config&quot;</span>;      <span class="comment">// 配置节点路径</span></span><br><span class="line"></span><br><span class="line">        <span class="type">DistributedConfigCenter</span> <span class="variable">configCenter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DistributedConfigCenter</span>(connectString, configPath);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取配置值</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> configCenter.getConfigValue();</span><br><span class="line">        System.out.println(<span class="string">&quot;Initial config value: &quot;</span> + value);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 监听配置变更</span></span><br><span class="line">        configCenter.watchConfigChanges();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 模拟配置变更</span></span><br><span class="line">        Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">        configCenter.client.setData().forPath(configPath, <span class="string">&quot;newConfigValue&quot;</span>.getBytes());</span><br><span class="line"></span><br><span class="line">        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">        configCenter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -16520,7 +16520,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper分布式配置中心</title>
-    <url>/posts/0.html</url>
+    <url>/posts/80270766.html</url>
     <content><![CDATA[<p>实现分布式锁是 ZooKeeper 的一个常见应用场景。下面是一个使用 ZooKeeper 实现分布式锁的简单示例，基于 <code>curator</code> 库。</p>
 <p>示例代码假设你的项目中引入了 <code>curator</code> 依赖。注意，这个示例只是一个基本的演示，实际生产环境中还需要考虑更多的异常处理、超时控制、死锁处理等情况。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.locks.InterProcessMutex;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DistributedLock</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String lockPath;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> InterProcessMutex lock;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">DistributedLock</span><span class="params">(String connectString, String lockPath)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br><span class="line">        <span class="built_in">this</span>.lockPath = lockPath;</span><br><span class="line">        <span class="built_in">this</span>.lock = <span class="keyword">new</span> <span class="title class_">InterProcessMutex</span>(client, lockPath);</span><br><span class="line">        client.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">acquireLock</span><span class="params">(<span class="type">long</span> timeout, TimeUnit unit)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> lock.acquire(timeout, unit);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">releaseLock</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            lock.release();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> &#123;</span><br><span class="line">        CloseableUtils.closeQuietly(client);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">connectString</span> <span class="operator">=</span> <span class="string">&quot;localhost:2181&quot;</span>;  <span class="comment">// ZooKeeper连接地址</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">lockPath</span> <span class="operator">=</span> <span class="string">&quot;/myApp/lock&quot;</span>;          <span class="comment">// 锁节点路径</span></span><br><span class="line"></span><br><span class="line">        <span class="type">DistributedLock</span> <span class="variable">distributedLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DistributedLock</span>(connectString, lockPath);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (distributedLock.acquireLock(<span class="number">10</span>, TimeUnit.SECONDS)) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Lock acquired. Doing critical section work...&quot;</span>);</span><br><span class="line">                Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Failed to acquire lock.&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            distributedLock.releaseLock();</span><br><span class="line">            distributedLock.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -16534,7 +16534,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper功能实践</title>
-    <url>/posts/0.html</url>
+    <url>/posts/45253a41.html</url>
     <content><![CDATA[<p>当谈论ZooKeeper时，以下是一些关键概念的详细解释：</p>
 <ol>
 <li><p><strong>ZNode（Zookeeper节点）</strong>：<br>ZNode是ZooKeeper中的基本数据单元。可以将其视为类似于文件系统中的文件或目录。每个ZNode都有一个唯一的路径标识，类似于文件系统中的绝对路径。ZNode可以保存数据，并且可以有子节点。ZooKeeper中的所有信息都存储在ZNode中。</p>
@@ -16571,7 +16571,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper分布式锁</title>
-    <url>/posts/0.html</url>
+    <url>/posts/7b1c422a.html</url>
     <content><![CDATA[<p>对于ZooKeeper的源码剖析是一个相对复杂的任务，因为ZooKeeper是一个庞大且高度分布式的系统。在这里，我将为您提供一个高层次的概述，帮助您理解其基本结构和关键组件。</p>
 <p>ZooKeeper的源码主要分为客户端和服务器两部分。服务器端负责存储和管理分布式数据，而客户端则与服务器交互以访问和修改这些数据。</p>
 <p><strong>服务器端源码剖析</strong>：<br>服务器端的源码涉及到ZooKeeper的内部工作机制、数据管理、选举算法等复杂内容。主要组件包括：</p>
@@ -16604,7 +16604,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper分布式锁</title>
-    <url>/posts/0.html</url>
+    <url>/posts/7b1c422a.html</url>
     <content><![CDATA[<p>ZooKeeper的迁移、扩容和监控是在维护和管理分布式系统中至关重要的方面。以下是对这些主题的详细解释：</p>
 <p><strong>ZooKeeper迁移</strong>：<br>迁移ZooKeeper集群可能涉及以下情况：</p>
 <ol>
@@ -16638,7 +16638,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Dubbo 容错机制与高扩展性分析</title>
-    <url>/posts/0.html</url>
+    <url>/posts/a6c7d05a.html</url>
     <content><![CDATA[<p>Dubbo作为一款分布式服务框架，具备强大的容错机制和高扩展性。下面分别对Dubbo的容错机制和高扩展性进行详细分析：</p>
 <p><strong>Dubbo容错机制</strong>：</p>
 <p>Dubbo提供了多种容错策略，以保证在分布式系统中出现故障或异常时能够维持系统的稳定性和可用性。</p>
@@ -16680,7 +16680,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper功能实践</title>
-    <url>/posts/0.html</url>
+    <url>/posts/45253a41.html</url>
     <content><![CDATA[<p>Dubbo是一款开源的分布式服务框架，用于构建高性能、可扩展的分布式应用。它提供了服务注册、发现、远程调用等功能，使得构建分布式系统变得更加简单。以下是Dubbo调用模块的详细解释：</p>
 <p>Dubbo的调用模块涉及到服务提供者和服务消费者之间的通信和调用过程。整个过程包括服务的注册、发现、远程通信、负载均衡等。</p>
 <ol>
@@ -16705,7 +16705,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Dubbo RPC协议底层原理与实现</title>
-    <url>/posts/0.html</url>
+    <url>/posts/525e6265.html</url>
     <content><![CDATA[<p>Dubbo作为一个分布式服务框架，使用了自定义的Dubbo RPC（Remote Procedure Call）协议来实现远程调用。下面是Dubbo RPC协议的底层原理和实现细节的解释：</p>
 <p><strong>Dubbo RPC协议底层原理</strong>：</p>
 <p>Dubbo RPC协议的底层原理是基于网络通信，通过将调用请求编码成字节流，然后通过网络传输到服务提供者，再由服务提供者解码并执行相应的服务方法，最终将结果返回给调用方。</p>
@@ -16744,7 +16744,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Zookeeper功能实践</title>
-    <url>/posts/0.html</url>
+    <url>/posts/45253a41.html</url>
     <content><![CDATA[<p>Dubbo是一款高性能、轻量级的分布式服务框架，旨在帮助开发者构建高效可靠的分布式应用。它的设计原理和源码结构涉及多个方面，下面是一个简要的分析和解释：</p>
 <p><strong>Dubbo设计原理分析</strong>：</p>
 <ol>
@@ -16781,7 +16781,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Dubbo 负载均衡策略</title>
-    <url>/posts/0.html</url>
+    <url>/posts/14be0fb8.html</url>
     <content><![CDATA[<p>Dubbo 是一个基于 Java 的开源分布式服务框架，用于构建高性能和可扩展的分布式应用程序。在 Dubbo 中，负载均衡策略是决定服务消费者如何选择提供该服务的多个提供者之一的机制。Dubbo 提供了多种负载均衡策略，让开发人员可以根据实际需求来选择适合的策略。以下是一些常见的 Dubbo 负载均衡策略及其分析：</p>
 <ol>
 <li><p><strong>Random Load Balancing（随机负载均衡）</strong>:<br>这种策略会随机选择一个可用的提供者来处理请求。优点是简单且易于实现，但不适合需要考虑服务器性能差异的场景，因为可能会导致请求被分配到性能较差的提供者上。</p>
@@ -16803,7 +16803,7 @@ public class RBTreeTest &#123;
   </entry>
   <entry>
     <title>Dubbo 调用模块详解</title>
-    <url>/posts/0.html</url>
+    <url>/posts/48ad4cb4.html</url>
     <content><![CDATA[]]></content>
       <categories>
         <category>framework</category>
