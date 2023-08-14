@@ -192,7 +192,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/35077.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/59015.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -206,7 +206,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/35077.html" class="post-title-link" itemprop="url">Trie树</a>
+            <a href="/posts/59015.html" class="post-title-link" itemprop="url">排序-希尔排序</a>
         </h2>
 
         <div class="post-meta">
@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 21:51:16" itemprop="dateModified" datetime="2023-08-09T21:51:16+08:00">2023-08-09</time>
+                <time title="修改时间：2023-08-09 23:51:28" itemprop="dateModified" datetime="2023-08-09T23:51:28+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -231,7 +231,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
                 </span>
             </span>
 
@@ -240,7 +240,662 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>431</span>
+              <span>268</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>以下是希尔排序的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ShellSort</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">shellSort</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始步长设定为数组长度的一半，逐渐减小步长</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">gap</span> <span class="operator">=</span> n / <span class="number">2</span>; gap &gt; <span class="number">0</span>; gap /= <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> gap; i &lt; n; i++) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> arr[i];</span><br><span class="line">                <span class="type">int</span> j;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 在当前步长下，使用插入排序对子数组进行排序</span></span><br><span class="line">                <span class="keyword">for</span> (j = i; j &gt;= gap &amp;&amp; arr[j - gap] &gt; temp; j -= gap) &#123;</span><br><span class="line">                    arr[j] = arr[j - gap];</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                arr[j] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">12</span>, <span class="number">34</span>, <span class="number">54</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;</span><br><span class="line">        System.out.println(<span class="string">&quot;Original array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line"></span><br><span class="line">        shellSort(arr);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Sorted array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>shellSort</code> 方法使用希尔排序算法对整数数组进行排序。希尔排序是一种插入排序的改进版本，它通过逐步缩小步长，将较大的元素尽快移到正确的位置，从而提高了插入排序的效率。</p>
+<p>这只是一个基本的希尔排序示例，实际应用中可能需要考虑不同的步长序列和性能优化。希尔排序的步长序列选择会影响算法的性能。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/63169.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/63169.html" class="post-title-link" itemprop="url">排序-堆排序</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:51:14" itemprop="dateModified" datetime="2023-08-09T23:51:14+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>306</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>下面是一个基本的堆排序的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HeapSort</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">heapSort</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 构建最大堆</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> n / <span class="number">2</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            heapify(arr, n, i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 一个一个地从堆中取出元素，放到数组末尾</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> n - <span class="number">1</span>; i &gt; <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="comment">// 将当前根节点（最大值）与最后一个元素交换</span></span><br><span class="line">            <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> arr[<span class="number">0</span>];</span><br><span class="line">            arr[<span class="number">0</span>] = arr[i];</span><br><span class="line">            arr[i] = temp;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 对交换后的堆重新进行堆化</span></span><br><span class="line">            heapify(arr, i, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> n, <span class="type">int</span> root)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">largest</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">2</span> * root + <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">2</span> * root + <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &lt; n &amp;&amp; arr[left] &gt; arr[largest]) &#123;</span><br><span class="line">            largest = left;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (right &lt; n &amp;&amp; arr[right] &gt; arr[largest]) &#123;</span><br><span class="line">            largest = right;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (largest != root) &#123;</span><br><span class="line">            <span class="comment">// 交换根节点和最大值节点</span></span><br><span class="line">            <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> arr[root];</span><br><span class="line">            arr[root] = arr[largest];</span><br><span class="line">            arr[largest] = temp;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 对被交换的子树进行堆化</span></span><br><span class="line">            heapify(arr, n, largest);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">12</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>&#125;;</span><br><span class="line">        System.out.println(<span class="string">&quot;Original array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line"></span><br><span class="line">        heapSort(arr);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Sorted array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>heapSort</code> 方法使用堆排序算法对整数数组进行排序。首先，构建一个最大堆，然后将根节点（最大值）与最后一个节点交换，然后再重新堆化剩余的部分。重复这个过程，直到整个数组有序。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/26468.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/26468.html" class="post-title-link" itemprop="url">排序-基数排序</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:50:58" itemprop="dateModified" datetime="2023-08-09T23:50:58+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>294</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>基数排序（Radix Sort）是一种非比较性的排序算法，它将数据按照位数逐个分配到不同的桶中，从而实现排序。以下是一个基数排序的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RadixSort</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">radixSort</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr == <span class="literal">null</span> || arr.length &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> Arrays.stream(arr).max().getAsInt();</span><br><span class="line">        <span class="type">int</span> <span class="variable">exp</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (max / exp &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            countingSortByDigit(arr, exp);</span><br><span class="line">            exp *= <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">countingSortByDigit</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> exp)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span>[] output = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        <span class="type">int</span>[] count = <span class="keyword">new</span> <span class="title class_">int</span>[<span class="number">10</span>];</span><br><span class="line"></span><br><span class="line">        Arrays.fill(count, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">digit</span> <span class="operator">=</span> (arr[i] / exp) % <span class="number">10</span>;</span><br><span class="line">            count[digit]++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            count[i] += count[i - <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">digit</span> <span class="operator">=</span> (arr[i] / exp) % <span class="number">10</span>;</span><br><span class="line">            output[count[digit] - <span class="number">1</span>] = arr[i];</span><br><span class="line">            count[digit]--;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.arraycopy(output, <span class="number">0</span>, arr, <span class="number">0</span>, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">170</span>, <span class="number">45</span>, <span class="number">75</span>, <span class="number">90</span>, <span class="number">802</span>, <span class="number">24</span>, <span class="number">2</span>, <span class="number">66</span>&#125;;</span><br><span class="line">        System.out.println(<span class="string">&quot;Original array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line">        </span><br><span class="line">        radixSort(arr);</span><br><span class="line">        </span><br><span class="line">        System.out.println(<span class="string">&quot;Sorted array: &quot;</span> + Arrays.toString(arr));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>radixSort</code> 方法使用基数排序算法来对整数数组进行排序。首先，找到数组中的最大值以确定需要进行几轮排序（根据位数）。然后，通过 <code>countingSortByDigit</code> 方法对数组按照当前位上的数字进行计数排序。最后，将排序后的结果拷贝回原始数组。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/29014.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/29014.html" class="post-title-link" itemprop="url">加密-md5</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>773</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>MD5 和SHA-1 是目前使用比较广泛的散列(Hash)函数，也是在消息认证和数字签名中普遍使用的两种加密算法。本文基于AVR 高速嵌入式单片机，实现了MD5和SHA-1 两种加密算法的比较，并对算法进行了汇编语言的优化和改进。根据实验结果，对两种算法的优缺点进行了比较和分析。 0 引言 随着信息技术和Internet 的迅速发展，信息安全和可靠性问题越来越重要。现在信息安全面临两大基本攻击：被动式攻击（获取消息的内容、业务流分析）和主动攻击（假冒、消息的篡改、业务拒绝）。前者主要靠加密和解密技术进行有效处理，而后者就要靠消息认证来处理。在金融交易、电子商务、电子信件、手机用户信息的确认等领域，数据完整性确认和数据来源的真伪鉴定都是很重要的安全服务。实现这些安全服务的最好方法就是使用加密函数中的单项散列（Hash）函数。单项散列（Hash）函数是一种单项密码体制，它是一个从明文到密文的不可逆函数，也就是说，是无法解密的。通常应用在只需要加密、不需要解密的特殊应用场合。单项散列（Hash）函数H(M)作用于一任意长度的消息M，它返回一固定长度的散列值h:h&#x3D;H(M)作为初始消息的独一无二的“数字指纹”，从而能保证数据的完整性和惟一性。 3.1 MD5 与SHA-1 的比较 由于MD5 与SHA-1均是从MD4 发展而来，它们的结构和强度等特性有很多相似之处，表（1）是对MD5 与SHA-1 的结构比较。SHA-1与MD5 的最大区别在于其摘要比MD5 摘要长 32 比特。对于强行攻击，产生任何一个报文使之摘要等于给定报文摘要的难度：MD5 是2128 数量级的操作，SHA-1 是2160 数量级的操作。产生具有相同摘要的两个报文的难度：MD5是 264 是数量级的操作，SHA-1 是280 数量级的操作。因而,SHA-1 对强行攻击的强度更大。但由于SHA-1 的循环步骤比MD5 多（80:64）且要处理的缓存大（160 比特:128 比特），SHA-1 的运行速度比MD5 慢。 5 结束语 MD5 和SHA-1 是单项散列函数的典型代表，它们广泛地应用在信息安全和数字签名等各个领域。从而有效地抗击了信息的主动式攻击，本文基于AVR 单片机实现了这两种算法，并结合汇编语言尽心了优化，取得了较好的效果。根据信息安全的要求的不同层次可以灵活选择这两种算法从而达到实际目的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/56223.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/56223.html" class="post-title-link" itemprop="url">redis统计信息--INFO</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>显示关于redis服务器的状态报告和统计数值</p>
+<pre><code>    redis&gt; INFO
+    # Server
+    redis_version:2.9.11 //服务器版本
+    redis_git_sha1:937384d0
+    redis_git_dirty:0
+    redis_build_id:8e9509442863f22
+    redis_mode:standalone  //mode
+    os:Linux 3.13.0-35-generic x86_64
+    arch_bits:64
+    multiplexing_api:epoll //事件处理机制
+    gcc_version:4.8.2
+    process_id:4716 //进程ID
+    run_id:26186aac3f2380aaee9eef21cc50aecd542d97dc  //随机标识符（用于 Sentinel 和集群）
+    tcp_port:6379   //监听端口号
+    uptime_in_seconds:362  //启动以来，经过的秒数
+    uptime_in_days:0  //启动以来，经过的天数
+    hz:10  //serverCron运行频率，此值越大表示redis对&quot;间歇性task&quot;的执行次数越频繁(次数/秒)
+    lru_clock:1725349  //以分钟为单位进行自增的时钟，用于 LRU 管理
+    config_file:
+    
+    # Clients
+    connected_clients:1  //已连接客户端的数量（不包括通过从属服务器连接的客户端）
+    client_longest_output_list:0  //当前连接的客户端当中，最长的输出列表
+    client_biggest_input_buf:0  //当前连接的客户端当中，最大输入缓存
+    blocked_clients:0 //正在等待阻塞命令（BLPOP、BRPOP、BRPOPLPUSH）的客户端的数量
+    
+    # Memory
+    used_memory:508536  //由 Redis 分配器分配的内存总量，以字节（byte）为单位
+    used_memory_human:496.62K  //以人类可读的格式返回 Redis 分配的内存总量
+    used_memory_rss:7974912  //从操作系统的角度，返回 Redis 已分配的内存总量（俗称常驻集大小）。这个值和 top 、 ps 等命令的输出一致。
+    //理想情况下， used_memory_rss 的值应该只比 used_memory 稍微高一点儿  
+    //当 rss &gt; used ，且两者的值相差较大时，表示存在（内部或外部的）内存碎片
+    //当 used &gt; rss 时，表示 Redis 的部分内存被操作系统换出到交换空间了，在这种情况下，操作可能会产生明显的延迟。
+    used_memory_peak:508536 //Redis 的内存消耗峰值（以字节为单位）
+    used_memory_peak_human:496.62K //以人类可读的格式返回 Redis 的内存消耗峰值
+    used_memory_lua:33792  // Lua 引擎所使用的内存大小（以字节为单位）
+    mem_fragmentation_ratio:15.68  //used_memory_rss 和 used_memory 之间的比率
+    mem_allocator:jemalloc-3.2.0  //在编译时指定的， Redis 所使用的内存分配器。可以是 libc 、 jemalloc 或者 tcmalloc
+    
+    # Persistence
+    loading:0  //一个标志值，记录了服务器是否正在载入持久化文件  
+    rdb_changes_since_last_save:6 //距离最近一次成功创建持久化文件之后，经过了多少秒
+    rdb_bgsave_in_progress:0 //一个标志值，记录了服务器是否正在创建 RDB 文件
+    rdb_last_save_time:1411011131 //最近一次成功创建 RDB 文件的 UNIX 时间戳
+    rdb_last_bgsave_status:ok //一个标志值，记录了最近一次创建 RDB 文件的结果是成功还是失败
+    rdb_last_bgsave_time_sec:-1 //记录了最近一次创建 RDB 文件耗费的秒数
+    rdb_current_bgsave_time_sec:-1 // 如果服务器正在创建 RDB 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
+    aof_enabled:0 //标志值，记录了 AOF 是否处于打开状态。
+      //如果 AOF 持久化功能处于开启状态，那么这个部分还会加上以下域：    
+      // aof_current_size : AOF 文件目前的大小。
+      // aof_base_size : 服务器启动时或者 AOF 重写最近一次执行之后，AOF 文件的大小。
+      // aof_pending_rewrite : 一个标志值，记录了是否有 AOF 重写操作在等待 RDB 文件创建完毕之后执行。
+      // aof_buffer_length : AOF 缓冲区的大小。
+      // aof_rewrite_buffer_length : AOF 重写缓冲区的大小。
+      // aof_pending_bio_fsync : 后台 I/O 队列里面，等待执行的 fsync 调用数量。
+      // aof_delayed_fsync : 被延迟的 fsync 调用数量。
+    aof_rewrite_in_progress:0 //一个标志值，记录了服务器是否正在创建 AOF 文件。
+    aof_rewrite_scheduled:0 //一个标志值，记录了在 RDB 文件创建完毕之后，是否需要执行预约的 AOF 重写操作
+    aof_last_rewrite_time_sec:-1 //最近一次创建 AOF 文件耗费的时长。
+    aof_current_rewrite_time_sec:-1 //如果服务器正在创建 AOF 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
+    aof_last_bgrewrite_status:ok //一个标志值，记录了最近一次创建 AOF 文件的结果是成功还是失败。
+    aof_last_write_status:ok //
+    
+    # Stats
+    total_connections_received:2 //服务器已接受的连接请求数量
+    total_commands_processed:4 //服务器已执行的命令数量
+    instantaneous_ops_per_sec:0 //服务器每秒钟执行的命令数量
+    rejected_connections:0 //因为最大客户端数量限制而被拒绝的连接请求数量
+    sync_full:0 
+    sync_partial_ok:0 
+    sync_partial_err:0
+    expired_keys:0 //因为过期而被自动删除的数据库键数量
+    evicted_keys:0 //因为最大内存容量限制而被驱逐（evict）的键数量。
+    keyspace_hits:0 //查找数据库键成功的次数。
+    keyspace_misses:0 //查找数据库键失败的次数。
+    pubsub_channels:0 //目前被订阅的频道数量。
+    pubsub_patterns:0 //目前被订阅的模式数量。
+    latest_fork_usec:0 //最近一次 fork() 操作耗费的毫秒数。
+    migrate_cached_sockets:0
+    
+    # Replication
+    role:master //如果当前服务器没有在复制任何其他服务器，那么这个域的值就是 master ；否则的话，这个域的值就是 slave 。注意，在创建复制链的时候，一个从服务器也可能是另一个服务器的主服务器。
+    connected_slaves:0
+    master_repl_offset:0
+    repl_backlog_active:0
+    repl_backlog_size:1048576
+    repl_backlog_first_byte_offset:0
+    repl_backlog_histlen:0
+    
+    # CPU
+    used_cpu_sys:0.21  // Redis 服务器耗费的系统 CPU 。
+    used_cpu_user:0.17  // Redis 服务器耗费的用户 CPU 。
+    used_cpu_sys_children:0.00 //后台进程耗费的系统 CPU 。
+    used_cpu_user_children:0.00 //后台进程耗费的用户 CPU 。
+    
+    # Cluster
+    cluster_enabled:0  //一个标志值，记录集群功能是否已经开启
+    
+    # Keyspace
+    db0:keys=2,expires=0,avg_ttl=0 //部分记录了数据库相关的统计信息，比如数据库的键数量、数据库已经被删除的过期键数量等。
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/25757.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/25757.html" class="post-title-link" itemprop="url">python-数学</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>172</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
+<h2 id="数学分析-概率论基础"><a href="#数学分析-概率论基础" class="headerlink" title="数学分析 概率论基础"></a>数学分析 概率论基础</h2><h3 id="导数与梯度"><a href="#导数与梯度" class="headerlink" title="导数与梯度"></a>导数与梯度</h3><h3 id="taylor展式的应用"><a href="#taylor展式的应用" class="headerlink" title="taylor展式的应用"></a>taylor展式的应用</h3><h2 id="机器学习"><a href="#机器学习" class="headerlink" title="机器学习"></a>机器学习</h2><h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
+<li>数据收集</li>
+<li>数据清洗</li>
+<li>特征工程</li>
+<li>数据建模</li>
+</ol>
+<h3 id="相关内容"><a href="#相关内容" class="headerlink" title="相关内容"></a>相关内容</h3><p>线性回归、rate、loss</p>
+<p>em code</p>
+<p>em算法</p>
+<p>gmm与图像</p>
+<p>图像的卷积</p>
+<p>去均值ICA分离</p>
+<p>带噪声的信号分离</p>
+<p>SVM: 高斯核函数的影响</p>
+<p>HMM分词：MLE</p>
+<p>LDA</p>
+<p>舆情</p>
+<p>最大熵模型</p>
+<p>聚类</p>
+<p>降维</p>
+<p>SVM</p>
+<p>主题模型pLASA&#x2F;LDA</p>
+<p>条件随机场</p>
+<p>变分推导Variation Inference</p>
+<p>深度学习</p>
+<p>$$ S&#x3D;\frac{1}{0!} + \frac{1}{1!} + \frac{1}{2!} + \frac{1}{3!} + \frac{1}{4!} + \frac{1}{4!} + \Lambda + \frac{1}{n!}  $$</p>
+<p>跳跃表分析</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43275.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/43275.html" class="post-title-link" itemprop="url">markdown常用语法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 22:52:05" itemprop="dateModified" datetime="2022-12-28T22:52:05+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/markdown/" itemprop="url" rel="index"><span itemprop="name">markdown</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>507</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -258,158 +913,116 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Trie 树，也称为字典树或前缀树，是一种用于存储和检索字符串集合的数据结构。它的主要优势是可以高效地进行字符串的插入、删除和搜索操作，特别适用于大量字符串的快速查找。Trie 树的基本思想是将字符串按照字符逐层存储，每个节点代表一个字符，从根节点到叶子节点的路径表示一个完整的字符串。</p>
-<p>以下是一个简单的 Java 实现示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TrieNode</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ALPHABET_SIZE</span> <span class="operator">=</span> <span class="number">26</span>;</span><br><span class="line">    TrieNode[] children;</span><br><span class="line">    <span class="type">boolean</span> isEndOfWord;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TrieNode</span><span class="params">()</span> &#123;</span><br><span class="line">        children = <span class="keyword">new</span> <span class="title class_">TrieNode</span>[ALPHABET_SIZE];</span><br><span class="line">        isEndOfWord = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Trie</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> TrieNode root;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Trie</span><span class="params">()</span> &#123;</span><br><span class="line">        root = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">insert</span><span class="params">(String word)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                current.children[index] = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        current.isEndOfWord = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">search</span><span class="params">(String word)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> current.isEndOfWord;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">startsWith</span><span class="params">(String prefix)</span> &#123;</span><br><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : prefix.toCharArray()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.children[index];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Trie</span> <span class="variable">trie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Trie</span>();</span><br><span class="line">        trie.insert(<span class="string">&quot;apple&quot;</span>);</span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;apple&quot;</span>));   <span class="comment">// 输出 true</span></span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;app&quot;</span>));     <span class="comment">// 输出 false</span></span><br><span class="line">        System.out.println(trie.startsWith(<span class="string">&quot;app&quot;</span>)); <span class="comment">// 输出 true</span></span><br><span class="line">        trie.insert(<span class="string">&quot;app&quot;</span>);</span><br><span class="line">        System.out.println(trie.search(<span class="string">&quot;app&quot;</span>));     <span class="comment">// 输出 true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，我们创建了一个 <code>TrieNode</code> 类来表示 Trie 树的节点。每个节点都包含一个字符数组作为子节点，并有一个标志来指示当前节点是否是一个单词的结尾。然后，我们创建了一个 <code>Trie</code> 类来实现 Trie 树的插入、搜索和前缀搜索功能。</p>
-<p>请注意，这只是 Trie 树的一个简单实现示例。在实际应用中，您可能需要进行更多的优化和功能扩展，以适应特定的需求。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22933.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/22933.html" class="post-title-link" itemprop="url">JAVA-同步锁-synchronized</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>167</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>控制Java多线程环境下的线程同步</p>
-<h2 id="对象锁"><a href="#对象锁" class="headerlink" title="对象锁"></a>对象锁</h2><p>synchronized修饰方法或者代码块</p>
-<h2 id="类锁"><a href="#类锁" class="headerlink" title="类锁"></a>类锁</h2><p>synchronized修饰静态方法或者代码块</p>
-<h2 id="方法锁（对象锁）"><a href="#方法锁（对象锁）" class="headerlink" title="方法锁（对象锁）"></a>方法锁（对象锁）</h2><p>synchronized修饰方法，锁住的也是这个对象</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><pre><code>public class SynchronizeTest &#123;
-    static class S&#123;
-        String name;
-        public void setName(String name) throws InterruptedException &#123;
-            synchronized (this) &#123;
-                System.out.println(&quot;..........&quot;);
-                Thread.sleep(1000*5L);
-                this.name = name;
-            &#125;
-        &#125;
-        public void print()&#123;
-            synchronized (this)&#123;
-                System.out.println(name);
-            &#125;
-        &#125;
-        public synchronized void doSomething1()&#123;
-            System.out.println(&quot;doSomething1&quot;);
-            try &#123;
-                Thread.sleep(1000*5L);
-            &#125; catch (InterruptedException e) &#123;
-                e.printStackTrace();
-            &#125;
-        &#125;
-        public synchronized void doSomething2()&#123;
-            System.out.println(name);
-        &#125;
-    &#125;
-    public static void main(String[] args) throws Exception&#123;
-        S s = new S();
-//        Thread t1 = new Thread(() -&gt; &#123;
-//            try &#123;
-//                s.setName(&quot;hello&quot;);
-//            &#125; catch (InterruptedException e) &#123;
-//                e.printStackTrace();
-//            &#125;
-//        &#125;);
-//        t1.start();
-//        Thread t2 = new Thread(() -&gt; &#123;
-//                s.print();
-//        &#125;);
-//        t2.start();
-//        t1.join();
-//        t2.join();
-        Thread t1 = new Thread(() -&gt; &#123;
-             s.doSomething1();
-        &#125;);
-        t1.start();
-        Thread t2 = new Thread(() -&gt; &#123;
-            s.doSomething2();
-        &#125;);
-        t2.start();
-        t1.join();
-        t2.join();
-
-    &#125;
-&#125;
+          <p>markdown优点是<em>易读易写</em>。格式化编辑，纯文本发布，无标签，但支持html标签。</p>
+<h2 id="区块元素"><a href="#区块元素" class="headerlink" title="区块元素"></a>区块元素</h2><p>   段落前后需要空行，若使用换行符<code>&lt;br/&gt;</code>，前面至少两个以上空格才会生效</p>
+<h2 id="标题"><a href="#标题" class="headerlink" title="标题"></a>标题</h2><blockquote>
+<p>Setext 底线形式</p>
+</blockquote>
+<p>高阶标题\次阶标题,大于等于2个&#x3D;-</p>
+<pre><code>This is Setext H1
+=================
+This is Setext H2
+-----------------
 </code></pre>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><pre><code>[TOC] 目录 Markdown语法书写的话，可以自动生成层级目录
+</code></pre>
+<p>六级标题</p>
+<blockquote>
+<p>atx 井号 1-6个</p>
+</blockquote>
+<pre><code># This is H1
+## This is H2
+</code></pre>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>可以加在每一行，也可以加在段落第一行，可以嵌套使用</p>
+<p><code>&gt; 引用文本-一级引用</code>  <br><br><code>&gt;&gt; 引用文本-二级引用</code> <br><br><code>&gt;&gt;&gt; 引用文本-三级引用</code> <br></p>
+<blockquote>
+<p>引用文本-一级引用</p>
+<blockquote>
+<p>引用文本-二级引用</p>
+<blockquote>
+<p>引用文本-三级引用</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>引用文本-一级引用</p>
+</blockquote>
+<h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h2><p>无序、有序  <code>&lt;br/&gt;</code><br>无序列表 使用 <code>*、+、-  &lt;br/&gt;</code><br>有序列表 使用 数字+英文句点</p>
+<h2 id="代码区块"><a href="#代码区块" class="headerlink" title="代码区块"></a>代码区块</h2><p>缩进4个空格或1个制表符 或<code>&lt;pre&gt;、&lt;code&gt;</code>标签</p>
+<h2 id="分割线"><a href="#分割线" class="headerlink" title="分割线"></a>分割线</h2><p>三个以上*、-、_</p>
+<h2 id="区段元素"><a href="#区段元素" class="headerlink" title="区段元素"></a>区段元素</h2><p>语法：行内式、参考式语法：行内式、参考式 [方括号]标记</p>
+<p>This is <a target="_blank" rel="noopener" href="https://www.baidu.com/" title="title">百度</a>  <br><br>    <code>This is [百度](https://www.baidu.com/ &quot;title&quot;)</code> </p>
+<p>This is <a href="/about" title="about">关于</a>  <br><br>    <code>This is [关于](/about &quot;about&quot;)</code></p>
+<p>This is <a target="_blank" rel="noopener" href="https://www.baidu.com/" title="title">百度</a>  <br></p>
+<pre><code>This is [百度][1]  &lt;br&gt;
+[1]:https://www.baidu.com/ &quot;title&quot;
+OR: [1]:&lt;https://www.baidu.com/&gt; &quot;title&quot;
+</code></pre>
+<h2 id="隐式链接标记"><a href="#隐式链接标记" class="headerlink" title="隐式链接标记"></a>隐式链接标记</h2><p><a target="_blank" rel="noopener" href="https://www.google.com/">Google</a></p>
+<pre><code>[Google][]
+[Google]:https://www.google.com/
+</code></pre>
+<p><em>参考式：更易读</em></p>
+<h2 id="强调"><a href="#强调" class="headerlink" title="强调"></a>强调</h2><p>使用 * 或者底线 _  <code>&lt;strong&gt;</code></p>
+<p><em>this is strong</em> &#x2F;&#x2F;*两侧不能有空白</p>
+<pre><code>*this is strong* //*两侧不能有空白
+</code></pre>
+<h2 id="行内代码标记"><a href="#行内代码标记" class="headerlink" title="行内代码标记"></a>行内代码标记</h2><p>反引号&#96;&#96;&#96;&#96;&#96;</p>
+<h2 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h2><p>行内式 参考式    <code>&lt;img&gt;</code></p>
+<pre><code>![alt text](/img/img1.jpg &quot;title&quot;)
+</code></pre>
+<h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><table>
+<thead>
+<tr>
+<th align="right">状态集</th>
+<th align="right">A</th>
+<th align="right">B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td align="right">43</td>
+<td align="right">33</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">33</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">130</td>
+<td align="right">118</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">17</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="right">180</td>
+<td align="right">111</td>
+</tr>
+<tr>
+<td align="right">总数</td>
+<td align="right">370</td>
+<td align="right">225</td>
+</tr>
+</tbody></table>
+<h2 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h2><p>标签: MARKDOWN</p>
+<p>Tags: MARKDOWN</p>
+<h2 id="删除线"><a href="#删除线" class="headerlink" title="删除线"></a>删除线</h2><p><del>这是一条删除线</del></p>
+<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p>这是一个注脚<a href="%E6%8F%8F%E8%BF%B0">^1</a></p>
+<h2 id="页内跳转"><a href="#页内跳转" class="headerlink" title="页内跳转"></a>页内跳转</h2><p><span id="jump">跳转</span></p>
+<p><a href="#jump">你好</a></p>
+<h2 id="github文件"><a href="#github文件" class="headerlink" title="github文件"></a>github文件</h2><p>github文件地址格式</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/%E7%94%A8%E6%88%B7%E5%90%8D/repository%E4%BB%93%E5%BA%93%E5%90%8D/raw/%E5%88%86%E6%94%AF%E5%90%8Dmaster/%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E5%A4%B9%E5%90%8D%E7%A7%B0/%E5%9B%BE%E7%89%87%E5%90%8D%E7%A7%B0">https://github.com/用户名/repository仓库名/raw/分支名master/图片文件夹名称/图片名称</a></p>
 
       
     </div>
@@ -429,7 +1042,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22404.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/57926.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -443,7 +1056,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/22404.html" class="post-title-link" itemprop="url">Java-java8语法</a>
+            <a href="/posts/57926.html" class="post-title-link" itemprop="url">markdown 公式编辑</a>
         </h2>
 
         <div class="post-meta">
@@ -460,7 +1073,326 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 21:50:53" itemprop="dateModified" datetime="2023-08-09T21:50:53+08:00">2023-08-09</time>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/markdown/" itemprop="url" rel="index"><span itemprop="name">markdown</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
+<h2 id="插入公式"><a href="#插入公式" class="headerlink" title="插入公式"></a>插入公式</h2><p>文本中加入公式  <code>$ 数学公式 $</code></p>
+<p>单独加入公式 <code>$$ 数学公式 $$</code></p>
+<pre><code>\begin&#123;equation&#125;
+数学公式
+\label&#123;eq:当前公式名&#125;
+\end&#123;equation&#125;
+自动编号后的公式可在全文任意处使用 \eqref&#123;eq:公式名&#125; 语句引用。
+</code></pre>
+<p><code>$ J_\alpha(x) = \sum_&#123;m=0&#125;^\infty \frac&#123;(-1)^m&#125;&#123;m! \Gamma (m + \alpha + 1)&#125; &#123;\left(&#123; \frac&#123;x&#125;&#123;2&#125; &#125;\right)&#125;^&#123;2m + \alpha&#125; \text &#123;，行内公式示例&#125;</code></p>
+<p>示例： $ J_\alpha(x) &#x3D; \sum_{m&#x3D;0}^\infty \frac{(-1)^m}{m! \Gamma (m + \alpha + 1)} {\left({ \frac{x}{2} }\right)}^{2m + \alpha} \text {，行内公式示例} $</p>
+<p><code>$$ J_\alpha(x) = \sum_&#123;m=0&#125;^\infty \frac&#123;(-1)^m&#125;&#123;m! \Gamma (m + \alpha + 1)&#125; &#123;\left(&#123; \frac&#123;x&#125;&#123;2&#125; &#125;\right)&#125;^&#123;2m + \alpha&#125; \text &#123;，独立公式示例&#125; $$</code></p>
+<p>示例：$$ J_\alpha(x) &#x3D; \sum_{m&#x3D;0}^\infty \frac{(-1)^m}{m! \Gamma (m + \alpha + 1)} {\left({ \frac{x}{2} }\right)}^{2m + \alpha} \text {，独立公式示例} $$ </p>
+<h2 id="上下标"><a href="#上下标" class="headerlink" title="上下标"></a>上下标</h2><p><code>^</code>表示上标, <code>_</code> 表示下标。如果上下标的内容多于一个字符，需要用<code>&#123;&#125;</code>将这些内容括成一个整体。上下标可以嵌套，也可以同时使用</p>
+<p><code>$$ x^&#123;y^z&#125;=(1+&#123;\rm e&#125;^x)^&#123;-2xy^w&#125; $$</code></p>
+<p>$$ x^{y^z}&#x3D;(1+{\rm e}^x)^{-2xy^w} $$</p>
+<p>左右两边都有上下标，可以用<code>\sideset</code> 命令</p>
+<p><code>$$ \sideset&#123;^1_2&#125;&#123;^3_4&#125;\bigotimes $$</code></p>
+<p>$$ \sideset{^1_2}{^3_4}\bigotimes $$</p>
+<h2 id="括号和分隔符"><a href="#括号和分隔符" class="headerlink" title="括号和分隔符"></a>括号和分隔符</h2><p><code>()</code>、<code>[]</code>和<code>|</code>表示符号本身，使用 <code>\&#123;\&#125;</code> 来表示 <code>&#123;&#125;</code>。当要显示大号的括号或分隔符时，要用 <code>\left</code> 和 <code>\right</code> 命令</p>
+<p><code>$$\langle表达式\rangle$$</code></p>
+<p>$$\langle表达式\rangle$$</p>
+<p><code>$$\lceil表达式\rceil$$</code></p>
+<p>$$\lceil表达式\rceil$$</p>
+<p><code>$$\lfloor表达式\rfloor$$</code></p>
+<p>$$\lfloor表达式\rfloor$$</p>
+<p><code>$$\lbrace表达式\rbrace$$</code></p>
+<p>$$\lbrace表达式\rbrace$$</p>
+<p><code>$$ f(x,y,z) = 3y^2z \left( 3+\frac&#123;7x+5&#125;&#123;1+y^2&#125; \right) $$</code></p>
+<p>$$ f(x,y,z) &#x3D; 3y^2z \left( 3+\frac{7x+5}{1+y^2} \right) $$</p>
+<h2 id="分数"><a href="#分数" class="headerlink" title="分数"></a>分数</h2><p>通常使用 <code>\frac &#123;分子&#125; &#123;分母&#125;</code> 命令产生一个分数\frac {分子} {分母}，分数可嵌套。<br>便捷情况可直接输入 \frac ab来快速生成一个\frac ab。<br>如果分式很复杂，亦可使用 分子 \over 分母 命令，此时分数仅有一层</p>
+<p><code>$$\frac&#123;a-1&#125;&#123;b-1&#125; \quad and \quad &#123;a+1\over b+1&#125;$$</code></p>
+<p>$$\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}$$</p>
+<h2 id="开方"><a href="#开方" class="headerlink" title="开方"></a>开方</h2><p>使用 <code>\sqrt [根指数，省略时为2] &#123;被开方数&#125;</code>命令输入开方。</p>
+<p><code>$$\sqrt&#123;2&#125; \quad and \quad \sqrt[n]&#123;3&#125;$$</code></p>
+<p>$$\sqrt{2} \quad and \quad \sqrt[n]{3}$$</p>
+<h2 id="省略号"><a href="#省略号" class="headerlink" title="省略号"></a>省略号</h2><p>省略号有两种，<code>\ldots</code> 表示与文本底线对齐的省略号，<code>\cdots</code> 表示与文本中线对齐的省略号</p>
+<p><code>$$f(x_1,x_2,\underbrace&#123;\ldots&#125;_&#123;\rm ldots&#125; ,x_n) = x_1^2 + x_2^2 + \underbrace&#123;\cdots&#125;_&#123;\rm cdots&#125; + x_n^2$$</code></p>
+<p>$$f(x_1,x_2,\underbrace{\ldots}<em>{\rm ldots} ,x_n) &#x3D; x_1^2 + x_2^2 + \underbrace{\cdots}</em>{\rm cdots} + x_n^2$$</p>
+<h2 id="矢量"><a href="#矢量" class="headerlink" title="矢量"></a>矢量</h2><p>使用 <code>\vec&#123;矢量&#125;</code>来自动产生一个矢量。也可以使用 <code>\overrightarrow</code>等命令自定义字母上方的符号</p>
+<p><code>$$\vec&#123;a&#125; \cdot \vec&#123;b&#125;=0$$</code></p>
+<p>$$\vec{a} \cdot \vec{b}&#x3D;0$$</p>
+<p><code>$$\overleftarrow&#123;xy&#125; \quad and \quad \overleftrightarrow&#123;xy&#125; \quad and \quad \overrightarrow&#123;xy&#125;$$</code></p>
+<p>$$\overleftarrow{xy} \quad and \quad \overleftrightarrow{xy} \quad and \quad \overrightarrow{xy}$$</p>
+<h2 id="积分"><a href="#积分" class="headerlink" title="积分"></a>积分</h2><p>使用 <code>\int_</code>积分下限^积分上限  <code>&#123;被积表达式&#125;</code> 来输入一个积分</p>
+<p><code>$$\int_0^1 &#123;x^2&#125; \,&#123;\rm d&#125;x$$</code></p>
+<p>$$\int_0^1 {x^2} ,{\rm d}x$$</p>
+<h2 id="极限运算"><a href="#极限运算" class="headerlink" title="极限运算"></a>极限运算</h2><p>使用<code>\lim_&#123;变量 \to 表达式&#125;</code> 表达式 来输入一个极限。如有需求，可以更改 <code>\to</code> 符号至任意符号</p>
+<p>$$ \lim_{n \to +\infty} \frac{1}{n(n+1)} \quad and \quad \lim_{x\leftarrow{示例}} \frac{1}{n(n+1)} $$</p>
+<p><code>$$ \lim_&#123;n \to +\infty&#125; \frac&#123;1&#125;&#123;n(n+1)&#125; \quad and \quad \lim_&#123;x\leftarrow&#123;示例&#125;&#125; \frac&#123;1&#125;&#123;n(n+1)&#125; $$</code></p>
+<h2 id="累加、累乘运算"><a href="#累加、累乘运算" class="headerlink" title="累加、累乘运算"></a>累加、累乘运算</h2><p>使用 <code>\sum_&#123;下标表达式&#125;^&#123;上标表达式&#125; &#123;累加表达式&#125;</code>来输入一个累加。<br>与之类似，使用 <code>\prod \bigcup \bigcap</code>来分别输入累乘、并集和交集。<br>此类符号在行内显示时上下标表达式将会移至右上角和右下角</p>
+<p><code>$$\sum_&#123;i=1&#125;^n \frac&#123;1&#125;&#123;i^2&#125; \quad and \quad \prod_&#123;i=1&#125;^n \frac&#123;1&#125;&#123;i^2&#125; \quad and \quad \bigcup_&#123;i=1&#125;^&#123;2&#125; R$$</code></p>
+<p>$$\sum_{i&#x3D;1}^n \frac{1}{i^2} \quad and \quad \prod_{i&#x3D;1}^n \frac{1}{i^2} \quad and \quad \bigcup_{i&#x3D;1}^{2} R$$</p>
+<h2 id="希腊字母"><a href="#希腊字母" class="headerlink" title="希腊字母"></a>希腊字母</h2><p>输入 <code>\小写希腊字母英文全称</code>和<code>\首字母大写希腊字母英文全称</code>来分别输入小写和大写希腊字母。</p>
+<table>
+<thead>
+<tr>
+<th align="right">输入</th>
+<th align="right">显示</th>
+<th align="right">输入</th>
+<th align="right">显示</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">\alpha</td>
+<td align="right">α</td>
+<td align="right">A</td>
+<td align="right">A</td>
+</tr>
+<tr>
+<td align="right">\beta</td>
+<td align="right">β</td>
+<td align="right">B</td>
+<td align="right">B</td>
+</tr>
+<tr>
+<td align="right">\gamma</td>
+<td align="right">γ</td>
+<td align="right">\Gamma</td>
+<td align="right">Γ</td>
+</tr>
+<tr>
+<td align="right">\delta</td>
+<td align="right">δ</td>
+<td align="right">\Delta</td>
+<td align="right">Δ</td>
+</tr>
+<tr>
+<td align="right">\epsilon</td>
+<td align="right">ϵ</td>
+<td align="right">E</td>
+<td align="right">E</td>
+</tr>
+<tr>
+<td align="right">\zeta</td>
+<td align="right">ζ</td>
+<td align="right">Z</td>
+<td align="right">Z</td>
+</tr>
+<tr>
+<td align="right">\eta</td>
+<td align="right">η</td>
+<td align="right">H</td>
+<td align="right">H</td>
+</tr>
+<tr>
+<td align="right">\theta</td>
+<td align="right">θ</td>
+<td align="right">\Theta</td>
+<td align="right">Θ</td>
+</tr>
+<tr>
+<td align="right">\iota</td>
+<td align="right">ι</td>
+<td align="right">I</td>
+<td align="right">I</td>
+</tr>
+<tr>
+<td align="right">\kappa</td>
+<td align="right">κ</td>
+<td align="right">K</td>
+<td align="right">K</td>
+</tr>
+<tr>
+<td align="right">\lambda</td>
+<td align="right">λ</td>
+<td align="right">\Lambda</td>
+<td align="right">Λ</td>
+</tr>
+<tr>
+<td align="right">\nu</td>
+<td align="right">ν</td>
+<td align="right">N</td>
+<td align="right">N</td>
+</tr>
+<tr>
+<td align="right">\mu</td>
+<td align="right">μ</td>
+<td align="right">M</td>
+<td align="right">M</td>
+</tr>
+<tr>
+<td align="right">\xi</td>
+<td align="right">ξ</td>
+<td align="right">\Xi</td>
+<td align="right">Ξ</td>
+</tr>
+<tr>
+<td align="right">o</td>
+<td align="right">o</td>
+<td align="right">O</td>
+<td align="right">O</td>
+</tr>
+<tr>
+<td align="right">\pi</td>
+<td align="right">π</td>
+<td align="right">\Pi</td>
+<td align="right">Π</td>
+</tr>
+<tr>
+<td align="right">\rho</td>
+<td align="right">ρ</td>
+<td align="right">P</td>
+<td align="right">P</td>
+</tr>
+<tr>
+<td align="right">\sigma</td>
+<td align="right">σ</td>
+<td align="right">\Sigma</td>
+<td align="right">Σ</td>
+</tr>
+<tr>
+<td align="right">\tau</td>
+<td align="right">τ</td>
+<td align="right">T</td>
+<td align="right">T</td>
+</tr>
+<tr>
+<td align="right">\upsilon</td>
+<td align="right">υ</td>
+<td align="right">\Upsilon</td>
+<td align="right">Υ</td>
+</tr>
+<tr>
+<td align="right">\phi</td>
+<td align="right">ϕ</td>
+<td align="right">\Phi</td>
+<td align="right">Φ</td>
+</tr>
+<tr>
+<td align="right">\chi</td>
+<td align="right">χ</td>
+<td align="right">X</td>
+<td align="right">X</td>
+</tr>
+<tr>
+<td align="right">\psi</td>
+<td align="right">ψ</td>
+<td align="right">\Psi</td>
+<td align="right">Ψ</td>
+</tr>
+<tr>
+<td align="right">\omega</td>
+<td align="right">ω</td>
+<td align="right">\Omega</td>
+<td align="right">Ω</td>
+</tr>
+</tbody></table>
+<h2 id="大括号和行标的使用"><a href="#大括号和行标的使用" class="headerlink" title="大括号和行标的使用"></a>大括号和行标的使用</h2><p>使用 <code>\left</code>和 <code>\right</code>来创建自动匹配高度的 <code>(圆括号)，[方括号] 和 &#123;花括号&#125; </code>。<br>在每个公式末尾前使用<code>\tag&#123;行标&#125;</code>来实现行标。</p>
+<pre><code>$$
+f\left(
+   \left[ 
+     \frac&#123;
+       1+\left\&#123;x,y\right\&#125;
+     &#125;&#123;
+       \left(
+          \frac&#123;x&#125;&#123;y&#125;+\frac&#123;y&#125;&#123;x&#125;
+       \right)
+       \left(u+1\right)
+     &#125;+a
+   \right]^&#123;3/2&#125;
+\right)
+\tag&#123;行标&#125;
+$$
+</code></pre>
+<p>$$<br>f\left(<br>   \left[<br>     \frac{<br>       1+\left{x,y\right}<br>     }{<br>       \left(<br>          \frac{x}{y}+\frac{y}{x}<br>       \right)<br>       \left(u+1\right)<br>     }+a<br>   \right]^{3&#x2F;2}<br>\right)<br>\tag{行标}<br>$$</p>
+<p><code>$\smash&#123;\displaystyle\max_&#123;0 \leq q \leq n-1&#125;&#125; f(q) \le n$</code></p>
+<p>$\smash{\displaystyle\max_{0 \leq q \leq n-1}} f(q) \le n$</p>
+<p><code>$f(x + \epsilon) \approx f(x) + f&#39;(x) \epsilon + \mathcal&#123;O&#125;(\epsilon^2).$</code></p>
+<p>$f(x + \epsilon) \approx f(x) + f’(x) \epsilon + \mathcal{O}(\epsilon^2).$</p>
+<p><code>$\text&#123;d&#125;x$</code></p>
+<p>$\text{d}x$</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/q735613050/p/7253073.html">Markdown公式编辑学习笔记</a><br>链接：<a target="_blank" rel="noopener" href="https://www.arxiv-vanity.com/papers/1712.01208/">The Case for Learned Index Structures</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/63989.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/63989.html" class="post-title-link" itemprop="url">JAVA-跳表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 21:55:58" itemprop="dateModified" datetime="2023-08-09T21:55:58+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -477,13 +1409,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>746</span>
+              <span>1.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>3 分钟</span>
+              <span>6 分钟</span>
             </span>
 
         </div>
@@ -495,32 +1427,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Java 8 是 Java 编程语言的一个重要版本，引入了许多新特性和语法改进，使得编写代码更加简洁和高效。以下是一些 Java 8 中的重要语法特性的详细解释：</p>
-<ol>
-<li><p><strong>Lambda 表达式</strong>：Lambda 表达式是一种更简洁的方法来表示匿名函数。它们可以用于替代需要单一抽象方法的接口实现。Lambda 表达式的语法如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(parameters) -&gt; expression</span><br><span class="line">或</span><br><span class="line">(parameters) -&gt; &#123; statements; &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>函数式接口</strong>：函数式接口是只包含一个抽象方法的接口。Java 8 中的 Lambda 表达式常常与函数式接口一起使用。例如，<code>Runnable</code> 和 <code>Callable</code> 接口就是函数式接口的例子。</p>
-</li>
-<li><p><strong>Stream API</strong>：Stream 是一种处理集合数据的新方式，它提供了一种流式处理元素的方法。Stream API 可以极大地简化集合操作，例如过滤、映射、聚合等。以下是一个使用 Stream 进行过滤的例子：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">List&lt;Integer&gt; evenNumbers = numbers.stream()</span><br><span class="line">                                   .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">                                   .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>方法引用</strong>：方法引用是一种更简洁地调用已存在方法的方式，可以使代码更易读。方法引用可以用于静态方法、实例方法以及构造函数。以下是一些方法引用的例子：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态方法引用</span></span><br><span class="line">Function&lt;String, Integer&gt; parseInt = Integer::parseInt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实例方法引用</span></span><br><span class="line">List&lt;String&gt; names = Arrays.asList(<span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Charlie&quot;</span>);</span><br><span class="line">names.forEach(System.out::println);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造函数引用</span></span><br><span class="line">Supplier&lt;List&lt;String&gt;&gt; listSupplier = ArrayList::<span class="keyword">new</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>默认方法和静态方法</strong>：Java 8 允许在接口中定义默认方法和静态方法。默认方法允许在不破坏实现类的情况下向接口添加新方法。静态方法可以直接通过接口名调用。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">MyInterface</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">doSomethingElse</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 默认实现</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">staticMethod</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 静态方法实现</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Optional 类</strong>：Optional 是一个容器类，可以用来处理可能为空的值，避免空指针异常。它鼓励程序员显式处理可能为空的情况。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; optionalValue = Optional.ofNullable(getValue());</span><br><span class="line"><span class="keyword">if</span> (optionalValue.isPresent()) &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> optionalValue.get();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 值为空的处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>新的日期和时间 API</strong>：Java 8 引入了新的日期和时间 API，解决了旧的 <code>Date</code> 和 <code>Calendar</code> 类的问题。新的 API 提供了更好的可读性和易用性。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">formatter</span> <span class="operator">=</span> DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">formattedDateTime</span> <span class="operator">=</span> now.format(formatter);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>默认方法的解决冲突</strong>：当一个类实现了多个接口，这些接口有相同的默认方法时，编译器会要求显示指定调用哪个接口的方法，或者在实现类中重写该方法。</p>
-</li>
+          <p>二分查找要求元素可以随机访问，所以决定了需要把元素存储在连续内存。这样查找确实很快，但是插入和删除元素的时候，为了保证元素的有序性，就需要大量的移动元素了。<br>如果需要的是一个能够进行二分查找，又能快速添加和删除元素的数据结构，首先就是二叉查找树，二叉查找树在最坏情况下可能变成一个链表。<br>于是，就出现了平衡二叉树，根据平衡算法的不同有AVL树，B-Tree，B+Tree，红黑树等，但是AVL树实现起来比较复杂，平衡操作较难理解，这时候就可以用SkipList跳跃表结构。</p>
+<p>Key-Value数据结构<br>目前常用的key-value数据结构有三种：Hash表、红黑树、SkipList，它们各自有着不同的优缺点（不考虑删除操作）：<br>Hash表：插入、查找最快，为O(1)；如使用链表实现则可实现无锁；数据有序化需要显式的排序操作。<br>红黑树：插入、查找为O(logn)，但常数项较小；无锁实现的复杂性很高，一般需要加锁；数据天然有序。<br>SkipList：插入、查找为O(logn)，但常数项比红黑树要大；底层结构为链表，可无锁实现；数据天然有序。</p>
+<p>如果要实现一个key-value结构，需求的功能有插入、查找、迭代、修改，那么首先Hash表就不是很适合了，因为迭代的时间复杂度比较高；而红黑树的插入很可能会涉及多个结点的旋转、变色操作，因此需要在外层加锁，这无形中降低了它可能的并发度。而SkipList底层是用链表实现的，可以实现为lock free，同时它还有着不错的性能（单线程下只比红黑树略慢），非常适合用来实现我们需求的那种key-value结构。<br>LevelDB、Reddis的底层存储结构就是用的SkipList。</p>
+<h2 id="基于锁的并发"><a href="#基于锁的并发" class="headerlink" title="基于锁的并发"></a>基于锁的并发</h2><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><ol>
+<li>编程模型简单，如果小心控制上锁顺序，一般来说不会有死锁的问题；</li>
+<li>可以通过调节锁的粒度来调节性能。</li>
 </ol>
-<p>这些是 Java 8 中的一些重要语法特性。它们使得代码更加简洁、可读性更高，并且提供了更多的灵活性和功能。在使用这些特性时，要注意充分了解它们的用法和适用场景，以便编写出高质量的代码。</p>
+<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a>缺点：</h3><ol>
+<li>所有基于锁的算法都有死锁的可能；</li>
+<li>上锁和解锁时进程要从用户态切换到内核态，并可能伴随有线程的调度、上下文切换等，开销比较重；</li>
+<li>对共享数据的读与写之间会有互斥。</li>
+</ol>
+<h2 id="无锁编程（lock-free）"><a href="#无锁编程（lock-free）" class="headerlink" title="无锁编程（lock free）"></a>无锁编程（lock free）</h2><p>常见的lock free编程一般是基于CAS(Compare And Swap)操作：<code>CAS(void *ptr, Any oldValue, Any newValue);</code><br>即查看内存地址ptr处的值，如果为oldValue则将其改为newValue，并返回true，否则返回false。X86平台上的CAS操作一般是通过CPU的CMPXCHG指令来完成的。CPU在执行此指令时会首先锁住CPU总线，禁止其它核心对内存的访问，然后再查看或修改*ptr的值。简单的说CAS利用了CPU的硬件锁来实现对共享资源的串行使用。</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
+<li>开销较小：不需要进入内核，不需要切换线程；</li>
+<li>没有死锁：总线锁最长持续为一次read+write的时间；</li>
+<li>只有写操作需要使用CAS，读操作与串行代码完全相同，可实现读写不互斥。</li>
+</ol>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
+<li>编程非常复杂，两行代码之间可能发生任何事，很多常识性的假设都不成立。</li>
+<li>CAS模型覆盖的情况非常少，无法用CAS实现原子的复数操作。</li>
+</ol>
+<p>而在性能层面上，CAS与mutex&#x2F;readwrite lock各有千秋，简述如下：</p>
+<ol>
+<li>单线程下CAS的开销大约为10次加法操作，mutex的上锁+解锁大约为20次加法操作，而readwrite lock的开销则更大一些。</li>
+<li>CAS的性能为固定值，而mutex则可以通过改变临界区的大小来调节性能；</li>
+<li>如果临界区中真正的修改操作只占一小部分，那么用CAS可以获得更大的并发度。</li>
+<li>多核CPU中线程调度成本较高，此时更适合用CAS。<br>跳表和红黑树的性能相当，最主要的优势就是当调整(插入或删除)时，红黑树需要使用旋转来维护平衡性，这个操作需要动多个节点，在并发时候很难控制。而跳表插入或删除时只需定位后插入，插入时只需添加插入的那个节点及其多个层的复制，以及定位和插入的原子性维护。所以它更加可以利用CAS操作来进行无锁编程。</li>
+</ol>
+<p>跳表使用多级链表来实现，可以在 O(log n) 的平均时间内执行插入、删除和查找操作。</p>
+<p>以下是一个简单的 Java 实现示例，用于构建和使用跳表：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SkipListNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    SkipListNode[] next;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SkipListNode</span><span class="params">(<span class="type">int</span> value, <span class="type">int</span> level)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.value = value;</span><br><span class="line">        <span class="built_in">this</span>.next = <span class="keyword">new</span> <span class="title class_">SkipListNode</span>[level + <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SkipList</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> maxLevel;</span><br><span class="line">    <span class="keyword">private</span> SkipListNode head;</span><br><span class="line">    <span class="keyword">private</span> Random random;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SkipList</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.maxLevel = <span class="number">16</span>; <span class="comment">// 跳表的最大层级</span></span><br><span class="line">        <span class="built_in">this</span>.head = <span class="keyword">new</span> <span class="title class_">SkipListNode</span>(Integer.MIN_VALUE, maxLevel);</span><br><span class="line">        <span class="built_in">this</span>.random = <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">randomLevel</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">level</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (random.nextDouble() &lt; <span class="number">0.5</span> &amp;&amp; level &lt; maxLevel) &#123;</span><br><span class="line">            level++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> level;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">insert</span><span class="params">(<span class="type">int</span> value)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">level</span> <span class="operator">=</span> randomLevel();</span><br><span class="line">        <span class="type">SkipListNode</span> <span class="variable">newNode</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SkipListNode</span>(value, level);</span><br><span class="line"></span><br><span class="line">        <span class="type">SkipListNode</span> <span class="variable">current</span> <span class="operator">=</span> head;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> maxLevel; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">while</span> (current.next[i] != <span class="literal">null</span> &amp;&amp; current.next[i].value &lt; value) &#123;</span><br><span class="line">                current = current.next[i];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (i &lt;= level) &#123;</span><br><span class="line">                newNode.next[i] = current.next[i];</span><br><span class="line">                current.next[i] = newNode;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">search</span><span class="params">(<span class="type">int</span> value)</span> &#123;</span><br><span class="line">        <span class="type">SkipListNode</span> <span class="variable">current</span> <span class="operator">=</span> head;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> maxLevel; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">while</span> (current.next[i] != <span class="literal">null</span> &amp;&amp; current.next[i].value &lt; value) &#123;</span><br><span class="line">                current = current.next[i];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (current.next[i] != <span class="literal">null</span> &amp;&amp; current.next[i].value == value) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">display</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> maxLevel; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="type">SkipListNode</span> <span class="variable">current</span> <span class="operator">=</span> head.next[i];</span><br><span class="line">            System.out.print(<span class="string">&quot;Level &quot;</span> + i + <span class="string">&quot;: &quot;</span>);</span><br><span class="line">            <span class="keyword">while</span> (current != <span class="literal">null</span>) &#123;</span><br><span class="line">                System.out.print(current.value + <span class="string">&quot; &quot;</span>);</span><br><span class="line">                current = current.next[i];</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">SkipList</span> <span class="variable">skipList</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SkipList</span>();</span><br><span class="line"></span><br><span class="line">        skipList.insert(<span class="number">3</span>);</span><br><span class="line">        skipList.insert(<span class="number">6</span>);</span><br><span class="line">        skipList.insert(<span class="number">9</span>);</span><br><span class="line">        skipList.insert(<span class="number">2</span>);</span><br><span class="line">        skipList.insert(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        skipList.display();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Search 6: &quot;</span> + skipList.search(<span class="number">6</span>)); <span class="comment">// 输出 true</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Search 8: &quot;</span> + skipList.search(<span class="number">8</span>)); <span class="comment">// 输出 false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，我们首先定义了 <code>SkipListNode</code> 类来表示跳表中的节点。每个节点包含一个值和一个指向下一级的数组。然后，我们创建了 <code>SkipList</code> 类来实现跳表。<code>randomLevel</code> 方法用于随机生成节点的层级，<code>insert</code> 方法用于插入节点，<code>search</code> 方法用于搜索节点，<code>display</code> 方法用于打印跳表的内容。</p>
+<p>请注意，这只是一个简单的跳表实现示例。在实际应用中，您可能需要考虑更多的功能和优化，以满足不同的需求。</p>
 
       
     </div>
@@ -540,7 +1481,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43300.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5009.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -554,7 +1495,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/43300.html" class="post-title-link" itemprop="url">JAVA-rbac权限管理</a>
+            <a href="/posts/5009.html" class="post-title-link" itemprop="url">树状数组</a>
         </h2>
 
         <div class="post-meta">
@@ -571,7 +1512,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 21:54:38" itemprop="dateModified" datetime="2023-08-09T21:54:38+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -588,7 +1529,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>159</span>
+              <span>403</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -606,642 +1547,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>RBAC : 基于角色的权限访问控制（Role-Based Access Control）通过角色绑定权限，然后给用户划分角色。在web应用中，可以将权限理解为url，一个权限对应一个url。</p>
-<h2 id="表设计"><a href="#表设计" class="headerlink" title="表设计"></a>表设计</h2><p>用户，角色，权限，权限组，菜单</p>
-<p>用户和角色，多对多<br>角色和权限，多对多<br>权限和权限组，多对一<br>权限组和菜单，多对一<br>菜单和菜单，自引用</p>
-<h2 id="系统"><a href="#系统" class="headerlink" title="系统"></a>系统</h2><p>用户登录后，取出其权限及所属菜单信息，写入session中</p>
-<p>自定义中间件，检查用户权限，进行访问控制</p>
-<p>参考：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f45b54768aa9">https://www.jianshu.com/p/f45b54768aa9</a></p>
+          <p>树状数组（Fenwick Tree，也称为Binary Indexed Tree，BIT）是一种用于高效处理区间求和（或其他类似操作）的数据结构。它具有较低的内存消耗，能够在 O(log n) 的时间内更新单个元素和计算前缀和。</p>
+<p>树状数组适用于处理动态数组中的元素累加操作，如频繁更新某个位置的值以及查询某个区间的和等情况。</p>
+<p>以下是一个简单的 Java 实现示例，用于构建和使用树状数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FenwickTree</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] fenwickTree;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">FenwickTree</span><span class="params">(<span class="type">int</span> size)</span> &#123;</span><br><span class="line">        fenwickTree = <span class="keyword">new</span> <span class="title class_">int</span>[size + <span class="number">1</span>]; <span class="comment">// 数组下标从1开始</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">update</span><span class="params">(<span class="type">int</span> index, <span class="type">int</span> value)</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (index &lt; fenwickTree.length) &#123;</span><br><span class="line">            fenwickTree[index] += value;</span><br><span class="line">            index += index &amp; -index; <span class="comment">// 增加下一个相关的位置</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">query</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (index &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            sum += fenwickTree[index];</span><br><span class="line">            index -= index &amp; -index; <span class="comment">// 减去最后一个被包含的元素</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] input = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>&#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">FenwickTree</span> <span class="variable">fenwickTree</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FenwickTree</span>(input.length);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 构建树状数组</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; input.length; i++) &#123;</span><br><span class="line">            fenwickTree.update(i + <span class="number">1</span>, input[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 查询前缀和</span></span><br><span class="line">        System.out.println(fenwickTree.query(<span class="number">3</span>)); <span class="comment">// 输出 9 (1 + 3 + 5)</span></span><br><span class="line">        System.out.println(fenwickTree.query(<span class="number">6</span>)); <span class="comment">// 输出 36 (1 + 3 + 5 + 7 + 9 + 11)</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-      
-    </div>
+<p>在上述代码中，<code>FenwickTree</code> 类用于实现树状数组。<code>update</code> 方法用于更新树状数组中的一个元素，<code>query</code> 方法用于查询前缀和。树状数组中的数组大小比原始数组大小多1，因为树状数组的下标从1开始。</p>
+<p>这只是一个简单的树状数组实现示例。在实际应用中，您可能需要考虑更多的功能和优化，以满足不同的需求。</p>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1252.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/1252.html" class="post-title-link" itemprop="url">JAVA-JVM内存模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-29 17:07:07" itemprop="dateModified" datetime="2022-12-29T17:07:07+08:00">2022-12-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>758</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="基本内容"><a href="#基本内容" class="headerlink" title="基本内容"></a>基本内容</h1><p><img src="/img/jvm_memory_20221229161909.png" alt="JVM内存模型"></p>
-<h2 id="指令重排-编译器、运行时"><a href="#指令重排-编译器、运行时" class="headerlink" title="指令重排(编译器、运行时)"></a>指令重排(编译器、运行时)</h2><p>从java源代码到最终实际执行的指令序列，会分别经历下面三种重排序：</p>
-<pre><code>编译器优化重排序
-指令级并行重排序
-内存系统重排序
-</code></pre>
-<h2 id="编译器优化重排序"><a href="#编译器优化重排序" class="headerlink" title="编译器优化重排序"></a>编译器优化重排序</h2><p>在执行程序时，为了提高性能，编译器和处理器会对指令做重排序。但是，JMM确保在不同的编译器和不同的处理器平台之上，通过插入特定类型的Memory Barrier来禁止特定类型的编译器重排序和处理器重排序，为上层提供一致的内存可见性保证。</p>
-<h2 id="指令级并行重排序"><a href="#指令级并行重排序" class="headerlink" title="指令级并行重排序"></a>指令级并行重排序</h2><p>编译器优化重排序：编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。<br>指令级并行的重排序：现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</p>
-<h2 id="内存系统重排序"><a href="#内存系统重排序" class="headerlink" title="内存系统重排序"></a>内存系统重排序</h2><p>内存系统的重排序：处理器使用缓存和读写缓冲区，这使得加载和存储操作看上去可能是在乱序执行(强调的是内存缓存)。<br>在虚拟机层面，为了尽可能减少内存操作速度远慢于CPU运行速度所带来的CPU空置的影响，虚拟机会按照自己的一些规则将程序编写顺序打乱——即写在后面的代码在时间顺序上可能会先执行，而写在前面的代码会后执行——以尽可能充分地利用CPU</p>
-<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><h3 id="内存屏障类型"><a href="#内存屏障类型" class="headerlink" title="内存屏障类型"></a>内存屏障类型</h3><ul>
-<li>LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。</li>
-<li>StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。</li>
-<li>LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li>
-<li>StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。它的开销是四种屏障中最大的。在大多数处理器的实现中，这个屏障是个万能屏障，兼具其它三种内存屏障的功能</li>
-</ul>
-<h3 id="基于保守策略的JMM内存屏障插入策略："><a href="#基于保守策略的JMM内存屏障插入策略：" class="headerlink" title="基于保守策略的JMM内存屏障插入策略："></a>基于保守策略的JMM内存屏障插入策略：</h3><ul>
-<li>在每个volatile写操作的前面插入一个StoreStore屏障</li>
-<li>在每个volatile写操作的后面插入一个StoreLoad屏障</li>
-<li>在每个volatile读操作的后面插入一个LoadLoad屏障</li>
-<li>在每个volatile读操作的后面插入一个LoadStore屏障</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37039.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/37039.html" class="post-title-link" itemprop="url">JAVA-JDK动态代理或CGLIB</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-29 15:44:41" itemprop="dateModified" datetime="2022-12-29T15:44:41+08:00">2022-12-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>191</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="使用JDK动态代理"><a href="#使用JDK动态代理" class="headerlink" title="使用JDK动态代理"></a>使用JDK动态代理</h1><p>Spring AOP默认使用JDK动态代理（基于接口的代理）。</p>
-<p>如果被代理的目标对象已经实现了接口，则使用JDK动态代理。如果目标对象未实现任何接口，则会创建CGLIB代理。</p>
-<h1 id="使用CGLIB代理注意"><a href="#使用CGLIB代理注意" class="headerlink" title="使用CGLIB代理注意"></a>使用CGLIB代理注意</h1><ul>
-<li>final方法不建议使用，因为它们无法被覆盖。</li>
-<li>除非强制使用CGLIB，需要将元素 <code>&lt;</code>aop:config<code>&gt;</code> 的属性proxy-target-class值设置为true。</li>
-<li>需要CGLIB库，找不到CGLIB库类时，Spring会发出警告。</li>
-<li>代理对象的构造函数将被调用两次。这是因为CGLIB代理会为每个代理对象生成子类。构造函数中只做赋值和初始化，不能实现其他的逻辑。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22405.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/22405.html" class="post-title-link" itemprop="url">Java-java8语法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>192</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Lambda表达式"><a href="#Lambda表达式" class="headerlink" title="Lambda表达式"></a>Lambda表达式</h2><h3 id="stream-forEach-循环处理"><a href="#stream-forEach-循环处理" class="headerlink" title="stream().forEach()循环处理"></a>stream().forEach()循环处理</h3><pre><code>List&lt;String&gt; list = com.google.common.collect.Lists.newArrayList();
-list.add(&quot;1&quot;);
-list.add(&quot;2&quot;);
-list.add(&quot;3&quot;);
-
-list.stream().forEach(string -&gt;&#123;
-    System.out.println(string);
-&#125;);
-</code></pre>
-<h3 id="stream-map-处理集合，collect-Collectors-toList-结果输出为List"><a href="#stream-map-处理集合，collect-Collectors-toList-结果输出为List" class="headerlink" title="stream().map()处理集合，collect(Collectors.toList())结果输出为List"></a>stream().map()处理集合，collect(Collectors.toList())结果输出为List</h3><pre><code>List&lt;String&gt; list1 = Lists.newArrayList();
-list1.add(&quot;1&quot;);
-list1.add(&quot;2&quot;);
-list1.add(&quot;3&quot;);
-
-List&lt;String&gt; list2 = list1.stream().map(string -&gt; &#123;
-    return &quot;stream().map()处理之后：&quot; + string;
-&#125;).collect(Collectors.toList());
-
-System.out.println(list2.toString());
-</code></pre>
-<h3 id="stream-filter-过滤集合"><a href="#stream-filter-过滤集合" class="headerlink" title="stream().filter()过滤集合"></a>stream().filter()过滤集合</h3><pre><code>List&lt;String&gt; list1 = Lists.newArrayList();
-list1.add(&quot;1&quot;);
-list1.add(&quot;1&quot;);
-list1.add(&quot;2&quot;);
-list1.add(&quot;3&quot;);
-
-List&lt;String&gt; list2 = list1.stream().filter(s -&gt; !s.equals(&quot;1&quot;)).collect(Collectors.toList());
-System.out.println(list2.toString());
-</code></pre>
-<h3 id="函数接口"><a href="#函数接口" class="headerlink" title="函数接口"></a>函数接口</h3><p>一个只包含一个方法的接口,可以使用Lambda表达式作为参数</p>
-<pre><code>new Thread(() -&gt; System.out.println(&quot;Hello World!&quot;));
-
-public interface Interface1 &#123;
-     void test();
-&#125;
-
-private void func(Interface1 interface1) &#123;
-    interface1.test();
-&#125;
-
-func(() -&gt; System.out.println(&quot;Hello World&quot;));
-
-//有参数，参数知名类型更规范
-func((Integer x) -&gt; System.out.println(&quot;Hello World&quot; + x));
-
-//有参数，有返回值
-func((Integer x) -&gt; &#123;
-    System.out.println(&quot;Hello World&quot; + x);
-    return true;
-&#125;);
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/21202.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/21202.html" class="post-title-link" itemprop="url">JAVA-EL-Spring 表达式语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:35:54" itemprop="dateModified" datetime="2022-12-28T14:35:54+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>170</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>EL-Spring 表达式语言，支持xml和注解中使用表达式，类似JSP 的EL 表达式，可以实现普通文件、网址、配置文件、系统环境变量的注入</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><pre><code>@PropertySource(&quot;classpath:application.properties&quot;)
-
-@Value(&quot;This is common string&quot;) // 注入普通字符串
-private String normal;
-
-@Value(&quot;#&#123;systemProperties[&#39;os.name&#39;]&#125;&quot;) // 注入操作系统属性
-private String osName;
-
-@Value(&quot;#&#123;T(java.lang.Math).random()*100.0&#125;&quot;) // 注入表达式结果
-private double randomNumber;
-
-@Value(&quot;#&#123;anotherService.property&#125;&quot;) // 注入其他Bean属性
-private String propfromAnother;
-
-@Value(&quot;#&#123;T(com.demo.el.spring_el_demo.DemoService).getCalc()*100&#125;&quot;) // 注入类static方法结果,支持运算处理
-private double result;
-
-@Value(&quot;classpath:test.txt&quot;) // 注入文件资源
-private Resource testFile;
-
-@Value(&quot;http://www.baidu.com&quot;) // 注入网址资源
-private Resource testUrl;
-
-@Value(&quot;$&#123;book.name&#125;&quot;) // 注入配置文件
-private String bookName;
-
-@Autowired
-private Environment environment;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/b76ba195.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/b76ba195.html" class="post-title-link" itemprop="url">LF will be replaced by CRLF</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-09-26 19:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T19:06:24+08:00">2021-09-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 16:44:30" itemprop="dateModified" datetime="2022-12-28T16:44:30+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>97</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>LF和CRLF其实都是换行符。</p>
-<p>LF是linux和Unix系统的换行符，CRLF是window系统的换行符。</p>
-<p>Git提供了换行符自动转换的功能，默认开启，自动把代码里换行的方式转换成当前系统的换行方式。提交代码时，Git就会提示 LF will be replaced by CRLF in。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config core.autocrlf false</span><br><span class="line">git config --global core.autocrlf false</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/81df75d5.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/81df75d5.html" class="post-title-link" itemprop="url">Permission denied publickey</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-09-26 19:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T19:06:24+08:00">2021-09-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 23:03:49" itemprop="dateModified" datetime="2022-12-28T23:03:49+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>64</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="查看全局配置"><a href="#查看全局配置" class="headerlink" title="查看全局配置"></a>查看全局配置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global --list</span><br><span class="line">git config --global user.name &quot;yourname&quot;</span><br><span class="line">git config --global user.email &quot;email@email.com&quot;</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;email@email.com&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt; <span class="built_in">cat</span> /c/Users/Alan/.ssh/id_rsa.pub</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="配置github授权"><a href="#配置github授权" class="headerlink" title="配置github授权"></a>配置github授权</h2><p>GitHub—&gt;setting—&gt;SSH and GPG keys—&gt;SSH keys </p>
-<h2 id="测试是否生效"><a href="#测试是否生效" class="headerlink" title="测试是否生效"></a>测试是否生效</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1259,7 +1572,7 @@ private Environment environment;
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1325,14 +1638,14 @@ private Environment environment;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">337</span>
+          <span class="site-state-item-count">350</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1374,12 +1687,12 @@ private Environment environment;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">312k</span>
+    <span title="站点总字数">320k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">18:55</span>
+    <span title="站点阅读时长">19:23</span>
 </div>
 
 <!--

@@ -192,7 +192,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ab80f837.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e5c71a8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -206,7 +206,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/ab80f837.html" class="post-title-link" itemprop="url">mysql-order by执行原理</a>
+            <a href="/posts/e5c71a8.html" class="post-title-link" itemprop="url">mysql-如何判断一个数据库是不是出问题了</a>
         </h2>
 
         <div class="post-meta">
@@ -216,14 +216,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-18 06:02:14" itemprop="dateCreated datePublished" datetime="2019-11-18T06:02:14+08:00">2019-11-18</time>
+              <time title="创建时间：2019-12-04 06:04:41" itemprop="dateCreated datePublished" datetime="2019-12-04T06:04:41+08:00">2019-12-04</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:46:13" itemprop="dateModified" datetime="2023-01-18T23:46:13+08:00">2023-01-18</time>
+                <time title="修改时间：2023-01-18 23:34:39" itemprop="dateModified" datetime="2023-01-18T23:34:39+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,13 +240,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>4.6k</span>
+              <span>3.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>17 分钟</span>
+              <span>14 分钟</span>
             </span>
 
         </div>
@@ -258,135 +258,130 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>order by执行原理在你开发应用的时候，一定会经常碰到需要根据指定的字段排序来显示结果的需求。</p>
-<p>还是以我们前面举例用过的市民表为例，假设你要查询城市是“杭州”的所有人名字，并且按照姓名排序返回前1000个人的姓名、年龄。</p>
-<p>假设这个表的部分定义是这样的：<br>这时，你的SQL语句可以这么写：<br>CREATE TABLE <code>t</code> (  <code>id</code> int(11) NOT NULL,  <code>city</code> varchar(16) NOT NULL,  <code>name</code> varchar(16) NOT NULL,  <code>age</code> int(11) NOT NULL,  <code>addr</code> varchar(128) DEFAULT NULL,  PRIMARY KEY (<code>id</code>),  KEY <code>city</code> (<code>city</code>)) ENGINE&#x3D;InnoDB;select city,name,age from t where city&#x3D;’杭州’ order by name limit 1000  ;这个语句看上去逻辑很清晰，但是你了解它的执行流程吗？今天，我就和你聊聊这个语句是怎么执行的，以及有什么参数会影响执行的行为。</p>
-<p>全字段排序前面我们介绍过索引，所以你现在就很清楚了，为避免全表扫描，我们需要在city字段加上索引。</p>
-<p>在city字段上创建索引之后，我们用explain命令来看看这个语句的执行情况。</p>
-<p>图1 使用explain命令查看语句的执行情况Extra这个字段中的“Using filesort”表示的就是需要排序，MySQL会给每个线程分配一块内存用于排序，称为sort_buffer。</p>
-<p>为了说明这个SQL查询语句的执行过程，我们先来看一下city这个索引的示意图。</p>
-<p>图2 city字段的索引示意图从图中可以看到，满足city&#x3D;’杭州’条件的行，是从ID_X到ID_(X+N)的这些记录。</p>
-<p>通常情况下，这个语句执行流程如下所示 ：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>如何判断一个数据库是不是出问题了？我在第25和27篇文章中，和你介绍了主备切换流程。</p>
+<p>通过这些内容的讲解，你应该已经很清楚了：在一主一备的双M架构里，主备切换只需要把客户端流量切到备库；而在一主多从架构里，主备切换除了要把客户端流量切到备库外，还需要把从库接到新主库上。</p>
+<p>主备切换有两种场景，一种是主动切换，一种是被动切换。</p>
+<p>而其中被动切换，往往是因为主库出问题了，由HA系统发起的。</p>
+<p>这也就引出了我们今天要讨论的问题：怎么判断一个主库出问题了？你一定会说，这很简单啊，连上MySQL，执行个select 1就好了。</p>
+<p>但是select 1成功返回了，就表示主库没问题吗？select 1判断实际上，select 1成功返回，只能说明这个库的进程还在，并不能说明主库没问题。</p>
+<p>现在，我们来看一下这个场景。</p>
+<p>图1 查询blocked我们设置innodb_thread_concurrency参数的目的是，控制InnoDB的并发线程上限。</p>
+<p>也就是说，一旦并发线程数达到这个值，InnoDB在接收到新请求的时候，就会进入等待状态，直到有线程退出。</p>
+<p>这里，我把innodb_thread_concurrency设置成3，表示InnoDB只允许3个线程并行执行。</p>
+<p>而在我们的例子中，前三个session 中的sleep(100)，使得这三个语句都处于“执行”状态，以此来模拟大查询。</p>
+<p>你看到了， session D里面，select 1是能执行成功的，但是查询表t的语句会被堵住。</p>
+<p>也就是说，如果这时候我们用select 1来检测实例是否正常的话，是检测不出问题的。</p>
+<p>在InnoDB中，innodb_thread_concurrency这个参数的默认值是0，表示不限制并发线程数量。</p>
+<p>但是，不限制并发线程数肯定是不行的。</p>
+<p>因为，一个机器的CPU核数有限，线程全冲进来，上下文切换的成本就会太高。</p>
+<p>所以，通常情况下，我们建议把innodb_thread_concurrency设置为64~128之间的值。</p>
+<p>这时，你一定会有疑问，并发线程上限数设置为128够干啥，线上的并发连接数动不动就上千了。</p>
+<p>产生这个疑问的原因，是搞混了并发连接和并发查询。</p>
+<p>set global innodb_thread_concurrency&#x3D;3;CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  &#96;c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀) ENGINE&#x3D;InnoDB; insert into t values(1,1)并发连接和并发查询，并不是同一个概念。</p>
+<p>你在show processlist的结果里，看到的几千个连接，指的就是并发连接。</p>
+<p>而“当前正在执行”的语句，才是我们所说的并发查询。</p>
+<p>并发连接数达到几千个影响并不大，就是多占一些内存而已。</p>
+<p>我们应该关注的是并发查询，因为并发查询太高才是CPU杀手。</p>
+<p>这也是为什么我们需要设置innodb_thread_concurrency参数的原因。</p>
+<p>然后，你可能还会想起我们在第7篇文章中讲到的热点更新和死锁检测的时候，如果把innodb_thread_concurrency设置为128的话，那么出现同一行热点更新的问题时，是不是很快就把128消耗完了，这样整个系统是不是就挂了呢？实际上，在线程进入锁等待以后，并发线程的计数会减一，也就是说等行锁（也包括间隙锁）的线程是不算在128里面的。</p>
+<p>MySQL这样设计是非常有意义的。</p>
+<p>因为，进入锁等待的线程已经不吃CPU了；更重要的是，必须这么设计，才能避免整个系统锁死。</p>
+<p>为什么呢？假设处于锁等待的线程也占并发线程的计数，你可以设想一下这个场景：</p>
 <ol>
-<li>初始化sort_buffer，确定放入name、city、age这三个字段；</li>
-<li>从索引city找到第一个满足city&#x3D;’杭州’条件的主键id，也就是图中的ID_X；</li>
-<li>到主键id索引取出整行，取name、city、age三个字段的值，存入sort_buffer中；</li>
-<li>从索引city取下一个记录的主键id；</li>
-<li>重复步骤3、4直到city的值不满足查询条件为止，对应的主键id也就是图中的ID_Y；</li>
-<li>对sort_buffer中的数据按照字段name做快速排序；</li>
-<li>按照排序结果取前1000行返回给客户端。</li>
+<li>线程1执行begin; update t set c&#x3D;c+1 where id&#x3D;1, 启动了事务trx1， 然后保持这个状态。</li>
 </ol>
-<p>我们暂且把这个排序过程，称为全字段排序，执行流程的示意图如下所示，下一篇文章中我们还会用到这个排序。</p>
-<p>图3 全字段排序图中“按name排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数sort_buffer_size。</p>
-<p>sort_buffer_size，就是MySQL为排序开辟的内存（sort_buffer）的大小。</p>
-<p>如果要排序的数据量小于sort_buffer_size，排序就在内存中完成。</p>
-<p>但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。</p>
-<p>你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。</p>
-<p>这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files中看到是否使用了临时文件。</p>
-<p>&#x2F;* 打开optimizer_trace，只对本线程有效 <em>&#x2F;SET optimizer_trace&#x3D;’enabled&#x3D;on’; &#x2F;</em> @a保存Innodb_rows_read的初始值 <em>&#x2F;select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name &#x3D; ‘Innodb_rows_read’;&#x2F;</em> 执行语句 <em>&#x2F;select city, name,age from t where city&#x3D;’杭州’ order by name limit 1000; &#x2F;</em> 查看 OPTIMIZER_TRACE 输出 <em>&#x2F;SELECT * FROM <code>information_schema</code>.<code>OPTIMIZER_TRACE</code>\G&#x2F;</em> @b保存Innodb_rows_read的当前值 <em>&#x2F;select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name &#x3D; ‘Innodb_rows_read’;&#x2F;</em> 计算Innodb_rows_read差值 *&#x2F;select @b-@a;图4 全排序的OPTIMIZER_TRACE部分结果number_of_tmp_files表示的是，排序过程中使用的临时文件数。</p>
-<p>你一定奇怪，为什么需要12个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。</p>
-<p>可以这么简单理解，MySQL将需要排序的数据分成12份，每一份单独排序后存在这些临时文件中。</p>
-<p>然后把这12个有序文件再合并成一个有序的大文件。</p>
-<p>如果sort_buffer_size超过了需要排序的数据量的大小，number_of_tmp_files就是0，表示排序可以直接在内存中完成。</p>
-<p>否则就需要放在临时文件中排序。</p>
-<p>sort_buffer_size越小，需要分成的份数越多，number_of_tmp_files的值就越大。</p>
-<p>接下来，我再和你解释一下图4中其他两个值的意思。</p>
-<p>我们的示例表中有4000条满足city&#x3D;’杭州’的记录，所以你可以看到 examined_rows&#x3D;4000，表示参与排序的行数是4000行。</p>
-<p>sort_mode 里面的packed_additional_fields的意思是，排序过程对字符串做了“紧凑”处理。</p>
-<p>即使name字段的定义是varchar(16)，在排序过程中还是要按照实际长度来分配空间的。</p>
-<p>同时，最后一个查询语句select @b-@a 的返回结果是4000，表示整个执行过程只扫描了4000行。</p>
-<p>这里需要注意的是，为了避免对结论造成干扰，我把internal_tmp_disk_storage_engine设置成MyISAM。</p>
-<p>否则，select @b-@a的结果会显示为4001。</p>
-<p>这是因为查询OPTIMIZER_TRACE这个表时，需要用到临时表，而internal_tmp_disk_storage_engine的默认值是InnoDB。</p>
-<p>如果使用的是InnoDB引擎的话，把数据从临时表取出来的时候，会让Innodb_rows_read的值加1。</p>
-<p>rowid排序在上面这个算法过程里面，只对原表的数据读了一遍，剩下的操作都是在sort_buffer和临时文件中执行的。</p>
-<p>但这个算法有一个问题，就是如果查询要返回的字段很多的话，那么sort_buffer里面要放的字段数太多，这样内存里能够同时放下的行数很少，要分成很多个临时文件，排序的性能会很差。</p>
-<p>所以如果单行很大，这个方法效率不够好。</p>
-<p>那么，如果MySQL认为排序的单行长度太大会怎么做呢？接下来，我来修改一个参数，让MySQL采用另外一种算法。</p>
-<p>max_length_for_sort_data，是MySQL中专门控制用于排序的行数据的长度的一个参数。</p>
-<p>它的意思是，如果单行的长度超过这个值，MySQL就认为单行太大，要换一个算法。</p>
-<p>city、name、age 这三个字段的定义总长度是36，我把max_length_for_sort_data设置为16，我们再来看看计算过程有什么改变。</p>
-<p>新的算法放入sort_buffer的字段，只有要排序的列（即name字段）和主键id。</p>
-<p>但这时，排序的结果就因为少了city和age字段的值，不能直接返回了，整个执行流程就变成如下所示的样子：</p>
-<ol>
-<li>初始化sort_buffer，确定放入两个字段，即name和id；</li>
-<li>从索引city找到第一个满足city&#x3D;’杭州’条件的主键id，也就是图中的ID_X；</li>
-<li>到主键id索引取出整行，取name、id这两个字段，存入sort_buffer中；</li>
-<li>从索引city取下一个记录的主键id；</li>
-<li>重复步骤3、4直到不满足city&#x3D;’杭州’条件为止，也就是图中的ID_Y；</li>
-<li>对sort_buffer中的数据按照字段name进行排序；</li>
-<li>遍历排序结果，取前1000行，并按照id的值回到原表中取出city、name和age三个字段返回给客户端。</li>
+<p>这时候，线程处于空闲状态，不算在并发线程里面。</p>
+<ol start="2">
+<li>线程2到线程129都执行 update t set c&#x3D;c+1 where id&#x3D;1; 由于等行锁，进入等待状态。</li>
 </ol>
-<p>这个执行流程的示意图如下，我把它称为rowid排序。</p>
-<p>SET max_length_for_sort_data &#x3D; 16;图5 rowid排序对比图3的全字段排序流程图你会发现，rowid排序多访问了一次表t的主键索引，就是步骤7。</p>
-<p>需要说明的是，最后的“结果集”是一个逻辑概念，实际上MySQL服务端从排序后的sort_buffer中依次取出id，然后到原表查到city、name和age这三个字段的结果，不需要在服务端再耗费内存存储结果，是直接返回给客户端的。</p>
-<p>根据这个说明过程和图示，你可以想一下，这个时候执行select @b-@a，结果会是多少呢？现在，我们就来看看结果有什么不同。</p>
-<p>首先，图中的examined_rows的值还是4000，表示用于排序的数据是4000行。</p>
-<p>但是select @b-@a这个语句的值变成5000了。</p>
-<p>因为这时候除了排序过程外，在排序完成后，还要根据id去原表取值。</p>
-<p>由于语句是limit 1000，因此会多读1000行。</p>
-<p>图6 rowid排序的OPTIMIZER_TRACE部分输出从OPTIMIZER_TRACE的结果中，你还能看到另外两个信息也变了。</p>
-<p>sort_mode变成了&lt;sort_key, rowid&gt;，表示参与排序的只有name和id这两个字段。</p>
-<p>number_of_tmp_files变成10了，是因为这时候参与排序的行数虽然仍然是4000行，但是每一行都变小了，因此需要排序的总数据量就变小了，需要的临时文件也相应地变少了。</p>
-<p>全字段排序 VS rowid排序我们来分析一下，从这两个执行流程里，还能得出什么结论。</p>
-<p>如果MySQL实在是担心排序内存太小，会影响排序效率，才会采用rowid排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据。</p>
-<p>如果MySQL认为内存足够大，会优先选择全字段排序，把需要的字段都放到sort_buffer中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据。</p>
-<p>这也就体现了MySQL的一个设计思想：如果内存够，就要多利用内存，尽量减少磁盘访问。</p>
-<p>对于InnoDB表来说，rowid排序会要求回表多造成磁盘读，因此不会被优先选择。</p>
-<p>这个结论看上去有点废话的感觉，但是你要记住它，下一篇文章我们就会用到。</p>
-<p>看到这里，你就了解了，MySQL做排序是一个成本比较高的操作。</p>
-<p>那么你会问，是不是所有的order by都需要排序操作呢？如果不排序就能得到正确的结果，那对系统的消耗会小很多，语句的执行时间也会变得更短。</p>
-<p>其实，并不是所有的order by语句，都需要排序操作的。</p>
-<p>从上面分析的执行过程，我们可以看到，MySQL之所以需要生成临时表，并且在临时表上做排序操作，其原因是原来的数据都是无序的。</p>
-<p>你可以设想下，如果能够保证从city这个索引上取出来的行，天然就是按照name递增排序的话，是不是就可以不用再排序了呢？确实是这样的。</p>
-<p>所以，我们可以在这个市民表上创建一个city和name的联合索引，对应的SQL语句是：<br>作为与city索引的对比，我们来看看这个索引的示意图。</p>
-<p>图7 city和name联合索引示意图在这个索引里面，我们依然可以用树搜索的方式定位到第一个满足city&#x3D;’杭州’的记录，并且额外确保了，接下来按顺序取“下一条记录”的遍历过程中，只要city的值是杭州，name的值就一定是有序的。</p>
-<p>这样整个查询过程的流程就变成了：</p>
-<ol>
-<li>从索引(city,name)找到第一个满足city&#x3D;’杭州’条件的主键id；</li>
-<li>到主键id索引取出整行，取name、city、age三个字段的值，作为结果集的一部分直接返回；</li>
-<li>从索引(city,name)取下一个记录主键id；<br>alter table t add index city_user(city, name);4. 重复步骤2、3，直到查到第1000条记录，或者是不满足city&#x3D;’杭州’条件时循环结束。</li>
+<p>这样就有128个线程处于等待状态；</p>
+<ol start="3">
+<li>如果处于锁等待状态的线程计数不减一，InnoDB就会认为线程数用满了，会阻止其他语句进入引擎执行，这样线程1不能提交事务。</li>
 </ol>
-<p>图8 引入(city,name)联合索引后，查询语句的执行计划可以看到，这个查询过程不需要临时表，也不需要排序。</p>
-<p>接下来，我们用explain的结果来印证一下。</p>
-<p>图9 引入(city,name)联合索引后，查询语句的执行计划从图中可以看到，Extra字段中没有Using filesort了，也就是不需要排序了。</p>
-<p>而且由于(city,name)这个联合索引本身有序，所以这个查询也不用把4000行全都读一遍，只要找到满足条件的前1000条记录就可以退出了。</p>
-<p>也就是说，在我们这个例子里，只需要扫描1000次。</p>
-<p>既然说到这里了，我们再往前讨论，这个语句的执行流程有没有可能进一步简化呢？不知道你还记不记得，我在第5篇文章《 深入浅出索引（下）》中，和你介绍的覆盖索引。</p>
-<p>这里我们可以再稍微复习一下。</p>
-<p>覆盖索引是指，索引上的信息足够满足查询请求，不需要再回到主键索引上去取数据。</p>
-<p>按照覆盖索引的概念，我们可以再优化一下这个查询语句的执行流程。</p>
-<p>针对这个查询，我们可以创建一个city、name和age的联合索引，对应的SQL语句就是：<br>这时，对于city字段的值相同的行来说，还是按照name字段的值递增排序的，此时的查询语句也就不再需要排序了。</p>
-<p>这样整个查询语句的执行流程就变成了：</p>
-<ol>
-<li>从索引(city,name,age)找到第一个满足city&#x3D;’杭州’条件的记录，取出其中的city、name和age这三个字段的值，作为结果集的一部分直接返回；</li>
-<li>从索引(city,name,age)取下一个记录，同样取出这三个字段的值，作为结果集的一部分直接返回；</li>
-<li>重复执行步骤2，直到查到第1000条记录，或者是不满足city&#x3D;’杭州’条件时循环结束。</li>
-</ol>
-<p>图10 引入(city,name,age)联合索引后，查询语句的执行流程然后，我们再来看看explain的结果。</p>
-<p>alter table t add index city_user_age(city, name, age);图11 引入(city,name,age)联合索引后，查询语句的执行计划可以看到，Extra字段里面多了“Using index”，表示的就是使用了覆盖索引，性能上会快很多。</p>
-<p>当然，这里并不是说要为了每个查询能用上覆盖索引，就要把语句中涉及的字段都建上联合索引，毕竟索引还是有维护代价的。</p>
-<p>这是一个需要权衡的决定。</p>
-<p>小结今天这篇文章，我和你介绍了MySQL里面order by语句的几种算法流程。</p>
-<p>在开发系统的时候，你总是不可避免地会使用到order by语句。</p>
-<p>你心里要清楚每个语句的排序逻辑是怎么实现的，还要能够分析出在最坏情况下，每个语句的执行对系统资源的消耗，这样才能做到下笔如有神，不犯低级错误。</p>
-<p>最后，我给你留下一个思考题吧。</p>
-<p>假设你的表里面已经有了city_name(city, name)这个联合索引，然后你要查杭州和苏州两个城市中所有的市民的姓名，并且按名字排序，显示前100条记录。</p>
-<p>如果SQL查询语句是这么写的 ：<br>那么，这个语句执行的时候会有排序过程吗，为什么？如果业务端代码由你来开发，需要实现一个在数据库端不需要排序的方案，你会怎么实现呢？进一步地，如果有分页需求，要显示第101页，也就是说语句最后要改成 “limit 10000,100”， 你的实现方法又会是什么呢？你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>而另外的128个线程又处于锁等待状态，整个系统就堵住了。</p>
+<p>下图2显示的就是这个状态。</p>
+<p>图2 系统锁死状态（假设等行锁的语句占用并发计数）这时候InnoDB不能响应任何请求，整个系统被锁死。</p>
+<p>而且，由于所有线程都处于等待状态，此时占用的CPU却是0，而这明显不合理。</p>
+<p>所以，我们说InnoDB在设计时，遇到进程进入锁等待的情况时，将并发线程的计数减1的设计，是合理而且是必要的。</p>
+<p>虽然说等锁的线程不算在并发线程计数里，但如果它在真正地执行查询，就比如我们上面例子中前三个事务中的select sleep(100) from t，还是要算进并发线程的计数的。</p>
+<p>在这个例子中，同时在执行的语句超过了设置的innodb_thread_concurrency的值，这时候系统其实已经不行了，但是通过select 1来检测系统，会认为系统还是正常的。</p>
+<p>因此，我们使用select 1的判断逻辑要修改一下。</p>
+<p>查表判断为了能够检测InnoDB并发线程数过多导致的系统不可用情况，我们需要找一个访问InnoDB的场景。</p>
+<p>一般的做法是，在系统库（mysql库）里创建一个表，比如命名为health_check，里面只放一行数据，然后定期执行：</p>
+<p>mysql&gt; select * from mysql.health_check; 使用这个方法，我们可以检测出由于并发线程过多导致的数据库不可用的情况。</p>
+<p>但是，我们马上还会碰到下一个问题，即：空间满了以后，这种方法又会变得不好使。</p>
+<p>我们知道，更新事务要写binlog，而一旦binlog所在磁盘的空间占用率达到100%，那么所有的更新语句和事务提交的commit语句就都会被堵住。</p>
+<p>但是，系统这时候还是可以正常读数据的。</p>
+<p>因此，我们还是把这条监控语句再改进一下。</p>
+<p>接下来，我们就看看把查询语句改成更新语句后的效果。</p>
+<p>更新判断既然要更新，就要放个有意义的字段，常见做法是放一个timestamp字段，用来表示最后一次执行检测的时间。</p>
+<p>这条更新语句类似于：</p>
+<p>节点可用性的检测都应该包含主库和备库。</p>
+<p>如果用更新来检测主库的话，那么备库也要进行更新检测。</p>
+<p>但，备库的检测也是要写binlog的。</p>
+<p>由于我们一般会把数据库A和B的主备关系设计为双M结构，所以在备库B上执行的检测命令，也要发回给主库A。</p>
+<p>但是，如果主库A和备库B都用相同的更新命令，就可能出现行冲突，也就是可能会导致主备同步停止。</p>
+<p>所以，现在看来mysql.health_check 这个表就不能只有一行数据了。</p>
+<p>为了让主备之间的更新不产生冲突，我们可以在mysql.health_check表上存入多行数据，并用A、B的server_id做主键。</p>
+<p>由于MySQL规定了主库和备库的server_id必须不同（否则创建主备关系的时候就会报错），这mysql&gt; update mysql.health_check set t_modified&#x3D;now();mysql&gt; CREATE TABLE &#96;health_check  ̀(  ìd  ̀int(11) NOT NULL,  t̀_modified  ̀timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  PRIMARY KEY (̀ id )̀) ENGINE&#x3D;InnoDB;&#x2F;* 检测命令 *&#x2F;insert into mysql.health_check(id, t_modified) values (@@server_id, now()) on duplicate key update t_modified&#x3D;now();样就可以保证主、备库各自的检测命令不会发生冲突。</p>
+<p>更新判断是一个相对比较常用的方案了，不过依然存在一些问题。</p>
+<p>其中，“判定慢”一直是让DBA头疼的问题。</p>
+<p>你一定会疑惑，更新语句，如果失败或者超时，就可以发起主备切换了，为什么还会有判定慢的问题呢？其实，这里涉及到的是服务器IO资源分配的问题。</p>
+<p>首先，所有的检测逻辑都需要一个超时时间N。</p>
+<p>执行一条update语句，超过N秒后还不返回，就认为系统不可用。</p>
+<p>你可以设想一个日志盘的IO利用率已经是100%的场景。</p>
+<p>这时候，整个系统响应非常慢，已经需要做主备切换了。</p>
+<p>但是你要知道，IO利用率100%表示系统的IO是在工作的，每个请求都有机会获得IO资源，执行自己的任务。</p>
+<p>而我们的检测使用的update命令，需要的资源很少，所以可能在拿到IO资源的时候就可以提交成功，并且在超时时间N秒未到达之前就返回给了检测系统。</p>
+<p>检测系统一看，update命令没有超时，于是就得到了“系统正常”的结论。</p>
+<p>也就是说，这时候在业务系统上正常的SQL语句已经执行得很慢了，但是DBA上去一看，HA系统还在正常工作，并且认为主库现在处于可用状态。</p>
+<p>之所以会出现这个现象，根本原因是我们上面说的所有方法，都是基于外部检测的。</p>
+<p>外部检测天然有一个问题，就是随机性。</p>
+<p>因为，外部检测都需要定时轮询，所以系统可能已经出问题了，但是却需要等到下一个检测发起执行语句的时候，我们才有可能发现问题。</p>
+<p>而且，如果你的运气不够好的话，可能第一次轮询还不能发现，这就会导致切换慢的问题。</p>
+<p>所以，接下来我要再和你介绍一种在MySQL内部发现数据库问题的方法。</p>
+<p>内部统计针对磁盘利用率这个问题，如果MySQL可以告诉我们，内部每一次IO请求的时间，那我们判断数据库是否出问题的方法就可靠得多了。</p>
+<p>其实，MySQL 5.6版本以后提供的performance_schema库，就在file_summary_by_event_name表里统计了每次IO请求的时间。</p>
+<p>file_summary_by_event_name表里有很多行数据，我们先来看看event_name&#x3D;’wait&#x2F;io&#x2F;file&#x2F;innodb&#x2F;innodb_log_file’这一行。</p>
+<p>图3 performance_schema.file_summary_by_event_name的一行图中这一行表示统计的是redo log的写入时间，第一列EVENT_NAME 表示统计的类型。</p>
+<p>接下来的三组数据，显示的是redo log操作的时间统计。</p>
+<p>第一组五列，是所有IO类型的统计。</p>
+<p>其中，COUNT_STAR是所有IO的总次数，接下来四列是具体的统计项， 单位是皮秒；前缀SUM、MIN、AVG、MAX，顾名思义指的就是总和、最小值、平均值和最大值。</p>
+<p>第二组六列，是读操作的统计。</p>
+<p>最后一列SUM_NUMBER_OF_BYTES_READ统计的是，总共从redo log里读了多少个字节。</p>
+<p>第三组六列，统计的是写操作。</p>
+<p>最后的第四组数据，是对其他类型数据的统计。</p>
+<p>在redo log里，你可以认为它们就是对fsync的统计。</p>
+<p>在performance_schema库的file_summary_by_event_name表里，binlog对应的是event_name &#x3D;”wait&#x2F;io&#x2F;file&#x2F;sql&#x2F;binlog”这一行。</p>
+<p>各个字段的统计逻辑，与redo log的各个字段完全相同。</p>
+<p>这里，我就不再赘述了。</p>
+<p>因为我们每一次操作数据库，performance_schema都需要额外地统计这些信息，所以我们打开这个统计功能是有性能损耗的。</p>
+<p>我的测试结果是，如果打开所有的performance_schema项，性能大概会下降10%左右。</p>
+<p>所以，我建议你只打开自己需要的项进行统计。</p>
+<p>你可以通过下面的方法打开或者关闭某个具体项的统计。</p>
+<p>如果要打开redo log的时间监控，你可以执行这个语句：</p>
+<p>假设，现在你已经开启了redo log和binlog这两个统计信息，那要怎么把这个信息用在实例状态诊断上呢？很简单，你可以通过MAX_TIMER的值来判断数据库是否出问题了。</p>
+<p>比如，你可以设定阈值，单次IO请求时间超过200毫秒属于异常，然后使用类似下面这条语句作为检测逻辑。</p>
+<p>发现异常后，取到你需要的信息，再通过下面这条语句：</p>
+<p>把之前的统计信息清空。</p>
+<p>这样如果后面的监控中，再次出现这个异常，就可以加入监控累积值了。</p>
+<p>小结今天，我和你介绍了检测一个MySQL实例健康状态的几种方法，以及各种方法存在的问题和演进的逻辑。</p>
+<p>你看完后可能会觉得，select 1这样的方法是不是已经被淘汰了呢，但实际上使用非常广泛的MHA（Master High Availability），默认使用的就是这个方法。</p>
+<p>MHA中的另一个可选方法是只做连接，就是 “如果连接成功就认为主库没问题”。</p>
+<p>不过据我所知，选择这个方法的很少。</p>
+<p>其实，每个改进的方案，都会增加额外损耗，并不能用“对错”做直接判断，需要你根据业务实际情况去做权衡。</p>
+<p>我个人比较倾向的方案，是优先考虑update系统表，然后再配合增加检测performance_schema的信息。</p>
+<p>最后，又到了我们的思考题时间。</p>
+<p>今天，我想问你的是：业务系统一般也有高可用的需求，在你开发和维护过的服务中，你是怎么判断服务有没有出问题的呢？mysql&gt; update setup_instruments set ENABLED&#x3D;’YES’, Timed&#x3D;’YES’ where name like ‘%wait&#x2F;io&#x2F;file&#x2F;innodb&#x2F;innodb_log_file%’;mysql&gt; select event_name,MAX_TIMER_WAIT  FROM performance_schema.file_summary_by_event_name where event_name in (‘wait&#x2F;io&#x2F;file&#x2F;innodb&#x2F;innodb_log_file’,’wait&#x2F;io&#x2F;file&#x2F;sql&#x2F;binlog’) and MAX_TIMER_WAIT&gt;200*1000000000;mysql&gt; truncate table performance_schema.file_summary_by_event_name;你可以把你用到的方法和分析写在留言区，我会在下一篇文章中选取有趣的方案一起来分享和分析。</p>
 <p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期的问题是，当MySQL去更新一行，但是要修改的值跟原来的值是相同的，这时候MySQL会真的去执行一次修改吗？还是看到值相同就直接返回呢？这是第一次我们课后问题的三个选项都有同学选的，所以我要和你需要详细说明一下。</p>
-<p>第一个选项是，MySQL读出数据，发现值与原来相同，不更新，直接返回，执行结束。</p>
-<p>这里我们可以用一个锁实验来确认。</p>
-<p>mysql&gt; select * from t where city in (‘杭州’,”苏州”) order by name limit 100;假设，当前表t里的值是(1,2)。</p>
-<p>图12 锁验证方式session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的，所以排除选项1。</p>
-<p>第二个选项是，MySQL调用了InnoDB引擎提供的接口，但是引擎发现值与原来相同，不更新，直接返回。</p>
-<p>有没有这种可能呢？这里我用一个可见性实验来确认。</p>
-<p>假设当前表里的值是(1,2)。</p>
-<p>图13 可见性验证方式session A的第二个select 语句是一致性读（快照读)，它是不能看见session B的更新的。</p>
-<p>现在它返回的是(1,3)，表示它看见了某个新的版本，这个版本只能是session A自己的update语句做更新的时候生成。</p>
-<p>（如果你对这个逻辑有疑惑的话，可以回顾下第8篇文章《事务到底是隔离的还是不隔离的？》中的相关内容）所以，我们上期思考题的答案应该是选项3，即：InnoDB认真执行了“把这个值修改成(1,2)”这个操作，该加锁的加锁，该更新的更新。</p>
-<p>然后你会说，MySQL怎么这么笨，就不会更新前判断一下值是不是相同吗？如果判断一下，不就不用浪费InnoDB操作，多去更新一次了？其实MySQL是确认了的。</p>
-<p>只是在这个语句里面，MySQL认为读出来的值，只有一个确定的(id&#x3D;1), 而要写的是(a&#x3D;3)，只从这两个信息是看不出来“不需要修改”的。</p>
+<p>上期问题时间上期的问题是，如果使用GTID等位点的方案做读写分离，在对大表做DDL的时候会怎么样。</p>
+<p>假设，这条语句在主库上要执行10分钟，提交后传到备库就要10分钟（典型的大事务）。</p>
+<p>那么，在主库DDL之后再提交的事务的GTID，去备库查的时候，就会等10分钟才出现。</p>
+<p>这样，这个读写分离机制在这10分钟之内都会超时，然后走主库。</p>
+<p>这种预期内的操作，应该在业务低峰期的时候，确保主库能够支持所有业务查询，然后把读请求都切到主库，再在主库上做DDL。</p>
+<p>等备库延迟追上以后，再把读请求切回备库。</p>
+<p>通过这个思考题，我主要想让关注的是，大事务对等位点方案的影响。</p>
+<p>当然了，使用gh-ost方案来解决这个问题也是不错的选择。</p>
 
       
     </div>
@@ -406,7 +401,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6d416b67.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5d62a522.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -420,7 +415,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/6d416b67.html" class="post-title-link" itemprop="url">mysql-答疑文章（一）：日志和索引相关问题</a>
+            <a href="/posts/5d62a522.html" class="post-title-link" itemprop="url">mysql-读写分离有哪些坑</a>
         </h2>
 
         <div class="post-meta">
@@ -430,7 +425,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-16 06:06:30" itemprop="dateCreated datePublished" datetime="2019-11-16T06:06:30+08:00">2019-11-16</time>
+              <time title="创建时间：2019-12-03 06:13:35" itemprop="dateCreated datePublished" datetime="2019-12-03T06:13:35+08:00">2019-12-03</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -454,13 +449,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>5.8k</span>
+              <span>5.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>21 分钟</span>
+              <span>20 分钟</span>
             </span>
 
         </div>
@@ -472,201 +467,256 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>答疑文章（一）：日志和索引相关问题<br>在今天这篇答疑文章更新前，MySQL实战这个专栏已经更新了14篇。</p>
-<p>在这些文章中，大家在评论区留下了很多高质量的留言。</p>
-<p>现在，每篇文章的评论区都有热心的同学帮忙总结文章知识点，也有不少同学提出了很多高质量的问题，更有一些同学帮忙解答其他同学提出的问题。</p>
-<p>在浏览这些留言并回复的过程中，我倍受鼓舞，也尽我所知地帮助你解决问题、和你讨论。</p>
-<p>可以说，你们的留言活跃了整个专栏的氛围、提升了整个专栏的质量，谢谢你们。</p>
-<p>评论区的大多数留言我都直接回复了，对于需要展开说明的问题，我都拿出小本子记了下来。</p>
-<p>这些被记下来的问题，就是我们今天这篇答疑文章的素材了。</p>
-<p>到目前为止，我已经收集了47个问题，很难通过今天这一篇文章全部展开。</p>
-<p>所以，我就先从中找了几个联系非常紧密的问题，串了起来，希望可以帮你解决关于日志和索引的一些疑惑。</p>
-<p>而其他问题，我们就留着后面慢慢展开吧。</p>
-<p>日志相关问题我在第2篇文章《日志系统：一条SQL更新语句是如何执行的？》中，和你讲到binlog（归档日志）和redo log（重做日志）配合崩溃恢复的时候，用的是反证法，说明了如果没有两阶段提交，会导致MySQL出现主备数据不一致等问题。</p>
-<p>在这篇文章下面，很多同学在问，在两阶段提交的不同瞬间，MySQL如果发生异常重启，是怎么保证数据完整性的？现在，我们就从这个问题开始吧。</p>
-<p>我再放一次两阶段提交的图，方便你学习下面的内容。</p>
-<p>图1 两阶段提交示意图这里，我要先和你解释一个误会式的问题。</p>
-<p>有同学在评论区问到，这个图不是一个update语句的执行流程吗，怎么还会调用commit语句？他产生这个疑问的原因，是把两个“commit”的概念混淆了：</p>
-<p>他说的“commit语句”，是指MySQL语法中，用于提交一个事务的命令。</p>
-<p>一般跟begin&#x2F;starttransaction 配对使用。</p>
-<p>而我们图中用到的这个“commit步骤”，指的是事务提交过程中的一个小步骤，也是最后一步。</p>
-<p>当这个步骤执行完成后，这个事务就提交完成了。</p>
-<p>“commit语句”执行的时候，会包含“commit 步骤”。</p>
-<p>而我们这个例子里面，没有显式地开启事务，因此这个update语句自己就是一个事务，在执行完成后提交事务时，就会用到这个“commit步骤“。</p>
-<p>接下来，我们就一起分析一下在两阶段提交的不同时刻，MySQL异常重启会出现什么现象。</p>
-<p>如果在图中时刻A的地方，也就是写入redo log 处于prepare阶段之后、写binlog之前，发生了崩溃（crash），由于此时binlog还没写，redo log也还没提交，所以崩溃恢复的时候，这个事务会回滚。</p>
-<p>这时候，binlog还没写，所以也不会传到备库。</p>
-<p>到这里，大家都可以理解。</p>
-<p>大家出现问题的地方，主要集中在时刻B，也就是binlog写完，redo log还没commit前发生crash，那崩溃恢复的时候MySQL会怎么处理？我们先来看一下崩溃恢复时的判断规则。</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>读写分离有哪些坑？在上一篇文章中，我和你介绍了一主多从的结构以及切换流程。</p>
+<p>今天我们就继续聊聊一主多从架构的应用场景：读写分离，以及怎么处理主备延迟导致的读写分离问题。</p>
+<p>我们在上一篇文章中提到的一主多从的结构，其实就是读写分离的基本结构了。</p>
+<p>这里，我再把这张图贴过来，方便你理解。</p>
+<p>图1 读写分离基本结构读写分离的主要目标就是分摊主库的压力。</p>
+<p>图1中的结构是客户端（client）主动做负载均衡，这种模式下一般会把数据库的连接信息放在客户端的连接层。</p>
+<p>也就是说，由客户端来选择后端数据库进行查询。</p>
+<p>还有一种架构是，在MySQL和客户端之间有一个中间代理层proxy，客户端只连接proxy， 由proxy根据请求类型和上下文决定请求的分发路由。</p>
+<p>图2 带proxy的读写分离架构接下来，我们就看一下客户端直连和带proxy的读写分离架构，各有哪些特点。</p>
 <ol>
-<li><p>如果redo log里面的事务是完整的，也就是已经有了commit标识，则直接提交；</p>
-</li>
-<li><p>如果redo log里面的事务只有完整的prepare，则判断对应的事务binlog是否存在并完整：</p>
-</li>
+<li>客户端直连方案，因为少了一层proxy转发，所以查询性能稍微好一点儿，并且整体架构简单，排查问题更方便。</li>
 </ol>
-<p>a. 如果是，则提交事务；</p>
-<p>b. 否则，回滚事务。</p>
-<p>这里，时刻B发生crash对应的就是2(a)的情况，崩溃恢复过程中事务会被提交。</p>
-<p>现在，我们继续延展一下这个问题。</p>
-<p>追问1：MySQL怎么知道binlog是完整的?回答：一个事务的binlog是有完整格式的：</p>
-<p>statement格式的binlog，最后会有COMMIT；</p>
-<p>row格式的binlog，最后会有一个XID event。</p>
-<p>另外，在MySQL 5.6.2版本以后，还引入了binlog-checksum参数，用来验证binlog内容的正确性。</p>
-<p>对于binlog日志由于磁盘原因，可能会在日志中间出错的情况，MySQL可以通过校验checksum的结果来发现。</p>
-<p>所以，MySQL还是有办法验证事务binlog的完整性的。</p>
-<p>追问2：redo log 和 binlog是怎么关联起来的?回答：它们有一个共同的数据字段，叫XID。</p>
-<p>崩溃恢复的时候，会按顺序扫描redo log：</p>
-<p>如果碰到既有prepare、又有commit的redo log，就直接提交；</p>
-<p>如果碰到只有parepare、而没有commit的redo log，就拿着XID去binlog找对应的事务。</p>
-<p>追问3：处于prepare阶段的redo log加上完整binlog，重启就能恢复，MySQL为什么要这么设计?回答：其实，这个问题还是跟我们在反证法中说到的数据与备份的一致性有关。</p>
-<p>在时刻B，也就是binlog写完以后MySQL发生崩溃，这时候binlog已经写入了，之后就会被从库（或者用这个binlog恢复出来的库）使用。</p>
-<p>所以，在主库上也要提交这个事务。</p>
-<p>采用这个策略，主库和备库的数据就保证了一致性。</p>
-<p>追问4：如果这样的话，为什么还要两阶段提交呢？干脆先redo log写完，再写binlog。</p>
-<p>崩溃恢复的时候，必须得两个日志都完整才可以。</p>
-<p>是不是一样的逻辑？回答：其实，两阶段提交是经典的分布式系统问题，并不是MySQL独有的。</p>
-<p>如果必须要举一个场景，来说明这么做的必要性的话，那就是事务的持久性问题。</p>
-<p>对于InnoDB引擎来说，如果redo log提交完成了，事务就不能回滚（如果这还允许回滚，就可能覆盖掉别的事务的更新）。</p>
-<p>而如果redo log直接提交，然后binlog写入的时候失败，InnoDB又回滚不了，数据和binlog日志又不一致了。</p>
-<p>两阶段提交就是为了给所有人一个机会，当每个人都说“我ok”的时候，再一起提交。</p>
-<p>追问5：不引入两个日志，也就没有两阶段提交的必要了。</p>
-<p>只用binlog来支持崩溃恢复，又能支持归档，不就可以了？回答：这位同学的意思是，只保留binlog，然后可以把提交流程改成这样：… -&gt; “数据更新到内存” -&gt; “写 binlog” -&gt; “提交事务”，是不是也可以提供崩溃恢复的能力？答案是不可以。</p>
-<p>如果说历史原因的话，那就是InnoDB并不是MySQL的原生存储引擎。</p>
-<p>MySQL的原生引擎是MyISAM，设计之初就有没有支持崩溃恢复。</p>
-<p>InnoDB在作为MySQL的插件加入MySQL引擎家族之前，就已经是一个提供了崩溃恢复和事务支持的引擎了。</p>
-<p>InnoDB接入了MySQL后，发现既然binlog没有崩溃恢复的能力，那就用InnoDB原有的redo log好了。</p>
-<p>而如果说实现上的原因的话，就有很多了。</p>
-<p>就按照问题中说的，只用binlog来实现崩溃恢复的流程，我画了一张示意图，这里就没有redo log了。</p>
-<p>图2 只用binlog支持崩溃恢复这样的流程下，binlog还是不能支持崩溃恢复的。</p>
-<p>我说一个不支持的点吧：binlog没有能力恢复“数据页”。</p>
-<p>如果在图中标的位置，也就是binlog2写完了，但是整个事务还没有commit的时候，MySQL发生了crash。</p>
-<p>重启后，引擎内部事务2会回滚，然后应用binlog2可以补回来；但是对于事务1来说，系统已经认为提交完成了，不会再应用一次binlog1。</p>
-<p>但是，InnoDB引擎使用的是WAL技术，执行事务的时候，写完内存和日志，事务就算完成了。</p>
-<p>如果之后崩溃，要依赖于日志来恢复数据页。</p>
-<p>也就是说在图中这个位置发生崩溃的话，事务1也是可能丢失了的，而且是数据页级的丢失。</p>
-<p>此时，binlog里面并没有记录数据页的更新细节，是补不回来的。</p>
-<p>你如果要说，那我优化一下binlog的内容，让它来记录数据页的更改可以吗？但，这其实就是又做了一个redo log出来。</p>
-<p>所以，至少现在的binlog能力，还不能支持崩溃恢复。</p>
-<p>追问6：那能不能反过来，只用redo log，不要binlog？回答：如果只从崩溃恢复的角度来讲是可以的。</p>
-<p>你可以把binlog关掉，这样就没有两阶段提交了，但系统依然是crash-safe的。</p>
-<p>但是，如果你了解一下业界各个公司的使用场景的话，就会发现在正式的生产库上，binlog都是开着的。</p>
-<p>因为binlog有着redo log无法替代的功能。</p>
-<p>一个是归档。</p>
-<p>redo log是循环写，写到末尾是要回到开头继续写的。</p>
-<p>这样历史日志没法保留，redo log也就起不到归档的作用。</p>
-<p>一个就是MySQL系统依赖于binlog。</p>
-<p>binlog作为MySQL一开始就有的功能，被用在了很多地方。</p>
-<p>其中，MySQL系统高可用的基础，就是binlog复制。</p>
-<p>还有很多公司有异构系统（比如一些数据分析系统），这些系统就靠消费MySQL的binlog来更新自己的数据。</p>
-<p>关掉binlog的话，这些下游系统就没法输入了。</p>
-<p>总之，由于现在包括MySQL高可用在内的很多系统机制都依赖于binlog，所以“鸠占鹊巢”redolog还做不到。</p>
-<p>你看，发展生态是多么重要。</p>
-<p>追问7：redo log一般设置多大？回答：redo log太小的话，会导致很快就被写满，然后不得不强行刷redo log，这样WAL机制的能力就发挥不出来了。</p>
-<p>所以，如果是现在常见的几个TB的磁盘的话，就不要太小气了，直接将redo log设置为4个文件、每个文件1GB吧。</p>
-<p>追问8：正常运行中的实例，数据写入后的最终落盘，是从redo log更新过来的还是从buffer pool更新过来的呢？回答：这个问题其实问得非常好。</p>
-<p>这里涉及到了，“redo log里面到底是什么”的问题。</p>
-<p>实际上，redo log并没有记录数据页的完整数据，所以它并没有能力自己去更新磁盘数据页，也就不存在“数据最终落盘，是由redo log更新过去”的情况。</p>
-<ol>
-<li>如果是正常运行的实例的话，数据页被修改以后，跟磁盘的数据页不一致，称为脏页。</li>
-</ol>
-<p>最终数据落盘，就是把内存中的数据页写盘。</p>
-<p>这个过程，甚至与redo log毫无关系。</p>
+<p>但是这种方案，由于要了解后端部署细节，所以在出现主备切换、库迁移等操作的时候，客户端都会感知到，并且需要调整数据库连接信息。</p>
+<p>你可能会觉得这样客户端也太麻烦了，信息大量冗余，架构很丑。</p>
+<p>其实也未必，一般采用这样的架构，一定会伴随一个负责管理后端的组件，比如Zookeeper，尽量让业务端只专注于业务逻辑开发。</p>
 <ol start="2">
-<li>在崩溃恢复场景中，InnoDB如果判断到一个数据页可能在崩溃恢复的时候丢失了更新，就会将它读到内存，然后让redo log更新内存内容。</li>
+<li>带proxy的架构，对客户端比较友好。</li>
 </ol>
-<p>更新完成后，内存页变成脏页，就回到了第一种情况的状态。</p>
-<p>追问9：redo log buffer是什么？是先修改内存，还是先写redo log文件？回答：这两个问题可以一起回答。</p>
-<p>在一个事务的更新过程中，日志是要写多次的。</p>
-<p>比如下面这个事务：</p>
-<p>这个事务要往两个表中插入记录，插入数据的过程中，生成的日志都得先保存起来，但又不能在还没commit的时候就直接写到redo log文件里。</p>
-<p>所以，redo log buffer就是一块内存，用来先存redo日志的。</p>
-<p>也就是说，在执行第一个insert的时候，数据的内存被修改了，redo log buffer也写入了日志。</p>
-<p>但是，真正把日志写到redo log文件（文件名是 ib_logfile+数字），是在执行commit语句的时候做的。</p>
-<p>（这里说的是事务执行过程中不会“主动去刷盘”，以减少不必要的IO消耗。</p>
-<p>但是可能会出现“被动写入磁盘”，比如内存不够、其他事务提交等情况。</p>
-<p>这个问题我们会在后面第22篇文章《MySQL有哪些“饮鸩止渴”的提高性能的方法？》中再详细展开）。</p>
-<p>单独执行一个更新语句的时候，InnoDB会自己启动一个事务，在语句执行完成的时候提交。</p>
-<p>过程跟上面是一样的，只不过是“压缩”到了一个语句里面完成。</p>
-<p>以上这些问题，就是把大家提过的关于redo log和binlog的问题串起来，做的一次集中回答。</p>
-<p>如果你还有问题，可以在评论区继续留言补充。</p>
-<p>业务设计问题接下来，我再和你分享@ithunter 同学在第8篇文章《事务到底是隔离的还是不隔离的？》的评论区提到的跟索引相关的一个问题。</p>
-<p>我觉得这个问题挺有趣、也挺实用的，其他同学也可能会碰上这样的场景，在这里解答和分享一下。</p>
-<p>问题是这样的（我文字上稍微做了点修改，方便大家理解）：</p>
-<p>begin;insert into t1 …insert into t2 …commit;业务上有这样的需求，A、B两个用户，如果互相关注，则成为好友。</p>
-<p>设计上是有两张表，一个是like表，一个是friend表，like表有user_id、liker_id两个字段，我设置为复合唯一索引即首先，我要先赞一下这样的提问方式。</p>
-<p>虽然极客时间现在的评论区还不能追加评论，但如果大家能够一次留言就把问题讲清楚的话，其实影响也不大。</p>
-<p>所以，我希望你在留言提问的时候，也能借鉴这种方式。</p>
-<p>接下来，我把@ithunter 同学说的表模拟出来，方便我们讨论。</p>
-<p>虽然这个题干中，并没有说到friend表的索引结构。</p>
-<p>但我猜测friend_1_id和friend_2_id也有索uk_user_id_liker_id。</p>
-<p>语句执行逻辑是这样的：</p>
-<p>以A关注B为例：</p>
-<p>第一步，先查询对方有没有关注自己（B有没有关注A）select * from like where user_id &#x3D; B and liker_id &#x3D; A;如果有，则成为好友insert into friend;没有，则只是单向关注关系insert into like;但是如果A、B同时关注对方，会出现不会成为好友的情况。</p>
-<p>因为上面第1步，双方都没关注对方。</p>
-<p>第1步即使使用了排他锁也不行，因为记录不存在，行锁无法生效。</p>
-<p>请问这种情况，在MySQL锁层面有没有办法处理？CREATE TABLE <code>like</code> (  <code>id</code> int(11) NOT NULL AUTO_INCREMENT,  <code>user_id</code> int(11) NOT NULL,  <code>liker_id</code> int(11) NOT NULL,  PRIMARY KEY (<code>id</code>),  UNIQUE KEY <code>uk_user_id_liker_id</code> (<code>user_id</code>,<code>liker_id</code>)) ENGINE&#x3D;InnoDB;CREATE TABLE <code>friend</code> (  id<code>int(11) NOT NULL AUTO_INCREMENT, </code>friend_1_id<code>int(11) NOT NULL, </code>firned_2_id<code>int(11) NOT NULL,  UNIQUE KEY</code>uk_friend<code> (</code>friend_1_id<code>,</code>firned_2_id<code>)  PRIMARY KEY (</code>id&#96;)) ENGINE&#x3D;InnoDB;引，为便于描述，我给加上唯一索引。</p>
-<p>顺便说明一下，“like”是关键字，我一般不建议使用关键字作为库名、表名、字段名或索引名。</p>
-<p>我把他的疑问翻译一下，在并发场景下，同时有两个人，设置为关注对方，就可能导致无法成功加为朋友关系。</p>
-<p>现在，我用你已经熟悉的时刻顺序表的形式，把这两个事务的执行语句列出来：</p>
-<p>图3 并发“喜欢”逻辑操作顺序由于一开始A和B之间没有关注关系，所以两个事务里面的select语句查出来的结果都是空。</p>
-<p>因此，session 1的逻辑就是“既然B没有关注A，那就只插入一个单向关注关系”。</p>
-<p>session 2也同样是这个逻辑。</p>
-<p>这个结果对业务来说就是bug了。</p>
-<p>因为在业务设定里面，这两个逻辑都执行完成以后，是应该在friend表里面插入一行记录的。</p>
-<p>如提问里面说的，“第1步即使使用了排他锁也不行，因为记录不存在，行锁无法生效”。</p>
-<p>不过，我想到了另外一个方法，来解决这个问题。</p>
-<p>首先，要给“like”表增加一个字段，比如叫作 relation_ship，并设为整型，取值1、2、3。</p>
-<p>值是1的时候，表示user_id 关注 liker_id;值是2的时候，表示liker_id 关注 user_id;值是3的时候，表示互相关注。</p>
-<p>然后，当 A关注B的时候，逻辑改成如下所示的样子：</p>
-<p>应用代码里面，比较A和B的大小，如果A&lt;B，就执行下面的逻辑如果A&gt;B，则执行下面的逻辑这个设计里，让“like”表里的数据保证user_id &lt; liker_id，这样不论是A关注B，还是B关注A，在操作“like”表的时候，如果反向的关系已经存在，就会出现行锁冲突。</p>
-<p>然后，insert … on duplicate语句，确保了在事务内部，执行了这个SQL语句后，就强行占住了这个行锁，之后的select 判断relation_ship这个逻辑时就确保了是在行锁保护下的读操作。</p>
-<p>操作符 “|” 是按位或，连同最后一句insert语句里的ignore，是为了保证重复调用时的幂等性。</p>
-<p>这样，即使在双方“同时”执行关注操作，最终数据库里的结果，也是like表里面有一条关于A和B的记录，而且relation_ship的值是3， 并且friend表里面也有了A和B的这条记录。</p>
-<p>mysql&gt; begin; &#x2F;<em>启动事务</em>&#x2F;insert into <code>like</code>(user_id, liker_id, relation_ship) values(A, B, 1) on duplicate key update relation_ship&#x3D;relation_ship | 1;select relation_ship from <code>like</code> where user_id&#x3D;A and liker_id&#x3D;B;&#x2F;*代码中判断返回的 relation_ship，  如果是1，事务结束，执行 commit  如果是3，则执行下面这两个语句：</p>
-<p>  *&#x2F;insert ignore into friend(friend_1_id, friend_2_id) values(A,B);commit;mysql&gt; begin; &#x2F;<em>启动事务</em>&#x2F;insert into <code>like</code>(user_id, liker_id, relation_ship) values(B, A, 2) on duplicate key update relation_ship&#x3D;relation_ship | 2;select relation_ship from <code>like</code> where user_id&#x3D;B and liker_id&#x3D;A;&#x2F;*代码中判断返回的 relation_ship，  如果是2，事务结束，执行 commit  如果是3，则执行下面这两个语句：</p>
-<p>*&#x2F;insert ignore into friend(friend_1_id, friend_2_id) values(B,A);commit;不知道你会不会吐槽：之前明明还说尽量不要使用唯一索引，结果这个例子一上来我就创建了两个。</p>
-<p>这里我要再和你说明一下，之前文章我们讨论的，是在“业务开发保证不会插入重复记录”的情况下，着重要解决性能问题的时候，才建议尽量使用普通索引。</p>
-<p>而像这个例子里，按照这个设计，业务根本就是保证“我一定会插入重复数据，数据库一定要要有唯一性约束”，这时就没啥好说的了，唯一索引建起来吧。</p>
-<p>小结这是专栏的第一篇答疑文章。</p>
-<p>我针对前14篇文章，大家在评论区中的留言，从中摘取了关于日志和索引的相关问题，串成了今天这篇文章。</p>
-<p>这里我也要再和你说一声，有些我答应在答疑文章中进行扩展的话题，今天这篇文章没来得及扩展，后续我会再找机会为你解答。</p>
-<p>所以，篇幅所限，评论区见吧。</p>
-<p>最后，虽然这篇是答疑文章，但课后问题还是要有的。</p>
-<p>我们创建了一个简单的表t，并插入一行，然后对这一行做修改。</p>
-<p>这时候，表t里有唯一的一行数据(1,2)。</p>
-<p>假设，我现在要执行：</p>
-<p>你会看到这样的结果：</p>
-<p>结果显示，匹配(rows matched)了一行，修改(Changed)了0行。</p>
-<p>仅从现象上看，MySQL内部在处理这个命令的时候，可以有以下三种选择：</p>
+<p>客户端不需要关注后端细节，连接维护、后端信息维护等工作，都是由proxy完成的。</p>
+<p>但这样的话，对后端维护团队的要求会更高。</p>
+<p>而且，proxy也需要有高可用架构。</p>
+<p>因此，带proxy架构的整体就相对比较复杂。</p>
+<p>理解了这两种方案的优劣，具体选择哪个方案就取决于数据库团队提供的能力了。</p>
+<p>但目前看，趋势是往带proxy的架构方向发展的。</p>
+<p>但是，不论使用哪种架构，你都会碰到我们今天要讨论的问题：由于主从可能存在延迟，客户端执行完一个更新事务后马上发起查询，如果查询选择的是从库的话，就有可能读到刚刚的事务更新之前的状态。</p>
+<p>这种“在从库上会读到系统的一个过期状态”的现象，在这篇文章里，我们暂且称之为“过期读”。</p>
+<p>前面我们说过了几种可能导致主备延迟的原因，以及对应的优化策略，但是主从延迟还是不能100%避免的。</p>
+<p>不论哪种结构，客户端都希望查询从库的数据结果，跟查主库的数据结果是一样的。</p>
+<p>接下来，我们就来讨论怎么处理过期读问题。</p>
+<p>这里，我先把文章中涉及到的处理过期读的方案汇总在这里，以帮助你更好地理解和掌握全文的知识脉络。</p>
+<p>这些方案包括：</p>
+<p>强制走主库方案；</p>
+<p>sleep方案；</p>
+<p>判断主备无延迟方案；</p>
+<p>配合semi-sync方案；</p>
+<p>等主库位点方案；</p>
+<p>等GTID方案。</p>
+<p>强制走主库方案强制走主库方案其实就是，将查询请求做分类。</p>
+<p>通常情况下，我们可以将查询请求分为这么两类：</p>
 <ol>
-<li><p>更新都是先读后写的，MySQL读出数据，发现a的值本来就是2，不更新，直接返回，执行mysql&gt; CREATE TABLE <code>t</code> (<code>id</code> int(11) NOT NULL primary key auto_increment,<code>a</code> int(11) DEFAULT NULL) ENGINE&#x3D;InnoDB;insert into t values(1,2);mysql&gt; update t set a&#x3D;2 where id&#x3D;1;结束；</p>
+<li>对于必须要拿到最新结果的请求，强制将其发到主库上。</li>
+</ol>
+<p>比如，在一个交易平台上，卖家发布商品以后，马上要返回主页面，看商品是否发布成功。</p>
+<p>那么，这个请求需要拿到最新的结果，就必须走主库。</p>
+<ol start="2">
+<li>对于可以读到旧数据的请求，才将其发到从库上。</li>
+</ol>
+<p>在这个交易平台上，买家来逛商铺页面，就算晚几秒看到最新发布的商品，也是可以接受的。</p>
+<p>那么，这类请求就可以走从库。</p>
+<p>你可能会说，这个方案是不是有点畏难和取巧的意思，但其实这个方案是用得最多的。</p>
+<p>当然，这个方案最大的问题在于，有时候你会碰到“所有查询都不能是过期读”的需求，比如一些金融类的业务。</p>
+<p>这样的话，你就要放弃读写分离，所有读写压力都在主库，等同于放弃了扩展性。</p>
+<p>因此接下来，我们来讨论的话题是：可以支持读写分离的场景下，有哪些解决过期读的方案，并分析各个方案的优缺点。</p>
+<p>Sleep 方案主库更新后，读从库之前先sleep一下。</p>
+<p>具体的方案就是，类似于执行一条select sleep(1)命令。</p>
+<p>这个方案的假设是，大多数情况下主备延迟在1秒之内，做一个sleep可以有很大概率拿到最新的数据。</p>
+<p>这个方案给你的第一感觉，很可能是不靠谱儿，应该不会有人用吧？并且，你还可能会说，直接在发起查询时先执行一条sleep语句，用户体验很不友好啊。</p>
+<p>但，这个思路确实可以在一定程度上解决问题。</p>
+<p>为了看起来更靠谱儿，我们可以换一种方式。</p>
+<p>以卖家发布商品为例，商品发布后，用Ajax（Asynchronous JavaScript + XML，异步JavaScript和XML）直接把客户端输入的内容作为“新的商品”显示在页面上，而不是真正地去数据库做查询。</p>
+<p>这样，卖家就可以通过这个显示，来确认产品已经发布成功了。</p>
+<p>等到卖家再刷新页面，去查看商品的时候，其实已经过了一段时间，也就达到了sleep的目的，进而也就解决了过期读的问题。</p>
+<p>也就是说，这个sleep方案确实解决了类似场景下的过期读问题。</p>
+<p>但，从严格意义上来说，这个方案存在的问题就是不精确。</p>
+<p>这个不精确包含了两层意思：</p>
+<ol>
+<li><p>如果这个查询请求本来0.5秒就可以在从库上拿到正确结果，也会等1秒；</p>
 </li>
-<li><p>MySQL调用了InnoDB引擎提供的“修改为(1,2)”这个接口，但是引擎发现值与原来相同，不更新，直接返回；</p>
-</li>
-<li><p>InnoDB认真执行了“把这个值修改成(1,2)”这个操作，该加锁的加锁，该更新的更新。</p>
+<li><p>如果延迟超过1秒，还是会出现过期读。</p>
 </li>
 </ol>
-<p>你觉得实际情况会是以上哪种呢？你可否用构造实验的方式，来证明你的结论？进一步地，可以思考一下，MySQL为什么要选择这种策略呢？你可以把你的验证方法和思考写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>看到这里，你是不是有一种“你是不是在逗我”的感觉，这个改进方案虽然可以解决类似Ajax场景下的过期读问题，但还是怎么看都不靠谱儿。</p>
+<p>别着急，接下来我就和你介绍一些更准确的方案。</p>
+<p>判断主备无延迟方案要确保备库无延迟，通常有三种做法。</p>
+<p>通过前面的第25篇文章，我们知道show slave status结果里的seconds_behind_master参数的值，可以用来衡量主备延迟时间的长短。</p>
+<p>所以第一种确保主备无延迟的方法是，每次从库执行查询请求前，先判断seconds_behind_master是否已经等于0。</p>
+<p>如果还不等于0 ，那就必须等到这个参数变为0才能执行查询请求。</p>
+<p>seconds_behind_master的单位是秒，如果你觉得精度不够的话，还可以采用对比位点和GTID的方法来确保主备无延迟，也就是我们接下来要说的第二和第三种方法。</p>
+<p>如图3所示，是一个show slave status结果的部分截图。</p>
+<p>图3 show slave status结果现在，我们就通过这个结果，来看看具体如何通过对比位点和GTID来确保主备无延迟。</p>
+<p>第二种方法，对比位点确保主备无延迟：</p>
+<p>Master_Log_File和Read_Master_Log_Pos，表示的是读到的主库的最新位点；</p>
+<p>Relay_Master_Log_File和Exec_Master_Log_Pos，表示的是备库执行的最新位点。</p>
+<p>如果Master_Log_File和Relay_Master_Log_File、Read_Master_Log_Pos和Exec_Master_Log_Pos这两组值完全相同，就表示接收到的日志已经同步完成。</p>
+<p>第三种方法，对比GTID集合确保主备无延迟：</p>
+<p>Auto_Position&#x3D;1 ，表示这对主备关系使用了GTID协议。</p>
+<p>Retrieved_Gtid_Set，是备库收到的所有日志的GTID集合；</p>
+<p>Executed_Gtid_Set，是备库所有已经执行完成的GTID集合。</p>
+<p>如果这两个集合相同，也表示备库接收到的日志都已经同步完成。</p>
+<p>可见，对比位点和对比GTID这两种方法，都要比判断seconds_behind_master是否为0更准确。</p>
+<p>在执行查询请求之前，先判断从库是否同步完成的方法，相比于sleep方案，准确度确实提升了不少，但还是没有达到“精确”的程度。</p>
+<p>为什么这么说呢？我们现在一起来回顾下，一个事务的binlog在主备库之间的状态：</p>
+<ol>
+<li><p>主库执行完成，写入binlog，并反馈给客户端；</p>
+</li>
+<li><p>binlog被从主库发送给备库，备库收到；</p>
+</li>
+<li><p>在备库执行binlog完成。</p>
+</li>
+</ol>
+<p>我们上面判断主备无延迟的逻辑，是“备库收到的日志都执行完成了”。</p>
+<p>但是，从binlog在主备之间状态的分析中，不难看出还有一部分日志，处于客户端已经收到提交确认，而备库还没收到日志的状态。</p>
+<p>如图4所示就是这样的一个状态。</p>
+<p>图4 备库还没收到trx3这时，主库上执行完成了三个事务trx1、trx2和trx3，其中：</p>
+<ol>
+<li><p>trx1和trx2已经传到从库，并且已经执行完成了；</p>
+</li>
+<li><p>trx3在主库执行完成，并且已经回复给客户端，但是还没有传到从库中。</p>
+</li>
+</ol>
+<p>如果这时候你在从库B上执行查询请求，按照我们上面的逻辑，从库认为已经没有同步延迟，但还是查不到trx3的。</p>
+<p>严格地说，就是出现了过期读。</p>
+<p>那么，这个问题有没有办法解决呢？配合semi-sync要解决这个问题，就要引入半同步复制，也就是semi-sync replication。</p>
+<p>semi-sync做了这样的设计：</p>
+<ol>
+<li><p>事务提交的时候，主库把binlog发给从库；</p>
+</li>
+<li><p>从库收到binlog以后，发回给主库一个ack，表示收到了；</p>
+</li>
+<li><p>主库收到这个ack以后，才能给客户端返回“事务完成”的确认。</p>
+</li>
+</ol>
+<p>也就是说，如果启用了semi-sync，就表示所有给客户端发送过确认的事务，都确保了备库已经收到了这个日志。</p>
+<p>在第25篇文章的评论区，有同学问到：如果主库掉电的时候，有些binlog还来不及发给从库，会不会导致系统数据丢失？答案是，如果使用的是普通的异步复制模式，就可能会丢失，但semi-sync就可以解决这个问题。</p>
+<p>这样，semi-sync配合前面关于位点的判断，就能够确定在从库上执行的查询请求，可以避免过期读。</p>
+<p>但是，semi-sync+位点判断的方案，只对一主一备的场景是成立的。</p>
+<p>在一主多从场景中，主库只要等到一个从库的ack，就开始给客户端返回确认。</p>
+<p>这时，在从库上执行查询请求，就有两种情况：</p>
+<ol>
+<li><p>如果查询是落在这个响应了ack的从库上，是能够确保读到最新数据；</p>
+</li>
+<li><p>但如果是查询落到其他从库上，它们可能还没有收到最新的日志，就会产生过期读的问题。</p>
+</li>
+</ol>
+<p>其实，判断同步位点的方案还有另外一个潜在的问题，即：如果在业务更新的高峰期，主库的位点或者GTID集合更新很快，那么上面的两个位点等值判断就会一直不成立，很可能出现从库上迟迟无法响应查询请求的情况。</p>
+<p>实际上，回到我们最初的业务逻辑里，当发起一个查询请求以后，我们要得到准确的结果，其实并不需要等到“主备完全同步”。</p>
+<p>为什么这么说呢？我们来看一下这个时序图。</p>
+<p>图5 主备持续延迟一个事务图5所示，就是等待位点方案的一个bad case。</p>
+<p>图中备库B下的虚线框，分别表示relaylog和binlog中的事务。</p>
+<p>可以看到，图5中从状态1 到状态4，一直处于延迟一个事务的状态。</p>
+<p>备库B一直到状态4都和主库A存在延迟，如果用上面必须等到无延迟才能查询的方案，select语句直到状态4都不能被执行。</p>
+<p>但是，其实客户端是在发完trx1更新后发起的select语句，我们只需要确保trx1已经执行完成就可以执行select语句了。</p>
+<p>也就是说，如果在状态3执行查询请求，得到的就是预期结果了。</p>
+<p>到这里，我们小结一下，semi-sync配合判断主备无延迟的方案，存在两个问题：</p>
+<ol>
+<li><p>一主多从的时候，在某些从库执行查询请求会存在过期读的现象；</p>
+</li>
+<li><p>在持续延迟的情况下，可能出现过度等待的问题。</p>
+</li>
+</ol>
+<p>接下来，我要和你介绍的等主库位点方案，就可以解决这两个问题。</p>
+<p>等主库位点方案要理解等主库位点方案，我需要先和你介绍一条命令：</p>
+<p>这条命令的逻辑如下：</p>
+<ol>
+<li><p>它是在从库执行的；</p>
+</li>
+<li><p>参数file和pos指的是主库上的文件名和位置；</p>
+</li>
+<li><p>timeout可选，设置为正整数N表示这个函数最多等待N秒。</p>
+</li>
+</ol>
+<p>这个命令正常返回的结果是一个正整数M，表示从命令开始执行，到应用完file和pos表示的binlog位置，执行了多少事务。</p>
+<p>当然，除了正常返回一个正整数M外，这条命令还会返回一些其他结果，包括：</p>
+<ol>
+<li><p>如果执行期间，备库同步线程发生异常，则返回NULL；</p>
+</li>
+<li><p>如果等待超过N秒，就返回-1；</p>
+</li>
+<li><p>如果刚开始执行的时候，就发现已经执行过这个位置了，则返回0。</p>
+</li>
+</ol>
+<p>对于图5中先执行trx1，再执行一个查询请求的逻辑，要保证能够查到正确的数据，我们可以使用这个逻辑：</p>
+<ol>
+<li><p>trx1事务更新完成后，马上执行show master status得到当前主库执行到的File和Position；</p>
+</li>
+<li><p>选定一个从库执行查询语句；</p>
+</li>
+<li><p>在从库上执行select master_pos_wait(File, Position, 1)；</p>
+</li>
+<li><p>如果返回值是&gt;&#x3D;0的正整数，则在这个从库执行查询语句；</p>
+</li>
+<li><p>否则，到主库执行查询语句。</p>
+</li>
+</ol>
+<p>我把上面这个流程画出来。</p>
+<p>select master_pos_wait(file, pos[, timeout]);图6 master_pos_wait方案这里我们假设，这条select查询最多在从库上等待1秒。</p>
+<p>那么，如果1秒内master_pos_wait返回一个大于等于0的整数，就确保了从库上执行的这个查询结果一定包含了trx1的数据。</p>
+<p>步骤5到主库执行查询语句，是这类方案常用的退化机制。</p>
+<p>因为从库的延迟时间不可控，不能无限等待，所以如果等待超时，就应该放弃，然后到主库去查。</p>
+<p>你可能会说，如果所有的从库都延迟超过1秒了，那查询压力不就都跑到主库上了吗？确实是这样。</p>
+<p>但是，按照我们设定不允许过期读的要求，就只有两种选择，一种是超时放弃，一种是转到主库查询。</p>
+<p>具体怎么选择，就需要业务开发同学做好限流策略了。</p>
+<p>GTID方案如果你的数据库开启了GTID模式，对应的也有等待GTID的方案。</p>
+<p>MySQL中同样提供了一个类似的命令：</p>
+<p> select wait_for_executed_gtid_set(gtid_set, 1);这条命令的逻辑是：</p>
+<ol>
+<li><p>等待，直到这个库执行的事务中包含传入的gtid_set，返回0；</p>
+</li>
+<li><p>超时返回1。</p>
+</li>
+</ol>
+<p>在前面等位点的方案中，我们执行完事务后，还要主动去主库执行show master status。</p>
+<p>而MySQL 5.7.6版本开始，允许在执行完更新类事务后，把这个事务的GTID返回给客户端，这样等GTID的方案就可以减少一次查询。</p>
+<p>这时，等GTID的执行流程就变成了：</p>
+<ol>
+<li><p>trx1事务更新完成后，从返回包直接获取这个事务的GTID，记为gtid1；</p>
+</li>
+<li><p>选定一个从库执行查询语句；</p>
+</li>
+<li><p>在从库上执行 select wait_for_executed_gtid_set(gtid1, 1)；</p>
+</li>
+<li><p>如果返回值是0，则在这个从库执行查询语句；</p>
+</li>
+<li><p>否则，到主库执行查询语句。</p>
+</li>
+</ol>
+<p>跟等主库位点的方案一样，等待超时后是否直接到主库查询，需要业务开发同学来做限流考虑。</p>
+<p>我把这个流程图画出来。</p>
+<p>图7 wait_for_executed_gtid_set方案在上面的第一步中，trx1事务更新完成后，从返回包直接获取这个事务的GTID。</p>
+<p>问题是，怎么能够让MySQL在执行事务后，返回包中带上GTID呢？你只需要将参数session_track_gtids设置为OWN_GTID，然后通过API接口mysql_session_track_get_first从返回包解析出GTID的值即可。</p>
+<p>在专栏的第一篇文章中，我介绍mysql_reset_connection的时候，评论区有同学留言问这类接口应该怎么使用。</p>
+<p>这里我再回答一下。</p>
+<p>其实，MySQL并没有提供这类接口的SQL用法，是提供给程序的API(<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/c-api-functions.html)%E3%80%82">https://dev.mysql.com/doc/refman/5.7/en/c-api-functions.html)。</a></p>
+<p>比如，为了让客户端在事务提交后，返回的GITD能够在客户端显示出来，我对MySQL客户端代码做了点修改，如下所示：</p>
+<p>图8 显示更新事务的GTID–代码这样，就可以看到语句执行完成，显示出GITD的值。</p>
+<p>图9 显示更新事务的GTID–效果当然了，这只是一个例子。</p>
+<p>你要使用这个方案的时候，还是应该在你的客户端代码中调用mysql_session_track_get_first这个函数。</p>
+<p>小结在今天这篇文章中，我跟你介绍了一主多从做读写分离时，可能碰到过期读的原因，以及几种应对的方案。</p>
+<p>这几种方案中，有的方案看上去是做了妥协，有的方案看上去不那么靠谱儿，但都是有实际应用场景的，你需要根据业务需求选择。</p>
+<p>即使是最后等待位点和等待GTID这两个方案，虽然看上去比较靠谱儿，但仍然存在需要权衡的情况。</p>
+<p>如果所有的从库都延迟，那么请求就会全部落到主库上，这时候会不会由于压力突然增大，把主库打挂了呢？其实，在实际应用中，这几个方案是可以混合使用的。</p>
+<p>比如，先在客户端对请求做分类，区分哪些请求可以接受过期读，而哪些请求完全不能接受过期读；然后，对于不能接受过期读的语句，再使用等GTID或等位点的方案。</p>
+<p>但话说回来，过期读在本质上是由一写多读导致的。</p>
+<p>在实际应用中，可能会有别的不需要等待就可以水平扩展的数据库方案，但这往往是用牺牲写性能换来的，也就是需要在读性能和写性能中取权衡。</p>
+<p>最后 ，我给你留下一个问题吧。</p>
+<p>假设你的系统采用了我们文中介绍的最后一个方案，也就是等GTID的方案，现在你要对主库的一张大表做DDL，可能会出现什么情况呢？为了避免这种情况，你会怎么做呢？你可以把你的分析和方案设计写在评论区，我会在下一篇文章跟你讨论这个问题。</p>
 <p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期的问题是，用一个计数表记录一个业务表的总行数，在往业务表插入数据的时候，需要给计数值加1。</p>
-<p>逻辑实现上是启动一个事务，执行两个语句：</p>
+<p>上期问题时间上期给你留的问题是，在GTID模式下，如果一个新的从库接上主库，但是需要的binlog已经没了，要怎么做？@某、人同学给了很详细的分析，我把他的回答略做修改贴过来。</p>
 <ol>
-<li><p>insert into 数据表；</p>
+<li>如果业务允许主从不一致的情况，那么可以在主库上先执行show global variables like‘gtid_purged’，得到主库已经删除的GTID集合，假设是gtid_purged1；然后先在从库上执行reset master，再执行set global gtid_purged &#x3D;‘gtid_purged1’；最后执行start slave，就会从主库现存的binlog开始同步。</li>
+</ol>
+<p>binlog缺失的那一部分，数据在从库上就可能会有丢失，造成主从不一致。</p>
+<ol start="2">
+<li><p>如果需要主从数据一致的话，最好还是通过重新搭建从库来做。</p>
 </li>
-<li><p>update 计数表，计数值加1。</p>
+<li><p>如果有其他的从库保留有全量的binlog的话，可以把新的从库先接到这个保留了全量binlog的从库，追上日志以后，如果有需要，再接回主库。</p>
+</li>
+<li><p>如果binlog有备份的情况，可以先在从库上应用缺失的binlog，然后再执行start slave。</p>
 </li>
 </ol>
-<p>从系统并发能力的角度考虑，怎么安排这两个语句的顺序。</p>
-<p>这里，我直接复制 @阿建 的回答过来供你参考：</p>
-<p>评论区有同学说，应该把update计数表放后面，因为这个计数表可能保存了多个业务表的计数值。</p>
-<p>如果把update计数表放到事务的第一个语句，多个业务表同时插入数据的话，等待时间会更长。</p>
-<p>这个答案的结论是对的，但是理解不太正确。</p>
-<p>即使我们用一个计数表记录多个业务表的行数，也肯定会给表名字段加唯一索引。</p>
-<p>类似于下面这样的表结构：</p>
-<p>并发系统性能的角度考虑，应该先插入操作记录，再更新计数表。</p>
-<p>知识点在《行锁功过：怎么减少行锁对性能的影响？》因为更新计数表涉及到行锁的竞争，先插入再更新能最大程度地减少事务之间的锁等待，提升并发度。</p>
-<p>在更新计数表的时候，一定会传入where table_name&#x3D;$table_name，使用主键索引，更新加行锁只会锁在一行上。</p>
-<p>而在不同业务表插入数据，是更新不同的行，不会有行锁。</p>
 
       
     </div>
@@ -686,7 +736,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6fde2059.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/fc93d163.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -700,7 +750,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/6fde2059.html" class="post-title-link" itemprop="url">mysql-count性能优化</a>
+            <a href="/posts/fc93d163.html" class="post-title-link" itemprop="url">mysql-主库出问题了从库怎么办</a>
         </h2>
 
         <div class="post-meta">
@@ -710,7 +760,854 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-15 06:10:36" itemprop="dateCreated datePublished" datetime="2019-11-15T06:10:36+08:00">2019-11-15</time>
+              <time title="创建时间：2019-12-02 06:01:31" itemprop="dateCreated datePublished" datetime="2019-12-02T06:01:31+08:00">2019-12-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>17 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>主库出问题了，从库怎么办？在前面的第24、25和26篇文章中，我和你介绍了MySQL主备复制的基础结构，但这些都是一主一备的结构。</p>
+<p>大多数的互联网应用场景都是读多写少，因此你负责的业务，在发展过程中很可能先会遇到读性能的问题。</p>
+<p>而在数据库层解决读性能问题，就要涉及到接下来两篇文章要讨论的架构：一主多从。</p>
+<p>今天这篇文章，我们就先聊聊一主多从的切换正确性。</p>
+<p>然后，我们在下一篇文章中再聊聊解决一主多从的查询逻辑正确性的方法。</p>
+<p>如图1所示，就是一个基本的一主多从结构。</p>
+<p>图1 一主多从基本结构图中，虚线箭头表示的是主备关系，也就是A和A’互为主备， 从库B、C、D指向的是主库A。</p>
+<p>一主多从的设置，一般用于读写分离，主库负责所有的写入和一部分读，其他的读请求则由从库分担。</p>
+<p>今天我们要讨论的就是，在一主多从架构下，主库故障后的主备切换问题。</p>
+<p>如图2所示，就是主库发生故障，主备切换后的结果。</p>
+<p>图2 一主多从基本结构–主备切换相比于一主一备的切换流程，一主多从结构在切换完成后，A’会成为新的主库，从库B、C、D也要改接到A’。</p>
+<p>正是由于多了从库B、C、D重新指向的这个过程，所以主备切换的复杂性也相应增加了。</p>
+<p>接下来，我们再一起看看一个切换系统会怎么完成一主多从的主备切换过程。</p>
+<p>基于位点的主备切换这里，我们需要先来回顾一个知识点。</p>
+<p>当我们把节点B设置成节点A’的从库的时候，需要执行一条change master命令：</p>
+<p>CHANGE MASTER TO MASTER_HOST&#x3D;$host_name MASTER_PORT&#x3D;$port MASTER_USER&#x3D;$user_name MASTER_PASSWORD&#x3D;$password MASTER_LOG_FILE&#x3D;$master_log_name MASTER_LOG_POS&#x3D;$master_log_pos  这条命令有这么6个参数：</p>
+<p>MASTER_HOST、MASTER_PORT、MASTER_USER和MASTER_PASSWORD四个参数，分别代表了主库A’的IP、端口、用户名和密码。</p>
+<p>最后两个参数MASTER_LOG_FILE和MASTER_LOG_POS表示，要从主库的master_log_name文件的master_log_pos这个位置的日志继续同步。</p>
+<p>而这个位置就是我们所说的同步位点，也就是主库对应的文件名和日志偏移量。</p>
+<p>那么，这里就有一个问题了，节点B要设置成A’的从库，就要执行change master命令，就不可避免地要设置位点的这两个参数，但是这两个参数到底应该怎么设置呢？原来节点B是A的从库，本地记录的也是A的位点。</p>
+<p>但是相同的日志，A的位点和A’的位点是不同的。</p>
+<p>因此，从库B要切换的时候，就需要先经过“找同步位点”这个逻辑。</p>
+<p>这个位点很难精确取到，只能取一个大概位置。</p>
+<p>为什么这么说呢？我来和你分析一下看看这个位点一般是怎么获取到的，你就清楚其中不精确的原因了。</p>
+<p>考虑到切换过程中不能丢数据，所以我们找位点的时候，总是要找一个“稍微往前”的，然后再通过判断跳过那些在从库B上已经执行过的事务。</p>
+<p>一种取同步位点的方法是这样的：</p>
+<ol>
+<li><p>等待新主库A’把中转日志（relay log）全部同步完成；</p>
+</li>
+<li><p>在A’上执行show master status命令，得到当前A’上最新的File 和 Position；</p>
+</li>
+<li><p>取原主库A故障的时刻T；</p>
+</li>
+<li><p>用mysqlbinlog工具解析A’的File，得到T时刻的位点。</p>
+</li>
+</ol>
+<p>图3 mysqlbinlog 部分输出结果图中，end_log_pos后面的值“123”，表示的就是A’这个实例，在T时刻写入新的binlog的位置。</p>
+<p>然后，我们就可以把123这个值作为$master_log_pos ，用在节点B的change master命令里。</p>
+<p>mysqlbinlog File –stop-datetime&#x3D;T –start-datetime&#x3D;T当然这个值并不精确。</p>
+<p>为什么呢？你可以设想有这么一种情况，假设在T这个时刻，主库A已经执行完成了一个insert 语句插入了一行数据R，并且已经将binlog传给了A’和B，然后在传完的瞬间主库A的主机就掉电了。</p>
+<p>那么，这时候系统的状态是这样的：</p>
+<ol>
+<li><p>在从库B上，由于同步了binlog， R这一行已经存在；</p>
+</li>
+<li><p>在新主库A’上， R这一行也已经存在，日志是写在123这个位置之后的；</p>
+</li>
+<li><p>我们在从库B上执行change master命令，指向A’的File文件的123位置，就会把插入R这一行数据的binlog又同步到从库B去执行。</p>
+</li>
+</ol>
+<p>这时候，从库B的同步线程就会报告 Duplicate entry ‘id_of_R’ for key ‘PRIMARY’ 错误，提示出现了主键冲突，然后停止同步。</p>
+<p>所以，通常情况下，我们在切换任务的时候，要先主动跳过这些错误，有两种常用的方法。</p>
+<p>一种做法是，主动跳过一个事务。</p>
+<p>跳过命令的写法是：</p>
+<p>因为切换过程中，可能会不止重复执行一个事务，所以我们需要在从库B刚开始接到新主库A’时，持续观察，每次碰到这些错误就停下来，执行一次跳过命令，直到不再出现停下来的情况，以此来跳过可能涉及的所有事务。</p>
+<p>另外一种方式是，通过设置slave_skip_errors参数，直接设置跳过指定的错误。</p>
+<p>在执行主备切换时，有这么两类错误，是经常会遇到的：</p>
+<p>1062错误是插入数据时唯一键冲突；</p>
+<p>1032错误是删除数据时找不到行。</p>
+<p>因此，我们可以把slave_skip_errors 设置为 “1032,1062”，这样中间碰到这两个错误时就直接跳过。</p>
+<p>这里需要注意的是，这种直接跳过指定错误的方法，针对的是主备切换时，由于找不到精确的同步位点，所以只能采用这种方法来创建从库和新主库的主备关系。</p>
+<p>这个背景是，我们很清楚在主备切换过程中，直接跳过1032和1062这两类错误是无损的，所以set global sql_slave_skip_counter&#x3D;1;start slave;才可以这么设置slave_skip_errors参数。</p>
+<p>等到主备间的同步关系建立完成，并稳定执行一段时间之后，我们还需要把这个参数设置为空，以免之后真的出现了主从数据不一致，也跳过了。</p>
+<p>GTID通过sql_slave_skip_counter跳过事务和通过slave_skip_errors忽略错误的方法，虽然都最终可以建立从库B和新主库A’的主备关系，但这两种操作都很复杂，而且容易出错。</p>
+<p>所以，MySQL 5.6版本引入了GTID，彻底解决了这个困难。</p>
+<p>那么，GTID到底是什么意思，又是如何解决找同步位点这个问题呢？现在，我就和你简单介绍一下。</p>
+<p>GTID的全称是Global Transaction Identifier，也就是全局事务ID，是一个事务在提交的时候生成的，是这个事务的唯一标识。</p>
+<p>它由两部分组成，格式是：</p>
+<p>其中：</p>
+<p>server_uuid是一个实例第一次启动时自动生成的，是一个全局唯一的值；</p>
+<p>gno是一个整数，初始值是1，每次提交事务的时候分配给这个事务，并加1。</p>
+<p>这里我需要和你说明一下，在MySQL的官方文档里，GTID格式是这么定义的：</p>
+<p>这里的source_id就是server_uuid；而后面的这个transaction_id，我觉得容易造成误导，所以我改成了gno。</p>
+<p>为什么说使用transaction_id容易造成误解呢？因为，在MySQL里面我们说transaction_id就是指事务id，事务id是在事务执行过程中分配的，如果这个事务回滚了，事务id也会递增，而gno是在事务提交的时候才会分配。</p>
+<p>从效果上看，GTID往往是连续的，因此我们用gno来表示更容易理解。</p>
+<p>GTID模式的启动也很简单，我们只需要在启动一个MySQL实例的时候，加上参数gtid_mode&#x3D;on和enforce_gtid_consistency&#x3D;on就可以了。</p>
+<p>在GTID模式下，每个事务都会跟一个GTID一一对应。</p>
+<p>这个GTID有两种生成方式，而使用哪种方式取决于session变量gtid_next的值。</p>
+<ol>
+<li>如果gtid_next&#x3D;automatic，代表使用默认值。</li>
+</ol>
+<p>这时，MySQL就会把server_uuid:gno分配给GTID&#x3D;server_uuid:gnoGTID&#x3D;source_id:transaction_id这个事务。</p>
+<p>a. 记录binlog的时候，先记录一行 SET @@SESSION.GTID_NEXT&#x3D;‘server_uuid:gno’;b. 把这个GTID加入本实例的GTID集合。</p>
+<ol start="2">
+<li>如果gtid_next是一个指定的GTID的值，比如通过set gtid_next&#x3D;’current_gtid’指定为current_gtid，那么就有两种可能：</li>
+</ol>
+<p>a. 如果current_gtid已经存在于实例的GTID集合中，接下来执行的这个事务会直接被系统忽略；</p>
+<p>b. 如果current_gtid没有存在于实例的GTID集合中，就将这个current_gtid分配给接下来要执行的事务，也就是说系统不需要给这个事务生成新的GTID，因此gno也不用加1。</p>
+<p>注意，一个current_gtid只能给一个事务使用。</p>
+<p>这个事务提交后，如果要执行下一个事务，就要执行set 命令，把gtid_next设置成另外一个gtid或者automatic。</p>
+<p>这样，每个MySQL实例都维护了一个GTID集合，用来对应“这个实例执行过的所有事务”。</p>
+<p>这样看上去不太容易理解，接下来我就用一个简单的例子，来和你说明GTID的基本用法。</p>
+<p>我们在实例X中创建一个表t。</p>
+<p>图4 初始化数据的binlog可以看到，事务的BEGIN之前有一条SET @@SESSION.GTID_NEXT命令。</p>
+<p>这时，如果实例X有从库，那么将CREATE TABLE和insert语句的binlog同步过去执行的话，执行事务之前就会先执行这两个SET命令， 这样被加入从库的GTID集合的，就是图中的这两个GTID。</p>
+<p>CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  &#96;c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀) ENGINE&#x3D;InnoDB;insert into t values(1,1);假设，现在这个实例X是另外一个实例Y的从库，并且此时在实例Y上执行了下面这条插入语句：</p>
+<p>并且，这条语句在实例Y上的GTID是 “aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10”。</p>
+<p>那么，实例X作为Y的从库，就要同步这个事务过来执行，显然会出现主键冲突，导致实例X的同步线程停止。</p>
+<p>这时，我们应该怎么处理呢？处理方法就是，你可以执行下面的这个语句序列：</p>
+<p>其中，前三条语句的作用，是通过提交一个空事务，把这个GTID加到实例X的GTID集合中。</p>
+<p>如图5所示，就是执行完这个空事务之后的show master status的结果。</p>
+<p>图5 show master status结果可以看到实例X的Executed_Gtid_set里面，已经加入了这个GTID。</p>
+<p>这样，我再执行start slave命令让同步线程执行起来的时候，虽然实例X上还是会继续执行实例Y传过来的事务，但是由于“aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10”已经存在于实例X的GTID集合中了，所以实例X就会直接跳过这个事务，也就不会再出现主键冲突的错误。</p>
+<p>在上面的这个语句序列中，start slave命令之前还有一句set gtid_next&#x3D;automatic。</p>
+<p>这句话的作用是“恢复GTID的默认分配行为”，也就是说如果之后有新的事务再执行，就还是按照原来的分配方式，继续分配gno&#x3D;3。</p>
+<p>insert into t values(1,1);set gtid_next&#x3D;’aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10’;begin;commit;set gtid_next&#x3D;automatic;start slave;基于GTID的主备切换现在，我们已经理解GTID的概念，再一起来看看基于GTID的主备复制的用法。</p>
+<p>在GTID模式下，备库B要设置为新主库A’的从库的语法如下：</p>
+<p>其中，master_auto_position&#x3D;1就表示这个主备关系使用的是GTID协议。</p>
+<p>可以看到，前面让我们头疼不已的MASTER_LOG_FILE和MASTER_LOG_POS参数，已经不需要指定了。</p>
+<p>我们把现在这个时刻，实例A’的GTID集合记为set_a，实例B的GTID集合记为set_b。</p>
+<p>接下来，我们就看看现在的主备切换逻辑。</p>
+<p>我们在实例B上执行start slave命令，取binlog的逻辑是这样的：</p>
+<ol>
+<li><p>实例B指定主库A’，基于主备协议建立连接。</p>
+</li>
+<li><p>实例B把set_b发给主库A’。</p>
+</li>
+<li><p>实例A’算出set_a与set_b的差集，也就是所有存在于set_a，但是不存在于set_b的GITD的集合，判断A’本地是否包含了这个差集需要的所有binlog事务。</p>
+</li>
+</ol>
+<p>a. 如果不包含，表示A’已经把实例B需要的binlog给删掉了，直接返回错误；</p>
+<p>b. 如果确认全部包含，A’从自己的binlog文件里面，找出第一个不在set_b的事务，发给B；</p>
+<ol start="4">
+<li>之后就从这个事务开始，往后读文件，按顺序取binlog发给B去执行。</li>
+</ol>
+<p>其实，这个逻辑里面包含了一个设计思想：在基于GTID的主备关系里，系统认为只要建立主备关系，就必须保证主库发给备库的日志是完整的。</p>
+<p>因此，如果实例B需要的日志已经不存在，A’就拒绝把日志发给B。</p>
+<p>这跟基于位点的主备协议不同。</p>
+<p>基于位点的协议，是由备库决定的，备库指定哪个位点，主库就发哪个位点，不做日志的完整性判断。</p>
+<p>基于上面的介绍，我们再来看看引入GTID后，一主多从的切换场景下，主备切换是如何实现的。</p>
+<p>CHANGE MASTER TO MASTER_HOST&#x3D;$host_name MASTER_PORT&#x3D;$port MASTER_USER&#x3D;$user_name MASTER_PASSWORD&#x3D;$password master_auto_position&#x3D;1 由于不需要找位点了，所以从库B、C、D只需要分别执行change master命令指向实例A’即可。</p>
+<p>其实，严谨地说，主备切换不是不需要找位点了，而是找位点这个工作，在实例A’内部就已经自动完成了。</p>
+<p>但由于这个工作是自动的，所以对HA系统的开发人员来说，非常友好。</p>
+<p>之后这个系统就由新主库A’写入，主库A’的自己生成的binlog中的GTID集合格式是：</p>
+<p>server_uuid_of_A’:1-M。</p>
+<p>如果之前从库B的GTID集合格式是 server_uuid_of_A:1-N， 那么切换之后GTID集合的格式就变成了server_uuid_of_A:1-N, server_uuid_of_A’:1-M。</p>
+<p>当然，主库A’之前也是A的备库，因此主库A’和从库B的GTID集合是一样的。</p>
+<p>这就达到了我们预期。</p>
+<p>GTID和在线DDL接下来，我再举个例子帮你理解GTID。</p>
+<p>之前在第22篇文章《MySQL有哪些“饮鸩止渴”提高性能的方法？》中，我和你提到业务高峰期的慢查询性能问题时，分析到如果是由于索引缺失引起的性能问题，我们可以通过在线加索引来解决。</p>
+<p>但是，考虑到要避免新增索引对主库性能造成的影响，我们可以先在备库加索引，然后再切换。</p>
+<p>当时我说，在双M结构下，备库执行的DDL语句也会传给主库，为了避免传回后对主库造成影响，要通过set sql_log_bin&#x3D;off关掉binlog。</p>
+<p>评论区有位同学提出了一个问题：这样操作的话，数据库里面是加了索引，但是binlog并没有记录下这一个更新，是不是会导致数据和日志不一致？这个问题提得非常好。</p>
+<p>当时，我在留言的回复中就引用了GTID来说明。</p>
+<p>今天，我再和你展开说明一下。</p>
+<p>假设，这两个互为主备关系的库还是实例X和实例Y，且当前主库是X，并且都打开了GTID模式。</p>
+<p>这时的主备切换流程可以变成下面这样：</p>
+<p>在实例X上执行stop slave。</p>
+<p>在实例Y上执行DDL语句。</p>
+<p>注意，这里并不需要关闭binlog。</p>
+<p>执行完成后，查出这个DDL语句对应的GTID，并记为 server_uuid_of_Y:gno。</p>
+<p>到实例X上执行以下语句序列：</p>
+<p>这样做的目的在于，既可以让实例Y的更新有binlog记录，同时也可以确保不会在实例X上执行这条更新。</p>
+<p>接下来，执行完主备切换，然后照着上述流程再执行一遍即可。</p>
+<p>小结在今天这篇文章中，我先和你介绍了一主多从的主备切换流程。</p>
+<p>在这个过程中，从库找新主库的位点是一个痛点。</p>
+<p>由此，我们引出了MySQL 5.6版本引入的GTID模式，介绍了GTID的基本概念和用法。</p>
+<p>可以看到，在GTID模式下，一主多从切换就非常方便了。</p>
+<p>因此，如果你使用的MySQL版本支持GTID的话，我都建议你尽量使用GTID模式来做一主多从的切换。</p>
+<p>在下一篇文章中，我们还能看到GTID模式在读写分离场景的应用。</p>
+<p>最后，又到了我们的思考题时间。</p>
+<p>你在GTID模式下设置主从关系的时候，从库执行start slave命令后，主库发现需要的binlog已经被删除掉了，导致主备创建不成功。</p>
+<p>这种情况下，你觉得可以怎么处理呢？你可以把你的方法写在留言区，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上一篇文章最后，我给你留的问题是，如果主库都是单线程压力模式，在从库追主库的过程中，binlog-transaction-dependency-tracking 应该选用什么参数？这个问题的答案是，应该将这个参数设置为WRITESET。</p>
+<p>由于主库是单线程压力模式，所以每个事务的commit_id都不同，那么设置为COMMIT_ORDER模式的话，从库也只能单线程执行。</p>
+<p>同样地，由于WRITESET_SESSION模式要求在备库应用日志的时候，同一个线程的日志必须set GTID_NEXT&#x3D;”server_uuid_of_Y:gno”;begin;commit;set gtid_next&#x3D;automatic;start slave;与主库上执行的先后顺序相同，也会导致主库单线程压力模式下退化成单线程复制。</p>
+<p>所以，应该将binlog-transaction-dependency-tracking 设置为WRITESET。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/8e19404c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/8e19404c.html" class="post-title-link" itemprop="url">mysql-备库为什么会延迟好几个小时</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-01 06:09:43" itemprop="dateCreated datePublished" datetime="2019-12-01T06:09:43+08:00">2019-12-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>22 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>备库为什么会延迟好几个小时？在上一篇文章中，我和你介绍了几种可能导致备库延迟的原因。</p>
+<p>你会发现，这些场景里，不论是偶发性的查询压力，还是备份，对备库延迟的影响一般是分钟级的，而且在备库恢复正常以后都能够追上来。</p>
+<p>但是，如果备库执行日志的速度持续低于主库生成日志的速度，那这个延迟就有可能成了小时级别。</p>
+<p>而且对于一个压力持续比较高的主库来说，备库很可能永远都追不上主库的节奏。</p>
+<p>这就涉及到今天我要给你介绍的话题：备库并行复制能力。</p>
+<p>为了便于你理解，我们再一起看一下第24篇文章《MySQL是怎么保证主备一致的？》的主备流程图。</p>
+<p>图1 主备流程图谈到主备的并行复制能力，我们要关注的是图中黑色的两个箭头。</p>
+<p>一个箭头代表了客户端写入主库，另一箭头代表的是备库上sql_thread执行中转日志（relay log）。</p>
+<p>如果用箭头的粗细来代表并行度的话，那么真实情况就如图1所示，第一个箭头要明显粗于第二个箭头。</p>
+<p>在主库上，影响并发度的原因就是各种锁了。</p>
+<p>由于InnoDB引擎支持行锁，除了所有并发事务都在更新同一行（热点行）这种极端场景外，它对业务并发度的支持还是很友好的。</p>
+<p>所以，你在性能测试的时候会发现，并发压测线程32就比单线程时，总体吞吐量高。</p>
+<p>而日志在备库上的执行，就是图中备库上sql_thread更新数据(DATA)的逻辑。</p>
+<p>如果是用单线程的话，就会导致备库应用日志不够快，造成主备延迟。</p>
+<p>在官方的5.6版本之前，MySQL只支持单线程复制，由此在主库并发高、TPS高时就会出现严重的主备延迟问题。</p>
+<p>从单线程复制到最新版本的多线程复制，中间的演化经历了好几个版本。</p>
+<p>接下来，我就跟你说说MySQL多线程复制的演进过程。</p>
+<p>其实说到底，所有的多线程复制机制，都是要把图1中只有一个线程的sql_thread，拆成多个线程，也就是都符合下面的这个模型：</p>
+<p>图2 多线程模型图2中，coordinator就是原来的sql_thread, 不过现在它不再直接更新数据了，只负责读取中转日志和分发事务。</p>
+<p>真正更新日志的，变成了worker线程。</p>
+<p>而work线程的个数，就是由参数slave_parallel_workers决定的。</p>
+<p>根据我的经验，把这个值设置为8~16之间最好（32核物理机的情况），毕竟备库还有可能要提供读查询，不能把CPU都吃光了。</p>
+<p>接下来，你需要先思考一个问题：事务能不能按照轮询的方式分发给各个worker，也就是第一个事务分给worker_1，第二个事务发给worker_2呢？其实是不行的。</p>
+<p>因为，事务被分发给worker以后，不同的worker就独立执行了。</p>
+<p>但是，由于CPU的调度策略，很可能第二个事务最终比第一个事务先执行。</p>
+<p>而如果这时候刚好这两个事务更新的是同一行，也就意味着，同一行上的两个事务，在主库和备库上的执行顺序相反，会导致主备不一致的问题。</p>
+<p>接下来，请你再设想一下另外一个问题：同一个事务的多个更新语句，能不能分给不同的worker来执行呢？答案是，也不行。</p>
+<p>举个例子，一个事务更新了表t1和表t2中的各一行，如果这两条更新语句被分到不同worker的话，虽然最终的结果是主备一致的，但如果表t1执行完成的瞬间，备库上有一个查询，就会看到这个事务“更新了一半的结果”，破坏了事务逻辑的隔离性。</p>
+<p>所以，coordinator在分发的时候，需要满足以下这两个基本要求：</p>
+<ol>
+<li>不能造成更新覆盖。</li>
+</ol>
+<p>这就要求更新同一行的两个事务，必须被分发到同一个worker中。</p>
+<ol start="2">
+<li>同一个事务不能被拆开，必须放到同一个worker中。</li>
+</ol>
+<p>各个版本的多线程复制，都遵循了这两条基本原则。</p>
+<p>接下来，我们就看看各个版本的并行复制策略。</p>
+<p>MySQL 5.5版本的并行复制策略官方MySQL 5.5版本是不支持并行复制的。</p>
+<p>但是，在2012年的时候，我自己服务的业务出现了严重的主备延迟，原因就是备库只有单线程复制。</p>
+<p>然后，我就先后写了两个版本的并行策略。</p>
+<p>这里，我给你介绍一下这两个版本的并行策略，即按表分发策略和按行分发策略，以帮助你理解MySQL官方版本并行复制策略的迭代。</p>
+<p>按表分发策略按表分发事务的基本思路是，如果两个事务更新不同的表，它们就可以并行。</p>
+<p>因为数据是存储在表里的，所以按表分发，可以保证两个worker不会更新同一行。</p>
+<p>当然，如果有跨表的事务，还是要把两张表放在一起考虑的。</p>
+<p>如图3所示，就是按表分发的规则。</p>
+<p>图3 按表并行复制程模型可以看到，每个worker线程对应一个hash表，用于保存当前正在这个worker的“执行队列”里的事务所涉及的表。</p>
+<p>hash表的key是“库名.表名”，value是一个数字，表示队列中有多少个事务修改这个表。</p>
+<p>在有事务分配给worker时，事务里面涉及的表会被加到对应的hash表中。</p>
+<p>worker执行完成后，这个表会被从hash表中去掉。</p>
+<p>图3中，hash_table_1表示，现在worker_1的“待执行事务队列”里，有4个事务涉及到db1.t1表，有1个事务涉及到db2.t2表；hash_table_2表示，现在worker_2中有一个事务会更新到表t3的数据。</p>
+<p>假设在图中的情况下，coordinator从中转日志中读入一个新事务T，这个事务修改的行涉及到表t1和t3。</p>
+<p>现在我们用事务T的分配流程，来看一下分配规则。</p>
+<ol>
+<li><p>由于事务T中涉及修改表t1，而worker_1队列中有事务在修改表t1，事务T和队列中的某个事务要修改同一个表的数据，这种情况我们说事务T和worker_1是冲突的。</p>
+</li>
+<li><p>按照这个逻辑，顺序判断事务T和每个worker队列的冲突关系，会发现事务T跟worker_2也冲突。</p>
+</li>
+<li><p>事务T跟多于一个worker冲突，coordinator线程就进入等待。</p>
+</li>
+<li><p>每个worker继续执行，同时修改hash_table。</p>
+</li>
+</ol>
+<p>假设hash_table_2里面涉及到修改表t3的事务先执行完成，就会从hash_table_2中把db1.t3这一项去掉。</p>
+<ol start="5">
+<li><p>这样coordinator会发现跟事务T冲突的worker只有worker_1了，因此就把它分配给worker_1。</p>
+</li>
+<li><p>coordinator继续读下一个中转日志，继续分配事务。</p>
+</li>
+</ol>
+<p>也就是说，每个事务在分发的时候，跟所有worker的冲突关系包括以下三种情况：</p>
+<ol>
+<li><p>如果跟所有worker都不冲突，coordinator线程就会把这个事务分配给最空闲的woker;2. 如果跟多于一个worker冲突，coordinator线程就进入等待状态，直到和这个事务存在冲突关系的worker只剩下1个；</p>
+</li>
+<li><p>如果只跟一个worker冲突，coordinator线程就会把这个事务分配给这个存在冲突关系的worker。</p>
+</li>
+</ol>
+<p>这个按表分发的方案，在多个表负载均匀的场景里应用效果很好。</p>
+<p>但是，如果碰到热点表，比如所有的更新事务都会涉及到某一个表的时候，所有事务都会被分配到同一个worker中，就变成单线程复制了。</p>
+<p>按行分发策略要解决热点表的并行复制问题，就需要一个按行并行复制的方案。</p>
+<p>按行复制的核心思路是：如果两个事务没有更新相同的行，它们在备库上可以并行执行。</p>
+<p>显然，这个模式要求binlog格式必须是row。</p>
+<p>这时候，我们判断一个事务T和worker是否冲突，用的就规则就不是“修改同一个表”，而是“修改同一行”。</p>
+<p>按行复制和按表复制的数据结构差不多，也是为每个worker，分配一个hash表。</p>
+<p>只是要实现按行分发，这时候的key，就必须是“库名+表名+唯一键的值”。</p>
+<p>但是，这个“唯一键”只有主键id还是不够的，我们还需要考虑下面这种场景，表t1中除了主键，还有唯一索引a：</p>
+<p>假设，接下来我们要在主库执行这两个事务：</p>
+<p>图4 唯一键冲突示例可以看到，这两个事务要更新的行的主键值不同，但是如果它们被分到不同的worker，就有可能session B的语句先执行。</p>
+<p>这时候id&#x3D;1的行的a的值还是1，就会报唯一键冲突。</p>
+<p>因此，基于行的策略，事务hash表中还需要考虑唯一键，即key应该是“库名+表名+索引a的名字+a的值”。</p>
+<p>比如，在上面这个例子中，我要在表t1上执行update t1 set a&#x3D;1 where id&#x3D;2语句，在binlog里面记录了整行的数据修改前各个字段的值，和修改后各个字段的值。</p>
+<p>因此，coordinator在解析这个语句的binlog的时候，这个事务的hash表就有三个项:1. key&#x3D;hash_func(db1+t1+“PRIMARY”+2), value&#x3D;2; 这里value&#x3D;2是因为修改前后的行id值不变，出现了两次。</p>
+<ol start="2">
+<li><p>key&#x3D;hash_func(db1+t1+“a”+2), value&#x3D;1，表示会影响到这个表a&#x3D;2的行。</p>
+</li>
+<li><p>key&#x3D;hash_func(db1+t1+“a”+1), value&#x3D;1，表示会影响到这个表a&#x3D;1的行。</p>
+</li>
+</ol>
+<p>可见，相比于按表并行分发策略，按行并行策略在决定线程分发的时候，需要消耗更多的计算资源。</p>
+<p>你可能也发现了，这两个方案其实都有一些约束条件：</p>
+<ol>
+<li>要能够从binlog里面解析出表名、主键值和唯一索引的值。</li>
+</ol>
+<p>也就是说，主库的binlog格式必CREATE TABLE t̀1  ̀(  ìd  ̀int(11) NOT NULL,  <code>a  ̀int(11) DEFAULT NULL,  </code>b  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  UNIQUE KEY &#96;a  ̀(̀ a )̀) ENGINE&#x3D;InnoDB;insert into t1 values(1,1,1),(2,2,2),(3,3,3),(4,4,4),(5,5,5);须是row；</p>
+<ol start="2">
+<li><p>表必须有主键；</p>
+</li>
+<li><p>不能有外键。</p>
+</li>
+</ol>
+<p>表上如果有外键，级联更新的行不会记录在binlog中，这样冲突检测就不准确。</p>
+<p>但，好在这三条约束规则，本来就是DBA之前要求业务开发人员必须遵守的线上使用规范，所以这两个并行复制策略在应用上也没有碰到什么麻烦。</p>
+<p>对比按表分发和按行分发这两个方案的话，按行分发策略的并行度更高。</p>
+<p>不过，如果是要操作很多行的大事务的话，按行分发的策略有两个问题：</p>
+<ol>
+<li>耗费内存。</li>
+</ol>
+<p>比如一个语句要删除100万行数据，这时候hash表就要记录100万个项。</p>
+<ol start="2">
+<li>耗费CPU。</li>
+</ol>
+<p>解析binlog，然后计算hash值，对于大事务，这个成本还是很高的。</p>
+<p>所以，我在实现这个策略的时候会设置一个阈值，单个事务如果超过设置的行数阈值（比如，如果单个事务更新的行数超过10万行），就暂时退化为单线程模式，退化过程的逻辑大概是这样的：</p>
+<ol>
+<li><p>coordinator暂时先hold住这个事务；</p>
+</li>
+<li><p>等待所有worker都执行完成，变成空队列；</p>
+</li>
+<li><p>coordinator直接执行这个事务；</p>
+</li>
+<li><p>恢复并行模式。</p>
+</li>
+</ol>
+<p>读到这里，你可能会感到奇怪，这两个策略又没有被合到官方，我为什么要介绍这么详细呢？其实，介绍这两个策略的目的是抛砖引玉，方便你理解后面要介绍的社区版本策略。</p>
+<p>MySQL 5.6版本的并行复制策略官方MySQL5.6版本，支持了并行复制，只是支持的粒度是按库并行。</p>
+<p>理解了上面介绍的按表分发策略和按行分发策略，你就理解了，用于决定分发策略的hash表里，key就是数据库名。</p>
+<p>这个策略的并行效果，取决于压力模型。</p>
+<p>如果在主库上有多个DB，并且各个DB的压力均衡，使用这个策略的效果会很好。</p>
+<p>相比于按表和按行分发，这个策略有两个优势：</p>
+<ol>
+<li><p>构造hash值的时候很快，只需要库名；而且一个实例上DB数也不会很多，不会出现需要构造100万个项这种情况。</p>
+</li>
+<li><p>不要求binlog的格式。</p>
+</li>
+</ol>
+<p>因为statement格式的binlog也可以很容易拿到库名。</p>
+<p>但是，如果你的主库上的表都放在同一个DB里面，这个策略就没有效果了；或者如果不同DB的热点不同，比如一个是业务逻辑库，一个是系统配置库，那也起不到并行的效果。</p>
+<p>理论上你可以创建不同的DB，把相同热度的表均匀分到这些不同的DB中，强行使用这个策略。</p>
+<p>不过据我所知，由于需要特地移动数据，这个策略用得并不多。</p>
+<p>MariaDB的并行复制策略在第23篇文章中，我给你介绍了redo log组提交(group commit)优化， 而MariaDB的并行复制策略利用的就是这个特性：</p>
+<ol>
+<li><p>能够在同一组里提交的事务，一定不会修改同一行；</p>
+</li>
+<li><p>主库上可以并行执行的事务，备库上也一定是可以并行执行的。</p>
+</li>
+</ol>
+<p>在实现上，MariaDB是这么做的：</p>
+<ol>
+<li><p>在一组里面一起提交的事务，有一个相同的commit_id，下一组就是commit_id+1；</p>
+</li>
+<li><p>commit_id直接写到binlog里面；</p>
+</li>
+<li><p>传到备库应用的时候，相同commit_id的事务分发到多个worker执行；</p>
+</li>
+<li><p>这一组全部执行完成后，coordinator再去取下一批。</p>
+</li>
+</ol>
+<p>当时，这个策略出来的时候是相当惊艳的。</p>
+<p>因为，之前业界的思路都是在“分析binlog，并拆分到worker”上。</p>
+<p>而MariaDB的这个策略，目标是“模拟主库的并行模式”。</p>
+<p>但是，这个策略有一个问题，它并没有实现“真正的模拟主库并发度”这个目标。</p>
+<p>在主库上，一组事务在commit的时候，下一组事务是同时处于“执行中”状态的。</p>
+<p>如图5所示，假设了三组事务在主库的执行情况，你可以看到在trx1、trx2和trx3提交的时候，trx4、trx5和trx6是在执行的。</p>
+<p>这样，在第一组事务提交完成的时候，下一组事务很快就会进入commit状态。</p>
+<p>图5 主库并行事务而按照MariaDB的并行复制策略，备库上的执行效果如图6所示。</p>
+<p>图6 MariaDB 并行复制，备库并行效果可以看到，在备库上执行的时候，要等第一组事务完全执行完成后，第二组事务才能开始执行，这样系统的吞吐量就不够。</p>
+<p>另外，这个方案很容易被大事务拖后腿。</p>
+<p>假设trx2是一个超大事务，那么在备库应用的时候，trx1和trx3执行完成后，就只能等trx2完全执行完成，下一组才能开始执行。</p>
+<p>这段时间，只有一个worker线程在工作，是对资源的浪费。</p>
+<p>不过即使如此，这个策略仍然是一个很漂亮的创新。</p>
+<p>因为，它对原系统的改造非常少，实现也很优雅。</p>
+<p>MySQL 5.7的并行复制策略在MariaDB并行复制实现之后，官方的MySQL5.7版本也提供了类似的功能，由参数slave-parallel-type来控制并行复制策略：</p>
+<ol>
+<li><p>配置为DATABASE，表示使用MySQL 5.6版本的按库并行策略；</p>
+</li>
+<li><p>配置为 LOGICAL_CLOCK，表示的就是类似MariaDB的策略。</p>
+</li>
+</ol>
+<p>不过，MySQL 5.7这个策略，针对并行度做了优化。</p>
+<p>这个优化的思路也很有趣儿。</p>
+<p>你可以先考虑这样一个问题：同时处于“执行状态”的所有事务，是不是可以并行？答案是，不能。</p>
+<p>因为，这里面可能有由于锁冲突而处于锁等待状态的事务。</p>
+<p>如果这些事务在备库上被分配到不同的worker，就会出现备库跟主库不一致的情况。</p>
+<p>而上面提到的MariaDB这个策略的核心，是“所有处于commit”状态的事务可以并行。</p>
+<p>事务处于commit状态，表示已经通过了锁冲突的检验了。</p>
+<p>这时候，你可以再回顾一下两阶段提交，我把前面第23篇文章中介绍过的两阶段提交过程图贴过来。</p>
+<p>图7 两阶段提交细化过程图其实，不用等到commit阶段，只要能够到达redo log prepare阶段，就表示事务已经通过锁冲突的检验了。</p>
+<p>因此，MySQL 5.7并行复制策略的思想是：</p>
+<ol>
+<li><p>同时处于prepare状态的事务，在备库执行时是可以并行的；</p>
+</li>
+<li><p>处于prepare状态的事务，与处于commit状态的事务之间，在备库执行时也是可以并行的。</p>
+</li>
+</ol>
+<p>我在第23篇文章，讲binlog的组提交的时候，介绍过两个参数：</p>
+<ol>
+<li>binlog_group_commit_sync_delay参数，表示延迟多少微秒后才调用fsync;2. binlog_group_commit_sync_no_delay_count参数，表示累积多少次以后才调用fsync。</li>
+</ol>
+<p>这两个参数是用于故意拉长binlog从write到fsync的时间，以此减少binlog的写盘次数。</p>
+<p>在MySQL5.7的并行复制策略里，它们可以用来制造更多的“同时处于prepare阶段的事务”。</p>
+<p>这样就增加了备库复制的并行度。</p>
+<p>也就是说，这两个参数，既可以“故意”让主库提交得慢些，又可以让备库执行得快些。</p>
+<p>在MySQL5.7处理备库延迟的时候，可以考虑调整这两个参数值，来达到提升备库复制并发度的目的。</p>
+<p>MySQL 5.7.22的并行复制策略在2018年4月份发布的MySQL 5.7.22版本里，MySQL增加了一个新的并行复制策略，基于WRITESET的并行复制。</p>
+<p>相应地，新增了一个参数binlog-transaction-dependency-tracking，用来控制是否启用这个新策略。</p>
+<p>这个参数的可选值有以下三种。</p>
+<ol>
+<li><p>COMMIT_ORDER，表示的就是前面介绍的，根据同时进入prepare和commit来判断是否可以并行的策略。</p>
+</li>
+<li><p>WRITESET，表示的是对于事务涉及更新的每一行，计算出这一行的hash值，组成集合writeset。</p>
+</li>
+</ol>
+<p>如果两个事务没有操作相同的行，也就是说它们的writeset没有交集，就可以并行。</p>
+<ol start="3">
+<li>WRITESET_SESSION，是在WRITESET的基础上多了一个约束，即在主库上同一个线程先后执行的两个事务，在备库执行的时候，要保证相同的先后顺序。</li>
+</ol>
+<p>当然为了唯一标识，这个hash值是通过“库名+表名+索引名+值”计算出来的。</p>
+<p>如果一个表上除了有主键索引外，还有其他唯一索引，那么对于每个唯一索引，insert语句对应的writeset就要多增加一个hash值。</p>
+<p>你可能看出来了，这跟我们前面介绍的基于MySQL 5.5版本的按行分发的策略是差不多的。</p>
+<p>不过，MySQL官方的这个实现还是有很大的优势：</p>
+<ol>
+<li><p>writeset是在主库生成后直接写入到binlog里面的，这样在备库执行的时候，不需要解析binlog内容（event里的行数据），节省了很多计算量；</p>
+</li>
+<li><p>不需要把整个事务的binlog都扫一遍才能决定分发到哪个worker，更省内存；</p>
+</li>
+<li><p>由于备库的分发策略不依赖于binlog内容，所以binlog是statement格式也是可以的。</p>
+</li>
+</ol>
+<p>因此，MySQL 5.7.22的并行复制策略在通用性上还是有保证的。</p>
+<p>当然，对于“表上没主键”和“外键约束”的场景，WRITESET策略也是没法并行的，也会暂时退化为单线程模型。</p>
+<p>小结在今天这篇文章中，我和你介绍了MySQL的各种多线程复制策略。</p>
+<p>为什么要有多线程复制呢？这是因为单线程复制的能力全面低于多线程复制，对于更新压力较大的主库，备库是可能一直追不上主库的。</p>
+<p>从现象上看就是，备库上seconds_behind_master的值越来越大。</p>
+<p>在介绍完每个并行复制策略后，我还和你分享了不同策略的优缺点：</p>
+<p>如果你是DBA，就需要根据不同的业务场景，选择不同的策略；</p>
+<p>如果是你业务开发人员，也希望你能从中获取灵感用到平时的开发工作中。</p>
+<p>从这些分析中，你也会发现大事务不仅会影响到主库，也是造成备库复制延迟的主要原因之一。</p>
+<p>因此，在平时的开发工作中，我建议你尽量减少大事务操作，把大事务拆成小事务。</p>
+<p>官方MySQL5.7版本新增的备库并行策略，修改了binlog的内容，也就是说binlog协议并不是向上兼容的，在主备切换、版本升级的时候需要把这个因素也考虑进去。</p>
+<p>最后，我给你留下一个思考题吧。</p>
+<p>假设一个MySQL 5.7.22版本的主库，单线程插入了很多数据，过了3个小时后，我们要给这个主库搭建一个相同版本的备库。</p>
+<p>这时候，你为了更快地让备库追上主库，要开并行复制。</p>
+<p>在binlog-transaction-dependency-tracking参数的COMMIT_ORDER、WRITESET和WRITE_SESSION这三个取值中，你会选择哪一个呢？你选择的原因是什么？如果设置另外两个参数，你认为会出现什么现象呢？你可以把你的答案和分析写在评论区，我会在下一篇文章跟你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期的问题是，什么情况下，备库的主备延迟会表现为一个45度的线段？评论区有不少同学的回复都说到了重点：备库的同步在这段时间完全被堵住了。</p>
+<p>产生这种现象典型的场景主要包括两种：</p>
+<p>一种是大事务（包括大表DDL、一个事务操作很多行）；</p>
+<p>还有一种情况比较隐蔽，就是备库起了一个长事务，比如然后就不动了。</p>
+<p>这时候主库对表t做了一个加字段操作，即使这个表很小，这个DDL在备库应用的时候也会被堵住，也不能看到这个现象。</p>
+<p>评论区还有同学说是不是主库多线程、从库单线程，备库跟不上主库的更新节奏导致的？今天这篇文章，我们刚好讲的是并行复制。</p>
+<p>所以，你知道了，这种情况会导致主备延迟，但不会表现为这种标准的呈45度的直线。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/9d443267.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/9d443267.html" class="post-title-link" itemprop="url">mysql-MySQL是怎么保证高可用的</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-30 06:08:44" itemprop="dateCreated datePublished" datetime="2019-11-30T06:08:44+08:00">2019-11-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-18 23:46:00" itemprop="dateModified" datetime="2023-01-18T23:46:00+08:00">2023-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>17 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>MySQL是怎么保证高可用的？在上一篇文章中，我和你介绍了binlog的基本内容，在一个主备关系中，每个备库接收主库的binlog并执行。</p>
+<p>正常情况下，只要主库执行更新生成的所有binlog，都可以传到备库并被正确地执行，备库就能达到跟主库一致的状态，这就是最终一致性。</p>
+<p>但是，MySQL要提供高可用能力，只有最终一致性是不够的。</p>
+<p>为什么这么说呢？今天我就着重和你分析一下。</p>
+<p>这里，我再放一次上一篇文章中讲到的双M结构的主备切换流程图。</p>
+<p>图 1 MySQL主备切换流程–双M结构主备延迟主备切换可能是一个主动运维动作，比如软件升级、主库所在机器按计划下线等，也可能是被动操作，比如主库所在机器掉电。</p>
+<p>接下来，我们先一起看看主动切换的场景。</p>
+<p>在介绍主动切换流程的详细步骤之前，我要先跟你说明一个概念，即“同步延迟”。</p>
+<p>与数据同步有关的时间点主要包括以下三个：</p>
+<ol>
+<li>主库A执行完成一个事务，写入binlog，我们把这个时刻记为T1;2. 之后传给备库B，我们把备库B接收完这个binlog的时刻记为T2;3. 备库B执行完成这个事务，我们把这个时刻记为T3。</li>
+</ol>
+<p>所谓主备延迟，就是同一个事务，在备库执行完成的时间和主库执行完成的时间之间的差值，也就是T3-T1。</p>
+<p>你可以在备库上执行show slave status命令，它的返回结果里面会显示seconds_behind_master，用于表示当前备库延迟了多少秒。</p>
+<p>seconds_behind_master的计算方法是这样的：</p>
+<ol>
+<li>每个事务的binlog 里面都有一个时间字段，用于记录主库上写入的时间；</li>
+<li>备库取出当前正在执行的事务的时间字段的值，计算它与当前系统时间的差值，得到seconds_behind_master。</li>
+</ol>
+<p>可以看到，其实seconds_behind_master这个参数计算的就是T3-T1。</p>
+<p>所以，我们可以用seconds_behind_master来作为主备延迟的值，这个值的时间精度是秒。</p>
+<p>你可能会问，如果主备库机器的系统时间设置不一致，会不会导致主备延迟的值不准？其实不会的。</p>
+<p>因为，备库连接到主库的时候，会通过执行SELECT UNIX_TIMESTAMP()函数来获得当前主库的系统时间。</p>
+<p>如果这时候发现主库的系统时间与自己不一致，备库在执行seconds_behind_master计算的时候会自动扣掉这个差值。</p>
+<p>需要说明的是，在网络正常的时候，日志从主库传给备库所需的时间是很短的，即T2-T1的值是非常小的。</p>
+<p>也就是说，网络正常情况下，主备延迟的主要来源是备库接收完binlog和执行完这个事务之间的时间差。</p>
+<p>所以说，主备延迟最直接的表现是，备库消费中转日志（relay log）的速度，比主库生产binlog的速度要慢。</p>
+<p>接下来，我就和你一起分析下，这可能是由哪些原因导致的。</p>
+<p>主备延迟的来源首先，有些部署条件下，备库所在机器的性能要比主库所在的机器性能差。</p>
+<p>一般情况下，有人这么部署时的想法是，反正备库没有请求，所以可以用差一点儿的机器。</p>
+<p>或者，他们会把20个主库放在4台机器上，而把备库集中在一台机器上。</p>
+<p>其实我们都知道，更新请求对IOPS的压力，在主库和备库上是无差别的。</p>
+<p>所以，做这种部署时，一般都会将备库设置为“非双1”的模式。</p>
+<p>但实际上，更新过程中也会触发大量的读操作。</p>
+<p>所以，当备库主机上的多个备库都在争抢资源的时候，就可能会导致主备延迟了。</p>
+<p>当然，这种部署现在比较少了。</p>
+<p>因为主备可能发生切换，备库随时可能变成主库，所以主备库选用相同规格的机器，并且做对称部署，是现在比较常见的情况。</p>
+<p>追问1：但是，做了对称部署以后，还可能会有延迟。</p>
+<p>这是为什么呢？这就是第二种常见的可能了，即备库的压力大。</p>
+<p>一般的想法是，主库既然提供了写能力，那么备库可以提供一些读能力。</p>
+<p>或者一些运营后台需要的分析语句，不能影响正常业务，所以只能在备库上跑。</p>
+<p>我真就见过不少这样的情况。</p>
+<p>由于主库直接影响业务，大家使用起来会比较克制，反而忽视了备库的压力控制。</p>
+<p>结果就是，备库上的查询耗费了大量的CPU资源，影响了同步速度，造成主备延迟。</p>
+<p>这种情况，我们一般可以这么处理：</p>
+<ol>
+<li>一主多从。</li>
+</ol>
+<p>除了备库外，可以多接几个从库，让这些从库来分担读的压力。</p>
+<ol start="2">
+<li>通过binlog输出到外部系统，比如Hadoop这类系统，让外部系统提供统计类查询的能力。</li>
+</ol>
+<p>其中，一主多从的方式大都会被采用。</p>
+<p>因为作为数据库系统，还必须保证有定期全量备份的能力。</p>
+<p>而从库，就很适合用来做备份。</p>
+<p>追问2：采用了一主多从，保证备库的压力不会超过主库，还有什么情况可能导致主备延迟吗？这就是第三种可能了，即大事务。</p>
+<p>大事务这种情况很好理解。</p>
+<p>因为主库上必须等事务执行完成才会写入binlog，再传给备库。</p>
+<p>所以，如果一个主库上的语句执行10分钟，那这个事务很可能就会导致从库延迟10分钟。</p>
+<p>不知道你所在公司的DBA有没有跟你这么说过：不要一次性地用delete语句删除太多数据。</p>
+<p>其实，这就是一个典型的大事务场景。</p>
+<p>比如，一些归档类的数据，平时没有注意删除历史数据，等到空间快满了，业务开发人员要一次性地删掉大量历史数据。</p>
+<p>同时，又因为要避免在高峰期操作会影响业务（至少有这个意识还是很不错的），所以会在晚上执行这些大量数据的删除操作。</p>
+<p>结果，负责的DBA同学半夜就会收到延迟报警。</p>
+<p>然后，DBA团队就要求你后续再删除数据的时候，要控制每个事务删除的数据量，分成多次删除。</p>
+<p>另一种典型的大事务场景，就是大表DDL。</p>
+<p>这个场景，我在前面的文章中介绍过。</p>
+<p>处理方案就是，计划内的DDL，建议使用gh-ost方案（这里，你可以再回顾下第13篇文章《为什么表数据删掉一半，表文件大小不变？》中的相关内容）。</p>
+<p>追问3：如果主库上也不做大事务了，还有什么原因会导致主备延迟吗？造成主备延迟还有一个大方向的原因，就是备库的并行复制能力。</p>
+<p>这个话题，我会留在下一篇文章再和你详细介绍。</p>
+<p>备注：这里需要说明一下，从库和备库在概念上其实差不多。</p>
+<p>在我们这个专栏里，为了方便描述，我把会在HA过程中被选成新主库的，称为备库，其他的称为从库。</p>
+<p>其实还是有不少其他情况会导致主备延迟，如果你还碰到过其他场景，欢迎你在评论区给我留言，我来和你一起分析、讨论。</p>
+<p>由于主备延迟的存在，所以在主备切换的时候，就相应的有不同的策略。</p>
+<p>可靠性优先策略在图1的双M结构下，从状态1到状态2切换的详细过程是这样的：</p>
+<ol>
+<li>判断备库B现在的seconds_behind_master，如果小于某个值（比如5秒）继续下一步，否则持续重试这一步；</li>
+<li>把主库A改成只读状态，即把readonly设置为true；</li>
+<li>判断备库B的seconds_behind_master的值，直到这个值变成0为止；</li>
+<li>把备库B改成可读写状态，也就是把readonly 设置为false；</li>
+<li>把业务请求切到备库B。</li>
+</ol>
+<p>这个切换流程，一般是由专门的HA系统来完成的，我们暂时称之为可靠性优先流程。</p>
+<p>图2 MySQL可靠性优先主备切换流程备注：图中的SBM，是seconds_behind_master参数的简写。</p>
+<p>可以看到，这个切换流程中是有不可用时间的。</p>
+<p>因为在步骤2之后，主库A和备库B都处于readonly状态，也就是说这时系统处于不可写状态，直到步骤5完成后才能恢复。</p>
+<p>在这个不可用状态中，比较耗费时间的是步骤3，可能需要耗费好几秒的时间。</p>
+<p>这也是为什么需要在步骤1先做判断，确保seconds_behind_master的值足够小。</p>
+<p>试想如果一开始主备延迟就长达30分钟，而不先做判断直接切换的话，系统的不可用时间就会长达30分钟，这种情况一般业务都是不可接受的。</p>
+<p>当然，系统的不可用时间，是由这个数据可靠性优先的策略决定的。</p>
+<p>你也可以选择可用性优先的策略，来把这个不可用时间几乎降为0。</p>
+<p>可用性优先策略如果我强行把步骤4、5调整到最开始执行，也就是说不等主备数据同步，直接把连接切到备库B，并且让备库B可以读写，那么系统几乎就没有不可用时间了。</p>
+<p>我们把这个切换流程，暂时称作可用性优先流程。</p>
+<p>这个切换流程的代价，就是可能出现数据不一致的情况。</p>
+<p>接下来，我就和你分享一个可用性优先流程产生数据不一致的例子。</p>
+<p>假设有一个表 t：<br>这个表定义了一个自增主键id，初始化数据后，主库和备库上都是3行数据。</p>
+<p>接下来，业务人员要继续在表t上执行两条插入语句的命令，依次是：<br>假设，现在主库上其他的数据表有大量的更新，导致主备延迟达到5秒。</p>
+<p>在插入一条c&#x3D;4的语句mysql&gt; CREATE TABLE t̀  ̀(  ìd  ̀int(11) unsigned NOT NULL AUTO_INCREMENT,  &#96;c  ̀int(11) unsigned DEFAULT NULL,  PRIMARY KEY (̀ id )̀) ENGINE&#x3D;InnoDB;insert into t(c) values(1),(2),(3);insert into t(c) values(4);insert into t(c) values(5);后，发起了主备切换。</p>
+<p>图3是可用性优先策略，且binlog_format&#x3D;mixed时的切换流程和数据结果。</p>
+<p>图3 可用性优先策略，且binlog_format&#x3D;mixed现在，我们一起分析下这个切换流程：</p>
+<ol>
+<li><p>步骤2中，主库A执行完insert语句，插入了一行数据（4,4），之后开始进行主备切换。</p>
+</li>
+<li><p>步骤3中，由于主备之间有5秒的延迟，所以备库B还没来得及应用“插入c&#x3D;4”这个中转日志，就开始接收客户端“插入 c&#x3D;5”的命令。</p>
+</li>
+<li><p>步骤4中，备库B插入了一行数据（4,5），并且把这个binlog发给主库A。</p>
+</li>
+<li><p>步骤5中，备库B执行“插入c&#x3D;4”这个中转日志，插入了一行数据（5,4）。</p>
+</li>
+</ol>
+<p>而直接在备库B执行的“插入c&#x3D;5”这个语句，传到主库A，就插入了一行新数据（5,5）。</p>
+<p>最后的结果就是，主库A和备库B上出现了两行不一致的数据。</p>
+<p>可以看到，这个数据不一致，是由可用性优先流程导致的。</p>
+<p>那么，如果我还是用可用性优先策略，但设置binlog_format&#x3D;row，情况又会怎样呢？因为row格式在记录binlog的时候，会记录新插入的行的所有字段值，所以最后只会有一行不一致。</p>
+<p>而且，两边的主备同步的应用线程会报错duplicate key error并停止。</p>
+<p>也就是说，这种情况下，备库B的(5,4)和主库A的(5,5)这两行数据，都不会被对方执行。</p>
+<p>图4中我画出了详细过程，你可以自己再分析一下。</p>
+<p>图4 可用性优先策略，且binlog_format&#x3D;row从上面的分析中，你可以看到一些结论：</p>
+<ol>
+<li>使用row格式的binlog时，数据不一致的问题更容易被发现。</li>
+</ol>
+<p>而使用mixed或者statement格式的binlog时，数据很可能悄悄地就不一致了。</p>
+<p>如果你过了很久才发现数据不一致的问题，很可能这时的数据不一致已经不可查，或者连带造成了更多的数据逻辑不一致。</p>
+<ol start="2">
+<li>主备切换的可用性优先策略会导致数据不一致。</li>
+</ol>
+<p>因此，大多数情况下，我都建议你使用可靠性优先策略。</p>
+<p>毕竟对数据服务来说的话，数据的可靠性一般还是要优于可用性的。</p>
+<p>但事无绝对，有没有哪种情况数据的可用性优先级更高呢？答案是，有的。</p>
+<p>我曾经碰到过这样的一个场景：<br>有一个库的作用是记录操作日志。</p>
+<p>这时候，如果数据不一致可以通过binlog来修补，而这个短暂的不一致也不会引发业务问题。</p>
+<p>同时，业务系统依赖于这个日志写入逻辑，如果这个库不可写，会导致线上的业务操作无法执行。</p>
+<p>这时候，你可能就需要选择先强行切换，事后再补数据的策略。</p>
+<p>当然，事后复盘的时候，我们想到了一个改进措施就是，让业务逻辑不要依赖于这类日志的写入。</p>
+<p>也就是说，日志写入这个逻辑模块应该可以降级，比如写到本地文件，或者写到另外一个临时库里面。</p>
+<p>这样的话，这种场景就又可以使用可靠性优先策略了。</p>
+<p>接下来我们再看看，按照可靠性优先的思路，异常切换会是什么效果？假设，主库A和备库B间的主备延迟是30分钟，这时候主库A掉电了，HA系统要切换B作为主库。</p>
+<p>我们在主动切换的时候，可以等到主备延迟小于5秒的时候再启动切换，但这时候已经别无选择了。</p>
+<p>图5 可靠性优先策略，主库不可用采用可靠性优先策略的话，你就必须得等到备库B的seconds_behind_master&#x3D;0之后，才能切换。</p>
+<p>但现在的情况比刚刚更严重，并不是系统只读、不可写的问题了，而是系统处于完全不可用的状态。</p>
+<p>因为，主库A掉电后，我们的连接还没有切到备库B。</p>
+<p>你可能会问，那能不能直接切换到备库B，但是保持B只读呢？这样也不行。</p>
+<p>因为，这段时间内，中转日志还没有应用完成，如果直接发起主备切换，客户端查询看不到之前执行完成的事务，会认为有“数据丢失”。</p>
+<p>虽然随着中转日志的继续应用，这些数据会恢复回来，但是对于一些业务来说，查询到“暂时丢失数据的状态”也是不能被接受的。</p>
+<p>聊到这里你就知道了，在满足数据可靠性的前提下，MySQL高可用系统的可用性，是依赖于主备延迟的。</p>
+<p>延迟的时间越小，在主库故障的时候，服务恢复需要的时间就越短，可用性就越高。</p>
+<p>小结今天这篇文章，我先和你介绍了MySQL高可用系统的基础，就是主备切换逻辑。</p>
+<p>紧接着，我又和你讨论了几种会导致主备延迟的情况，以及相应的改进方向。</p>
+<p>然后，由于主备延迟的存在，切换策略就有不同的选择。</p>
+<p>所以，我又和你一起分析了可靠性优先和可用性优先策略的区别。</p>
+<p>在实际的应用中，我更建议使用可靠性优先的策略。</p>
+<p>毕竟保证数据准确，应该是数据库服务的底线。</p>
+<p>在这个基础上，通过减少主备延迟，提升系统的可用性。</p>
+<p>最后，我给你留下一个思考题吧。</p>
+<p>一般现在的数据库运维系统都有备库延迟监控，其实就是在备库上执行 show slave status，采集seconds_behind_master的值。</p>
+<p>假设，现在你看到你维护的一个备库，它的延迟监控的图像类似图6，是一个45°斜向上的线段，你觉得可能是什么原因导致呢？你又会怎么去确认这个原因呢？图6 备库延迟你可以把你的分析写在评论区，我会在下一篇文章的末尾跟你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期我留给你的问题是，什么情况下双M结构会出现循环复制。</p>
+<p>一种场景是，在一个主库更新事务后，用命令set global server_id&#x3D;x修改了server_id。</p>
+<p>等日志再传回来的时候，发现server_id跟自己的server_id不同，就只能执行了。</p>
+<p>另一种场景是，有三个节点的时候，如图7所示，trx1是在节点 B执行的，因此binlog上的server_id就是B，binlog传给节点 A，然后A和A’搭建了双M结构，就会出现循环复制。</p>
+<p>图7 三节点循环复制这种三节点复制的场景，做数据库迁移的时候会出现。</p>
+<p>如果出现了循环复制，可以在A或者A’上，执行如下命令：<br>这样这个节点收到日志后就不会再执行。</p>
+<p>过一段时间后，再执行下面的命令把这个值改回来。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/9b1409.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/9b1409.html" class="post-title-link" itemprop="url">mysql-MySQL是怎么保证主备一致的</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-29 06:14:07" itemprop="dateCreated datePublished" datetime="2019-11-29T06:14:07+08:00">2019-11-29</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -734,13 +1631,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>3.1k</span>
+              <span>5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>11 分钟</span>
+              <span>18 分钟</span>
             </span>
 
         </div>
@@ -752,113 +1649,180 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><h2 id="count-语句实现方式"><a href="#count-语句实现方式" class="headerlink" title="count(*)语句实现方式"></a>count(*)语句实现方式</h2><p>在不同的MySQL引擎中，count(*)有不同的实现方式。</p>
-<h3 id="MyISAM引擎"><a href="#MyISAM引擎" class="headerlink" title="MyISAM引擎"></a>MyISAM引擎</h3><p>MyISAM引擎把一个表的总行数存在了磁盘上，执行count(*)的时候会直接返回这个数，效率很高； 加 where 条件后，无法直接得到结果，也需要过滤。</p>
-<h3 id="InnoDB引擎"><a href="#InnoDB引擎" class="headerlink" title="InnoDB引擎"></a>InnoDB引擎</h3><p>InnoDB引执行count(*)的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数。</p>
-<p>InnoDB不论是在事务支持、并发能力还是在数据安全方面，InnoDB都优于MyISAM。</p>
-<p>当你的记录数越来越多的时候，计算一个表的总行数会越来越慢。</p>
-<h4 id="为什么InnoDB不跟MyISAM一样，也把数字存起来呢？因为即使是在同一个时刻的多个查询，由于多版本并发控制（MVCC）的原因，InnoDB-表“应该返回多少行”也是不确定的。"><a href="#为什么InnoDB不跟MyISAM一样，也把数字存起来呢？因为即使是在同一个时刻的多个查询，由于多版本并发控制（MVCC）的原因，InnoDB-表“应该返回多少行”也是不确定的。" class="headerlink" title="为什么InnoDB不跟MyISAM一样，也把数字存起来呢？因为即使是在同一个时刻的多个查询，由于多版本并发控制（MVCC）的原因，InnoDB 表“应该返回多少行”也是不确定的。"></a>为什么InnoDB不跟MyISAM一样，也把数字存起来呢？因为即使是在同一个时刻的多个查询，由于多版本并发控制（MVCC）的原因，InnoDB 表“应该返回多少行”也是不确定的。</h4><p>这里，我用一个算count(*)的例子来为你解释一下。</p>
-<p>表“应该返回多少行”也是不确定的。</p>
-<p>假设表t中现在有10000条记录，我们设计了三个用户并行的会话。</p>
-<p>假设表t中现在有10000条记录，我们设计了三个用户并行的会话。</p>
-<p>会话A先启动事务并查询一次表的总行数；</p>
-<p>会话B启动事务，插入一行后记录后，查询表的总行数；</p>
-<p>会话C先启动一个单独的语句，插入一行记录后，查询表的总行数。</p>
-<p>会话C先启动一个单独的语句，插入一行记录后，查询表的总行数。</p>
-<p>我们假设从上到下是按照时间顺序执行的，同一行语句是在同一时刻执行的。</p>
-<p>我们假设从上到下是按照时间顺序执行的，同一行语句是在同一时刻执行的。</p>
-<p>你会看到，在最后一个时刻，三个会话A、B、C会同时查询表t的总行数，但拿到的结果却不同。</p>
-<p>这和InnoDB的事务设计有关系，可重复读是它默认的隔离级别，在代码上就是通过多版本并发控制，也就是MVCC来实现的。</p>
-<p>每一行记录都要判断自己是否对这个会话可见，因此对于count(*)请求来说，InnoDB只好把数据一行一行地读出依次判断。</p>
-<h2 id="优化方法InnoDB是索引组织表，主键索引树的叶子节点是数据，而普通索引树的叶子节点是主键值。"><a href="#优化方法InnoDB是索引组织表，主键索引树的叶子节点是数据，而普通索引树的叶子节点是主键值。" class="headerlink" title="优化方法InnoDB是索引组织表，主键索引树的叶子节点是数据，而普通索引树的叶子节点是主键值。"></a>优化方法InnoDB是索引组织表，主键索引树的叶子节点是数据，而普通索引树的叶子节点是主键值。</h2><p>所以，普通索引树比主键索引树小很多。</p>
-<p>对于count(*)这样的操作，遍历哪个索引树得到的结果逻辑上都是一样的。</p>
-<p>因此，MySQL优化器会找到最小的那棵树来遍历。</p>
-<p>在保证逻辑正确的前提下，尽量减少扫描的数据量，是数据库系统设计的通用法则之一。</p>
-<p>如果你用过show table status 命令的话，就会发现这个命令的输出结果里面也有一个TABLE_ROWS用于显示这个表当前有多少行，这个命令执行挺快的，那这个TABLE_ROWS能代替count(*)吗？索引统计的值是通过采样来估算的。</p>
-<p>实际上，TABLE_ROWS就是从这个采样估算得来的，因此它也很不准。</p>
-<p>是通过采样来估算的。</p>
-<p>有多不准呢，官方文档说误差可能达到40%到50%。</p>
-<p>所以，show table status命令显示的行数也不能直接使用。</p>
-<p>MyISAM表虽然count(*)很快，但是不支持事务；</p>
-<p>show table status命令虽然返回很快，但是不准确；</p>
-<p>InnoDB表直接count(*)会遍历全表，虽然结果准确，但会导致性能问题。</p>
-<p>InnoDB表直接count(*)会遍历全表，虽然结果准确，但会导致性能问题。</p>
-<p>如果你现在有一个页面经常要显示交易系统的操作记录总数，到底## 最佳实现自己计数### 用缓存系统保存计数对于更新很频繁的库来说，你可能会第一时间想到，用缓存系统来支持。</p>
-<p>可以用一个Redis服务来保存这个表的总行数。</p>
-<p>这个表每被插入一行Redis计数就加1，每被删除一行Redis计数就减1。</p>
-<p>这种方式下，读和更新操作都很快，但你再想一下这种方式存在什么问题吗？没错，缓存系统可能会丢失更新。</p>
-<p>Redis的数据不能永久地留在内存里，所以你会找一个地方把这个值定期地持久化存储起来。</p>
-<p>但即使这样，仍然可能丢失更新。</p>
-<p>试想如果刚刚在数据表中插入了一行，Redis中保存的值也加了1，然后Redis异常重启了，重启后你要从存储redis数据的地方把这个值读回来，而刚刚加1的这个计数操作却丢失了。</p>
-<p>当然了，这还是有解的。</p>
-<p>比如，Redis异常重启以后，到数据库里面单独执行一次count(*)获取真实的行数，再把这个值写回到Redis里就可以了。</p>
-<p>异常重启毕竟不是经常出现的情况，这一次全表扫描的成本，还是可以接受的。</p>
-<p>但实际上，将计数保存在缓存系统中的方式，还不只是丢失更新的问题。</p>
-<p>即使Redis正常工作，这个值还是逻辑上不精确的。</p>
-<p>你可以设想一下有这么一个页面，要显示操作记录的总数，同时还要显示最近操作的100条记录。</p>
-<p>那么，这个页面的逻辑就需要先到Redis里面取出计数，再到数据表里面取数据记录，这个页面的逻辑就需要先到Redis里面取出计数，再到数据表里面取数据记录。</p>
-<p>我们是这么定义不精确的：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>MySQL是怎么保证主备一致的？</p>
+<p>binlog可以用来归档，也可以用来做主备同步，但它的内容是什么样的呢？为什么备库执行了binlog就可以跟主库保持一致了呢？今天我就正式地和你介绍一下它。</p>
+<p>毫不夸张地说，MySQL能够成为现下最流行的开源数据库，binlog功不可没。</p>
+<p>在最开始，MySQL是以容易学习和方便的高可用架构，被开发人员青睐的。</p>
+<p>而它的几乎所有的高可用架构，都直接依赖于binlog。</p>
+<p>虽然这些高可用架构已经呈现出越来越复杂的趋势，但都是从最基本的一主一备演化过来的。</p>
+<p>今天这篇文章我主要为你介绍主备的基本原理。</p>
+<p>理解了背后的设计原理，你也可以从业务开发的角度，来借鉴这些设计思想。</p>
+<p>MySQL主备的基本原理如图1所示就是基本的主备切换流程。</p>
+<p>图 1 MySQL主备切换流程在状态1中，客户端的读写都直接访问节点A，而节点B是A的备库，只是将A的更新都同步过来，到本地执行。</p>
+<p>这样可以保持节点B和A的数据是相同的。</p>
+<p>当需要切换的时候，就切成状态2。</p>
+<p>这时候客户端读写访问的都是节点B，而节点A是B的备库。</p>
+<p>在状态1中，虽然节点B没有被直接访问，但是我依然建议你把节点B（也就是备库）设置成只读（readonly）模式。</p>
+<p>这样做，有以下几个考虑：</p>
 <ol>
-<li><p>一种是，查到的100行结果里面有最新插入记录，而Redis的计数里还没加1；</p>
+<li>有时候一些运营类的查询语句会被放到备库上去查，设置为只读可以防止误操作；</li>
+<li>防止切换逻辑有bug，比如切换过程中出现双写，造成主备不一致；</li>
+<li>可以用readonly状态，来判断节点的角色。</li>
+</ol>
+<p>你可能会问，我把备库设置成只读了，还怎么跟主库保持同步更新呢？这个问题，你不用担心。</p>
+<p>因为readonly设置对超级(super)权限用户是无效的，而用于同步更新的线程，就拥有超级权限。</p>
+<p>接下来，我们再看看节点A到B这条线的内部流程是什么样的。</p>
+<p>图2中画出的就是一个update语句在节点A执行，然后同步到节点B的完整流程图。</p>
+<p>图2 主备流程图图2中，包含了我在上一篇文章中讲到的binlog和redo log的写入机制相关的内容，可以看到：主库接收到客户端的更新请求后，执行内部事务的更新逻辑，同时写binlog。</p>
+<p>备库B跟主库A之间维持了一个长连接。</p>
+<p>主库A内部有一个线程，专门用于服务备库B的这个长连接。</p>
+<p>一个事务日志同步的完整过程是这样的：</p>
+<ol>
+<li><p>在备库B上通过change master命令，设置主库A的IP、端口、用户名、密码，以及要从哪个位置开始请求binlog，这个位置包含文件名和日志偏移量。</p>
 </li>
-<li><p>另一种是，查到的100行结果里没有最新插入的记录，而Redis的计数里已经加了1。</p>
+<li><p>在备库B上执行start slave命令，这时候备库会启动两个线程，就是图中的io_thread和sql_thread。</p>
 </li>
 </ol>
-<p>这两种情况，都是逻辑不一致的。</p>
-<p>会话A是一个插入交易记录的逻辑，往数据表里插入一行R，然后Redis计数加1；会话B就是查询页面显示时需要的数据。</p>
-<p>在图2的这个时序里，在T3时刻会话B来查询的时候，会显示出新插入的R这个记录，但是Redis的计数还没加1。</p>
-<p>这时候，就会出现我们说的数据不一致。</p>
-<p>你一定会说，这是因为我们执行新增记录逻辑时候，是先写数据表，再改Redis计数。</p>
-<p>而读的时候是先读Redis，再读数据表，这个顺序是相反的。</p>
-<p>那么，如果保持顺序一样的话，是不是就没问题了？我们现在把会话A的更新顺序换一下，再看看执行结果。</p>
-<p>问题了？我们现在把会话A的更新顺序换一下，再看看执行结果。</p>
-<p>调整顺序后，会话B在T3时刻查询的时候，Redis计数加了1了，但还查不到新插入的R这一行，也是数据不一致的情况。</p>
-<p>在并发系统里面，我们是无法精确控制不同线程的执行时刻的，因为存在图中的这种操作序列，所以，我们说即使Redis正常工作，这个计数值还是逻辑上不精确的。</p>
-<h3 id="用数据库保存计数把这个计数直接放到数据库里单独的一张计数表C中，又会怎么样呢？首先，这解决了崩溃丢失的问题，InnoDB是支持崩溃恢复不丢数据的。"><a href="#用数据库保存计数把这个计数直接放到数据库里单独的一张计数表C中，又会怎么样呢？首先，这解决了崩溃丢失的问题，InnoDB是支持崩溃恢复不丢数据的。" class="headerlink" title="用数据库保存计数把这个计数直接放到数据库里单独的一张计数表C中，又会怎么样呢？首先，这解决了崩溃丢失的问题，InnoDB是支持崩溃恢复不丢数据的。"></a>用数据库保存计数把这个计数直接放到数据库里单独的一张计数表C中，又会怎么样呢？首先，这解决了崩溃丢失的问题，InnoDB是支持崩溃恢复不丢数据的。</h3><p>会话B的读操作仍然是在T3执行的，但是因为这时候更新事务还没有提交，所以计数值加1这个操作对会话B还不可见。</p>
-<p>还没有提交，所以计数值加1这个操作对会话B还不可见。</p>
-<p>因此，会话B看到的结果里， 查计数值和“最近100条记录”看到的结果，逻辑上就是一致的。</p>
-<h2 id="不同的count用法基于InnoDB引擎，count-、count-主键id-、count-字段-和count-1-等不同用法的性能，有哪些差别。"><a href="#不同的count用法基于InnoDB引擎，count-、count-主键id-、count-字段-和count-1-等不同用法的性能，有哪些差别。" class="headerlink" title="不同的count用法基于InnoDB引擎，count(*)、count(主键id)、count(字段)和count(1)等不同用法的性能，有哪些差别。"></a>不同的count用法基于InnoDB引擎，count(*)、count(主键id)、count(字段)和count(1)等不同用法的性能，有哪些差别。</h2><p>首先你要弄清楚count()的语义。</p>
-<p>count()是一个聚合函数，对于返回的结果集，一行行地判断，如果count函数的参数不是NULL，累计值就加1，否则不加。</p>
-<p>最后返回累计值。</p>
-<p>所以，count(*)、count(主键id)和count(1) 都表示返回满足条件的结果集的总行数；而count(字段），则表示返回满足条件的数据行里面，参数“字段”不为NULL的总个数。</p>
-<p>至于分析性能差别的时候，你可以记住这么几个原则：</p>
-<ol>
-<li><p>server层要什么就给什么；</p>
+<p>其中io_thread负责与主库建立连接。</p>
+<ol start="3">
+<li><p>主库A校验完用户名、密码后，开始按照备库B传过来的位置，从本地读取binlog，发给B。</p>
 </li>
-<li><p>InnoDB只给必要的值；</p>
+<li><p>备库B拿到binlog后，写到本地文件，称为中转日志（relay log）。</p>
 </li>
-<li><p>现在的优化器只优化了count(*)的语义为“取行数”，其他“显而易见”的优化并没有做。</p>
+<li><p>sql_thread读取中转日志，解析出日志里的命令，并执行。</p>
 </li>
 </ol>
-<p>这是什么意思呢？接下来，我们就一个个地来看看。</p>
-<p>这是什么意思呢？接下来，我们就一个个地来看看。</p>
-<p>对于count(主键id)来说，InnoDB引擎会遍历整张表，把每一行的id值都取出来，返回给server层。</p>
-<p>server层拿到id后，判断是不可能为空的，就按行累加。</p>
-<p>对于count(1)来说，InnoDB引擎遍历整张表，但不取值。</p>
-<p>server层对于返回的每一行，放一个数字“1”进去，判断是不可能为空的，按行累加。</p>
-<p>单看这两个用法的差别的话，你能对比出来，count(1)执行得要比count(主键id)快。</p>
-<p>因为从引擎返回id会涉及到解析数据行，以及拷贝字段值的操作。</p>
-<p>返回id会涉及到解析数据行，以及拷贝字段值的操作。</p>
-<p>对于count(字段)来说：</p>
+<p>这里需要说明，后来由于多线程复制方案的引入，sql_thread演化成为了多个线程，跟我们今天要介绍的原理没有直接关系，暂且不展开。</p>
+<p>分析完了这个长连接的逻辑，我们再来看一个问题：binlog里面到底是什么内容，为什么备库拿过去可以直接执行。</p>
+<p>binlog的三种格式对比我在第15篇答疑文章中，和你提到过binlog有两种格式，一种是statement，一种是row。</p>
+<p>可能你在其他资料上还会看到有第三种格式，叫作mixed，其实它就是前两种格式的混合。</p>
+<p>为了便于描述binlog的这三种格式间的区别，我创建了一个表，并初始化几行数据。</p>
+<p>如果要在表中删除一行数据的话，我们来看看这个delete语句的binlog是怎么记录的。</p>
+<p>注意，下面这个语句包含注释，如果你用MySQL客户端来做这个实验的话，要记得加-c参数，否则客户端会自动去掉注释。</p>
+<p>当binlog_format&#x3D;statement时，binlog里面记录的就是SQL语句的原文。</p>
+<p>你可以用mysql&gt; CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>a  ̀int(11) DEFAULT NULL,  t̀_modified  ̀timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  PRIMARY KEY (̀ id )̀,  KEY </code>a  ̀(̀ a )̀,  KEY t̀_modified (̀̀ t_modified )̀) ENGINE&#x3D;InnoDB;insert into t values(1,1,’2018-11-13’);insert into t values(2,2,’2018-11-12’);insert into t values(3,3,’2018-11-11’);insert into t values(4,4,’2018-11-10’);insert into t values(5,5,’2018-11-09’);mysql&gt; delete from t &#x2F;<em>comment</em>&#x2F;  where a&gt;&#x3D;4 and t_modified&lt;&#x3D;’2018-11-10’ limit 1;mysql&gt; show binlog events in ‘master.000001’;命令看binlog中的内容。</p>
+<p>图3 statement格式binlog 示例现在，我们来看一下图3的输出结果。</p>
+<p>第一行SET @@SESSION.GTID_NEXT&#x3D;’ANONYMOUS’你可以先忽略，后面文章我们会在介绍主备切换的时候再提到；<br>第二行是一个BEGIN，跟第四行的commit对应，表示中间是一个事务；<br>第三行就是真实执行的语句了。</p>
+<p>可以看到，在真实执行的delete命令之前，还有一个“use‘test’”命令。</p>
+<p>这条命令不是我们主动执行的，而是MySQL根据当前要操作的表所在的数据库，自行添加的。</p>
+<p>这样做可以保证日志传到备库去执行的时候，不论当前的工作线程在哪个库里，都能够正确地更新到test库的表t。</p>
+<p>use ‘test’命令之后的delete 语句，就是我们输入的SQL原文了。</p>
+<p>可以看到，binlog“忠实”地记录了SQL命令，甚至连注释也一并记录了。</p>
+<p>最后一行是一个COMMIT。</p>
+<p>你可以看到里面写着xid&#x3D;61。</p>
+<p>你还记得这个XID是做什么用的吗？如果记忆模糊了，可以再回顾一下第15篇文章中的相关内容。</p>
+<p>为了说明statement 和 row格式的区别，我们来看一下这条delete命令的执行效果图：<br>图4 delete执行warnings可以看到，运行这条delete命令产生了一个warning，原因是当前binlog设置的是statement格式，并且语句中有limit，所以这个命令可能是unsafe的。</p>
+<p>为什么这么说呢？这是因为delete 带limit，很可能会出现主备数据不一致的情况。</p>
+<p>比如上面这个例子：</p>
 <ol>
-<li><p>如果这个“字段”是定义为not null的话，一行行地从记录里面读出这个字段，判断不能为null，按行累加；</p>
+<li>如果delete语句使用的是索引a，那么会根据索引a找到第一个满足条件的行，也就是说删除的是a&#x3D;4这一行；</li>
+<li>但如果使用的是索引t_modified，那么删除的就是 t_modified&#x3D;’2018-11-09’也就是a&#x3D;5这一行。</li>
+</ol>
+<p>由于statement格式下，记录到binlog里的是语句原文，因此可能会出现这样一种情况：在主库执行这条SQL语句的时候，用的是索引a；而在备库执行这条SQL语句的时候，却使用了索引t_modified。</p>
+<p>因此，MySQL认为这样写是有风险的。</p>
+<p>那么，如果我把binlog的格式改为binlog_format&#x3D;‘row’， 是不是就没有这个问题了呢？我们先来看看这时候binog中的内容吧。</p>
+<p>图5 row格式binlog 示例可以看到，与statement格式的binlog相比，前后的BEGIN和COMMIT是一样的。</p>
+<p>但是，row格式的binlog里没有了SQL语句的原文，而是替换成了两个event：Table_map和Delete_rows。</p>
+<ol>
+<li>Table_map event，用于说明接下来要操作的表是test库的表t;2. Delete_rows event，用于定义删除的行为。</li>
+</ol>
+<p>其实，我们通过图5是看不到详细信息的，还需要借助mysqlbinlog工具，用下面这个命令解析和查看binlog中的内容。</p>
+<p>因为图5中的信息显示，这个事务的binlog是从8900这个位置开始的，所以可以用start-position参数来指定从这个位置的日志开始解析。</p>
+<p>mysqlbinlog  -vv data&#x2F;master.000001 –start-position&#x3D;8900;图6 row格式binlog 示例的详细信息从这个图中，我们可以看到以下几个信息：<br>server id 1，表示这个事务是在server_id&#x3D;1的这个库上执行的。</p>
+<p>每个event都有CRC32的值，这是因为我把参数binlog_checksum设置成了CRC32。</p>
+<p>Table_map event跟在图5中看到的相同，显示了接下来要打开的表，map到数字226。</p>
+<p>现在我们这条SQL语句只操作了一张表，如果要操作多张表呢？每个表都有一个对应的Table_mapevent、都会map到一个单独的数字，用于区分对不同表的操作。</p>
+<p>我们在mysqlbinlog的命令中，使用了-vv参数是为了把内容都解析出来，所以从结果里面可以看到各个字段的值（比如，@1&#x3D;4、 @2&#x3D;4这些值）。</p>
+<p>binlog_row_image的默认配置是FULL，因此Delete_event里面，包含了删掉的行的所有字段的值。</p>
+<p>如果把binlog_row_image设置为MINIMAL，则只会记录必要的信息，在这个例子里，就是只会记录id&#x3D;4这个信息。</p>
+<p>最后的Xid event，用于表示事务被正确地提交了。</p>
+<p>你可以看到，当binlog_format使用row格式的时候，binlog里面记录了真实删除行的主键id，这样binlog传到备库去的时候，就肯定会删除id&#x3D;4的行，不会有主备删除不同行的问题。</p>
+<p>为什么会有mixed格式的binlog？基于上面的信息，我们来讨论一个问题：为什么会有mixed这种binlog格式的存在场景？推论过程是这样的：<br>因为有些statement格式的binlog可能会导致主备不一致，所以要使用row格式。</p>
+<p>但row格式的缺点是，很占空间。</p>
+<p>比如你用一个delete语句删掉10万行数据，用statement的话就是一个SQL语句被记录到binlog中，占用几十个字节的空间。</p>
+<p>但如果用row格式的binlog，就要把这10万条记录都写到binlog中。</p>
+<p>这样做，不仅会占用更大的空间，同时写binlog也要耗费IO资源，影响执行速度。</p>
+<p>所以，MySQL就取了个折中方案，也就是有了mixed格式的binlog。</p>
+<p>mixed格式的意思是，MySQL自己会判断这条SQL语句是否可能引起主备不一致，如果有可能，就用row格式，否则就用statement格式。</p>
+<p>也就是说，mixed格式可以利用statment格式的优点，同时又避免了数据不一致的风险。</p>
+<p>因此，如果你的线上MySQL设置的binlog格式是statement的话，那基本上就可以认为这是一个不合理的设置。</p>
+<p>你至少应该把binlog的格式设置为mixed。</p>
+<p>比如我们这个例子，设置为mixed后，就会记录为row格式；而如果执行的语句去掉limit 1，就会记录为statement格式。</p>
+<p>当然我要说的是，现在越来越多的场景要求把MySQL的binlog格式设置成row。</p>
+<p>这么做的理由有很多，我来给你举一个可以直接看出来的好处：恢复数据。</p>
+<p>接下来，我们就分别从delete、insert和update这三种SQL语句的角度，来看看数据恢复的问题。</p>
+<p>通过图6你可以看出来，即使我执行的是delete语句，row格式的binlog也会把被删掉的行的整行信息保存起来。</p>
+<p>所以，如果你在执行完一条delete语句以后，发现删错数据了，可以直接把binlog中记录的delete语句转成insert，把被错删的数据插入回去就可以恢复了。</p>
+<p>如果你是执行错了insert语句呢？那就更直接了。</p>
+<p>row格式下，insert语句的binlog里会记录所有的字段信息，这些信息可以用来精确定位刚刚被插入的那一行。</p>
+<p>这时，你直接把insert语句转成delete语句，删除掉这被误插入的一行数据就可以了。</p>
+<p>如果执行的是update语句的话，binlog里面会记录修改前整行的数据和修改后的整行数据。</p>
+<p>所以，如果你误执行了update语句的话，只需要把这个event前后的两行信息对调一下，再去数据库里面执行，就能恢复这个更新操作了。</p>
+<p>其实，由delete、insert或者update语句导致的数据操作错误，需要恢复到操作之前状态的情况，也时有发生。</p>
+<p>MariaDB的Flashback工具就是基于上面介绍的原理来回滚数据的。</p>
+<p>虽然mixed格式的binlog现在已经用得不多了，但这里我还是要再借用一下mixed格式来说明一个问题，来看一下这条SQL语句：<br>如果我们把binlog格式设置为mixed，你觉得MySQL会把它记录为row格式还是statement格式呢？先不要着急说结果，我们一起来看一下这条语句执行的效果。</p>
+<p>图7 mixed格式和now()可以看到，MySQL用的居然是statement格式。</p>
+<p>你一定会奇怪，如果这个binlog过了1分钟才传给备库的话，那主备的数据不就不一致了吗？接下来，我们再用mysqlbinlog工具来看看：<br>mysql&gt; insert into t values(10,10, now());图8 TIMESTAMP 命令从图中的结果可以看到，原来binlog在记录event的时候，多记了一条命令：SETTIMESTAMP&#x3D;1546103491。</p>
+<p>它用 SET TIMESTAMP命令约定了接下来的now()函数的返回时间。</p>
+<p>因此，不论这个binlog是1分钟之后被备库执行，还是3天后用来恢复这个库的备份，这个insert语句插入的行，值都是固定的。</p>
+<p>也就是说，通过这条SET TIMESTAMP命令，MySQL就确保了主备数据的一致性。</p>
+<p>我之前看过有人在重放binlog数据的时候，是这么做的：用mysqlbinlog解析出日志，然后把里面的statement语句直接拷贝出来执行。</p>
+<p>你现在知道了，这个方法是有风险的。</p>
+<p>因为有些语句的执行结果是依赖于上下文命令的，直接执行的结果很可能是错误的。</p>
+<p>所以，用binlog来恢复数据的标准做法是，用 mysqlbinlog工具解析出来，然后把解析结果整个发给MySQL执行。</p>
+<p>类似下面的命令：<br>这个命令的意思是，将 master.000001 文件里面从第2738字节到第2973字节中间这段内容解析出来，放到MySQL去执行。</p>
+<p>循环复制问题通过上面对MySQL中binlog基本内容的理解，你现在可以知道，binlog的特性确保了在备库执行相同的binlog，可以得到与主库相同的状态。</p>
+<p>因此，我们可以认为正常情况下主备的数据是一致的。</p>
+<p>也就是说，图1中A、B两个节点的内容是一致的。</p>
+<p>其实，图1中我画的是M-S结构，但实际生产上使用比较多的是双M结构，也就是图9所示的主备切换流程。</p>
+<p>mysqlbinlog master.000001  –start-position&#x3D;2738 –stop-position&#x3D;2973 | mysql -h127.0.0.1 -P13000 -u$user -p$pwd;图 9 MySQL主备切换流程–双M结构对比图9和图1，你可以发现，双M结构和M-S结构，其实区别只是多了一条线，即：节点A和B之间总是互为主备关系。</p>
+<p>这样在切换的时候就不用再修改主备关系。</p>
+<p>但是，双M结构还有一个问题需要解决。</p>
+<p>业务逻辑在节点A上更新了一条语句，然后再把生成的binlog 发给节点B，节点B执行完这条更新语句后也会生成binlog。</p>
+<p>（我建议你把参数log_slave_updates设置为on，表示备库执行relay log后生成binlog）。</p>
+<p>那么，如果节点A同时是节点B的备库，相当于又把节点B新生成的binlog拿过来执行了一次，然后节点A和B间，会不断地循环执行这个更新语句，也就是循环复制了。</p>
+<p>这个要怎么解决呢？从上面的图6中可以看到，MySQL在binlog中记录了这个命令第一次执行时所在实例的serverid。</p>
+<p>因此，我们可以用下面的逻辑，来解决两个节点间的循环复制的问题：</p>
+<ol>
+<li>规定两个库的server id必须不同，如果相同，则它们之间不能设定为主备关系；</li>
+<li>一个备库接到binlog并在重放的过程中，生成与原binlog的server id相同的新的binlog；</li>
+<li>每个库在收到从自己的主库发过来的日志后，先判断server id，如果跟自己的相同，表示这个日志是自己生成的，就直接丢弃这个日志。</li>
+</ol>
+<p>按照这个逻辑，如果我们设置了双M结构，日志的执行流就会变成这样：</p>
+<ol>
+<li>从节点A更新的事务，binlog里面记的都是A的server id；</li>
+<li>传到节点B执行一次以后，节点B生成的binlog 的server id也是A的server id；</li>
+<li>再传回给节点A，A判断到这个server id与自己的相同，就不会再处理这个日志。</li>
+</ol>
+<p>所以，死循环在这里就断掉了。</p>
+<p>小结今天这篇文章，我给你介绍了MySQL binlog的格式和一些基本机制，是后面我要介绍的读写分离等系列文章的背景知识，希望你可以认真消化理解。</p>
+<p>binlog在MySQL的各种高可用方案上扮演了重要角色。</p>
+<p>今天介绍的可以说是所有MySQL高可用方案的基础。</p>
+<p>在这之上演化出了诸如多节点、半同步、MySQL group replication等相对复杂的方案。</p>
+<p>我也跟你介绍了MySQL不同格式binlog的优缺点，和设计者的思考。</p>
+<p>希望你在做系统开发时候，也能借鉴这些设计思想。</p>
+<p>最后，我给你留下一个思考题吧。</p>
+<p>说到循环复制问题的时候，我们说MySQL通过判断server id的方式，断掉死循环。</p>
+<p>但是，这个机制其实并不完备，在某些场景下，还是有可能出现死循环。</p>
+<p>你能构造出一个这样的场景吗？又应该怎么解决呢？你可以把你的设计和分析写在评论区，我会在下一篇文章跟你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期我留给你的问题是，你在什么时候会把线上生产库设置成“非双1”。</p>
+<p>我目前知道的场景，有以下这些：</p>
+<ol>
+<li>业务高峰期。</li>
+</ol>
+<p>一般如果有预知的高峰期，DBA会有预案，把主库设置成“非双1”。</p>
+<ol start="2">
+<li>备库延迟，为了让备库尽快赶上主库。</li>
+</ol>
+<p>@永恒记忆和@Second Sight提到了这个场景。</p>
+<ol start="3">
+<li><p>用备份恢复主库的副本，应用binlog的过程，这个跟上一种场景类似。</p>
 </li>
-<li><p>如果这个“字段”定义允许为null，那么执行的时候，判断到有可能是null，还要把值取出来再判断一下，不是null才累加。</p>
+<li><p>批量导入数据的时候。</p>
 </li>
 </ol>
-<p>也就是前面的第一条原则，server层要什么字段，InnoDB就返回什么字段。</p>
-<p>但是count(*)是例外，并不会把全部字段取出来，而是专门做了优化，不取值。</p>
-<p>count(*)肯定不是null，按行累加。</p>
-<p>看到这里，你一定会说，优化器就不能自己判断一下吗，主键id肯定非空啊，为什么不能按照count(*)来处理，多么简单的优化啊。</p>
-<p>当然，MySQL专门针对这个语句进行优化，也不是不可以。</p>
-<p>但是这种需要专门优化的情况太多了，而且MySQL已经优化过count(*)了，你直接使用这种用法就可以了。</p>
-<p>所以结论是：按照效率排序的话，count(字段)&lt;count(主键id)&lt;count(1)≈count(*)今天，我和你聊了聊MySQL中获得表行数的两种方法。</p>
-<p>我们提到了在不同引擎中count(*)的实现<br>把计数放在Redis里面，不能够保证计数和MySQL表里的数据精确一致的原因，是这两个不同的存储构成的系统，不支持分布式事务，无法拿到精确一致的视图。</p>
-<p>而把计数值也放在MySQL中，就解决了一致性视图的问题。</p>
-<p>InnoDB引擎支持事务，我们利用好事务的原子性和隔离性，就可以简化在业务开发时的逻辑。</p>
-<p>我们用事务来确保计数准确。</p>
-<p>由于事务可以保证中间结果不被别的事务读到，因此修改计数值和插入新记录的顺序是不影响逻辑结果的。</p>
-<p>但是，从并发系统性能的角度考虑，你觉得在这个事务序列里，应该先插入操作记录，还是应该先更新计数表呢？</p>
+<p>一般情况下，把生产库改成“非双1”配置，是设置innodb_flush_logs_at_trx_commit&#x3D;2、sync_binlog&#x3D;1000。</p>
 
       
     </div>
@@ -878,7 +1842,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/89a00def.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/4c5bdfaf.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -892,7 +1856,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/89a00def.html" class="post-title-link" itemprop="url">mysql-为什么表数据删掉一半，表文件大小不变</a>
+            <a href="/posts/4c5bdfaf.html" class="post-title-link" itemprop="url">mysql-MySQL是怎么保证数据不丢的</a>
         </h2>
 
         <div class="post-meta">
@@ -902,14 +1866,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-14 06:15:11" itemprop="dateCreated datePublished" datetime="2019-11-14T06:15:11+08:00">2019-11-14</time>
+              <time title="创建时间：2019-11-28 06:14:46" itemprop="dateCreated datePublished" datetime="2019-11-28T06:14:46+08:00">2019-11-28</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:46:13" itemprop="dateModified" datetime="2023-01-18T23:46:13+08:00">2023-01-18</time>
+                <time title="修改时间：2023-01-18 23:46:00" itemprop="dateModified" datetime="2023-01-18T23:46:00+08:00">2023-01-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -926,13 +1890,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>3.6k</span>
+              <span>4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>13 分钟</span>
+              <span>15 分钟</span>
             </span>
 
         </div>
@@ -944,138 +1908,150 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>为什么表数据删掉一半，表文件大小不变？经常会有同学来问我，我的数据库占用空间太大，我把一个最大的表删掉了一半的数据，怎么表文件的大小还是没变？那么今天，我就和你聊聊数据库表的空间回收，看看如何解决这个问题。</p>
-<p>这里，我们还是针对MySQL中应用最广泛的InnoDB引擎展开讨论。</p>
-<p>一个InnoDB表包含两部分，即：表结构定义和数据。</p>
-<p>在MySQL 8.0版本以前，表结构是存在以.frm为后缀的文件里。</p>
-<p>而MySQL 8.0版本，则已经允许把表结构定义放在系统数据表中了。</p>
-<p>因为表结构定义占用的空间很小，所以我们今天主要讨论的是表数据。</p>
-<p>接下来，我会先和你说明为什么简单地删除表数据达不到表空间回收的效果，然后再和你介绍正确回收空间的方法。</p>
-<p>参数innodb_file_per_table表数据既可以存在共享表空间里，也可以是单独的文件。</p>
-<p>这个行为是由参数innodb_file_per_table控制的：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>MySQL是怎么保证数据不丢的？今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。</p>
+<p>从文章标题“MySQL是怎么保证数据不丢的？”，你就可以看出来，今天我和你介绍的方法，跟数据的可靠性有关。</p>
+<p>在专栏前面文章和答疑篇中，我都着重介绍了WAL机制（你可以再回顾下第2篇、第9篇、第12篇和第15篇文章中的相关内容），得到的结论是：只要redo log和binlog保证持久化到磁盘，就能确保MySQL异常重启后，数据可以恢复。</p>
+<p>评论区有同学又继续追问，redo log的写入流程是怎么样的，如何保证redo log真实地写入了磁盘。</p>
+<p>那么今天，我们就再一起看看MySQL写入binlog和redo log的流程。</p>
+<p>binlog的写入机制其实，binlog的写入逻辑比较简单：事务执行过程中，先把日志写到binlog cache，事务提交的时候，再把binlog cache写到binlog文件中。</p>
+<p>一个事务的binlog是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。</p>
+<p>这就涉及到了binlog cache的保存问题。</p>
+<p>系统给binlog cache分配了一片内存，每个线程一个，参数 binlog_cache_size用于控制单个线程内binlog cache所占内存的大小。</p>
+<p>如果超过了这个参数规定的大小，就要暂存到磁盘。</p>
+<p>事务提交的时候，执行器把binlog cache里的完整事务写入到binlog中，并清空binlog cache。</p>
+<p>状态如图1所示。</p>
+<p>图1 binlog写盘状态可以看到，每个线程有自己binlog cache，但是共用同一份binlog文件。</p>
+<p>图中的write，指的就是指把日志写入到文件系统的page cache，并没有把数据持久化到磁盘，所以速度比较快。</p>
+<p>图中的fsync，才是将数据持久化到磁盘的操作。</p>
+<p>一般情况下，我们认为fsync才占磁盘的IOPS。</p>
+<p>write 和fsync的时机，是由参数sync_binlog控制的：</p>
 <ol>
-<li><p>这个参数设置为OFF表示的是，表的数据放在系统共享表空间，也就是跟数据字典放在一起；</p>
-</li>
-<li><p>这个参数设置为ON表示的是，每个InnoDB表数据存储在一个以 .ibd为后缀的文件中。</p>
-</li>
+<li>sync_binlog&#x3D;0的时候，表示每次提交事务都只write，不fsync；</li>
+<li>sync_binlog&#x3D;1的时候，表示每次提交事务都会执行fsync；</li>
+<li>sync_binlog&#x3D;N(N&gt;1)的时候，表示每次提交事务都write，但累积N个事务后才fsync。</li>
 </ol>
-<p>从MySQL 5.6.6版本开始，它的默认值就是ON了。</p>
-<p>我建议你不论使用MySQL的哪个版本，都将这个值设置为ON。</p>
-<p>因为，一个表单独存储为一个文件更容易管理，而且在你不需要这个表的时候，通过drop table命令，系统就会直接删除这个文件。</p>
-<p>而如果是放在共享表空间中，即使表删掉了，空间也是不会回收的。</p>
-<p>所以，将innodb_file_per_table设置为ON，是推荐做法，我们接下来的讨论都是基于这个设置展开的。</p>
-<p>我们在删除整个表的时候，可以使用drop table命令回收表空间。</p>
-<p>但是，我们遇到的更多的删除数据的场景是删除某些行，这时就遇到了我们文章开头的问题：表中的数据被删除了，但是表空间却没有被回收。</p>
-<p>我们要彻底搞明白这个问题的话，就要从数据删除流程说起了。</p>
-<p>数据删除流程我们先再来看一下InnoDB中一个索引的示意图。</p>
-<p>在前面第4和第5篇文章中，我和你介绍索引时曾经提到过，InnoDB里的数据都是用B+树的结构组织的。</p>
-<p>图1 B+树索引示意图假设，我们要删掉R4这个记录，InnoDB引擎只会把R4这个记录标记为删除。</p>
-<p>如果之后要再插入一个ID在300和600之间的记录时，可能会复用这个位置。</p>
-<p>但是，磁盘文件的大小并不会缩小。</p>
-<p>现在，你已经知道了InnoDB的数据是按页存储的，那么如果我们删掉了一个数据页上的所有记录，会怎么样？答案是，整个数据页就可以被复用了。</p>
-<p>但是，数据页的复用跟记录的复用是不同的。</p>
-<p>记录的复用，只限于符合范围条件的数据。</p>
-<p>比如上面的这个例子，R4这条记录被删除后，如果插入一个ID是400的行，可以直接复用这个空间。</p>
-<p>但如果插入的是一个ID是800的行，就不能复用这个位置了。</p>
-<p>而当整个页从B+树里面摘掉以后，可以复用到任何位置。</p>
-<p>以图1为例，如果将数据页page A上的所有记录删除以后，page A会被标记为可复用。</p>
-<p>这时候如果要插入一条ID&#x3D;50的记录需要使用新页的时候，page A是可以被复用的。</p>
-<p>如果相邻的两个数据页利用率都很小，系统就会把这两个页上的数据合到其中一个页上，另外一个数据页就被标记为可复用。</p>
-<p>进一步地，如果我们用delete命令把整个表的数据删除呢？结果就是，所有的数据页都会被标记为可复用。</p>
-<p>但是磁盘上，文件不会变小。</p>
-<p>你现在知道了，delete命令其实只是把记录的位置，或者数据页标记为了“可复用”，但磁盘文件的大小是不会变的。</p>
-<p>也就是说，通过delete命令是不能回收表空间的。</p>
-<p>这些可以复用，而没有被使用的空间，看起来就像是“空洞”。</p>
-<p>实际上，不止是删除数据会造成空洞，插入数据也会。</p>
-<p>如果数据是按照索引递增顺序插入的，那么索引是紧凑的。</p>
-<p>但如果数据是随机插入的，就可能造成索引的数据页分裂。</p>
-<p>假设图1中page A已经满了，这时我要再插入一行数据，会怎样呢？图2 插入数据导致页分裂可以看到，由于page A满了，再插入一个ID是550的数据时，就不得不再申请一个新的页面page B来保存数据了。</p>
-<p>页分裂完成后，page A的末尾就留下了空洞（注意：实际上，可能不止1个记录的位置是空洞）。</p>
-<p>另外，更新索引上的值，可以理解为删除一个旧的值，再插入一个新值。</p>
-<p>不难理解，这也是会造成空洞的。</p>
-<p>也就是说，经过大量增删改的表，都是可能是存在空洞的。</p>
-<p>所以，如果能够把这些空洞去掉，就能达到收缩表空间的目的。</p>
-<p>而重建表，就可以达到这样的目的。</p>
-<p>重建表试想一下，如果你现在有一个表A，需要做空间收缩，为了把表中存在的空洞去掉，你可以怎么做呢？你可以新建一个与表A结构相同的表B，然后按照主键ID递增的顺序，把数据一行一行地从表A里读出来再插入到表B中。</p>
-<p>由于表B是新建的表，所以表A主键索引上的空洞，在表B中就都不存在了。</p>
-<p>显然地，表B的主键索引更紧凑，数据页的利用率也更高。</p>
-<p>如果我们把表B作为临时表，数据从表A导入表B的操作完成后，用表B替换A，从效果上看，就起到了收缩表A空间的作用。</p>
-<p>这里，你可以使用alter table A engine&#x3D;InnoDB命令来重建表。</p>
-<p>在MySQL 5.5版本之前，这个命令的执行流程跟我们前面描述的差不多，区别只是这个临时表B不需要你自己创建，MySQL会自动完成转存数据、交换表名、删除旧表的操作。</p>
-<p>图3 改锁表DDL显然，花时间最多的步骤是往临时表插入数据的过程，如果在这个过程中，有新的数据要写入到表A的话，就会造成数据丢失。</p>
-<p>因此，在整个DDL过程中，表A中不能有更新。</p>
-<p>也就是说，这个DDL不是Online的。</p>
-<p>而在MySQL 5.6版本开始引入的Online DDL，对这个操作流程做了优化。</p>
-<p>我给你简单描述一下引入了Online DDL之后，重建表的流程：</p>
+<p>因此，在出现IO瓶颈的场景里，将sync_binlog设置成一个比较大的值，可以提升性能。</p>
+<p>在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成0，比较常见的是将其设置为100~1000中的某个数值。</p>
+<p>但是，将sync_binlog设置为N，对应的风险是：如果主机发生异常重启，会丢失最近N个事务的binlog日志。</p>
+<p>redo log的写入机制接下来，我们再说说redo log的写入机制。</p>
+<p>在专栏的第15篇答疑文章中，我给你介绍了redo log buffer。</p>
+<p>事务在执行过程中，生成的redolog是要先写到redo log buffer的。</p>
+<p>然后就有同学问了，redo log buffer里面的内容，是不是每次生成后都要直接持久化到磁盘呢？答案是，不需要。</p>
+<p>如果事务执行期间MySQL发生异常重启，那这部分日志就丢了。</p>
+<p>由于事务并没有提交，所以这时日志丢了也不会有损失。</p>
+<p>那么，另外一个问题是，事务还没提交的时候，redo log buffer中的部分日志有没有可能被持久化到磁盘呢？答案是，确实会有。</p>
+<p>这个问题，要从redo log可能存在的三种状态说起。</p>
+<p>这三种状态，对应的就是图2 中的三个颜色块。</p>
+<p>图2 MySQL redo log存储状态这三种状态分别是：</p>
 <ol>
-<li><p>建立一个临时文件，扫描表A主键的所有数据页；</p>
-</li>
-<li><p>用数据页中表A的记录生成B+树，存储到临时文件中；</p>
-</li>
-<li><p>生成临时文件的过程中，将所有对A的操作记录在一个日志文件（row log）中，对应的是图中state2的状态；</p>
-</li>
-<li><p>临时文件生成后，将日志文件中的操作应用到临时文件，得到一个逻辑数据上与表A相同的数据文件，对应的就是图中state3的状态；</p>
-</li>
-<li><p>用临时文件替换表A的数据文件。</p>
-</li>
+<li>存在redo log buffer中，物理上是在MySQL进程内存中，就是图中的红色部分；</li>
+<li>写到磁盘(write)，但是没有持久化（fsync)，物理上是在文件系统的page cache里面，也就是图中的黄色部分；</li>
+<li>持久化到磁盘，对应的是hard disk，也就是图中的绿色部分。</li>
 </ol>
-<p>图4 Online DDL可以看到，与图3过程的不同之处在于，由于日志文件记录和重放操作这个功能的存在，这个方案在重建表的过程中，允许对表A做增删改操作。</p>
-<p>这也就是Online DDL名字的来源。</p>
-<p>我记得有同学在第6篇讲表锁的文章《全局锁和表锁 ：给表加个字段怎么索这么多阻碍？》的评论区留言说，DDL之前是要拿MDL写锁的，这样还能叫Online DDL吗？确实，图4的流程中，alter语句在启动的时候需要获取MDL写锁，但是这个写锁在真正拷贝数据之前就退化成读锁了。</p>
-<p>为什么要退化呢？为了实现Online，MDL读锁不会阻塞增删改操作。</p>
-<p>那为什么不干脆直接解锁呢？为了保护自己，禁止其他线程对这个表同时做DDL。</p>
-<p>而对于一个大表来说，Online DDL最耗时的过程就是拷贝数据到临时表的过程，这个步骤的执行期间可以接受增删改操作。</p>
-<p>所以，相对于整个DDL过程来说，锁的时间非常短。</p>
-<p>对业务来说，就可以认为是Online的。</p>
-<p>需要补充说明的是，上述的这些重建方法都会扫描原表数据和构建临时文件。</p>
-<p>对于很大的表来说，这个操作是很消耗IO和CPU资源的。</p>
-<p>因此，如果是线上服务，你要很小心地控制操作时间。</p>
-<p>如果想要比较安全的操作的话，我推荐你使用GitHub开源的gh-ost来做。</p>
-<p>Online 和 inplace说到Online，我还要再和你澄清一下它和另一个跟DDL有关的、容易混淆的概念inplace的区别。</p>
-<p>你可能注意到了，在图3中，我们把表A中的数据导出来的存放位置叫作tmp_table。</p>
-<p>这是一个临时表，是在server层创建的。</p>
-<p>在图4中，根据表A重建出来的数据是放在“tmp_file”里的，这个临时文件是InnoDB在内部创建出来的。</p>
-<p>整个DDL过程都在InnoDB内部完成。</p>
-<p>对于server层来说，没有把数据挪动到临时表，是一个“原地”操作，这就是“inplace”名称的来源。</p>
-<p>所以，我现在问你，如果你有一个1TB的表，现在磁盘间是1.2TB，能不能做一个inplace的DDL呢？答案是不能。</p>
-<p>因为，tmp_file也是要占用临时空间的。</p>
-<p>我们重建表的这个语句alter table t engine&#x3D;InnoDB，其实隐含的意思是：</p>
-<p>跟inplace对应的就是拷贝表的方式了，用法是：</p>
-<p>当你使用ALGORITHM&#x3D;copy的时候，表示的是强制拷贝表，对应的流程就是图3的操作过程。</p>
-<p>但我这样说你可能会觉得，inplace跟Online是不是就是一个意思？其实不是的，只是在重建表这个逻辑中刚好是这样而已。</p>
-<p>比如，如果我要给InnoDB表的一个字段加全文索引，写法是：</p>
-<p>这个过程是inplace的，但会阻塞增删改操作，是非Online的。</p>
-<p>如果说这两个逻辑之间的关系是什么的话，可以概括为：</p>
+<p>日志写到redo log buffer是很快的，wirte到page cache也差不多，但是持久化到磁盘的速度就慢多了。</p>
+<p>为了控制redo log的写入策略，InnoDB提供了innodb_flush_log_at_trx_commit参数，它有三种可能取值：</p>
 <ol>
-<li>DDL过程如果是Online的，就一定是inplace的；</li>
+<li>设置为0的时候，表示每次事务提交时都只是把redo log留在redo log buffer中;2. 设置为1的时候，表示每次事务提交时都将redo log直接持久化到磁盘；</li>
+<li>设置为2的时候，表示每次事务提交时都只是把redo log写到page cache。</li>
 </ol>
-<p>alter table t engine&#x3D;innodb,ALGORITHM&#x3D;inplace;alter table t engine&#x3D;innodb,ALGORITHM&#x3D;copy;alter table t add FULLTEXT(field_name);2. 反过来未必，也就是说inplace的DDL，有可能不是Online的。</p>
-<p>截止到MySQL 8.0，添加全文索引（FULLTEXT index）和空间索引(SPATIAL index)就属于这种情况。</p>
-<p>最后，我们再延伸一下。</p>
-<p>在第10篇文章《MySQL为什么有时候会选错索引》的评论区中，有同学问到使用optimizetable、analyze table和alter table这三种方式重建表的区别。</p>
-<p>这里，我顺便再简单和你解释一下。</p>
-<p>从MySQL 5.6版本开始，alter table t engine &#x3D; InnoDB（也就是recreate）默认的就是上面图4的流程了；</p>
-<p>analyze table t 其实不是重建表，只是对表的索引信息做重新统计，没有修改数据，这个过程中加了MDL读锁；</p>
-<p>optimize table t 等于recreate+analyze。</p>
-<p>小结今天这篇文章，我和你讨论了数据库中收缩表空间的方法。</p>
-<p>现在你已经知道了，如果要收缩一个表，只是delete掉表里面不用的数据的话，表文件的大小是不会变的，你还要通过alter table命令重建表，才能达到表文件变小的目的。</p>
-<p>我跟你介绍了重建表的两种实现方式，Online DDL的方式是可以考虑在业务低峰期使用的，而MySQL 5.5及之前的版本，这个命令是会阻塞DML的，这个你需要特别小心。</p>
-<p>最后，又到了我们的课后问题时间。</p>
-<p>假设现在有人碰到了一个“想要收缩表空间，结果适得其反”的情况，看上去是这样的：</p>
+<p>InnoDB有一个后台线程，每隔1秒，就会把redo log buffer中的日志，调用write写到文件系统的page cache，然后调用fsync持久化到磁盘。</p>
+<p>注意，事务执行中间过程的redo log也是直接写在redo log buffer中的，这些redo log也会被后台线程一起持久化到磁盘。</p>
+<p>也就是说，一个没有提交的事务的redo log，也是可能已经持久化到磁盘的。</p>
+<p>实际上，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的redolog写入到磁盘中。</p>
 <ol>
-<li><p>一个表t文件大小为1TB；</p>
-</li>
-<li><p>对这个表执行 alter table t engine&#x3D;InnoDB；</p>
-</li>
-<li><p>发现执行完成后，空间不仅没变小，还稍微大了一点儿，比如变成了1.01TB。</p>
-</li>
+<li>一种是，redo log buffer占用的空间即将达到 innodb_log_buffer_size一半的时候，后台线程会主动写盘。</li>
 </ol>
-<p>你觉得可能是什么原因呢 ？你可以把你觉得可能的原因写在留言区里，我会在下一篇文章的末尾把大家描述的合理的原因都列出来，以后其他同学就不用掉到这样的坑里了。</p>
+<p>注意，由于这个事务并没有提交，所以这个写盘动作只是write，而没有调用fsync，也就是只留在了文件系统的page cache。</p>
+<ol start="2">
+<li>另一种是，并行的事务提交的时候，顺带将这个事务的redo log buffer持久化到磁盘。</li>
+</ol>
+<p>假设一个事务A执行到一半，已经写了一些redo log到buffer中，这时候有另外一个线程的事务B提交，如果innodb_flush_log_at_trx_commit设置的是1，那么按照这个参数的逻辑，事务B要把redo log buffer里的日志全部持久化到磁盘。</p>
+<p>这时候，就会带上事务A在redolog buffer里的日志一起持久化到磁盘。</p>
+<p>这里需要说明的是，我们介绍两阶段提交的时候说过，时序上redo log先prepare， 再写binlog，最后再把redo log commit。</p>
+<p>如果把innodb_flush_log_at_trx_commit设置成1，那么redo log在prepare阶段就要持久化一次，因为有一个崩溃恢复逻辑是要依赖于prepare 的redo log，再加上binlog来恢复的。</p>
+<p>（如果你印象有点儿模糊了，可以再回顾下第15篇文章中的相关内容）。</p>
+<p>每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB就认为redo log在commit的时候就不需要fsync了，只会write到文件系统的page cache中就够了。</p>
+<p>通常我们说MySQL的“双1”配置，指的就是sync_binlog和innodb_flush_log_at_trx_commit都设置成 1。</p>
+<p>也就是说，一个事务完整提交前，需要等待两次刷盘，一次是redo log（prepare 阶段），一次是binlog。</p>
+<p>这时候，你可能有一个疑问，这意味着我从MySQL看到的TPS是每秒两万的话，每秒就会写四万次磁盘。</p>
+<p>但是，我用工具测试出来，磁盘能力也就两万左右，怎么能实现两万的TPS？解释这个问题，就要用到组提交（group commit）机制了。</p>
+<p>这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。</p>
+<p>LSN是单调递增的，用来对应redo log的一个个写入点。</p>
+<p>每次写入长度为length的redo log， LSN的值就会加上length。</p>
+<p>LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行重复的redo log。</p>
+<p>关于LSN和redo log、checkpoint的关系，我会在后面的文章中详细展开。</p>
+<p>如图3所示，是三个并发事务(trx1, trx2, trx3)在prepare 阶段，都写完redo log buffer，持久化到磁盘的过程，对应的LSN分别是50、120 和160。</p>
+<p>图3 redo log 组提交从图中可以看到，1. trx1是第一个到达的，会被选为这组的 leader；<br>2. 等trx1要开始写盘的时候，这个组里面已经有了三个事务，这时候LSN也变成了160；<br>3. trx1去写盘的时候，带的就是LSN&#x3D;160，因此等trx1返回时，所有LSN小于等于160的redolog，都已经被持久化到磁盘；<br>4. 这时候trx2和trx3就可以直接返回了。</p>
+<p>所以，一次组提交里面，组员越多，节约磁盘IOPS的效果越好。</p>
+<p>但如果只有单线程压测，那就只能老老实实地一个事务对应一次持久化操作了。</p>
+<p>在并发更新场景下，第一个事务写完redo log buffer以后，接下来这个fsync越晚调用，组员可能越多，节约IOPS的效果就越好。</p>
+<p>为了让一次fsync带的组员更多，MySQL有一个很有趣的优化：拖时间。</p>
+<p>在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。</p>
+<p>图4 两阶段提交图中，我把“写binlog”当成一个动作。</p>
+<p>但实际上，写binlog是分成两步的：</p>
+<ol>
+<li>先把binlog从binlog cache中写到磁盘上的binlog文件；</li>
+<li>调用fsync持久化。</li>
+</ol>
+<p>MySQL为了让组提交的效果更好，把redo log做fsync的时间拖到了步骤1之后。</p>
+<p>也就是说，上面的图变成了这样：<br>图5 两阶段提交细化这么一来，binlog也可以组提交了。</p>
+<p>在执行图5中第4步把binlog fsync到磁盘时，如果有多个事务的binlog已经写完了，也是一起持久化的，这样也可以减少IOPS的消耗。</p>
+<p>不过通常情况下第3步执行得会很快，所以binlog的write和fsync间的间隔时间短，导致能集合到一起持久化的binlog比较少，因此binlog的组提交的效果通常不如redo log的效果那么好。</p>
+<p>如果你想提升binlog组提交的效果，可以通过设置 binlog_group_commit_sync_delay 和binlog_group_commit_sync_no_delay_count来实现。</p>
+<ol>
+<li>binlog_group_commit_sync_delay参数，表示延迟多少微秒后才调用fsync;2. binlog_group_commit_sync_no_delay_count参数，表示累积多少次以后才调用fsync。</li>
+</ol>
+<p>这两个条件是或的关系，也就是说只要有一个满足条件就会调用fsync。</p>
+<p>所以，当binlog_group_commit_sync_delay设置为0的时候，binlog_group_commit_sync_no_delay_count也无效了。</p>
+<p>之前有同学在评论区问到，WAL机制是减少磁盘写，可是每次提交事务都要写redo log和binlog，这磁盘读写次数也没变少呀？现在你就能理解了，WAL机制主要得益于两个方面：</p>
+<ol>
+<li>redo log 和 binlog都是顺序写，磁盘的顺序写比随机写速度要快；</li>
+<li>组提交机制，可以大幅度降低磁盘的IOPS消耗。</li>
+</ol>
+<p>分析到这里，我们再来回答这个问题：如果你的MySQL现在出现了性能瓶颈，而且瓶颈在IO上，可以通过哪些方法来提升性能呢？针对这个问题，可以考虑以下三种方法：</p>
+<ol>
+<li>设置 binlog_group_commit_sync_delay 和 binlog_group_commit_sync_no_delay_count参数，减少binlog的写盘次数。</li>
+</ol>
+<p>这个方法是基于“额外的故意等待”来实现的，因此可能会增加语句的响应时间，但没有丢失数据的风险。</p>
+<ol start="2">
+<li>将sync_binlog 设置为大于1的值（比较常见是100~1000）。</li>
+</ol>
+<p>这样做的风险是，主机掉电时会丢binlog日志。</p>
+<ol start="3">
+<li>将innodb_flush_log_at_trx_commit设置为2。</li>
+</ol>
+<p>这样做的风险是，主机掉电的时候会丢数据。</p>
+<p>我不建议你把innodb_flush_log_at_trx_commit 设置成0。</p>
+<p>因为把这个参数设置成0，表示redolog只保存在内存中，这样的话MySQL本身异常重启也会丢数据，风险太大。</p>
+<p>而redo log写到文件系统的page cache的速度也是很快的，所以将这个参数设置成2跟设置成0其实性能差不多，但这样做MySQL异常重启时就不会丢数据了，相比之下风险会更小。</p>
+<p>小结在专栏的第2篇和第15篇文章中，我和你分析了，如果redo log和binlog是完整的，MySQL是如何保证crash-safe的。</p>
+<p>今天这篇文章，我着重和你介绍的是MySQL是“怎么保证redo log和binlog是完整的”。</p>
+<p>希望这三篇文章串起来的内容，能够让你对crash-safe这个概念有更清晰的理解。</p>
+<p>之前的第15篇答疑文章发布之后，有同学继续留言问到了一些跟日志相关的问题，这里为了方便你回顾、学习，我再集中回答一次这些问题。</p>
+<p>问题1：执行一个update语句以后，我再去执行hexdump命令直接查看ibd文件内容，为什么没有看到数据有改变呢？回答：这可能是因为WAL机制的原因。</p>
+<p>update语句执行完成后，InnoDB只保证写完了redolog、内存，可能还没来得及将数据写到磁盘。</p>
+<p>问题2：为什么binlog cache是每个线程自己维护的，而redo log buffer是全局共用的？回答：MySQL这么设计的主要原因是，binlog是不能“被打断的”。</p>
+<p>一个事务的binlog必须连续写，因此要整个事务完成后，再一起写到文件里。</p>
+<p>而redo log并没有这个要求，中间有生成的日志可以写到redo log buffer中。</p>
+<p>redo log buffer中的内容还能“搭便车”，其他事务提交的时候可以被一起写到磁盘中。</p>
+<p>问题3：事务执行期间，还没到提交阶段，如果发生crash的话，redo log肯定丢了，这会不会导致主备不一致呢？回答：不会。</p>
+<p>因为这时候binlog 也还在binlog cache里，没发给备库。</p>
+<p>crash以后redo log和binlog都没有了，从业务角度看这个事务也没有提交，所以数据是一致的。</p>
+<p>问题4：如果binlog写完盘以后发生crash，这时候还没给客户端答复就重启了。</p>
+<p>等客户端再重连进来，发现事务已经提交成功了，这是不是bug？回答：不是。</p>
+<p>你可以设想一下更极端的情况，整个事务都提交成功了，redo log commit完成了，备库也收到binlog并执行了。</p>
+<p>但是主库和客户端网络断开了，导致事务成功的包返回不回去，这时候客户端也会收到“网络断开”的异常。</p>
+<p>这种也只能算是事务成功的，不能认为是bug。</p>
+<p>实际上数据库的crash-safe保证的是：</p>
+<ol>
+<li>如果客户端收到事务成功的消息，事务就一定持久化了；</li>
+<li>如果客户端收到事务失败（比如主键冲突、回滚等）的消息，事务就一定失败了；</li>
+<li>如果客户端收到“执行异常”的消息，应用需要重连后通过查询当前状态来继续后续的逻辑。</li>
+</ol>
+<p>此时数据库只需要保证内部（数据和日志之间，主库和备库之间）一致就可以了。</p>
+<p>最后，又到了课后问题时间。</p>
+<p>今天我留给你的思考题是：你的生产库设置的是“双1”吗？ 如果平时是的话，你有在什么场景下改成过“非双1”吗？你的这个操作又是基于什么决定的？另外，我们都知道这些设置可能有损，如果发生了异常，你的止损方案是什么？你可以把你的理解或者经验写在留言区，我会在下一篇文章的末尾选取有趣的评论和你一起分享和分析。</p>
 <p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间在上期文章最后，我留给你的问题是，如果一个高配的机器，redo log设置太小，会发生什么情况。</p>
-<p>每次事务提交都要写redo log，如果设置太小，很快就会被写满，也就是下面这个图的状态，这个“环”将很快被写满，write pos一直追着CP。</p>
-<p>这时候系统不得不停止所有更新，去推进checkpoint。</p>
-<p>这时，你看到的现象就是磁盘压力很小，但是数据库出现间歇性的性能下跌。</p>
 
       
     </div>
@@ -1095,7 +2071,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a5f547a0.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/84d0671b.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1109,7 +2085,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/a5f547a0.html" class="post-title-link" itemprop="url">mysql-为什么我的MySQL会“抖”一下</a>
+            <a href="/posts/84d0671b.html" class="post-title-link" itemprop="url">mysql-MySQL有提高性能的冷门方法</a>
         </h2>
 
         <div class="post-meta">
@@ -1119,7 +2095,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-13 06:01:45" itemprop="dateCreated datePublished" datetime="2019-11-13T06:01:45+08:00">2019-11-13</time>
+              <time title="创建时间：2019-11-27 06:11:42" itemprop="dateCreated datePublished" datetime="2019-11-27T06:11:42+08:00">2019-11-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -1161,329 +2137,157 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>为什么我的MySQL会“抖”一下平时的工作中，不知道你有没有遇到过这样的场景，一条SQL语句，正常执行的时候特别快，但是有时也不知道怎么回事，它就会变得特别慢，并且这样的场景很难复现，它不只随机，而且持续时间还很短。</p>
-<p>看上去，这就像是数据库“抖”了一下。</p>
-<p>今天，我们就一起来看一看这是什么原因。</p>
-<p>你的SQL语句为什么变“慢”了在前面第2篇文章《日志系统：一条SQL更新语句是如何执行的？》中，我为你介绍了WAL机制。</p>
-<p>现在你知道了，InnoDB在处理更新语句的时候，只做了写日志这一个磁盘操作。</p>
-<p>这个日志叫作redo log（重做日志），也就是《孔乙己》里咸亨酒店掌柜用来记账的粉板，在更新内存写完redo log后，就返回给客户端，本次更新成功。</p>
-<p>做下类比的话，掌柜记账的账本是数据文件，记账用的粉板是日志文件（redo log），掌柜的记忆就是内存。</p>
-<p>掌柜总要找时间把账本更新一下，这对应的就是把内存里的数据写入磁盘的过程，术语就是flush。</p>
-<p>在这个flush操作执行之前，孔乙己的赊账总额，其实跟掌柜手中账本里面的记录是不一致的。</p>
-<p>因为孔乙己今天的赊账金额还只在粉板上，而账本里的记录是老的，还没把今天的赊账算进去。</p>
-<p>当内存数据页跟磁盘数据页内容不一致的时候，我们称这个内存页为“脏页”。</p>
-<p>内存数据写入到磁盘后，内存和磁盘上的数据页的内容就一致了，称为“干净页”。</p>
-<p>不论是脏页还是干净页，都在内存中。</p>
-<p>在这个例子里，内存对应的就是掌柜的记忆。</p>
-<p>接下来，我们用一个示意图来展示一下“孔乙己赊账”的整个操作过程。</p>
-<p>假设原来孔乙己欠账10文，这次又要赊9文。</p>
-<p>图1 “孔乙己赊账”更新和flush过程回到文章开头的问题，你不难想象，平时执行很快的更新操作，其实就是在写内存和日志，而MySQL偶尔“抖”一下的那个瞬间，可能就是在刷脏页（flush）。</p>
-<p>那么，什么情况会引发数据库的flush过程呢？我们还是继续用咸亨酒店掌柜的这个例子，想一想：掌柜在什么情况下会把粉板上的赊账记录改到账本上？第一种场景是，粉板满了，记不下了。</p>
-<p>这时候如果再有人来赊账，掌柜就只得放下手里的活儿，将粉板上的记录擦掉一些，留出空位以便继续记账。</p>
-<p>当然在擦掉之前，他必须先将正确的账目记录到账本中才行。</p>
-<p>这个场景，对应的就是InnoDB的redo log写满了。</p>
-<p>这时候系统会停止所有更新操作，把checkpoint往前推进，redo log留出空间可以继续写。</p>
-<p>我在第二讲画了一个redo log的示意图，这里我改成环形，便于大家理解。</p>
-<p>图2 redo log状态图checkpoint可不是随便往前修改一下位置就可以的。</p>
-<p>比如图2中，把checkpoint位置从CP推进到CP’，就需要将两个点之间的日志（浅绿色部分），对应的所有脏页都flush到磁盘上。</p>
-<p>之后，图中从write pos到CP’之间就是可以再写入的redo log的区域。</p>
-<p>第二种场景是，这一天生意太好，要记住的事情太多，掌柜发现自己快记不住了，赶紧找出账本把孔乙己这笔账先加进去。</p>
-<p>这种场景，对应的就是系统内存不足。</p>
-<p>当需要新的内存页，而内存不够用的时候，就要淘汰一些数据页，空出内存给别的数据页使用。</p>
-<p>如果淘汰的是“脏页”，就要先将脏页写到磁盘。</p>
-<p>你一定会说，这时候难道不能直接把内存淘汰掉，下次需要请求的时候，从磁盘读入数据页，然后拿redo log出来应用不就行了？这里其实是从性能考虑的。</p>
-<p>如果刷脏页一定会写盘，就保证了每个数据页有两种状态：</p>
-<p>一种是内存里存在，内存里就肯定是正确的结果，直接返回；</p>
-<p>另一种是内存里没有数据，就可以肯定数据文件上是正确的结果，读入内存后返回。</p>
-<p>这样的效率最高。</p>
-<p>第三种场景是，生意不忙的时候，或者打烊之后。</p>
-<p>这时候柜台没事，掌柜闲着也是闲着，不如更新账本。</p>
-<p>这种场景，对应的就是MySQL认为系统“空闲”的时候。</p>
-<p>当然，MySQL“这家酒店”的生意好起来可是会很快就能把粉板记满的，所以“掌柜”要合理地安排时间，即使是“生意好”的时候，也要见缝插针地找时间，只要有机会就刷一点“脏页”。</p>
-<p>第四种场景是，年底了咸亨酒店要关门几天，需要把账结清一下。</p>
-<p>这时候掌柜要把所有账都记到账本上，这样过完年重新开张的时候，就能就着账本明确账目情况了。</p>
-<p>这种场景，对应的就是MySQL正常关闭的情况。</p>
-<p>这时候，MySQL会把内存的脏页都flush到磁盘上，这样下次MySQL启动的时候，就可以直接从磁盘上读数据，启动速度会很快。</p>
-<p>接下来，你可以分析一下上面四种场景对性能的影响。</p>
-<p>其中，第三种情况是属于MySQL空闲时的操作，这时系统没什么压力，而第四种场景是数据库本来就要关闭了。</p>
-<p>这两种情况下，你不会太关注“性能”问题。</p>
-<p>所以这里，我们主要来分析一下前两种场景下的性能问题。</p>
-<p>第一种是“redo log写满了，要flush脏页”，这种情况是InnoDB要尽量避免的。</p>
-<p>因为出现这种情况的时候，整个系统就不能再接受更新了，所有的更新都必须堵住。</p>
-<p>如果你从监控上看，这时候更新数会跌为0。</p>
-<p>第二种是“内存不够用了，要先将脏页写到磁盘”，这种情况其实是常态。</p>
-<p>InnoDB用缓冲池（buffer pool）管理内存，缓冲池中的内存页有三种状态：</p>
-<p>第一种是，还没有使用的；</p>
-<p>第二种是，使用了并且是干净页；</p>
-<p>第三种是，使用了并且是脏页。</p>
-<p>InnoDB的策略是尽量使用内存，因此对于一个长时间运行的库来说，未被使用的页面很少。</p>
-<p>而当要读入的数据页没有在内存的时候，就必须到缓冲池中申请一个数据页。</p>
-<p>这时候只能把最久不使用的数据页从内存中淘汰掉：如果要淘汰的是一个干净页，就直接释放出来复用；但如果是脏页呢，就必须将脏页先刷到磁盘，变成干净页后才能复用。</p>
-<p>所以，刷脏页虽然是常态，但是出现以下这两种情况，都是会明显影响性能的：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>MySQL有哪些“饮鸩止渴”提高性能的方法？不知道你在实际运维过程中有没有碰到这样的情景：业务高峰期，生产环境的MySQL压力太大，没法正常响应，需要短期内、临时性地提升一些性能。</p>
+<p>我以前做业务护航的时候，就偶尔会碰上这种场景。</p>
+<p>用户的开发负责人说，不管你用什么方案，让业务先跑起来再说。</p>
+<p>但，如果是无损方案的话，肯定不需要等到这个时候才上场。</p>
+<p>今天我们就来聊聊这些临时方案，并着重说一说它们可能存在的风险。</p>
+<p>短连接风暴正常的短连接模式就是连接到数据库后，执行很少的SQL语句就断开，下次需要的时候再重连。</p>
+<p>如果使用的是短连接，在业务高峰期的时候，就可能出现连接数突然暴涨的情况。</p>
+<p>我在第1篇文章《基础架构：一条SQL查询语句是如何执行的？》中说过，MySQL建立连接的过程，成本是很高的。</p>
+<p>除了正常的网络连接三次握手外，还需要做登录权限判断和获得这个连接的数据读写权限。</p>
+<p>在数据库压力比较小的时候，这些额外的成本并不明显。</p>
+<p>但是，短连接模型存在一个风险，就是一旦数据库处理得慢一些，连接数就会暴涨。</p>
+<p>max_connections参数，用来控制一个MySQL实例同时存在的连接数的上限，超过这个值，系统就会拒绝接下来的连接请求，并报错提示“Too many connections”。</p>
+<p>对于被拒绝连接的请求来说，从业务角度看就是数据库不可用。</p>
+<p>在机器负载比较高的时候，处理现有请求的时间变长，每个连接保持的时间也更长。</p>
+<p>这时，再有新建连接的话，就可能会超过max_connections的限制。</p>
+<p>碰到这种情况时，一个比较自然的想法，就是调高max_connections的值。</p>
+<p>但这样做是有风险的。</p>
+<p>因为设计max_connections这个参数的目的是想保护MySQL，如果我们把它改得太大，让更多的连接都可以进来，那么系统的负载可能会进一步加大，大量的资源耗费在权限验证等逻辑上，结果可能是适得其反，已经连接的线程拿不到CPU资源去执行业务的SQL请求。</p>
+<p>那么这种情况下，你还有没有别的建议呢？我这里还有两种方法，但要注意，这些方法都是有损的。</p>
+<p>第一种方法：先处理掉那些占着连接但是不工作的线程。</p>
+<p>max_connections的计算，不是看谁在running，是只要连着就占用一个计数位置。</p>
+<p>对于那些不需要保持的连接，我们可以通过kill connection主动踢掉。</p>
+<p>这个行为跟事先设置wait_timeout的效果是一样的。</p>
+<p>设置wait_timeout参数表示的是，一个线程空闲wait_timeout这么多秒之后，就会被MySQL直接断开连接。</p>
+<p>但是需要注意，在show processlist的结果里，踢掉显示为sleep的线程，可能是有损的。</p>
+<p>我们来看下面这个例子。</p>
+<p>图1 sleep线程的两种状态在上面这个例子里，如果断开session A的连接，因为这时候session A还没有提交，所以MySQL只能按照回滚事务来处理；而断开session B的连接，就没什么大影响。</p>
+<p>所以，如果按照优先级来说，你应该优先断开像session B这样的事务外空闲的连接。</p>
+<p>但是，怎么判断哪些是事务外空闲的呢？session C在T时刻之后的30秒执行show processlist，看到的结果是这样的。</p>
+<p>图2 sleep线程的两种状态，show processlist结果图中id&#x3D;4和id&#x3D;5的两个会话都是Sleep 状态。</p>
+<p>而要看事务具体状态的话，你可以查information_schema库的innodb_trx表。</p>
+<p>图3 从information_schema.innodb_trx查询事务状态这个结果里，trx_mysql_thread_id&#x3D;4，表示id&#x3D;4的线程还处在事务中。</p>
+<p>因此，如果是连接数过多，你可以优先断开事务外空闲太久的连接；如果这样还不够，再考虑断开事务内空闲太久的连接。</p>
+<p>从服务端断开连接使用的是kill connection + id的命令， 一个客户端处于sleep状态时，它的连接被服务端主动断开后，这个客户端并不会马上知道。</p>
+<p>直到客户端在发起下一个请求的时候，才会收到这样的报错“ERROR 2013 (HY000): Lost connection to MySQL server during query”。</p>
+<p>从数据库端主动断开连接可能是有损的，尤其是有的应用端收到这个错误后，不重新连接，而是直接用这个已经不能用的句柄重试查询。</p>
+<p>这会导致从应用端看上去，“MySQL一直没恢复”。</p>
+<p>你可能觉得这是一个冷笑话，但实际上我碰到过不下10次。</p>
+<p>所以，如果你是一个支持业务的DBA，不要假设所有的应用代码都会被正确地处理。</p>
+<p>即使只是一个断开连接的操作，也要确保通知到业务开发团队。</p>
+<p>第二种方法：减少连接过程的消耗。</p>
+<p>有的业务代码会在短时间内先大量申请数据库连接做备用，如果现在数据库确认是被连接行为打挂了，那么一种可能的做法，是让数据库跳过权限验证阶段。</p>
+<p>跳过权限验证的方法是：重启数据库，并使用–skip-grant-tables参数启动。</p>
+<p>这样，整个MySQL会跳过所有的权限验证阶段，包括连接过程和语句执行过程在内。</p>
+<p>但是，这种方法特别符合我们标题里说的“饮鸩止渴”，风险极高，是我特别不建议使用的方案。</p>
+<p>尤其你的库外网可访问的话，就更不能这么做了。</p>
+<p>在MySQL 8.0版本里，如果你启用–skip-grant-tables参数，MySQL会默认把 –skip-networking参数打开，表示这时候数据库只能被本地的客户端连接。</p>
+<p>可见，MySQL官方对skip-grant-tables这个参数的安全问题也很重视。</p>
+<p>除了短连接数暴增可能会带来性能问题外，实际上，我们在线上碰到更多的是查询或者更新语句导致的性能问题。</p>
+<p>其中，查询问题比较典型的有两类，一类是由新出现的慢查询导致的，一类是由QPS（每秒查询数）突增导致的。</p>
+<p>而关于更新语句导致的性能问题，我会在下一篇文章和你展开说明。</p>
+<p>慢查询性能问题在MySQL中，会引发性能问题的慢查询，大体有以下三种可能：</p>
 <ol>
-<li><p>一个查询要淘汰的脏页个数太多，会导致查询的响应时间明显变长；</p>
-</li>
-<li><p>日志写满，更新全部堵住，写性能跌为0，这种情况对敏感业务来说，是不能接受的。</p>
-</li>
+<li>索引没有设计好；</li>
+<li>SQL语句没写好；</li>
+<li>MySQL选错了索引。</li>
 </ol>
-<p>所以，InnoDB需要有控制脏页比例的机制，来尽量避免上面的这两种情况。</p>
-<p>InnoDB刷脏页的控制策略接下来，我就来和你说说InnoDB脏页的控制策略，以及和这些策略相关的参数。</p>
-<p>首先，你要正确地告诉InnoDB所在主机的IO能力，这样InnoDB才能知道需要全力刷脏页的时候，可以刷多快。</p>
-<p>这就要用到innodb_io_capacity这个参数了，它会告诉InnoDB你的磁盘能力。</p>
-<p>这个值我建议你设置成磁盘的IOPS。</p>
-<p>磁盘的IOPS可以通过fio这个工具来测试，下面的语句是我用来测试磁盘随机读写的命令：</p>
-<p>其实，因为没能正确地设置innodb_io_capacity参数，而导致的性能问题也比比皆是。</p>
-<p>之前，就曾有其他公司的开发负责人找我看一个库的性能问题，说MySQL的写入速度很慢，TPS很低，但是数据库主机的IO压力并不大。</p>
-<p>经过一番排查，发现罪魁祸首就是这个参数的设置出了问题。</p>
-<p>他的主机磁盘用的是SSD，但是innodb_io_capacity的值设置的是300。</p>
-<p>于是，InnoDB认为这个系统的能力就这么差，所以刷脏页刷得特别慢，甚至比脏页生成的速度还慢，这样就造成了脏页累积，影响了查询和更新性能。</p>
-<p>虽然我们现在已经定义了“全力刷脏页”的行为，但平时总不能一直是全力刷吧？毕竟磁盘能力不能只用来刷脏页，还需要服务用户请求。</p>
-<p>所以接下来，我们就一起看看InnoDB怎么控制引擎按照“全力”的百分比来刷脏页。</p>
-<p>根据我前面提到的知识点，试想一下，如果你来设计策略控制刷脏页的速度，会参考哪些因素呢？这个问题可以这么想，如果刷太慢，会出现什么情况？首先是内存脏页太多，其次是redo log写满。</p>
-<p>所以，InnoDB的刷盘速度就是要参考这两个因素：一个是脏页比例，一个是redo log写盘速度。</p>
-<p> fio -filename&#x3D;$filename -direct&#x3D;1 -iodepth 1 -thread -rw&#x3D;randrw -ioengine&#x3D;psync -bs&#x3D;16k -size&#x3D;500M -numjobs&#x3D;10 -runtime&#x3D;10 -group_reporting -name&#x3D;mytest InnoDB会根据这两个因素先单独算出两个数字。</p>
-<p>参数innodb_max_dirty_pages_pct是脏页比例上限，默认值是75%。</p>
-<p>InnoDB会根据当前的脏页比例（假设为M），算出一个范围在0到100之间的数字，计算这个数字的伪代码类似这样：</p>
-<p>InnoDB每次写入的日志都有一个序号，当前写入的序号跟checkpoint对应的序号之间的差值，我们假设为N。</p>
-<p>InnoDB会根据这个N算出一个范围在0到100之间的数字，这个计算公式可以记为F2(N)。</p>
-<p>F2(N)算法比较复杂，你只要知道N越大，算出来的值越大就好了。</p>
-<p>然后，根据上述算得的F1(M)和F2(N)两个值，取其中较大的值记为R，之后引擎就可以按照innodb_io_capacity定义的能力乘以R%来控制刷脏页的速度。</p>
-<p>上述的计算流程比较抽象，不容易理解，所以我画了一个简单的流程图。</p>
-<p>图中的F1、F2就是上面我们通过脏页比例和redo log写入速度算出来的两个值。</p>
-<p>F1(M){  if M&gt;&#x3D;innodb_max_dirty_pages_pct then      return 100;  return 100*M&#x2F;innodb_max_dirty_pages_pct;}图3 InnoDB刷脏页速度策略现在你知道了，InnoDB会在后台刷脏页，而刷脏页的过程是要将内存页写入磁盘。</p>
-<p>所以，无论是你的查询语句在需要内存的时候可能要求淘汰一个脏页，还是由于刷脏页的逻辑会占用IO资源并可能影响到了你的更新语句，都可能是造成你从业务端感知到MySQL“抖”了一下的原因。</p>
-<p>要尽量避免这种情况，你就要合理地设置innodb_io_capacity的值，并且平时要多关注脏页比例，不要让它经常接近75%。</p>
-<p>其中，脏页比例是通过Innodb_buffer_pool_pages_dirty&#x2F;Innodb_buffer_pool_pages_total得到的，具体的命令参考下面的代码：</p>
-<p>接下来，我们再看一个有趣的策略。</p>
-<p>一旦一个查询请求需要在执行过程中先flush掉一个脏页时，这个查询就可能要比平时慢了。</p>
-<p>而MySQL中的一个机制，可能让你的查询会更慢：在准备刷一个脏页的时候，如果这个数据页旁边的数据页刚好是脏页，就会把这个“邻居”也带着一起刷掉；而且这个把“邻居”拖下水的逻辑还可以继续蔓延，也就是对于每个邻居数据页，如果跟它相邻的数据页也还是脏页的话，也会被放到一起刷。</p>
-<p>在InnoDB中，innodb_flush_neighbors 参数就是用来控制这个行为的，值为1的时候会有上述的“连坐”机制，值为0时表示不找邻居，自己刷自己的。</p>
-<p>找“邻居”这个优化在机械硬盘时代是很有意义的，可以减少很多随机IO。</p>
-<p>机械硬盘的随机IOPS一般只有几百，相同的逻辑操作减少随机IO就意味着系统性能的大幅度提升。</p>
-<p>而如果使用的是SSD这类IOPS比较高的设备的话，我就建议你把innodb_flush_neighbors的值设置成0。</p>
-<p>因为这时候IOPS往往不是瓶颈，而“只刷自己”，就能更快地执行完必要的刷脏页操作，减少SQL语句响应时间。</p>
-<p>在MySQL 8.0中，innodb_flush_neighbors参数的默认值已经是0了。</p>
-<p>小结今天这篇文章，我延续第2篇中介绍的WAL的概念，和你解释了这个机制后续需要的刷脏页操作和执行时机。</p>
-<p>利用WAL技术，数据库将随机写转换成了顺序写，大大提升了数据库的性能。</p>
-<p>但是，由此也带来了内存脏页的问题。</p>
-<p>脏页会被后台线程自动flush，也会由于数据页淘汰而触发flush，而刷脏页的过程由于会占用资源，可能会让你的更新和查询语句的响应时间长一些。</p>
-<p>在文章里，我也给你介绍了控制刷脏页的方法和对应的监控方式。</p>
-<p>文章最后，我给你留下一个思考题吧。</p>
-<p>mysql&gt; select VARIABLE_VALUE into @a from global_status where VARIABLE_NAME &#x3D; ‘Innodb_buffer_pool_pages_dirty’;select VARIABLE_VALUE into @b from global_status where VARIABLE_NAME &#x3D; ‘Innodb_buffer_pool_pages_total’;select @a&#x2F;@b;一个内存配置为128GB、innodb_io_capacity设置为20000的大规格实例，正常会建议你将redolog设置成4个1GB的文件。</p>
-<p>但如果你在配置的时候不慎将redo log设置成了1个100M的文件，会发生什么情况呢？又为什么会出现这样的情况呢？你可以把你的分析结论写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期我留给你的问题是，给一个学号字段创建索引，有哪些方法。</p>
-<p>由于这个学号的规则，无论是正向还是反向的前缀索引，重复度都比较高。</p>
-<p>因为维护的只是一个学校的，因此前面6位（其中，前三位是所在城市编号、第四到第六位是学校编号）其实是固定的，邮箱后缀都是@gamil.com，因此可以只存入学年份加顺序编号，它们的长度是9位。</p>
-<p>而其实在此基础上，可以用数字类型来存这9位数字。</p>
-<p>比如201100001，这样只需要占4个字节。</p>
-<p>其实这个就是一种hash，只是它用了最简单的转换规则：字符串转数字的规则，而刚好我们设定的这个背景，可以保证这个转换后结果的唯一性。</p>
-<p>评论区中，也有其他一些很不错的见解。</p>
-<p>评论用户@封建的风 说，一个学校的总人数这种数据量，50年才100万学生，这个表肯定是小表。</p>
-<p>为了业务简单，直接存原来的字符串。</p>
-<p>这个答复里面包含了“优化成本和收益”的思想，我觉得值得at出来。</p>
-<p>@小潘 同学提了另外一个极致的方向。</p>
-<p>如果碰到表数据量特别大的场景，通过这种方式的收益是很不错的。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e1ece7cd.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/e1ece7cd.html" class="post-title-link" itemprop="url">mysql-怎么给字符串字段加索引</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-12 06:08:14" itemprop="dateCreated datePublished" datetime="2019-11-12T06:08:14+08:00">2019-11-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>3.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>13 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>怎么给字符串字段加索引？现在，几乎所有的系统都支持邮箱登录，如何在邮箱这样的字段上建立合理的索引，是我们今天要讨论的问题。</p>
-<p>假设，你现在维护一个支持邮箱登录的系统，用户表是这么定义的：</p>
-<p>由于要使用邮箱登录，所以业务代码中一定会出现类似于这样的语句：</p>
-<p>从第4和第5篇讲解索引的文章中，我们可以知道，如果email这个字段上没有索引，那么这个语句就只能做全表扫描。</p>
-<p>同时，MySQL是支持前缀索引的，也就是说，你可以定义字符串的一部分作为索引。</p>
-<p>默认地，mysql&gt; create table SUser(ID bigint unsigned primary key,email varchar(64), … )engine&#x3D;innodb; mysql&gt; select f1, f2 from SUser where email&#x3D;’xxx’;如果你创建索引的语句不指定前缀长度，那么索引就会包含整个字符串。</p>
-<p>比如，这两个在email字段上创建索引的语句：</p>
-<p>第一个语句创建的index1索引里面，包含了每个记录的整个字符串；而第二个语句创建的index2索引里面，对于每个记录都是只取前6个字节。</p>
-<p>那么，这两种不同的定义在数据结构和存储上有什么区别呢？如图2和3所示，就是这两个索引的示意图。</p>
-<p>图1 email 索引结构mysql&gt; alter table SUser add index index1(email);或mysql&gt; alter table SUser add index index2(email(6));图2 email(6) 索引结构从图中你可以看到，由于email(6)这个索引结构中每个邮箱字段都只取前6个字节（即：</p>
-<p>zhangs），所以占用的空间会更小，这就是使用前缀索引的优势。</p>
-<p>但，这同时带来的损失是，可能会增加额外的记录扫描次数。</p>
-<p>接下来，我们再看看下面这个语句，在这两个索引定义下分别是怎么执行的。</p>
-<p>如果使用的是index1（即email整个字符串的索引结构），执行顺序是这样的：</p>
+<p>接下来，我们就具体分析一下这三种可能，以及对应的解决方案。</p>
+<p>导致慢查询的第一种可能是，索引没有设计好。</p>
+<p>这种场景一般就是通过紧急创建索引来解决。</p>
+<p>MySQL 5.6版本以后，创建索引都支持Online DDL了，对于那种高峰期数据库已经被这个语句打挂了的情况，最高效的做法就是直接执行altertable 语句。</p>
+<p>比较理想的是能够在备库先执行。</p>
+<p>假设你现在的服务是一主一备，主库A、备库B，这个方案的大致流程是这样的：</p>
 <ol>
-<li><p>从index1索引树找到满足索引值是’<a href="mailto:&#x7a;&#x68;&#x61;&#110;&#103;&#115;&#115;&#120;&#x79;&#x7a;&#x40;&#120;&#120;&#x78;&#x2e;&#x63;&#111;&#109;">&#x7a;&#x68;&#x61;&#110;&#103;&#115;&#115;&#120;&#x79;&#x7a;&#x40;&#120;&#120;&#x78;&#x2e;&#x63;&#111;&#109;</a>’的这条记录，取得ID2的值；</p>
-</li>
-<li><p>到主键上查到主键值是ID2的行，判断email的值是正确的，将这行记录加入结果集；</p>
-</li>
-<li><p>取index1索引树上刚刚查到的位置的下一条记录，发现已经不满足email&#x3D;‘<a href="mailto:&#x7a;&#x68;&#x61;&#110;&#103;&#115;&#x73;&#120;&#121;&#x7a;&#64;&#x78;&#120;&#120;&#x2e;&#99;&#x6f;&#x6d;">&#x7a;&#x68;&#x61;&#110;&#103;&#115;&#x73;&#120;&#121;&#x7a;&#64;&#x78;&#120;&#120;&#x2e;&#99;&#x6f;&#x6d;</a>’的条件了，循环结束。</p>
-</li>
+<li>在备库B上执行 set sql_log_bin&#x3D;off，也就是不写binlog，然后执行alter table 语句加上索引；</li>
+<li>执行主备切换；</li>
+<li>这时候主库是B，备库是A。</li>
 </ol>
-<p>这个过程中，只需要回主键索引取一次数据，所以系统认为只扫描了一行。</p>
-<p>select id,name,email from SUser where email&#x3D;‘<a href="mailto:&#x7a;&#104;&#97;&#x6e;&#x67;&#115;&#x73;&#x78;&#x79;&#x7a;&#64;&#x78;&#120;&#x78;&#x2e;&#99;&#111;&#109;">&#x7a;&#104;&#97;&#x6e;&#x67;&#115;&#x73;&#x78;&#x79;&#x7a;&#64;&#x78;&#120;&#x78;&#x2e;&#99;&#111;&#109;</a>‘;如果使用的是index2（即email(6)索引结构），执行顺序是这样的：</p>
+<p>在A上执行 set sql_log_bin&#x3D;off，然后执行alter table 语句加上索引。</p>
+<p>这是一个“古老”的DDL方案。</p>
+<p>平时在做变更的时候，你应该考虑类似gh-ost这样的方案，更加稳妥。</p>
+<p>但是在需要紧急处理时，上面这个方案的效率是最高的。</p>
+<p>导致慢查询的第二种可能是，语句没写好。</p>
+<p>比如，我们犯了在第18篇文章《为什么这些SQL语句逻辑相同，性能却差异巨大？》中提到的那些错误，导致语句没有使用上索引。</p>
+<p>这时，我们可以通过改写SQL语句来处理。</p>
+<p>MySQL 5.7提供了query_rewrite功能，可以把输入的一种语句改写成另外一种模式。</p>
+<p>比如，语句被错误地写成了 select * from t where id + 1 &#x3D; 10000，你可以通过下面的方式，增加一个语句改写规则。</p>
+<p>这里，call query_rewrite.flush_rewrite_rules()这个存储过程，是让插入的新规则生效，也就是我们说的“查询重写”。</p>
+<p>你可以用图4中的方法来确认改写规则是否生效。</p>
+<p>图4 查询重写效果mysql&gt; insert into query_rewrite.rewrite_rules(pattern, replacement, pattern_database) values (“select * from t where id + 1 &#x3D; ?”, “select * from t where id &#x3D; ? - 1”, “db1”);call query_rewrite.flush_rewrite_rules();导致慢查询的第三种可能，就是碰上了我们在第10篇文章《MySQL为什么有时候会选错索引？》中提到的情况，MySQL选错了索引。</p>
+<p>这时候，应急方案就是给这个语句加上force index。</p>
+<p>同样地，使用查询重写功能，给原来的语句加上force index，也可以解决这个问题。</p>
+<p>上面我和你讨论的由慢查询导致性能问题的三种可能情况，实际上出现最多的是前两种，即：索引没设计好和语句没写好。</p>
+<p>而这两种情况，恰恰是完全可以避免的。</p>
+<p>比如，通过下面这个过程，我们就可以预先发现问题。</p>
 <ol>
-<li><p>从index2索引树找到满足索引值是’zhangs’的记录，找到的第一个是ID1；</p>
-</li>
-<li><p>到主键上查到主键值是ID1的行，判断出email的值不是’<a href="mailto:&#122;&#x68;&#x61;&#x6e;&#103;&#115;&#115;&#x78;&#121;&#122;&#x40;&#x78;&#x78;&#x78;&#x2e;&#x63;&#111;&#109;">&#122;&#x68;&#x61;&#x6e;&#103;&#115;&#115;&#x78;&#121;&#122;&#x40;&#x78;&#x78;&#x78;&#x2e;&#x63;&#111;&#109;</a>’，这行记录丢弃；</p>
-</li>
-<li><p>取index2上刚刚查到的位置的下一条记录，发现仍然是’zhangs’，取出ID2，再到ID索引上取整行然后判断，这次值对了，将这行记录加入结果集；</p>
-</li>
-<li><p>重复上一步，直到在idxe2上取到的值不是’zhangs’时，循环结束。</p>
-</li>
+<li>上线前，在测试环境，把慢查询日志（slow log）打开，并且把long_query_time设置成0，确保每个语句都会被记录入慢查询日志；</li>
+<li>在测试表里插入模拟线上的数据，做一遍回归测试；</li>
+<li>观察慢查询日志里每类语句的输出，特别留意Rows_examined字段是否与预期一致。</li>
 </ol>
-<p>在这个过程中，要回主键索引取4次数据，也就是扫描了4行。</p>
-<p>通过这个对比，你很容易就可以发现，使用前缀索引后，可能会导致查询语句读数据的次数变多。</p>
-<p>但是，对于这个查询语句来说，如果你定义的index2不是email(6)而是email(7），也就是说取email字段的前7个字节来构建索引的话，即满足前缀’zhangss’的记录只有一个，也能够直接查到ID2，只扫描一行就结束了。</p>
-<p>也就是说使用前缀索引，定义好长度，就可以做到既节省空间，又不用额外增加太多的查询成本。</p>
-<p>于是，你就有个问题：当要给字符串创建前缀索引时，有什么方法能够确定我应该使用多长的前缀呢？实际上，我们在建立索引时关注的是区分度，区分度越高越好。</p>
-<p>因为区分度越高，意味着重复的键值越少。</p>
-<p>因此，我们可以通过统计索引上有多少个不同的值来判断要使用多长的前缀。</p>
-<p>首先，你可以使用下面这个语句，算出这个列上有多少个不同的值：</p>
-<p>然后，依次选取不同长度的前缀来看这个值，比如我们要看一下4~7个字节的前缀索引，可以用这个语句：</p>
-<p>mysql&gt; select count(distinct email) as L from SUser;当然，使用前缀索引很可能会损失区分度，所以你需要预先设定一个可以接受的损失比例，比如5%。</p>
-<p>然后，在返回的L4~L7中，找出不小于 L * 95%的值，假设这里L6、L7都满足，你就可以选择前缀长度为6。</p>
-<p>前缀索引对覆盖索引的影响前面我们说了使用前缀索引可能会增加扫描行数，这会影响到性能。</p>
-<p>其实，前缀索引的影响不止如此，我们再看一下另外一个场景。</p>
-<p>你先来看看这个SQL语句：</p>
-<p>与前面例子中的SQL语句相比，这个语句只要求返回id和email字段。</p>
-<p>所以，如果使用index1（即email整个字符串的索引结构）的话，可以利用覆盖索引，从index1查到结果后直接就返回了，不需要回到ID索引再去查一次。</p>
-<p>而如果使用index2（即email(6)索引结构）的话，就不得不回到ID索引再去判断email字段的值。</p>
-<p>即使你将index2的定义修改为email(18)的前缀索引，这时候虽然index2已经包含了所有的信息，但InnoDB还是要回到id索引再查一下，因为系统并不确定前缀索引的定义是否截断了完整信息。</p>
-<p>也就是说，使用前缀索引就用不上覆盖索引对查询性能的优化了，这也是你在选择是否使用前缀索引时需要考虑的一个因素。</p>
-<p>其他方式对于类似于邮箱这样的字段来说，使用前缀索引的效果可能还不错。</p>
-<p>但是，遇到前缀的区分度不mysql&gt; select   count(distinct left(email,4)）as L4,  count(distinct left(email,5)）as L5,  count(distinct left(email,6)）as L6,  count(distinct left(email,7)）as L7,from SUser;select id,email from SUser where email&#x3D;‘<a href="mailto:&#x7a;&#104;&#97;&#110;&#103;&#x73;&#115;&#x78;&#121;&#x7a;&#64;&#120;&#x78;&#x78;&#46;&#99;&#111;&#109;">&#x7a;&#104;&#97;&#110;&#103;&#x73;&#115;&#x78;&#121;&#x7a;&#64;&#120;&#x78;&#x78;&#46;&#99;&#111;&#109;</a>‘;select id,name,email from SUser where email&#x3D;‘<a href="mailto:&#122;&#x68;&#x61;&#110;&#103;&#115;&#x73;&#x78;&#121;&#x7a;&#x40;&#x78;&#120;&#120;&#x2e;&#99;&#x6f;&#x6d;">&#122;&#x68;&#x61;&#110;&#103;&#115;&#x73;&#x78;&#121;&#x7a;&#x40;&#x78;&#120;&#120;&#x2e;&#99;&#x6f;&#x6d;</a>‘;够好的情况时，我们要怎么办呢？比如，我们国家的身份证号，一共18位，其中前6位是地址码，所以同一个县的人的身份证号前6位一般会是相同的。</p>
-<p>假设你维护的数据库是一个市的公民信息系统，这时候如果对身份证号做长度为6的前缀索引的话，这个索引的区分度就非常低了。</p>
-<p>按照我们前面说的方法，可能你需要创建长度为12以上的前缀索引，才能够满足区分度要求。</p>
-<p>但是，索引选取的越长，占用的磁盘空间就越大，相同的数据页能放下的索引值就越少，搜索的效率也就会越低。</p>
-<p>那么，如果我们能够确定业务需求里面只有按照身份证进行等值查询的需求，还有没有别的处理方法呢？这种方法，既可以占用更小的空间，也能达到相同的查询效率。</p>
-<p>答案是，有的。</p>
-<p>第一种方式是使用倒序存储。</p>
-<p>如果你存储身份证号的时候把它倒过来存，每次查询的时候，你可以这么写：</p>
-<p>由于身份证号的最后6位没有地址码这样的重复逻辑，所以最后这6位很可能就提供了足够的区分度。</p>
-<p>当然了，实践中你不要忘记使用count(distinct)方法去做个验证。</p>
-<p>第二种方式是使用hash字段。</p>
-<p>你可以在表上再创建一个整数字段，来保存身份证的校验码，同时在这个字段上创建索引。</p>
-<p>然后每次插入新记录的时候，都同时用crc32()这个函数得到校验码填到这个新字段。</p>
-<p>由于校验码可能存在冲突，也就是说两个不同的身份证号通过crc32()函数得到的结果可能是相同的，所以你的查询语句where部分要判断id_card的值是否精确相同。</p>
-<p>这样，索引的长度变成了4个字节，比原来小了很多。</p>
-<p>mysql&gt; select field_list from t where id_card &#x3D; reverse(‘input_id_card_string’);mysql&gt; alter table t add id_card_crc int unsigned, add index(id_card_crc);mysql&gt; select field_list from t where id_card_crc&#x3D;crc32(‘input_id_card_string’) and id_card&#x3D;’input_id_card_string’接下来，我们再一起看看使用倒序存储和使用hash字段这两种方法的异同点。</p>
-<p>首先，它们的相同点是，都不支持范围查询。</p>
-<p>倒序存储的字段上创建的索引是按照倒序字符串的方式排序的，已经没有办法利用索引方式查出身份证号码在[ID_X, ID_Y]的所有市民了。</p>
-<p>同样地，hash字段的方式也只能支持等值查询。</p>
-<p>它们的区别，主要体现在以下三个方面：</p>
+<p>（我们在前面文章中已经多次用到过Rows_examined方法了，相信你已经动手尝试过了。</p>
+<p>如果还有不明白的，欢迎给我留言，我们一起讨论）。</p>
+<p>不要吝啬这段花在上线前的“额外”时间，因为这会帮你省下很多故障复盘的时间。</p>
+<p>如果新增的SQL语句不多，手动跑一下就可以。</p>
+<p>而如果是新项目的话，或者是修改了原有项目的表结构设计，全量回归测试都是必要的。</p>
+<p>这时候，你需要工具帮你检查所有的SQL语句的返回结果。</p>
+<p>比如，你可以使用开源工具pt-query-digest(<a target="_blank" rel="noopener" href="https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html)%E3%80%82">https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html)。</a></p>
+<p>QPS突增问题有时候由于业务突然出现高峰，或者应用程序bug，导致某个语句的QPS突然暴涨，也可能导致MySQL压力过大，影响服务。</p>
+<p>我之前碰到过一类情况，是由一个新功能的bug导致的。</p>
+<p>当然，最理想的情况是让业务把这个功能下掉，服务自然就会恢复。</p>
+<p>而下掉一个功能，如果从数据库端处理的话，对应于不同的背景，有不同的方法可用。</p>
+<p>我这里再和你展开说明一下。</p>
 <ol>
-<li>从占用的额外空间来看，倒序存储方式在主键索引上，不会消耗额外的存储空间，而hash字段方法需要增加一个字段。</li>
+<li>一种是由全新业务的bug导致的。</li>
 </ol>
-<p>当然，倒序存储方式使用4个字节的前缀长度应该是不够的，如果再长一点，这个消耗跟额外这个hash字段也差不多抵消了。</p>
+<p>假设你的DB运维是比较规范的，也就是说白名单是一个个加的。</p>
+<p>这种情况下，如果你能够确定业务方会下掉这个功能，只是时间上没那么快，那么就可以从数据库端直接把白名单去掉。</p>
 <ol start="2">
-<li>在CPU消耗方面，倒序方式每次写和读的时候，都需要额外调用一次reverse函数，而hash字段的方式需要额外调用一次crc32()函数。</li>
+<li>如果这个新功能使用的是单独的数据库用户，可以用管理员账号把这个用户删掉，然后断开现有连接。</li>
 </ol>
-<p>如果只从这两个函数的计算复杂度来看的话，reverse函数额外消耗的CPU资源会更小些。</p>
+<p>这样，这个新功能的连接不成功，由它引发的QPS就会变成0。</p>
 <ol start="3">
-<li>从查询效率上看，使用hash字段方式的查询性能相对更稳定一些。</li>
+<li>如果这个新增的功能跟主体功能是部署在一起的，那么我们只能通过处理语句来限制。</li>
 </ol>
-<p>因为crc32算出来的值虽然有冲突的概率，但是概率非常小，可以认为每次查询的平均扫描行数接近1。</p>
-<p>而倒序存储方式毕竟还是用的前缀索引的方式，也就是说还是会增加扫描行数。</p>
-<p>小结在今天这篇文章中，我跟你聊了聊字符串字段创建索引的场景。</p>
-<p>我们来回顾一下，你可以使用的方式有：</p>
+<p>这时，我们可以使用上面提到的查询重写功能，把压力最大的SQL语句直接重写成”select 1”返回。</p>
+<p>当然，这个操作的风险很高，需要你特别细致。</p>
+<p>它可能存在两个副作用：</p>
 <ol>
-<li><p>直接创建完整索引，这样可能比较占用空间；</p>
+<li>如果别的功能里面也用到了这个SQL语句模板，会有误伤；</li>
+<li>很多业务并不是靠这一个语句就能完成逻辑的，所以如果单独把这一个语句以select 1的结果返回的话，可能会导致后面的业务逻辑一起失败。</li>
+</ol>
+<p>所以，方案3是用于止血的，跟前面提到的去掉权限验证一样，应该是你所有选项里优先级最低的一个方案。</p>
+<p>同时你会发现，其实方案1和2都要依赖于规范的运维体系：虚拟化、白名单机制、业务账号分离。</p>
+<p>由此可见，更多的准备，往往意味着更稳定的系统。</p>
+<p>小结今天这篇文章，我以业务高峰期的性能问题为背景，和你介绍了一些紧急处理的手段。</p>
+<p>这些处理手段中，既包括了粗暴地拒绝连接和断开连接，也有通过重写语句来绕过一些坑的方法；既有临时的高危方案，也有未雨绸缪的、相对安全的预案。</p>
+<p>在实际开发中，我们也要尽量避免一些低效的方法，比如避免大量地使用短连接。</p>
+<p>同时，如果你做业务开发的话，要知道，连接异常断开是常有的事，你的代码里要有正确地重连并重试的机制。</p>
+<p>DBA虽然可以通过语句重写来暂时处理问题，但是这本身是一个风险高的操作，做好SQL审计可以减少需要这类操作的机会。</p>
+<p>其实，你可以看得出来，在这篇文章中我提到的解决方法主要集中在server层。</p>
+<p>在下一篇文章中，我会继续和你讨论一些跟InnoDB有关的处理方法。</p>
+<p>最后，又到了我们的思考题时间了。</p>
+<p>今天，我留给你的课后问题是，你是否碰到过，在业务高峰期需要临时救火的场景？你又是怎么处理的呢？你可以把你的经历和经验写在留言区，我会在下一篇文章的末尾选取有趣的评论跟大家一起分享和分析。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间前两期我给你留的问题是，下面这个图的执行序列中，为什么session B的insert语句会被堵住。</p>
+<p>我们用上一篇的加锁规则来分析一下，看看session A的select语句加了哪些锁：</p>
+<ol>
+<li><p>由于是order by c desc，第一个要定位的是索引c上“最右边的”c&#x3D;20的行，所以会加上间隙锁(20,25)和next-key lock (15,20]。</p>
 </li>
-<li><p>创建前缀索引，节省空间，但会增加查询扫描次数，并且不能使用覆盖索引；</p>
+<li><p>在索引c上向左遍历，要扫描到c&#x3D;10才停下来，所以next-key lock会加到(5,10]，这正是阻塞session B的insert语句的原因。</p>
 </li>
-<li><p>倒序存储，再创建前缀索引，用于绕过字符串本身前缀的区分度不够的问题；</p>
-</li>
-<li><p>创建hash字段索引，查询性能稳定，有额外的存储和计算消耗，跟第三种方式一样，都不支持范围扫描。</p>
+<li><p>在扫描过程中，c&#x3D;20、c&#x3D;15、c&#x3D;10这三行都存在值，由于是select *，所以会在主键id上加三个行锁。</p>
 </li>
 </ol>
-<p>在实际应用中，你要根据业务字段的特点选择使用哪种方式。</p>
-<p>好了，又到了最后的问题时间。</p>
-<p>如果你在维护一个学校的学生信息数据库，学生登录名的统一格式是”学号@gmail.com”, 而学号的规则是：十五位的数字，其中前三位是所在城市编号、第四到第六位是学校编号、第七位到第十位是入学年份、最后五位是顺序编号。</p>
-<p>系统登录的时候都需要学生输入登录名和密码，验证正确后才能继续使用系统。</p>
-<p>就只考虑登录验证这个行为的话，你会怎么设计这个登录名的索引呢？你可以把你的分析思路和设计结果写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上篇文章中的第一个例子，评论区有几位同学说没有复现，大家要检查一下隔离级别是不是RR（Repeatable Read，可重复读），创建的表t是不是InnoDB引擎。</p>
-<p>我把复现过程做成了一个视频，供你参考。</p>
-<p>在上一篇文章最后，我给你留的问题是，为什么经过这个操作序列，explain的结果就不对了？这里，我来为你分析一下原因。</p>
-<p>delete 语句删掉了所有的数据，然后再通过call idata()插入了10万行数据，看上去是覆盖了原来的10万行。</p>
-<p>但是，session A开启了事务并没有提交，所以之前插入的10万行数据是不能删除的。</p>
-<p>这样，之前的数据每一行数据都有两个版本，旧版本是delete之前的数据，新版本是标记为deleted的数据。</p>
-<p>这样，索引a上的数据其实就有两份。</p>
-<p>然后你会说，不对啊，主键上的数据也不能删，那没有使用force index的语句，使用explain命令看到的扫描行数为什么还是100000左右？（潜台词，如果这个也翻倍，也许优化器还会认为选字段a作为索引更合适）是的，不过这个是主键，主键是直接按照表的行数来估计的。</p>
-<p>而表的行数，优化器直接用的是show table status的值。</p>
-<p>这个值的计算方法，我会在后面有文章为你详细讲解。</p>
+<p>因此，session A 的select语句锁的范围就是：</p>
+<ol>
+<li>索引c上 (5, 25)；</li>
+<li>主键索引上id&#x3D;15、20两个行锁。</li>
+</ol>
+<p>这里，我再啰嗦下，你会发现我在文章中，每次加锁都会说明是加在“哪个索引上”的。</p>
+<p>因为，锁就是加在索引上的，这是InnoDB的一个基础设定，需要你在分析问题的时候要一直记得。</p>
 
       
     </div>
@@ -1503,7 +2307,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1591a1f8.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e1607c99.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1517,7 +2321,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/1591a1f8.html" class="post-title-link" itemprop="url">mysql-MySQL为什么有时候会选错索引</a>
+            <a href="/posts/e1607c99.html" class="post-title-link" itemprop="url">mysql-为什么我只改一行的语句锁这么多</a>
         </h2>
 
         <div class="post-meta">
@@ -1527,7 +2331,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-11 06:15:26" itemprop="dateCreated datePublished" datetime="2019-11-11T06:15:26+08:00">2019-11-11</time>
+              <time title="创建时间：2019-11-26 06:13:30" itemprop="dateCreated datePublished" datetime="2019-11-26T06:13:30+08:00">2019-11-26</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -1551,13 +2355,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>4.8k</span>
+              <span>4.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>17 分钟</span>
+              <span>16 分钟</span>
             </span>
 
         </div>
@@ -1569,371 +2373,158 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>MySQL为什么有时候会选错索引？</p>
-<p>前面我们介绍过索引，你已经知道了在MySQL中一张表其实是可以支持多个索引的。</p>
-<p>但是，你写SQL语句的时候，并没有主动指定使用哪个索引。</p>
-<p>也就是说，使用哪个索引是由MySQL来确定的。</p>
-<p>不知道你有没有碰到过这种情况，一条本来可以执行得很快的语句，却由于MySQL选错了索引，而导致执行速度变得很慢？我们一起来看一个例子吧。</p>
-<p>我们先建一个简单的表，表里有a、b两个字段，并分别建上索引：<br>CREATE TABLE <code>t</code> (  <code>id</code> int(11) NOT NULL,  <code>a</code> int(11) DEFAULT NULL,  <code>b</code> int(11) DEFAULT NULL,  PRIMARY KEY (<code>id</code>),  KEY <code>a</code> (<code>a</code>),  KEY <code>b</code> (<code>b</code>)) ENGINE&#x3D;InnoDB；<br>然后，我们往表t中插入10万行记录，取值按整数递增，即：(1,1,1)，(2,2,2)，(3,3,3) 直到(100000,100000,100000)。</p>
-<p>我是用存储过程来插入数据的，这里我贴出来方便你复现：<br>接下来，我们分析一条SQL语句：<br>你一定会说，这个语句还用分析吗，很简单呀，a上有索引，肯定是要使用索引a的。</p>
-<p>你说得没错，图1显示的就是使用explain命令看到的这条语句的执行情况。</p>
-<p>图1 使用explain命令查看语句执行情况从图1看上去，这条查询语句的执行也确实符合预期，key这个字段值是’a’，表示优化器选择了索引a。</p>
-<p>不过别急，这个案例不会这么简单。</p>
-<p>在我们已经准备好的包含了10万行数据的表上，我们再做如下操作。</p>
-<p>delimiter ;;create procedure idata()begin  declare i int;  set i&#x3D;1;  while(i&lt;&#x3D;100000)do    insert into t values(i, i, i);    set i&#x3D;i+1;  end while;end;;delimiter ;call idata();mysql&gt; select * from t where a between 10000 and 20000;图2 session A和session B的执行流程这里，session A的操作你已经很熟悉了，它就是开启了一个事务。</p>
-<p>随后，session B把数据都删除后，又调用了 idata这个存储过程，插入了10万行数据。</p>
-<p>这时候，session B的查询语句select * from t where a between 10000 and 20000就不会再选择索引a了。</p>
-<p>我们可以通过慢查询日志（slow log）来查看一下具体的执行情况。</p>
-<p>为了说明优化器选择的结果是否正确，我增加了一个对照，即：使用force index(a)来让优化器强制使用索引a（这部分内容，我还会在这篇文章的后半部分中提到）。</p>
-<p>下面的三条SQL语句，就是这个实验过程。</p>
-<p>第一句，是将慢查询日志的阈值设置为0，表示这个线程接下来的语句都会被记录入慢查询日志中；<br>第二句，Q1是session B原来的查询；<br>第三句，Q2是加了force index(a)来和session B原来的查询语句执行情况对比。</p>
-<p>如图3所示是这三条SQL语句执行完成后的慢查询日志。</p>
-<p>set long_query_time&#x3D;0;select * from t where a between 10000 and 20000; &#x2F;<em>Q1</em>&#x2F;select * from t force index(a) where a between 10000 and 20000;&#x2F;<em>Q2</em>&#x2F;图3 slow log结果可以看到，Q1扫描了10万行，显然是走了全表扫描，执行时间是40毫秒。</p>
-<p>Q2扫描了10001行，执行了21毫秒。</p>
-<p>也就是说，我们在没有使用force index的时候，MySQL用错了索引，导致了更长的执行时间。</p>
-<p>这个例子对应的是我们平常不断地删除历史数据和新增数据的场景。</p>
-<p>这时，MySQL竟然会选错索引，是不是有点奇怪呢？今天，我们就从这个奇怪的结果说起吧。</p>
-<p>优化器的逻辑在第一篇文章中，我们就提到过，选择索引是优化器的工作。</p>
-<p>而优化器选择索引的目的，是找到一个最优的执行方案，并用最小的代价去执行语句。</p>
-<p>在数据库里面，扫描行数是影响执行代价的因素之一。</p>
-<p>扫描的行数越少，意味着访问磁盘数据的次数越少，消耗的CPU资源越少。</p>
-<p>当然，扫描行数并不是唯一的判断标准，优化器还会结合是否使用临时表、是否排序等因素进行综合判断。</p>
-<p>我们这个简单的查询语句并没有涉及到临时表和排序，所以MySQL选错索引肯定是在判断扫描行数的时候出问题了。</p>
-<p>那么，问题就是：扫描行数是怎么判断的？MySQL在真正开始执行语句之前，并不能精确地知道满足这个条件的记录有多少条，而只能根据统计信息来估算记录数。</p>
-<p>这个统计信息就是索引的“区分度”。</p>
-<p>显然，一个索引上不同的值越多，这个索引的区分度就越好。</p>
-<p>而一个索引上不同的值的个数，我们称之为“基数”（cardinality）。</p>
-<p>也就是说，这个基数越大，索引的区分度越好。</p>
-<p>我们可以使用show index方法，看到一个索引的基数。</p>
-<p>如图4所示，就是表t的show index 的结果。</p>
-<p>虽然这个表的每一行的三个字段值都是一样的，但是在统计信息中，这三个索引的基数值并不同，而且其实都不准确。</p>
-<p>图4 表t的show index 结果那么，MySQL是怎样得到索引的基数的呢？这里，我给你简单介绍一下MySQL采样统计的方法。</p>
-<p>为什么要采样统计呢？因为把整张表取出来一行行统计，虽然可以得到精确的结果，但是代价太高了，所以只能选择“采样统计”。</p>
-<p>采样统计的时候，InnoDB默认会选择N个数据页，统计这些页面上的不同值，得到一个平均值，然后乘以这个索引的页面数，就得到了这个索引的基数。</p>
-<p>而数据表是会持续更新的，索引统计信息也不会固定不变。</p>
-<p>所以，当变更的数据行数超过1&#x2F;M的时候，会自动触发重新做一次索引统计。</p>
-<p>在MySQL中，有两种存储索引统计的方式，可以通过设置参数innodb_stats_persistent的值来选择：<br>设置为on的时候，表示统计信息会持久化存储。</p>
-<p>这时，默认的N是20，M是10。</p>
-<p>设置为off的时候，表示统计信息只存储在内存中。</p>
-<p>这时，默认的N是8，M是16。</p>
-<p>由于是采样统计，所以不管N是20还是8，这个基数都是很容易不准的。</p>
-<p>但，这还不是全部。</p>
-<p>你可以从图4中看到，这次的索引统计值（cardinality列）虽然不够精确，但大体上还是差不多的，选错索引一定还有别的原因。</p>
-<p>其实索引统计只是一个输入，对于一个具体的语句来说，优化器还要判断，执行这个语句本身要扫描多少行。</p>
-<p>接下来，我们再一起看看优化器预估的，这两个语句的扫描行数是多少。</p>
-<p>图5 意外的explain结果rows这个字段表示的是预计扫描行数。</p>
-<p>其中，Q1的结果还是符合预期的，rows的值是104620；但是Q2的rows值是37116，偏差就大了。</p>
-<p>而图1中我们用explain命令看到的rows是只有10001行，是这个偏差误导了优化器的判断。</p>
-<p>到这里，可能你的第一个疑问不是为什么不准，而是优化器为什么放着扫描37000行的执行计划不用，却选择了扫描行数是100000的执行计划呢？这是因为，如果使用索引a，每次从索引a上拿到一个值，都要回到主键索引上查出整行数据，这个代价优化器也要算进去的。</p>
-<p>而如果选择扫描10万行，是直接在主键索引上扫描的，没有额外的代价。</p>
-<p>优化器会估算这两个选择的代价，从结果看来，优化器认为直接扫描主键索引更快。</p>
-<p>当然，从执行时间看来，这个选择并不是最优的。</p>
-<p>使用普通索引需要把回表的代价算进去，在图1执行explain的时候，也考虑了这个策略的代价 ，但图1的选择是对的。</p>
-<p>也就是说，这个策略并没有问题。</p>
-<p>所以冤有头债有主，MySQL选错索引，这件事儿还得归咎到没能准确地判断出扫描行数。</p>
-<p>至于为什么会得到错误的扫描行数，这个原因就作为课后问题，留给你去分析了。</p>
-<p>既然是统计信息不对，那就修正。</p>
-<p>analyze table t 命令，可以用来重新统计索引信息。</p>
-<p>我们来看一下执行效果。</p>
-<p>图6 执行analyze table t 命令恢复的explain结果这回对了。</p>
-<p>所以在实践中，如果你发现explain的结果预估的rows值跟实际情况差距比较大，可以采用这个方法来处理。</p>
-<p>其实，如果只是索引统计不准确，通过analyze命令可以解决很多问题，但是前面我们说了，优化器可不止是看扫描行数。</p>
-<p>依然是基于这个表t，我们看看另外一个语句：<br>从条件上看，这个查询没有符合条件的记录，因此会返回空集合。</p>
-<p>在开始执行这条语句之前，你可以先设想一下，如果你来选择索引，会选择哪一个呢？为了便于分析，我们先来看一下a、b这两个索引的结构图。</p>
-<p>图7 a、b索引的结构图如果使用索引a进行查询，那么就是扫描索引a的前1000个值，然后取到对应的id，再到主键索引上去查出每一行，然后根据字段b来过滤。</p>
-<p>显然这样需要扫描1000行。</p>
-<p>如果使用索引b进行查询，那么就是扫描索引b的最后50001个值，与上面的执行过程相同，也是需要回到主键索引上取值再判断，所以需要扫描50001行。</p>
-<p>所以你一定会想，如果使用索引a的话，执行速度明显会快很多。</p>
-<p>那么，下面我们就来看看到底是不是这么一回事儿。</p>
-<p>mysql&gt; select * from t where (a between 1 and 1000)  and (b between 50000 and 100000) order by b limit 1;图8是执行explain的结果。</p>
-<p>图8 使用explain方法查看执行计划 2可以看到，返回结果中key字段显示，这次优化器选择了索引b，而rows字段显示需要扫描的行数是50198。</p>
-<p>从这个结果中，你可以得到两个结论：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>为什么我只改一行的语句，锁这么多在上一篇文章中，我和你介绍了间隙锁和next-key lock的概念，但是并没有说明加锁规则。</p>
+<p>间隙锁的概念理解起来确实有点儿难，尤其在配合上行锁以后，很容易在判断是否会出现锁等待的问题上犯错。</p>
+<p>所以今天，我们就先从这个加锁规则开始吧。</p>
+<p>首先说明一下，这些加锁规则我没在别的地方看到过有类似的总结，以前我自己判断的时候都是想着代码里面的实现来脑补的。</p>
+<p>这次为了总结成不看代码的同学也能理解的规则，是我又重新刷了代码临时总结出来的。</p>
+<p>所以，这个规则有以下两条前提说明：</p>
 <ol>
-<li>扫描行数的估计值依然不准确；</li>
-<li>这个例子里MySQL又选错了索引。</li>
-</ol>
-<p>索引选择异常和处理其实大多数时候优化器都能找到正确的索引，但偶尔你还是会碰到我们上面举例的这两种情况：<br>原本可以执行得很快的SQL语句，执行速度却比你预期的慢很多，你应该怎么办呢？一种方法是，像我们第一个例子一样，采用force index强行选择一个索引。</p>
-<p>MySQL会根据词法解析的结果分析出可能可以使用的索引作为候选项，然后在候选列表中依次判断每个索引需要扫描多少行。</p>
-<p>如果force index指定的索引在候选索引列表中，就直接选择这个索引，不再评估其他索引的执行代价。</p>
-<p>我们来看看第二个例子。</p>
-<p>刚开始分析时，我们认为选择索引a会更好。</p>
-<p>现在，我们就来看看执行效果：<br>图9 使用不同索引的语句执行耗时可以看到，原本语句需要执行2.23秒，而当你使用force index(a)的时候，只用了0.05秒，比优化器的选择快了40多倍。</p>
-<p>也就是说，优化器没有选择正确的索引，force index起到了“矫正”的作用。</p>
-<p>不过很多程序员不喜欢使用force index，一来这么写不优美，二来如果索引改了名字，这个语句mysql&gt; explain select * from t where (a between 1 and 1000) and (b between 50000 and 100000) order by b limit 1;也得改，显得很麻烦。</p>
-<p>而且如果以后迁移到别的数据库的话，这个语法还可能会不兼容。</p>
-<p>但其实使用force index最主要的问题还是变更的及时性。</p>
-<p>因为选错索引的情况还是比较少出现的，所以开发的时候通常不会先写上force index。</p>
-<p>而是等到线上出现问题的时候，你才会再去修改SQL语句、加上force index。</p>
-<p>但是修改之后还要测试和发布，对于生产系统来说，这个过程不够敏捷。</p>
-<p>所以，数据库的问题最好还是在数据库内部来解决。</p>
-<p>那么，在数据库里面该怎样解决呢？既然优化器放弃了使用索引a，说明a还不够合适，所以第二种方法就是，我们可以考虑修改语句，引导MySQL使用我们期望的索引。</p>
-<p>比如，在这个例子里，显然把“order by b limit 1” 改成 “order by b,a limit 1” ，语义的逻辑是相同的。</p>
-<p>我们来看看改之后的效果：<br>图10 order by b,a limit 1 执行结果之前优化器选择使用索引b，是因为它认为使用索引b可以避免排序（b本身是索引，已经是有序的了，如果选择索引b的话，不需要再做排序，只需要遍历），所以即使扫描行数多，也判定为代价更小。</p>
-<p>现在order by b,a 这种写法，要求按照b,a排序，就意味着使用这两个索引都需要排序。</p>
-<p>因此，扫描行数成了影响决策的主要条件，于是此时优化器选了只需要扫描1000行的索引a。</p>
-<p>当然，这种修改并不是通用的优化手段，只是刚好在这个语句里面有limit 1，因此如果有满足条件的记录， order by b limit 1和order by b,a limit 1 都会返回b是最小的那一行，逻辑上一致，才可以这么做。</p>
-<p>如果你觉得修改语义这件事儿不太好，这里还有一种改法，图11是执行效果。</p>
-<p>图11 改写SQL的explain在这个例子里，我们用limit 100让优化器意识到，使用b索引代价是很高的。</p>
-<p>其实是我们根据数mysql&gt; select * from  (select * from t where (a between 1 and 1000)  and (b between 50000 and 100000) order by b limit 100)alias limit 1;据特征诱导了一下优化器，也不具备通用性。</p>
-<p>第三种方法是，在有些场景下，我们可以新建一个更合适的索引，来提供给优化器做选择，或删掉误用的索引。</p>
-<p>不过，在这个例子中，我没有找到通过新增索引来改变优化器行为的方法。</p>
-<p>这种情况其实比较少，尤其是经过DBA索引优化过的库，再碰到这个bug，找到一个更合适的索引一般比较难。</p>
-<p>如果我说还有一个方法是删掉索引b，你可能会觉得好笑。</p>
-<p>但实际上我碰到过两次这样的例子，最终是DBA跟业务开发沟通后，发现这个优化器错误选择的索引其实根本没有必要存在，于是就删掉了这个索引，优化器也就重新选择到了正确的索引。</p>
-<p>小结今天我们一起聊了聊索引统计的更新机制，并提到了优化器存在选错索引的可能性。</p>
-<p>对于由于索引统计信息不准确导致的问题，你可以用analyze table来解决。</p>
-<p>而对于其他优化器误判的情况，你可以在应用端用force index来强行指定索引，也可以通过修改语句来引导优化器，还可以通过增加或者删除索引来绕过这个问题。</p>
-<p>你可能会说，今天这篇文章后面的几个例子，怎么都没有展开说明其原理。</p>
-<p>我要告诉你的是，今天的话题，我们面对的是MySQL的bug，每一个展开都必须深入到一行行代码去量化，实在不是我们在这里应该做的事情。</p>
-<p>所以，我把我用过的解决方法跟你分享，希望你在碰到类似情况的时候，能够有一些思路。</p>
-<p>你平时在处理MySQL优化器bug的时候有什么别的方法，也发到评论区分享一下吧。</p>
-<p>最后，我给你留下一个思考题。</p>
-<p>前面我们在构造第一个例子的过程中，通过session A的配合，让session B删除数据后又重新插入了一遍数据，然后就发现explain结果中，rows字段从10001变成37000多。</p>
-<p>而如果没有session A的配合，只是单独执行delete from t 、call idata()、explain这三句话，会看到rows字段其实还是10000左右。</p>
-<p>你可以自己验证一下这个结果。</p>
-<p>这是什么原因呢？也请你分析一下吧。</p>
-<p>你可以把你的分析结论写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我在上一篇文章最后留给你的问题是，如果某次写入使用了change buffer机制，之后主机异常重启，是否会丢失change buffer和数据。</p>
-<p>这个问题的答案是不会丢失，留言区的很多同学都回答对了。</p>
-<p>虽然是只更新内存，但是在事务提交的时候，我们把change buffer的操作也记录到redo log里了，所以崩溃恢复的时候，changebuffer也能找回来。</p>
-<p>在评论区有同学问到，merge的过程是否会把数据直接写回磁盘，这是个好问题。</p>
-<p>这里，我再为你分析一下。</p>
-<p>merge的执行流程是这样的：</p>
-<ol>
-<li>从磁盘读入数据页到内存（老版本的数据页）；</li>
-<li>从change buffer里找出这个数据页的change buffer 记录(可能有多个），依次应用，得到新版数据页；</li>
-<li>写redo log。</li>
-</ol>
-<p>这个redo log包含了数据的变更和change buffer的变更。</p>
-<p>到这里merge过程就结束了。</p>
-<p>这时候，数据页和内存中change buffer对应的磁盘位置都还没有修改，属于脏页，之后各自刷回自己的物理数据，就是另外一个过程了。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5ec5b1a0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/5ec5b1a0.html" class="post-title-link" itemprop="url">mysql-普通索引和唯一索引，应该怎么选择</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-10 06:16:37" itemprop="dateCreated datePublished" datetime="2019-11-10T06:16:37+08:00">2019-11-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>4.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>17 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>普通索引和唯一索引，应该怎么选择今天的正文开始前，我要特意感谢一下评论区几位留下高质量留言的同学。</p>
-<p>用户名是 @某、人 的同学，对文章的知识点做了梳理，然后提了关于事务可见性的问题，就是先启动但是后提交的事务，对数据可见性的影响。</p>
-<p>@夏日雨同学也提到了这个问题，我在置顶评论中回复了，今天的文章末尾也会再展开说明。</p>
-<p>@Justin和@倪大人两位同学提了两个好问题。</p>
-<p>对于能够引发更深一步思考的问题，我会在回复的内容中写上“好问题”三个字，方便你搜索，你也可以去看看他们的留言。</p>
-<p>非常感谢大家很细致地看文章，并且留下了那么多和很高质量的留言。</p>
-<p>知道文章有给大家带来一些新理解，对我来说是一个很好的鼓励。</p>
-<p>同时，也让其他认真看评论区的同学，有机会发现一些自己还没有意识到的、但可能还不清晰的知识点，这也在总体上提高了整个专栏的质量。</p>
-<p>再次谢谢你们。</p>
-<p>好了，现在就回到我们今天的正文内容。</p>
-<p>在前面的基础篇文章中，我给你介绍过索引的基本概念，相信你已经了解了唯一索引和普通索引的区别。</p>
-<p>今天我们就继续来谈谈，在不同的业务场景下，应该选择普通索引，还是唯一索引？假设你在维护一个市民系统，每个人都有一个唯一的身份证号，而且业务代码已经保证了不会写入两个重复的身份证号。</p>
-<p>如果市民系统需要按照身份证号查姓名，就会执行类似这样的SQL语句：</p>
-<p>所以，你一定会考虑在id_card字段上建索引。</p>
-<p>由于身份证号字段比较大，我不建议你把身份证号当做主键，那么现在你有两个选择，要么给id_card字段创建唯一索引，要么创建一个普通索引。</p>
-<p>如果业务代码已经保证了不会写入重复的身份证号，那么这两个选择逻辑上都是正确的。</p>
-<p>现在我要问你的是，从性能的角度考虑，你选择唯一索引还是普通索引呢？选择的依据是什么呢？简单起见，我们还是用第4篇文章《深入浅出索引（上）》中的例子来说明，假设字段 k 上的值都不重复。</p>
-<p>图1 InnoDB的索引组织结构接下来，我们就从这两种索引对查询语句和更新语句的性能影响来进行分析。</p>
-<p>查询过程select name from CUser where id_card &#x3D; ‘xxxxxxxyyyyyyzzzzz’;假设，执行查询的语句是 select id from T where k&#x3D;5。</p>
-<p>这个查询语句在索引树上查找的过程，先是通过B+树从树根开始，按层搜索到叶子节点，也就是图中右下角的这个数据页，然后可以认为数据页内部通过二分法来定位记录。</p>
-<p>对于普通索引来说，查找到满足条件的第一个记录(5,500)后，需要查找下一个记录，直到碰到第一个不满足k&#x3D;5条件的记录。</p>
-<p>对于唯一索引来说，由于索引定义了唯一性，查找到第一个满足条件的记录后，就会停止继续检索。</p>
-<p>那么，这个不同带来的性能差距会有多少呢？答案是，微乎其微。</p>
-<p>你知道的，InnoDB的数据是按数据页为单位来读写的。</p>
-<p>也就是说，当需要读一条记录的时候，并不是将这个记录本身从磁盘读出来，而是以页为单位，将其整体读入内存。</p>
-<p>在InnoDB中，每个数据页的大小默认是16KB。</p>
-<p>因为引擎是按页读写的，所以说，当找到k&#x3D;5的记录的时候，它所在的数据页就都在内存里了。</p>
-<p>那么，对于普通索引来说，要多做的那一次“查找和判断下一条记录”的操作，就只需要一次指针寻找和一次计算。</p>
-<p>当然，如果k&#x3D;5这个记录刚好是这个数据页的最后一个记录，那么要取下一个记录，必须读取下一个数据页，这个操作会稍微复杂一些。</p>
-<p>但是，我们之前计算过，对于整型字段，一个数据页可以放近千个key，因此出现这种情况的概率会很低。</p>
-<p>所以，我们计算平均性能差异时，仍可以认为这个操作成本对于现在的CPU来说可以忽略不计。</p>
-<p>更新过程为了说明普通索引和唯一索引对更新语句性能的影响这个问题，我需要先跟你介绍一下changebuffer。</p>
-<p>当需要更新一个数据页时，如果数据页在内存中就直接更新，而如果这个数据页还没有在内存中的话，在不影响数据一致性的前提下，InooDB会将这些更新操作缓存在change buffer中，这样就不需要从磁盘中读入这个数据页了。</p>
-<p>在下次查询需要访问这个数据页的时候，将数据页读入内存，然后执行change buffer中与这个页有关的操作。</p>
-<p>通过这种方式就能保证这个数据逻辑的正确性。</p>
-<p>需要说明的是，虽然名字叫作change buffer，实际上它是可以持久化的数据。</p>
-<p>也就是说，change buffer在内存中有拷贝，也会被写入到磁盘上。</p>
-<p>将change buffer中的操作应用到原数据页，得到最新结果的过程称为merge。</p>
-<p>除了访问这个数据页会触发merge外，系统有后台线程会定期merge。</p>
-<p>在数据库正常关闭（shutdown）的过程中，也会执行merge操作。</p>
-<p>显然，如果能够将更新操作先记录在change buffer，减少读磁盘，语句的执行速度会得到明显的提升。</p>
-<p>而且，数据读入内存是需要占用buffer pool的，所以这种方式还能够避免占用内存，提高内存利用率。</p>
-<p>那么，什么条件下可以使用change buffer呢？对于唯一索引来说，所有的更新操作都要先判断这个操作是否违反唯一性约束。</p>
-<p>比如，要插入(4,400)这个记录，就要先判断现在表中是否已经存在k&#x3D;4的记录，而这必须要将数据页读入内存才能判断。</p>
-<p>如果都已经读入到内存了，那直接更新内存会更快，就没必要使用change buffer了。</p>
-<p>因此，唯一索引的更新就不能使用change buffer，实际上也只有普通索引可以使用。</p>
-<p>change buffer用的是buffer pool里的内存，因此不能无限增大。</p>
-<p>change buffer的大小，可以通过参数innodb_change_buffer_max_size来动态设置。</p>
-<p>这个参数设置为50的时候，表示changebuffer的大小最多只能占用buffer pool的50%。</p>
-<p>现在，你已经理解了change buffer的机制，那么我们再一起来看看如果要在这张表中插入一个新记录(4,400)的话，InnoDB的处理流程是怎样的。</p>
-<p>第一种情况是，这个记录要更新的目标页在内存中。</p>
-<p>这时，InnoDB的处理流程如下：</p>
-<p>对于唯一索引来说，找到3和5之间的位置，判断到没有冲突，插入这个值，语句执行结束；</p>
-<p>对于普通索引来说，找到3和5之间的位置，插入这个值，语句执行结束。</p>
-<p>这样看来，普通索引和唯一索引对更新语句性能影响的差别，只是一个判断，只会耗费微小的CPU时间。</p>
-<p>但，这不是我们关注的重点。</p>
-<p>第二种情况是，这个记录要更新的目标页不在内存中。</p>
-<p>这时，InnoDB的处理流程如下：</p>
-<p>对于唯一索引来说，需要将数据页读入内存，判断到没有冲突，插入这个值，语句执行结束；</p>
-<p>对于普通索引来说，则是将更新记录在change buffer，语句执行就结束了。</p>
-<p>将数据从磁盘读入内存涉及随机IO的访问，是数据库里面成本最高的操作之一。</p>
-<p>change buffer因为减少了随机磁盘访问，所以对更新性能的提升是会很明显的。</p>
-<p>之前我就碰到过一件事儿，有个DBA的同学跟我反馈说，他负责的某个业务的库内存命中率突然从99%降低到了75%，整个系统处于阻塞状态，更新语句全部堵住。</p>
-<p>而探究其原因后，我发现这个业务有大量插入数据的操作，而他在前一天把其中的某个普通索引改成了唯一索引。</p>
-<p>change buffer的使用场景通过上面的分析，你已经清楚了使用change buffer对更新过程的加速作用，也清楚了changebuffer只限于用在普通索引的场景下，而不适用于唯一索引。</p>
-<p>那么，现在有一个问题就是：普通索引的所有场景，使用change buffer都可以起到加速作用吗？因为merge的时候是真正进行数据更新的时刻，而change buffer的主要目的就是将记录的变更动作缓存下来，所以在一个数据页做merge之前，change buffer记录的变更越多（也就是这个页面上要更新的次数越多），收益就越大。</p>
-<p>因此，对于写多读少的业务来说，页面在写完以后马上被访问到的概率比较小，此时changebuffer的使用效果最好。</p>
-<p>这种业务模型常见的就是账单类、日志类的系统。</p>
-<p>反过来，假设一个业务的更新模式是写入之后马上会做查询，那么即使满足了条件，将更新先记录在change buffer，但之后由于马上要访问这个数据页，会立即触发merge过程。</p>
-<p>这样随机访问IO的次数不会减少，反而增加了change buffer的维护代价。</p>
-<p>所以，对于这种业务模式来说，change buffer反而起到了副作用。</p>
-<p>索引选择和实践回到我们文章开头的问题，普通索引和唯一索引应该怎么选择。</p>
-<p>其实，这两类索引在查询能力上是没差别的，主要考虑的是对更新性能的影响。</p>
-<p>所以，我建议你尽量选择普通索引。</p>
-<p>如果所有的更新后面，都马上伴随着对这个记录的查询，那么你应该关闭change buffer。</p>
-<p>而在其他情况下，change buffer都能提升更新性能。</p>
-<p>在实际使用中，你会发现，普通索引和change buffer的配合使用，对于数据量大的表的更新优化还是很明显的。</p>
-<p>特别地，在使用机械硬盘时，change buffer这个机制的收效是非常显著的。</p>
-<p>所以，当你有一个类似“历史数据”的库，并且出于成本考虑用的是机械硬盘时，那你应该特别关注这些表里的索引，尽量使用普通索引，然后把change buffer 尽量开大，以确保这个“历史数据”表的数据写入速度。</p>
-<p>change buffer 和 redo log理解了change buffer的原理，你可能会联想到我在前面文章中和你介绍过的redo log和WAL。</p>
-<p>在前面文章的评论中，我发现有同学混淆了redo log和change buffer。</p>
-<p>WAL 提升性能的核心机制，也的确是尽量减少随机读写，这两个概念确实容易混淆。</p>
-<p>所以，这里我把它们放到了同一个流程里来说明，便于你区分这两个概念。</p>
-<p>现在，我们要在表上执行这个插入语句：</p>
-<p>这里，我们假设当前k索引树的状态，查找到位置后，k1所在的数据页在内存(InnoDB bufferpool)中，k2所在的数据页不在内存中。</p>
-<p>如图2所示是带change buffer的更新状态图。</p>
-<p>图2 带change buffer的更新过程分析这条更新语句，你会发现它涉及了四个部分：内存、redo log（ib_log_fileX）、 数据表空间（t.ibd）、系统表空间（ibdata1）。</p>
-<p>这条更新语句做了如下的操作（按照图中的数字顺序）：</p>
-<ol>
-<li><p>Page 1在内存中，直接更新内存；</p>
+<li><p>MySQL后面的版本可能会改变加锁策略，所以这个规则只限于截止到现在的最新版本，即5.x系列&lt;&#x3D;5.7.24，8.0系列 &lt;&#x3D;8.0.13。</p>
 </li>
-<li><p>Page 2没有在内存中，就在内存的change buffer区域，记录下“我要往Page 2插入一行”这个信息备注：这里，你可以再回顾下第2篇文章《日志系统：一条SQL更新语句是如何执行的？》中的相关内容。</p>
+<li><p>如果大家在验证中有发现bad case的话，请提出来，我会再补充进这篇文章，使得一起学习本专栏的所有同学都能受益。</p>
 </li>
 </ol>
-<p>mysql&gt; insert into t(id,k) values(id1,k1),(id2,k2);3. 将上述两个动作记入redo log中（图中3和4）。</p>
-<p>做完上面这些，事务就可以完成了。</p>
-<p>所以，你会看到，执行这条更新语句的成本很低，就是写了两处内存，然后写了一处磁盘（两次操作合在一起写了一次磁盘），而且还是顺序写的。</p>
-<p>同时，图中的两个虚线箭头，是后台操作，不影响更新的响应时间。</p>
-<p>那在这之后的读请求，要怎么处理呢？比如，我们现在要执行 select * from t where k in (k1, k2)。</p>
-<p>这里，我画了这两个读请求的流程图。</p>
-<p>如果读语句发生在更新语句后不久，内存中的数据都还在，那么此时的这两个读操作就与系统表空间（ibdata1）和 redo log（ib_log_fileX）无关了。</p>
-<p>所以，我在图中就没画出这两部分。</p>
-<p>图3 带change buffer的读过程从图中可以看到：</p>
+<p>因为间隙锁在可重复读隔离级别下才有效，所以本篇文章接下来的描述，若没有特殊说明，默认是可重复读隔离级别。</p>
+<p>我总结的加锁规则里面，包含了两个“原则”、两个“优化”和一个“bug”。</p>
 <ol>
-<li>读Page 1的时候，直接从内存返回。</li>
+<li>原则1：加锁的基本单位是next-key lock。</li>
 </ol>
-<p>有几位同学在前面文章的评论中问到，WAL之后如果读数据，是不是一定要读盘，是不是一定要从redo log里面把数据更新以后才可以返回？其实是不用的。</p>
-<p>你可以看一下图3的这个状态，虽然磁盘上还是之前的数据，但是这里直接从内存返回结果，结果是正确的。</p>
+<p>希望你还记得，next-key lock是前开后闭区间。</p>
 <ol start="2">
-<li>要读Page 2的时候，需要把Page 2从磁盘读入内存中，然后应用change buffer里面的操作日志，生成一个正确的版本并返回结果。</li>
+<li><p>原则2：查找过程中访问到的对象才会加锁。</p>
+</li>
+<li><p>优化1：索引上的等值查询，给唯一索引加锁的时候，next-key lock退化为行锁。</p>
+</li>
+<li><p>优化2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-keylock退化为间隙锁。</p>
+</li>
+<li><p>一个bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止。</p>
+</li>
 </ol>
-<p>可以看到，直到需要读Page 2的时候，这个数据页才会被读入内存。</p>
-<p>所以，如果要简单地对比这两个机制在提升更新性能上的收益的话，redo log 主要节省的是随机写磁盘的IO消耗（转成顺序写），而change buffer主要节省的则是随机读磁盘的IO消耗。</p>
-<p>小结今天，我从普通索引和唯一索引的选择开始，和你分享了数据的查询和更新过程，然后说明了change buffer的机制以及应用场景，最后讲到了索引选择的实践。</p>
-<p>由于唯一索引用不上change buffer的优化机制，因此如果业务可以接受，从性能角度出发我建议你优先考虑非唯一索引。</p>
-<p>最后，又到了思考题时间。</p>
-<p>通过图2你可以看到，change buffer一开始是写内存的，那么如果这个时候机器掉电重启，会不会导致change buffer丢失呢？change buffer丢失可不是小事儿，再从磁盘读入数据可就没有了merge过程，就等于是数据丢失了。</p>
-<p>会不会出现这种情况呢？你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>我还是以上篇文章的表t为例，和你解释一下这些规则。</p>
+<p>表t的建表语句和初始化语句如下。</p>
+<p>接下来的例子基本都是配合着图片说明的，所以我建议你可以对照着文稿看，有些例子可能会“毁三观”，也建议你读完文章后亲手实践一下。</p>
+<p>案例一：等值查询间隙锁第一个例子是关于等值条件操作间隙：</p>
+<p>图1 等值查询的间隙锁由于表t中没有id&#x3D;7的记录，所以用我们上面提到的加锁规则判断一下的话：</p>
+<p>CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY &#96;c  ̀(̀ c )̀) ENGINE&#x3D;InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);1. 根据原则1，加锁单位是next-key lock，session A加锁范围就是(5,10]；</p>
+<ol start="2">
+<li>同时根据优化2，这是一个等值查询(id&#x3D;7)，而id&#x3D;10不满足查询条件，next-key lock退化成间隙锁，因此最终加锁的范围是(5,10)。</li>
+</ol>
+<p>所以，session B要往这个间隙里面插入id&#x3D;8的记录会被锁住，但是session C修改id&#x3D;10这行是可以的。</p>
+<p>案例二：非唯一索引等值锁第二个例子是关于覆盖索引上的锁：</p>
+<p>图2 只加在非唯一索引上的锁看到这个例子，你是不是有一种“该锁的不锁，不该锁的乱锁”的感觉？我们来分析一下吧。</p>
+<p>这里session A要给索引c上c&#x3D;5的这一行加上读锁。</p>
+<ol>
+<li><p>根据原则1，加锁单位是next-key lock，因此会给(0,5]加上next-key lock。</p>
+</li>
+<li><p>要注意c是普通索引，因此仅访问c&#x3D;5这一条记录是不能马上停下来的，需要向右遍历，查到c&#x3D;10才放弃。</p>
+</li>
+</ol>
+<p>根据原则2，访问到的都要加锁，因此要给(5,10]加next-key lock。</p>
+<ol start="3">
+<li><p>但是同时这个符合优化2：等值判断，向右遍历，最后一个值不满足c&#x3D;5这个等值条件，因此退化成间隙锁(5,10)。</p>
+</li>
+<li><p>根据原则2 ，只有访问到的对象才会加锁，这个查询使用覆盖索引，并不需要访问主键索引，所以主键索引上没有加任何锁，这就是为什么session B的update语句可以执行完成。</p>
+</li>
+</ol>
+<p>但session C要插入一个(7,7,7)的记录，就会被session A的间隙锁(5,10)锁住。</p>
+<p>需要注意，在这个例子中，lock in share mode只锁覆盖索引，但是如果是for update就不一样了。</p>
+<p> 执行 for update时，系统会认为你接下来要更新数据，因此会顺便给主键索引上满足条件的行加上行锁。</p>
+<p>这个例子说明，锁是加在索引上的；同时，它给我们的指导是，如果你要用lock in share mode来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段。</p>
+<p>比如，将session A的查询语句改成select d from t where c&#x3D;5 lock in share mode。</p>
+<p>你可以自己验证一下效果。</p>
+<p>案例三：主键索引范围锁第三个例子是关于范围查询的。</p>
+<p>举例之前，你可以先思考一下这个问题：对于我们这个表t，下面这两条查询语句，加锁范围相同吗？你可能会想，id定义为int类型，这两个语句就是等价的吧？其实，它们并不完全等价。</p>
+<p>在逻辑上，这两条查语句肯定是等价的，但是它们的加锁规则不太一样。</p>
+<p>现在，我们就让session A执行第二个查询语句，来看看加锁效果。</p>
+<p>图3 主键索引上范围查询的锁现在我们就用前面提到的加锁规则，来分析一下session A 会加什么锁呢？mysql&gt; select * from t where id&#x3D;10 for update;mysql&gt; select * from t where id&gt;&#x3D;10 and id&lt;11 for update;1. 开始执行的时候，要找到第一个id&#x3D;10的行，因此本该是next-key lock(5,10]。</p>
+<p> 根据优化1，主键id上的等值条件，退化成行锁，只加了id&#x3D;10这一行的行锁。</p>
+<ol start="2">
+<li>范围查找就往后继续找，找到id&#x3D;15这一行停下来，因此需要加next-key lock(10,15]。</li>
+</ol>
+<p>所以，session A这时候锁的范围就是主键索引上，行锁id&#x3D;10和next-key lock(10,15]。</p>
+<p>这样，session B和session C的结果你就能理解了。</p>
+<p>这里你需要注意一点，首次session A定位查找id&#x3D;10的行的时候，是当做等值查询来判断的，而向右扫描到id&#x3D;15的时候，用的是范围查询判断。</p>
+<p>案例四：非唯一索引范围锁接下来，我们再看两个范围查询加锁的例子，你可以对照着案例三来看。</p>
+<p>需要注意的是，与案例三不同的是，案例四中查询语句的where部分用的是字段c。</p>
+<p>图4 非唯一索引范围锁这次session A用字段c来判断，加锁规则跟案例三唯一的不同是：在第一次用c&#x3D;10定位记录的时候，索引c上加了(5,10]这个next-key lock后，由于索引c是非唯一索引，没有优化规则，也就是说不会蜕变为行锁，因此最终sesion A加的锁是，索引c上的(5,10] 和(10,15] 这两个next-keylock。</p>
+<p>所以从结果上来看，sesson B要插入（8,8,8)的这个insert语句时就被堵住了。</p>
+<p>这里需要扫描到c&#x3D;15才停止扫描，是合理的，因为InnoDB要扫到c&#x3D;15，才知道不需要继续往后找了。</p>
+<p>案例五：唯一索引范围锁bug前面的四个案例，我们已经用到了加锁规则中的两个原则和两个优化，接下来再看一个关于加锁规则中bug的案例。</p>
+<p>图5 唯一索引范围锁的bugsession A是一个范围查询，按照原则1的话，应该是索引id上只加(10,15]这个next-key lock，并且因为id是唯一键，所以循环判断到id&#x3D;15这一行就应该停止了。</p>
+<p>但是实现上，InnoDB会往前扫描到第一个不满足条件的行为止，也就是id&#x3D;20。</p>
+<p>而且由于这是个范围扫描，因此索引id上的(15,20]这个next-key lock也会被锁上。</p>
+<p>所以你看到了，session B要更新id&#x3D;20这一行，是会被锁住的。</p>
+<p>同样地，session C要插入id&#x3D;16的一行，也会被锁住。</p>
+<p>照理说，这里锁住id&#x3D;20这一行的行为，其实是没有必要的。</p>
+<p>因为扫描到id&#x3D;15，就可以确定不用往后再找了。</p>
+<p>但实现上还是这么做了，因此我认为这是个bug。</p>
+<p>我也曾找社区的专家讨论过，官方bug系统上也有提到，但是并未被verified。</p>
+<p>所以，认为这是bug这个事儿，也只能算我的一家之言，如果你有其他见解的话，也欢迎你提出来。</p>
+<p>案例六：非唯一索引上存在”等值”的例子接下来的例子，是为了更好地说明“间隙”这个概念。</p>
+<p>这里，我给表t插入一条新记录。</p>
+<p>新插入的这一行c&#x3D;10，也就是说现在表里有两个c&#x3D;10的行。</p>
+<p>那么，这时候索引c上的间隙是什么状态了呢？你要知道，由于非唯一索引上包含主键的值，所以是不可能存在“相同”的两行的。</p>
+<p>mysql&gt; insert into t values(30,10,30);图6 非唯一索引等值的例子可以看到，虽然有两个c&#x3D;10，但是它们的主键值id是不同的（分别是10和30），因此这两个c&#x3D;10的记录之间，也是有间隙的。</p>
+<p>图中我画出了索引c上的主键id。</p>
+<p>为了跟间隙锁的开区间形式进行区别，我用(c&#x3D;10,id&#x3D;30)这样的形式，来表示索引上的一行。</p>
+<p>现在，我们来看一下案例六。</p>
+<p>这次我们用delete语句来验证。</p>
+<p>注意，delete语句加锁的逻辑，其实跟select … for update 是类似的，也就是我在文章开始总结的两个“原则”、两个“优化”和一个“bug”。</p>
+<p>图7 delete 示例这时，session A在遍历的时候，先访问第一个c&#x3D;10的记录。</p>
+<p>同样地，根据原则1，这里加的是(c&#x3D;5,id&#x3D;5)到(c&#x3D;10,id&#x3D;10)这个next-key lock。</p>
+<p>然后，session A向右查找，直到碰到(c&#x3D;15,id&#x3D;15)这一行，循环才结束。</p>
+<p>根据优化2，这是一个等值查询，向右查找到了不满足条件的行，所以会退化成(c&#x3D;10,id&#x3D;10) 到 (c&#x3D;15,id&#x3D;15)的间隙锁。</p>
+<p>也就是说，这个delete语句在索引c上的加锁范围，就是下图中蓝色区域覆盖的部分。</p>
+<p>图8 delete加锁效果示例这个蓝色区域左右两边都是虚线，表示开区间，即(c&#x3D;5,id&#x3D;5)和(c&#x3D;15,id&#x3D;15)这两行上都没有锁。</p>
+<p>案例七：limit 语句加锁例子6也有一个对照案例，场景如下所示：</p>
+<p>图9 limit 语句加锁这个例子里，session A的delete语句加了 limit 2。</p>
+<p>你知道表t里c&#x3D;10的记录其实只有两条，因此加不加limit 2，删除的效果都是一样的，但是加锁的效果却不同。</p>
+<p>可以看到，session B的insert语句执行通过了，跟案例六的结果不同。</p>
+<p>这是因为，案例七里的delete语句明确加了limit 2的限制，因此在遍历到(c&#x3D;10, id&#x3D;30)这一行之后，满足条件的语句已经有两条，循环就结束了。</p>
+<p>因此，索引c上的加锁范围就变成了从（c&#x3D;5,id&#x3D;5)到（c&#x3D;10,id&#x3D;30)这个前开后闭区间，如下图所示：</p>
+<p>图10 带limit 2的加锁效果可以看到，(c&#x3D;10,id&#x3D;30）之后的这个间隙并没有在加锁范围里，因此insert语句插入c&#x3D;12是可以执行成功的。</p>
+<p>这个例子对我们实践的指导意义就是，在删除数据的时候尽量加limit。</p>
+<p>这样不仅可以控制删除数据的条数，让操作更安全，还可以减小加锁的范围。</p>
+<p>案例八：一个死锁的例子前面的例子中，我们在分析的时候，是按照next-key lock的逻辑来分析的，因为这样分析比较方便。</p>
+<p>最后我们再看一个案例，目的是说明：next-key lock实际上是间隙锁和行锁加起来的结果。</p>
+<p>你一定会疑惑，这个概念不是一开始就说了吗？不要着急，我们先来看下面这个例子：</p>
+<p>图11 案例八的操作序列现在，我们按时间顺序来分析一下为什么是这样的结果。</p>
+<ol>
+<li><p>session A 启动事务后执行查询语句加lock in share mode，在索引c上加了next-keylock(5,10] 和间隙锁(10,15)；</p>
+</li>
+<li><p>session B 的update语句也要在索引c上加next-key lock(5,10] ，进入锁等待；</p>
+</li>
+<li><p>然后session A要再插入(8,8,8)这一行，被session B的间隙锁锁住。</p>
+</li>
+</ol>
+<p>由于出现了死锁，InnoDB让session B回滚。</p>
+<p>你可能会问，session B的next-key lock不是还没申请成功吗？其实是这样的，session B的“加next-key lock(5,10] ”操作，实际上分成了两步，先是加(5,10)的间隙锁，加锁成功；然后加c&#x3D;10的行锁，这时候才被锁住的。</p>
+<p>也就是说，我们在分析加锁规则的时候可以用next-key lock来分析。</p>
+<p>但是要知道，具体执行的时候，是要分成间隙锁和行锁两段来执行的。</p>
+<p>小结这里我再次说明一下，我们上面的所有案例都是在可重复读隔离级别(repeatable-read)下验证的。</p>
+<p>同时，可重复读隔离级别遵守两阶段锁协议，所有加锁的资源，都是在事务提交或者回滚的时候才释放的。</p>
+<p>在最后的案例中，你可以清楚地知道next-key lock实际上是由间隙锁加行锁实现的。</p>
+<p>如果切换到读提交隔离级别(read-committed)的话，就好理解了，过程中去掉间隙锁的部分，也就是只剩下行锁的部分。</p>
+<p>其实读提交隔离级别在外键场景下还是有间隙锁，相对比较复杂，我们今天先不展开。</p>
+<p>另外，在读提交隔离级别下还有一个优化，即：语句执行过程中加上的行锁，在语句执行完成后，就要把“不满足条件的行”上的行锁直接释放了，不需要等到事务提交。</p>
+<p>也就是说，读提交隔离级别下，锁的范围更小，锁的时间更短，这也是不少业务都默认使用读提交隔离级别的原因。</p>
+<p>不过，我希望你学过今天的课程以后，可以对next-key lock的概念有更清晰的认识，并且会用加锁规则去判断语句的加锁范围。</p>
+<p>在业务需要使用可重复读隔离级别的时候，能够更细致地设计操作数据库的语句，解决幻读问题的同时，最大限度地提升系统并行处理事务的能力。</p>
+<p>经过这篇文章的介绍，你再看一下上一篇文章最后的思考题，再来尝试分析一次。</p>
+<p>我把题目重新描述和简化一下：还是我们在文章开头初始化的表t，里面有6条记录，图12的语句序列中，为什么session B的insert操作，会被锁住呢？图12 锁分析思考题另外，如果你有兴趣多做一些实验的话，可以设计好语句序列，在执行之前先自己分析一下，然后实际地验证结果是否跟你的分析一致。</p>
+<p>对于那些你自己无法解释的结果，可以发到评论区里，后面我争取挑一些有趣的案例在文章中分析。</p>
+<p>你可以把你关于思考题的分析写在留言区，也可以分享你自己设计的锁验证方案，我会在下一篇文章的末尾选取有趣的评论跟大家分享。</p>
 <p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>补充：</p>
-<p>评论区大家对“是否使用唯一索引”有比较多的讨论，主要是纠结在“业务可能无法确保”的情况。</p>
-<p>这里，我再说明一下：</p>
-<p>首先，业务正确性优先。</p>
-<p>咱们这篇文章的前提是“业务代码已经保证不会写入重复数据”的情况下，讨论性能问题。</p>
-<p>如果业务不能保证，或者业务就是要求数据库来做约束，那么没得选，必须创建唯一索引。</p>
-<p>这种情况下，本篇文章的意义在于，如果碰上了大量插入数据慢、内存命中率低的时候，可以给你多提供一个排查思路。</p>
-<p>然后，在一些“归档库”的场景，你是可以考虑使用唯一索引的。</p>
-<p>比如，线上数据只需要保留半年，然后历史数据保存在归档库。</p>
-<p>这时候，归档数据已经是确保没有唯一键冲突了。</p>
-<p>要提高归档效率，可以考虑把表里面的唯一索引改成普通索引。</p>
-<p>上期问题时间上期的问题是：如何构造一个“数据无法修改”的场景。</p>
-<p>评论区里已经有不少同学给出了正确答案，这里我再描述一下。</p>
-<p>这样，session A看到的就是我截图的效果了。</p>
-<p>其实，还有另外一种场景，同学们在留言区都还没有提到。</p>
-<p>这个操作序列跑出来，session A看的内容也是能够复现我截图的效果的。</p>
-<p>这个session B’启动的事务比A要早，其实是上期我们描述事务版本的可见性规则时留的彩蛋，因为规则里还有一个“活跃事务的判断”，我是准备留到这里再补充的。</p>
-<p>当我试图在这里讲述完整规则的时候，发现第8篇文章《事务到底是隔离的还是不隔离的？》中的解释引入了太多的概念，以致于分析起来非常复杂。</p>
-<p>因此，我重写了第8篇，这样我们人工去判断可见性的时候，才会更方便。</p>
-<p>【看到这里，我建议你能够再重新打开第8篇文章并认真学习一次。</p>
-<p>如果学习的过程中，有任何问题，也欢迎你给我留言】用新的方式来分析session B’的更新为什么对session A不可见就是：在session A视图数组创建的瞬间，session B’是活跃的，属于“版本未提交，不可见”这种情况。</p>
-<p>业务中如果要绕过这类问题，@约书亚提供了一个“乐观锁”的解法，大家可以去上一篇的留言区看一下。</p>
+<p>上期问题时间上期的问题，我在本期继续作为了课后思考题，所以会在下篇文章再一起公布“答案”。</p>
+<p>这里，我展开回答一下评论区几位同学的问题。</p>
+<p>@令狐少侠 说，以前一直认为间隙锁只在二级索引上有。</p>
+<p>现在你知道了，有间隙的地方就可能有间隙锁。</p>
+<p>@浪里白条 同学问，如果是varchar类型，加锁规则是什么样的。</p>
+<p>回答：实际上在判断间隙的时候，varchar和int是一样的，排好序以后，相邻两个值之间就有间隙。</p>
+<p>有几位同学提到说，上一篇文章自己验证的结果跟案例一不同，就是在session A执行完这两个语句：</p>
+<p>以后，session B 的update 和session C的insert 都会被堵住。</p>
+<p>这是不是跟文章的结论矛盾？其实不是的，这个例子用的是反证假设，就是假设不堵住，会出现问题；然后，推导出sessionA需要锁整个表所有的行和所有间隙。</p>
 
       
     </div>
@@ -1953,7 +2544,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c6101e2f.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/97b6038b.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1967,7 +2558,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/c6101e2f.html" class="post-title-link" itemprop="url">mysql-事务到底是隔离的还是不隔离的</a>
+            <a href="/posts/97b6038b.html" class="post-title-link" itemprop="url">mysql-幻读是什么幻读有什么问题</a>
         </h2>
 
         <div class="post-meta">
@@ -1977,7 +2568,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-09 06:17:41" itemprop="dateCreated datePublished" datetime="2019-11-09T06:17:41+08:00">2019-11-09</time>
+              <time title="创建时间：2019-11-25 06:13:13" itemprop="dateCreated datePublished" datetime="2019-11-25T06:13:13+08:00">2019-11-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -2001,7 +2592,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>4.9k</span>
+              <span>5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -2019,356 +2610,169 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>事务到底是隔离的还是不隔离的？我在第3篇文章和你讲事务隔离级别的时候提到过，如果是可重复读隔离级别，事务T启动的时候会创建一个视图read-view，之后事务T执行期间，即使有其他事务修改了数据，事务T看到的仍然跟在启动时看到的一样。</p>
-<p>也就是说，一个在可重复读隔离级别下执行的事务，好像与世无争，不受外界影响。</p>
-<p>但是，我在上一篇文章中，和你分享行锁的时候又提到，一个事务要更新一行，如果刚好有另外一个事务拥有这一行的行锁，它又不能这么超然了，会被锁住，进入等待状态。</p>
-<p>问题是，既然进入了等待状态，那么等到这个事务自己获取到行锁要更新数据的时候，它读到的值又是什么呢？我给你举一个例子吧。</p>
-<p>下面是一个只有两行的表的初始化语句。</p>
-<p>mysql&gt; CREATE TABLE <code>t</code> (  <code>id</code> int(11) NOT NULL,  <code>k</code> int(11) DEFAULT NULL,  PRIMARY KEY (<code>id</code>)) ENGINE&#x3D;InnoDB;insert into t(id, k) values(1,1),(2,2);图1 事务A、B、C的执行流程这里，我们需要注意的是事务的启动时机。</p>
-<p>begin&#x2F;start transaction 命令并不是一个事务的起点，在执行到它们之后的第一个操作InnoDB表的语句，事务才真正启动。</p>
-<p>如果你想要马上启动一个事务，可以使用start transaction withconsistent snapshot 这个命令。</p>
-<p>还需要注意的是，在整个专栏里面，我们的例子中如果没有特别说明，都是默认autocommit&#x3D;1。</p>
-<p>在这个例子中，事务C没有显式地使用begin&#x2F;commit，表示这个update语句本身就是一个事务，语句完成的时候会自动提交。</p>
-<p>事务B在更新了行之后查询; 事务A在一个只读事务中查询，并且时间顺序上是在事务B的查询之后。</p>
-<p>这时，如果我告诉你事务B查到的k的值是3，而事务A查到的k的值是1，你是不是感觉有点晕呢？所以，今天这篇文章，我其实就是想和你说明白这个问题，希望借由把这个疑惑解开的过程，能够帮助你对InnoDB的事务和锁有更进一步的理解。</p>
-<p>在MySQL里，有两个“视图”的概念：</p>
-<p>一个是view。</p>
-<p>它是一个用查询语句定义的虚拟表，在调用的时候执行查询语句并生成结果。</p>
-<p>创建视图的语法是create view … ，而它的查询方法与表一样。</p>
-<p>另一个是InnoDB在实现MVCC时用到的一致性读视图，即consistent read view，用于支持RC（Read Committed，读提交）和RR（Repeatable Read，可重复读）隔离级别的实现。</p>
-<p>它没有物理结构，作用是事务执行期间用来定义“我能看到什么数据”。</p>
-<p>在第3篇文章《事务隔离：为什么你改了我还看不见？》中，我跟你解释过一遍MVCC的实现逻辑。</p>
-<p>今天为了说明查询和更新的区别，我换一个方式来说明，把read view拆开。</p>
-<p>你可以结合这两篇文章的说明来更深一步地理解MVCC。</p>
-<p>“快照”在MVCC里是怎么工作的？在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。</p>
-<p>注意，这个快照是基于整库的。</p>
-<p>这时，你会说这看上去不太现实啊。</p>
-<p>如果一个库有100G，那么我启动一个事务，MySQL就要拷贝100G的数据出来，这个过程得多慢啊。</p>
-<p>可是，我平时的事务执行起来很快啊。</p>
-<p>实际上，我们并不需要拷贝出这100G的数据。</p>
-<p>我们先来看看这个快照是怎么实现的。</p>
-<p>InnoDB里面每个事务有一个唯一的事务ID，叫作transaction id。</p>
-<p>它是在事务开始的时候向InnoDB的事务系统申请的，是按申请顺序严格递增的。</p>
-<p>而每行数据也都是有多个版本的。</p>
-<p>每次事务更新数据的时候，都会生成一个新的数据版本，并且把transaction id赋值给这个数据版本的事务ID，记为row trx_id。</p>
-<p>同时，旧的数据版本要保留，并且在新的数据版本中，能够有信息可以直接拿到它。</p>
-<p>也就是说，数据表中的一行记录，其实可能有多个版本(row)，每个版本有自己的row trx_id。</p>
-<p>如图2所示，就是一个记录被多个事务连续更新后的状态。</p>
-<p>图2 行状态变更图图中虚线框里是同一行数据的4个版本，当前最新版本是V4，k的值是22，它是被transaction id为25的事务更新的，因此它的row trx_id也是25。</p>
-<p>你可能会问，前面的文章不是说，语句更新会生成undo log（回滚日志）吗？那么，undo log在哪呢？实际上，图2中的三个虚线箭头，就是undo log；而V1、V2、V3并不是物理上真实存在的，而是每次需要的时候根据当前版本和undo log计算出来的。</p>
-<p>比如，需要V2的时候，就是通过V4依次执行U3、U2算出来。</p>
-<p>明白了多版本和row trx_id的概念后，我们再来想一下，InnoDB是怎么定义那个“100G”的快照的。</p>
-<p>按照可重复读的定义，一个事务启动的时候，能够看到所有已经提交的事务结果。</p>
-<p>但是之后，这个事务执行期间，其他事务的更新对它不可见。</p>
-<p>因此，一个事务只需要在启动的时候声明说，“以我启动的时刻为准，如果一个数据版本是在我启动之前生成的，就认；如果是我启动以后才生成的，我就不认，我必须要找到它的上一个版本”。</p>
-<p>当然，如果“上一个版本”也不可见，那就得继续往前找。</p>
-<p>还有，如果是这个事务自己更新的数据，它自己还是要认的。</p>
-<p>在实现上， InnoDB为每个事务构造了一个数组，用来保存这个事务启动瞬间，当前正在“活跃”的所有事务ID。</p>
-<p>“活跃”指的就是，启动了但还没提交。</p>
-<p>数组里面事务ID的最小值记为低水位，当前系统里面已经创建过的事务ID的最大值加1记为高水位。</p>
-<p>这个视图数组和高水位，就组成了当前事务的一致性视图（read-view）。</p>
-<p>而数据版本的可见性规则，就是基于数据的row trx_id和这个一致性视图的对比结果得到的。</p>
-<p>这个视图数组把所有的row trx_id 分成了几种不同的情况。</p>
-<p>图3 数据版本可见性规则这样，对于当前事务的启动瞬间来说，一个数据版本的row trx_id，有以下几种可能：</p>
+          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。</p>
+<p>今天，我们就从这个问题说起吧。</p>
+<p>为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。</p>
+<p>建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）：</p>
+<p>这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。</p>
+<p>上期我留给你的问题是，下面的语句序列，是怎么加锁的，加的锁又是什么时候释放的呢？CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY &#96;c  ̀(̀ c )̀) ENGINE&#x3D;InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);比较好理解的是，这个语句会命中d&#x3D;5的这一行，对应的主键id&#x3D;5，因此在select 语句执行完成后，id&#x3D;5这一行会加一个写锁，而且由于两阶段锁协议，这个写锁会在执行commit语句的时候释放。</p>
+<p>由于字段d上没有索引，因此这条查询语句会做全表扫描。</p>
+<p>那么，其他被扫描到的，但是不满足条件的5行记录上，会不会被加锁呢？我们知道，InnoDB的默认事务隔离级别是可重复读，所以本文接下来没有特殊说明的部分，都是设定在可重复读隔离级别下。</p>
+<p>幻读是什么？现在，我们就来分析一下，如果只在id&#x3D;5这一行加锁，而其他行的不加锁的话，会怎么样。</p>
+<p>下面先来看一下这个场景（注意：这是我假设的一个场景）：</p>
+<p>图 1 假设只在id&#x3D;5这一行加行锁可以看到，session A里执行了三次查询，分别是Q1、Q2和Q3。</p>
+<p>它们的SQL语句相同，都是select * from t where d&#x3D;5 for update。</p>
+<p>这个语句的意思你应该很清楚了，查所有d&#x3D;5的行，而且使用的是当前读，并且加上写锁。</p>
+<p>现在，我们来看一下这三条SQL语句，分别会返回什么结果。</p>
 <ol>
-<li><p>如果落在绿色部分，表示这个版本是已提交的事务或者是当前事务自己生成的，这个数据是可见的；</p>
+<li>Q1只返回id&#x3D;5这一行；</li>
+</ol>
+<p>begin;select * from t where d&#x3D;5 for update;commit;2. 在T2时刻，session B把id&#x3D;0这一行的d值改成了5，因此T3时刻Q2查出来的是id&#x3D;0和id&#x3D;5这两行；</p>
+<ol start="3">
+<li>在T4时刻，session C又插入一行（1,1,5），因此T5时刻Q3查出来的是id&#x3D;0、id&#x3D;1和id&#x3D;5的这三行。</li>
+</ol>
+<p>其中，Q3读到id&#x3D;1这一行的现象，被称为“幻读”。</p>
+<p>也就是说，幻读指的是一个事务在前后两次查询同一个范围的时候，后一次查询看到了前一次查询没有看到的行。</p>
+<p>这里，我需要对“幻读”做一个说明：</p>
+<ol>
+<li>在可重复读隔离级别下，普通的查询是快照读，是不会看到别的事务插入的数据的。</li>
+</ol>
+<p>因此，幻读在“当前读”下才会出现。</p>
+<ol start="2">
+<li>上面session B的修改结果，被session A之后的select语句用“当前读”看到，不能称为幻读。</li>
+</ol>
+<p>幻读仅专指“新插入的行”。</p>
+<p>如果只从第8篇文章《事务到底是隔离的还是不隔离的？》我们学到的事务可见性规则来分析的话，上面这三条SQL语句的返回结果都没有问题。</p>
+<p>因为这三个查询都是加了for update，都是当前读。</p>
+<p>而当前读的规则，就是要能读到所有已经提交的记录的最新值。</p>
+<p>并且，session B和sessionC的两条语句，执行后就会提交，所以Q2和Q3就是应该看到这两个事务的操作效果，而且也看到了，这跟事务的可见性规则并不矛盾。</p>
+<p>但是，这是不是真的没问题呢？不，这里还真就有问题。</p>
+<p>幻读有什么问题？首先是语义上的。</p>
+<p>session A在T1时刻就声明了，“我要把所有d&#x3D;5的行锁住，不准别的事务进行读写操作”。</p>
+<p>而实际上，这个语义被破坏了。</p>
+<p>如果现在这样看感觉还不明显的话，我再往session B和session C里面分别加一条SQL语句，你再看看会出现什么现象。</p>
+<p>图 2 假设只在id&#x3D;5这一行加行锁–语义被破坏session B的第二条语句update t set c&#x3D;5 where id&#x3D;0，语义是“我把id&#x3D;0、d&#x3D;5这一行的c值，改成了5”。</p>
+<p>由于在T1时刻，session A 还只是给id&#x3D;5这一行加了行锁， 并没有给id&#x3D;0这行加上锁。</p>
+<p>因此，session B在T2时刻，是可以执行这两条update语句的。</p>
+<p>这样，就破坏了 session A 里Q1语句要锁住所有d&#x3D;5的行的加锁声明。</p>
+<p>session C也是一样的道理，对id&#x3D;1这一行的修改，也是破坏了Q1的加锁声明。</p>
+<p>其次，是数据一致性的问题。</p>
+<p>我们知道，锁的设计是为了保证数据的一致性。</p>
+<p>而这个一致性，不止是数据库内部数据状态在此刻的一致性，还包含了数据和日志在逻辑上的一致性。</p>
+<p>为了说明这个问题，我给session A在T1时刻再加一个更新语句，即：update t set d&#x3D;100 whered&#x3D;5。</p>
+<p>图 3 假设只在id&#x3D;5这一行加行锁–数据一致性问题update的加锁语义和select …for update 是一致的，所以这时候加上这条update语句也很合理。</p>
+<p>session A声明说“要给d&#x3D;5的语句加上锁”，就是为了要更新数据，新加的这条update语句就是把它认为加上了锁的这一行的d值修改成了100。</p>
+<p>现在，我们来分析一下图3执行完成后，数据库里会是什么结果。</p>
+<ol>
+<li>经过T1时刻，id&#x3D;5这一行变成 (5,5,100)，当然这个结果最终是在T6时刻正式提交的;2. 经过T2时刻，id&#x3D;0这一行变成(0,5,5);3. 经过T4时刻，表里面多了一行(1,5,5);4. 其他行跟这个执行序列无关，保持不变。</li>
+</ol>
+<p>这样看，这些数据也没啥问题，但是我们再来看看这时候binlog里面的内容。</p>
+<ol>
+<li><p>T2时刻，session B事务提交，写入了两条语句；</p>
 </li>
-<li><p>如果落在红色部分，表示这个版本是由将来启动的事务生成的，是肯定不可见的；</p>
+<li><p>T4时刻，session C事务提交，写入了两条语句；</p>
 </li>
-<li><p>如果落在黄色部分，那就包括两种情况a. 若 row trx_id在数组中，表示这个版本是由还没提交的事务生成的，不可见；</p>
+<li><p>T6时刻，session A事务提交，写入了update t set d&#x3D;100 where d&#x3D;5 这条语句。</p>
 </li>
 </ol>
-<p>b. 若 row trx_id不在数组中，表示这个版本是已经提交了的事务生成的，可见。</p>
-<p>比如，对于图2中的数据来说，如果有一个事务，它的低水位是18，那么当它访问这一行数据时，就会从V4通过U3计算出V3，所以在它看来，这一行的值是11。</p>
-<p>你看，有了这个声明后，系统里面随后发生的更新，是不是就跟这个事务看到的内容无关了呢？因为之后的更新，生成的版本一定属于上面的2或者3(a)的情况，而对它来说，这些新的数据版本是不存在的，所以这个事务的快照，就是“静态”的了。</p>
-<p>所以你现在知道了，InnoDB利用了“所有数据都有多个版本”的这个特性，实现了“秒级创建快照”的能力。</p>
-<p>接下来，我们继续看一下图1中的三个事务，分析下事务A的语句返回的结果，为什么是k&#x3D;1。</p>
-<p>这里，我们不妨做如下假设：</p>
+<p>我统一放到一起的话，就是这样的：</p>
+<p>好，你应该看出问题了。</p>
+<p>这个语句序列，不论是拿到备库去执行，还是以后用binlog来克隆一个库，这三行的结果，都变成了 (0,5,100)、(1,5,100)和(5,5,100)。</p>
+<p>也就是说，id&#x3D;0和id&#x3D;1这两行，发生了数据不一致。</p>
+<p>这个问题很严重，是不行的。</p>
+<p>到这里，我们再回顾一下，这个数据不一致到底是怎么引入的？我们分析一下可以知道，这是我们假设“select * from t where d&#x3D;5 for update这条语句只给d&#x3D;5这一行，也就是id&#x3D;5的这一行加锁”导致的。</p>
+<p>所以我们认为，上面的设定不合理，要改。</p>
+<p>那怎么改呢？我们把扫描过程中碰到的行，也都加上写锁，再来看看执行效果。</p>
+<p>update t set d&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,0,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,5,5)</em>&#x2F;insert into t values(1,1,5); &#x2F;<em>(1,1,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;1; &#x2F;<em>(1,5,5)</em>&#x2F;update t set d&#x3D;100 where d&#x3D;5;&#x2F;<em>所有d&#x3D;5的行，d改成100</em>&#x2F;图 4 假设扫描到的行都被加上了行锁由于session A把所有的行都加了写锁，所以session B在执行第一个update语句的时候就被锁住了。</p>
+<p>需要等到T6时刻session A提交以后，session B才能继续执行。</p>
+<p>这样对于id&#x3D;0这一行，在数据库里的最终结果还是 (0,5,5)。</p>
+<p>在binlog里面，执行序列是这样的：</p>
+<p>可以看到，按照日志顺序执行，id&#x3D;0这一行的最终结果也是(0,5,5)。</p>
+<p>所以，id&#x3D;0这一行的问题解决了。</p>
+<p>但同时你也可以看到，id&#x3D;1这一行，在数据库里面的结果是(1,5,5)，而根据binlog的执行结果是(1,5,100)，也就是说幻读的问题还是没有解决。</p>
+<p>为什么我们已经这么“凶残”地，把所有的记录都上了锁，还是阻止不了id&#x3D;1这一行的插入和更新呢？原因很简单。</p>
+<p>在T3时刻，我们给所有行加锁的时候，id&#x3D;1这一行还不存在，不存在也就加不上锁。</p>
+<p>也就是说，即使把所有的记录都加上锁，还是阻止不了新插入的记录，这也是为什么“幻读”会被单独拿出来解决的原因。</p>
+<p>到这里，其实我们刚说明完文章的标题 ：幻读的定义和幻读有什么问题。</p>
+<p>接下来，我们再看看InnoDB怎么解决幻读的问题。</p>
+<p>如何解决幻读？现在你知道了，产生幻读的原因是，行锁只能锁住行，但是新插入记录这个动作，要更新的是记录之间的“间隙”。</p>
+<p>因此，为了解决幻读问题，InnoDB只好引入新的锁，也就是间隙锁(GapLock)。</p>
+<p>顾名思义，间隙锁，锁的就是两个值之间的空隙。</p>
+<p>比如文章开头的表t，初始化插入了6个记录，这就产生了7个间隙。</p>
+<p>insert into t values(1,1,5); &#x2F;<em>(1,1,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;1; &#x2F;<em>(1,5,5)</em>&#x2F;update t set d&#x3D;100 where d&#x3D;5;&#x2F;<em>所有d&#x3D;5的行，d改成100</em>&#x2F;update t set d&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,0,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,5,5)</em>&#x2F;图 5 表t主键索引上的行锁和间隙锁这样，当你执行 select * from t where d&#x3D;5 for update的时候，就不止是给数据库中已有的6个记录加上了行锁，还同时加了7个间隙锁。</p>
+<p>这样就确保了无法再插入新的记录。</p>
+<p>也就是说这时候，在一行行扫描的过程中，不仅将给行加上了行锁，还给行两边的空隙，也加上了间隙锁。</p>
+<p>现在你知道了，数据行是可以加上锁的实体，数据行之间的间隙，也是可以加上锁的实体。</p>
+<p>但是间隙锁跟我们之前碰到过的锁都不太一样。</p>
+<p>比如行锁，分成读锁和写锁。</p>
+<p>下图就是这两种类型行锁的冲突关系。</p>
+<p>图6 两种行锁间的冲突关系也就是说，跟行锁有冲突关系的是“另外一个行锁”。</p>
+<p>但是间隙锁不一样，跟间隙锁存在冲突关系的，是“往这个间隙中插入一个记录”这个操作。</p>
+<p>间隙锁之间都不存在冲突关系。</p>
+<p>这句话不太好理解，我给你举个例子：</p>
+<p>图7 间隙锁之间不互锁这里session B并不会被堵住。</p>
+<p>因为表t里并没有c&#x3D;7这个记录，因此session A加的是间隙锁(5,10)。</p>
+<p>而session B也是在这个间隙加的间隙锁。</p>
+<p>它们有共同的目标，即：保护这个间隙，不允许插入值。</p>
+<p>但，它们之间是不冲突的。</p>
+<p>间隙锁和行锁合称next-key lock，每个next-key lock是前开后闭区间。</p>
+<p>也就是说，我们的表t初始化以后，如果用select * from t for update要把整个表所有记录锁起来，就形成了7个next-keylock，分别是 (-∞,0]、(0,5]、(5,10]、(10,15]、(15,20]、(20, 25]、(25, +supremum]。</p>
+<p>你可能会问说，这个supremum从哪儿来的呢？这是因为+∞是开区间。</p>
+<p>实现上，InnoDB给每个索引加了一个不存在的最大值supremum，这样才符合我们前面说的“都是前开后闭区间”。</p>
+<p>间隙锁和next-key lock的引入，帮我们解决了幻读的问题，但同时也带来了一些“困扰”。</p>
+<p>在前面的文章中，就有同学提到了这个问题。</p>
+<p>我把他的问题转述一下，对应到我们这个例子的表来说，业务逻辑这样的：任意锁住一行，如果这一行不存在的话就插入，如果存在这一行就更新它的数据，代码如下：</p>
+<p>备注：这篇文章中，如果没有特别说明，我们把间隙锁记为开区间，把next-key lock记为前开后闭区间。</p>
+<p>begin;select * from t where id&#x3D;N for update;&#x2F;<em>如果行不存在</em>&#x2F;insert into t values(N,N,N);&#x2F;<em>如果行存在</em>&#x2F;update t set d&#x3D;N set id&#x3D;N;commit;可能你会说，这个不是insert … on duplicate key update 就能解决吗？但其实在有多个唯一键的时候，这个方法是不能满足这位提问同学的需求的。</p>
+<p>至于为什么，我会在后面的文章中再展开说明。</p>
+<p>现在，我们就只讨论这个逻辑。</p>
+<p>这个同学碰到的现象是，这个逻辑一旦有并发，就会碰到死锁。</p>
+<p>你一定也觉得奇怪，这个逻辑每次操作前用for update锁起来，已经是最严格的模式了，怎么还会有死锁呢？这里，我用两个session来模拟并发，并假设N&#x3D;9。</p>
+<p>图8 间隙锁导致的死锁你看到了，其实都不需要用到后面的update语句，就已经形成死锁了。</p>
+<p>我们按语句执行顺序来分析一下：</p>
 <ol>
-<li><p>事务A开始前，系统里面只有一个活跃事务ID是99；</p>
+<li><p>session A 执行select … for update语句，由于id&#x3D;9这一行并不存在，因此会加上间隙锁(5,10);2. session B 执行select … for update语句，同样会加上间隙锁(5,10)，间隙锁之间不会冲突，因此这个语句可以执行成功；</p>
 </li>
-<li><p>事务A、B、C的版本号分别是100、101、102，且当前系统里只有这四个事务；</p>
+<li><p>session B 试图插入一行(9,9,9)，被session A的间隙锁挡住了，只好进入等待；</p>
 </li>
-<li><p>三个事务开始前，(1,1）这一行数据的row trx_id是90。</p>
+<li><p>session A试图插入一行(9,9,9)，被session B的间隙锁挡住了。</p>
 </li>
 </ol>
-<p>这样，事务A的视图数组就是[99,100], 事务B的视图数组是[99,100,101], 事务C的视图数组是[99,100,101,102]。</p>
-<p>为了简化分析，我先把其他干扰语句去掉，只画出跟事务A查询逻辑有关的操作：</p>
-<p>图4 事务A查询数据逻辑图从图中可以看到，第一个有效更新是事务C，把数据从(1,1)改成了(1,2)。</p>
-<p>这时候，这个数据的最新版本的row trx_id是102，而90这个版本已经成为了历史版本。</p>
-<p>第二个有效更新是事务B，把数据从(1,2)改成了(1,3)。</p>
-<p>这时候，这个数据的最新版本（即rowtrx_id）是101，而102又成为了历史版本。</p>
-<p>你可能注意到了，在事务A查询的时候，其实事务B还没有提交，但是它生成的(1,3)这个版本已经变成当前版本了。</p>
-<p>但这个版本对事务A必须是不可见的，否则就变成脏读了。</p>
-<p>好，现在事务A要来读数据了，它的视图数组是[99,100]。</p>
-<p>当然了，读数据都是从当前版本读起的。</p>
-<p>所以，事务A查询语句的读数据流程是这样的：</p>
-<p>找到(1,3)的时候，判断出row trx_id&#x3D;101，比高水位大，处于红色区域，不可见；</p>
-<p>接着，找到上一个历史版本，一看row trx_id&#x3D;102，比高水位大，处于红色区域，不可见；</p>
-<p>再往前找，终于找到了（1,1)，它的row trx_id&#x3D;90，比低水位小，处于绿色区域，可见。</p>
-<p>这样执行下来，虽然期间这一行数据被修改过，但是事务A不论在什么时候查询，看到这行数据的结果都是一致的，所以我们称之为一致性读。</p>
-<p>这个判断规则是从代码逻辑直接转译过来的，但是正如你所见，用于人肉分析可见性很麻烦。</p>
-<p>所以，我来给你翻译一下。</p>
-<p>一个数据版本，对于一个事务视图来说，除了自己的更新总是可见以外，有三种情况：</p>
-<ol>
-<li><p>版本未提交，不可见；</p>
-</li>
-<li><p>版本已提交，但是是在视图创建后提交的，不可见；</p>
-</li>
-<li><p>版本已提交，而且是在视图创建前提交的，可见。</p>
-</li>
-</ol>
-<p>现在，我们用这个规则来判断图4中的查询结果，事务A的查询语句的视图数组是在事务A启动的时候生成的，这时候：</p>
-<p>(1,3)还没提交，属于情况1，不可见；</p>
-<p>(1,2)虽然提交了，但是是在视图数组创建之后提交的，属于情况2，不可见；</p>
-<p>(1,1)是在视图数组创建之前提交的，可见。</p>
-<p>你看，去掉数字对比后，只用时间先后顺序来判断，分析起来是不是轻松多了。</p>
-<p>所以，后面我们就都用这个规则来分析。</p>
-<p>更新逻辑细心的同学可能有疑问了：事务B的update语句，如果按照一致性读，好像结果不对哦？你看图5中，事务B的视图数组是先生成的，之后事务C才提交，不是应该看不见(1,2)吗，怎么能算出(1,3)来？图5 事务B更新逻辑图是的，如果事务B在更新之前查询一次数据，这个查询返回的k的值确实是1。</p>
-<p>但是，当它要去更新数据的时候，就不能再在历史版本上更新了，否则事务C的更新就丢失了。</p>
-<p>因此，事务B此时的set k&#x3D;k+1是在（1,2）的基础上进行的操作。</p>
-<p>所以，这里就用到了这样一条规则：更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）。</p>
-<p>因此，在更新的时候，当前读拿到的数据是(1,2)，更新后生成了新版本的数据(1,3)，这个新版本的row trx_id是101。</p>
-<p>所以，在执行事务B查询语句的时候，一看自己的版本号是101，最新数据的版本号也是101，是自己的更新，可以直接使用，所以查询得到的k的值是3。</p>
-<p>这里我们提到了一个概念，叫作当前读。</p>
-<p>其实，除了update语句外，select语句如果加锁，也是当前读。</p>
-<p>所以，如果把事务A的查询语句select * from t where id&#x3D;1修改一下，加上lock in share mode 或for update，也都可以读到版本号是101的数据，返回的k的值是3。</p>
-<p>下面这两个select语句，就是分别加了读锁（S锁，共享锁）和写锁（X锁，排他锁）。</p>
-<p>再往前一步，假设事务C不是马上提交的，而是变成了下面的事务C’，会怎么样呢？图6 事务A、B、C’的执行流程事务C’的不同是，更新后并没有马上提交，在它提交前，事务B的更新语句先发起了。</p>
-<p>前面说过了，虽然事务C’还没提交，但是(1,2)这个版本也已经生成了，并且是当前的最新版本。</p>
-<p>那么，事务B的更新语句会怎么处理呢？这时候，我们在上一篇文章中提到的“两阶段锁协议”就要上场了。</p>
-<p>事务C’没提交，也就是说(1,2)这个版本上的写锁还没释放。</p>
-<p>而事务B是当前读，必须要读最新版本，而且必须加锁，因此就被锁住了，必须等到事务C’释放这个锁，才能继续它的当前读。</p>
-<p>mysql&gt; select k from t where id&#x3D;1 lock in share mode;mysql&gt; select k from t where id&#x3D;1 for update;图7 事务B更新逻辑图（配合事务C’）到这里，我们把一致性读、当前读和行锁就串起来了。</p>
-<p>现在，我们再回到文章开头的问题：事务的可重复读的能力是怎么实现的？可重复读的核心就是一致性读（consistent read）；而事务更新数据的时候，只能用当前读。</p>
-<p>如果当前的记录的行锁被其他事务占用的话，就需要进入锁等待。</p>
-<p>而读提交的逻辑和可重复读的逻辑类似，它们最主要的区别是：</p>
-<p>在可重复读隔离级别下，只需要在事务开始的时候创建一致性视图，之后事务里的其他查询都共用这个一致性视图；</p>
-<p>在读提交隔离级别下，每一个语句执行前都会重新算出一个新的视图。</p>
-<p>那么，我们再看一下，在读提交隔离级别下，事务A和事务B的查询语句查到的k，分别应该是多少呢？这里需要说明一下，“start transaction with consistent snapshot; ”的意思是从这个语句开始，创建一个持续整个事务的一致性快照。</p>
-<p>所以，在读提交隔离级别下，这个用法就没意义了，等效于普通的start transaction。</p>
-<p>下面是读提交时的状态图，可以看到这两个查询语句的创建视图数组的时机发生了变化，就是图中的read view框。</p>
-<p>（注意：这里，我们用的还是事务C的逻辑直接提交，而不是事务C’）图8 读提交隔离级别下的事务状态图这时，事务A的查询语句的视图数组是在执行这个语句的时候创建的，时序上(1,2)、(1,3)的生成时间都在创建这个视图数组的时刻之前。</p>
-<p>但是，在这个时刻：</p>
-<p>(1,3)还没提交，属于情况1，不可见；</p>
-<p>(1,2)提交了，属于情况3，可见。</p>
-<p>所以，这时候事务A查询语句返回的是k&#x3D;2。</p>
-<p>显然地，事务B查询结果k&#x3D;3。</p>
-<p>小结InnoDB的行数据有多个版本，每个数据版本有自己的row trx_id，每个事务或者语句有自己的一致性视图。</p>
-<p>普通查询语句是一致性读，一致性读会根据row trx_id和一致性视图确定数据版本的可见性。</p>
-<p>对于可重复读，查询只承认在事务启动前就已经提交完成的数据；</p>
-<p>对于读提交，查询只承认在语句启动前就已经提交完成的数据；</p>
-<p>而当前读，总是读取已经提交完成的最新版本。</p>
-<p>你也可以想一下，为什么表结构不支持“可重复读”？这是因为表结构没有对应的行数据，也没有row trx_id，因此只能遵循当前读的逻辑。</p>
-<p>当然，MySQL 8.0已经可以把表结构放在InnoDB字典里了，也许以后会支持表结构的可重复读。</p>
-<p>又到思考题时间了。</p>
-<p>我用下面的表结构和初始化语句作为试验环境，事务隔离级别是可重复读。</p>
-<p>现在，我要把所有“字段c和id值相等的行”的c值清零，但是却发现了一个“诡异”的、改不掉的情况。</p>
-<p>请你构造出这种情况，并说明其原理。</p>
-<p>mysql&gt; CREATE TABLE <code>t</code> (  <code>id</code> int(11) NOT NULL,  <code>c</code> int(11) DEFAULT NULL,  PRIMARY KEY (<code>id</code>)) ENGINE&#x3D;InnoDB;insert into t(id, c) values(1,1),(2,2),(3,3),(4,4);复现出来以后，请你再思考一下，在实际的业务开发中有没有可能碰到这种情况？你的应用代码会不会掉进这个“坑”里，你又是怎么解决的呢？你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
+<p>至此，两个session进入互相等待状态，形成死锁。</p>
+<p>当然，InnoDB的死锁检测马上就发现了这对死锁关系，让session A的insert语句报错返回了。</p>
+<p>你现在知道了，间隙锁的引入，可能会导致同样的语句锁住更大的范围，这其实是影响了并发度的。</p>
+<p>其实，这还只是一个简单的例子，在下一篇文章中我们还会碰到更多、更复杂的例子。</p>
+<p>你可能会说，为了解决幻读的问题，我们引入了这么一大串内容，有没有更简单一点的处理方法呢。</p>
+<p>我在文章一开始就说过，如果没有特别说明，今天和你分析的问题都是在可重复读隔离级别下的，间隙锁是在可重复读隔离级别下才会生效的。</p>
+<p>所以，你如果把隔离级别设置为读提交的话，就没有间隙锁了。</p>
+<p>但同时，你要解决可能出现的数据和日志不一致问题，需要把binlog格式设置为row。</p>
+<p>这，也是现在不少公司使用的配置组合。</p>
+<p>前面文章的评论区有同学留言说，他们公司就使用的是读提交隔离级别加binlog_format&#x3D;row的组合。</p>
+<p>他曾问他们公司的DBA说，你为什么要这么配置。</p>
+<p>DBA直接答复说，因为大家都这么用呀。</p>
+<p>所以，这个同学在评论区就问说，这个配置到底合不合理。</p>
+<p>关于这个问题本身的答案是，如果读提交隔离级别够用，也就是说，业务不需要可重复读的保证，这样考虑到读提交下操作数据的锁范围更小（没有间隙锁），这个选择是合理的。</p>
+<p>但其实我想说的是，配置是否合理，跟业务场景有关，需要具体问题具体分析。</p>
+<p>但是，如果DBA认为之所以这么用的原因是“大家都这么用”，那就有问题了，或者说，迟早会出问题。</p>
+<p>比如说，大家都用读提交，可是逻辑备份的时候，mysqldump为什么要把备份线程设置成可重复读呢？（这个我在前面的文章中已经解释过了，你可以再回顾下第6篇文章《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》的内容）然后，在备份期间，备份线程用的是可重复读，而业务线程用的是读提交。</p>
+<p>同时存在两种事务隔离级别，会不会有问题？进一步地，这两个不同的隔离级别现象有什么不一样的，关于我们的业务，“用读提交就够了”这个结论是怎么得到的？如果业务开发和运维团队这些问题都没有弄清楚，那么“没问题”这个结论，本身就是有问题的。</p>
+<p>小结今天我们从上一篇文章的课后问题说起，提到了全表扫描的加锁方式。</p>
+<p>我们发现即使给所有的行都加上行锁，仍然无法解决幻读问题，因此引入了间隙锁的概念。</p>
+<p>我碰到过很多对数据库有一定了解的业务开发人员，他们在设计数据表结构和业务SQL语句的时候，对行锁有很准确的认识，但却很少考虑到间隙锁。</p>
+<p>最后的结果，就是生产库上会经常出现由于间隙锁导致的死锁现象。</p>
+<p>行锁确实比较直观，判断规则也相对简单，间隙锁的引入会影响系统的并发度，也增加了锁分析的复杂度，但也有章可循。</p>
+<p>下一篇文章，我就会为你讲解InnoDB的加锁规则，帮你理顺这其中的“章法”。</p>
+<p>作为对下一篇文章的预习，我给你留下一个思考题。</p>
+<p>图9 事务进入锁等待状态如果你之前没有了解过本篇文章的相关内容，一定觉得这三个语句简直是风马牛不相及。</p>
+<p>但实际上，这里session B和session C的insert 语句都会进入锁等待状态。</p>
+<p>你可以试着分析一下，出现这种情况的原因是什么？这里需要说明的是，这其实是我在下一篇文章介绍加锁规则后才能回答的问题，是留给你作为预习的，其中session C被锁住这个分析是有点难度的。</p>
+<p>如果你没有分析出来，也不要气馁，我会在下一篇文章和你详细说明。</p>
+<p>你也可以说说，你的线上MySQL配置的是什么隔离级别，为什么会这么配置？你有没有碰到什么场景，是必须使用可重复读隔离级别的呢？你可以把你的碰到的场景和分析写在留言区里，我会在下一篇文章选取有趣的评论跟大家一起分享和分析。</p>
 <p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我在上一篇文章最后，留给你的问题是：怎么删除表的前10000行。</p>
-<p>比较多的留言都选择了第二种方式，即：在一个连接中循环执行20次 delete from T limit 500。</p>
-<p>确实是这样的，第二种方式是相对较好的。</p>
-<p>第一种方式（即：直接执行delete from T limit 10000）里面，单个语句占用时间长，锁的时间也比较长；而且大事务还会导致主从延迟。</p>
-<p>第三种方式（即：在20个连接中同时执行delete from T limit 500），会人为造成锁冲突。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/3f0fbdd7.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/3f0fbdd7.html" class="post-title-link" itemprop="url">mysql-行锁功过：怎么减少行锁对性能的影响</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-08 06:09:24" itemprop="dateCreated datePublished" datetime="2019-11-08T06:09:24+08:00">2019-11-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:34:39" itemprop="dateModified" datetime="2023-01-18T23:34:39+08:00">2023-01-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>3.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>12 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>行锁功过：怎么减少行锁对性能的影响？在上一篇文章中，我跟你介绍了MySQL的全局锁和表级锁，今天我们就来讲讲MySQL的行锁。</p>
-<p>MySQL的行锁是在引擎层由各个引擎自己实现的。</p>
-<p>但并不是所有的引擎都支持行锁，比如MyISAM引擎就不支持行锁。</p>
-<p>不支持行锁意味着并发控制只能使用表锁，对于这种引擎的表，同一张表上任何时刻只能有一个更新在执行，这就会影响到业务并发度。</p>
-<p>InnoDB是支持行锁的，这也是MyISAM被InnoDB替代的重要原因之一。</p>
-<p>我们今天就主要来聊聊InnoDB的行锁，以及如何通过减少锁冲突来提升业务并发度。</p>
-<p>顾名思义，行锁就是针对数据表中行记录的锁。</p>
-<p>这很好理解，比如事务A更新了一行，而这时候事务B也要更新同一行，则必须等事务A的操作完成后才能进行更新。</p>
-<p>当然，数据库中还有一些没那么一目了然的概念和设计，这些概念如果理解和使用不当，容易导致程序出现非预期行为，比如两阶段锁。</p>
-<p>从两阶段锁说起我先给你举个例子。</p>
-<p>在下面的操作序列中，事务B的update语句执行时会是什么现象呢？假设字段id是表t的主键。</p>
-<p>这个问题的结论取决于事务A在执行完两条update语句后，持有哪些锁，以及在什么时候释放。</p>
-<p>你可以验证一下：实际上事务B的update语句会被阻塞，直到事务A执行commit之后，事务B才能继续执行。</p>
-<p>知道了这个答案，你一定知道了事务A持有的两个记录的行锁，都是在commit的时候才释放的。</p>
-<p>也就是说，在InnoDB事务中，行锁是在需要的时候才加上的，但并不是不需要了就立刻释放，而是要等到事务结束时才释放。</p>
-<p>这个就是两阶段锁协议。</p>
-<p>知道了这个设定，对我们使用事务有什么帮助呢？那就是，如果你的事务中需要锁多个行，要把最可能造成锁冲突、最可能影响并发度的锁尽量往后放。</p>
-<p>我给你举个例子。</p>
-<p>假设你负责实现一个电影票在线交易业务，顾客A要在影院B购买电影票。</p>
-<p>我们简化一点，这个业务需要涉及到以下操作：</p>
-<ol>
-<li><p>从顾客A账户余额中扣除电影票价；</p>
-</li>
-<li><p>给影院B的账户余额增加这张电影票价；</p>
-</li>
-<li><p>记录一条交易日志。</p>
-</li>
-</ol>
-<p>也就是说，要完成这个交易，我们需要update两条记录，并insert一条记录。</p>
-<p>当然，为了保证交易的原子性，我们要把这三个操作放在一个事务中。</p>
-<p>那么，你会怎样安排这三个语句在事务中的顺序呢？试想如果同时有另外一个顾客C要在影院B买票，那么这两个事务冲突的部分就是语句2了。</p>
-<p>因为它们要更新同一个影院账户的余额，需要修改同一行数据。</p>
-<p>根据两阶段锁协议，不论你怎样安排语句顺序，所有的操作需要的行锁都是在事务提交的时候才释放的。</p>
-<p>所以，如果你把语句2安排在最后，比如按照3、1、2这样的顺序，那么影院账户余额这一行的锁时间就最少。</p>
-<p>这就最大程度地减少了事务之间的锁等待，提升了并发度。</p>
-<p>好了，现在由于你的正确设计，影院余额这一行的行锁在一个事务中不会停留很长时间。</p>
-<p>但是，这并没有完全解决你的困扰。</p>
-<p>如果这个影院做活动，可以低价预售一年内所有的电影票，而且这个活动只做一天。</p>
-<p>于是在活动时间开始的时候，你的MySQL就挂了。</p>
-<p>你登上服务器一看，CPU消耗接近100%，但整个数据库每秒就执行不到100个事务。</p>
-<p>这是什么原因呢？这里，我就要说到死锁和死锁检测了。</p>
-<p>死锁和死锁检测当并发系统中不同线程出现循环资源依赖，涉及的线程都在等待别的线程释放资源时，就会导致这几个线程都进入无限等待的状态，称为死锁。</p>
-<p>这里我用数据库中的行锁举个例子。</p>
-<p>这时候，事务A在等待事务B释放id&#x3D;2的行锁，而事务B在等待事务A释放id&#x3D;1的行锁。</p>
-<p> 事务A和事务B在互相等待对方的资源释放，就是进入了死锁状态。</p>
-<p>当出现死锁以后，有两种策略：</p>
-<p>一种策略是，直接进入等待，直到超时。</p>
-<p>这个超时时间可以通过参数innodb_lock_wait_timeout来设置。</p>
-<p>另一种策略是，发起死锁检测，发现死锁后，主动回滚死锁链条中的某一个事务，让其他事务得以继续执行。</p>
-<p>将参数innodb_deadlock_detect设置为on，表示开启这个逻辑。</p>
-<p>在InnoDB中，innodb_lock_wait_timeout的默认值是50s，意味着如果采用第一个策略，当出现死锁以后，第一个被锁住的线程要过50s才会超时退出，然后其他线程才有可能继续执行。</p>
-<p>对于在线服务来说，这个等待时间往往是无法接受的。</p>
-<p>但是，我们又不可能直接把这个时间设置成一个很小的值，比如1s。</p>
-<p>这样当出现死锁的时候，确实很快就可以解开，但如果不是死锁，而是简单的锁等待呢？所以，超时时间设置太短的话，会出现很多误伤。</p>
-<p>所以，正常情况下我们还是要采用第二种策略，即：主动死锁检测，而且innodb_deadlock_detect的默认值本身就是on。</p>
-<p>主动死锁检测在发生死锁的时候，是能够快速发现并进行处理的，但是它也是有额外负担的。</p>
-<p>你可以想象一下这个过程：每当一个事务被锁的时候，就要看看它所依赖的线程有没有被别人锁住，如此循环，最后判断是否出现了循环等待，也就是死锁。</p>
-<p>那如果是我们上面说到的所有事务都要更新同一行的场景呢？每个新来的被堵住的线程，都要判断会不会由于自己的加入导致了死锁，这是一个时间复杂度是O(n)的操作。</p>
-<p>假设有1000个并发线程要同时更新同一行，那么死锁检测操作就是100万这个量级的。</p>
-<p>虽然最终检测的结果是没有死锁，但是这期间要消耗大量的CPU资源。</p>
-<p>因此，你就会看到CPU利用率很高，但是每秒却执行不了几个事务。</p>
-<p>根据上面的分析，我们来讨论一下，怎么解决由这种热点行更新导致的性能问题呢？问题的症结在于，死锁检测要耗费大量的CPU资源。</p>
-<p>一种头痛医头的方法，就是如果你能确保这个业务一定不会出现死锁，可以临时把死锁检测关掉。</p>
-<p>但是这种操作本身带有一定的风险，因为业务设计的时候一般不会把死锁当做一个严重错误，毕竟出现死锁了，就回滚，然后通过业务重试一般就没问题了，这是业务无损的。</p>
-<p>而关掉死锁检测意味着可能会出现大量的超时，这是业务有损的。</p>
-<p>另一个思路是控制并发度。</p>
-<p>根据上面的分析，你会发现如果并发能够控制住，比如同一行同时最多只有10个线程在更新，那么死锁检测的成本很低，就不会出现这个问题。</p>
-<p>一个直接的想法就是，在客户端做并发控制。</p>
-<p>但是，你会很快发现这个方法不太可行，因为客户端很多。</p>
-<p>我见过一个应用，有600个客户端，这样即使每个客户端控制到只有5个并发线程，汇总到数据库服务端以后，峰值并发数也可能要达到3000。</p>
-<p>因此，这个并发控制要做在数据库服务端。</p>
-<p>如果你有中间件，可以考虑在中间件实现；如果你的团队有能修改MySQL源码的人，也可以做在MySQL里面。</p>
-<p>基本思路就是，对于相同行的更新，在进入引擎之前排队。</p>
-<p>这样在InnoDB内部就不会有大量的死锁检测工作了。</p>
-<p>可能你会问，如果团队里暂时没有数据库方面的专家，不能实现这样的方案，能不能从设计上优化这个问题呢？你可以考虑通过将一行改成逻辑上的多行来减少锁冲突。</p>
-<p>还是以影院账户为例，可以考虑放在多条记录上，比如10个记录，影院的账户总额等于这10个记录的值的总和。</p>
-<p>这样每次要给影院账户加金额的时候，随机选其中一条记录来加。</p>
-<p>这样每次冲突概率变成原来的1&#x2F;10，可以减少锁等待个数，也就减少了死锁检测的CPU消耗。</p>
-<p>这个方案看上去是无损的，但其实这类方案需要根据业务逻辑做详细设计。</p>
-<p>如果账户余额可能会减少，比如退票逻辑，那么这时候就需要考虑当一部分行记录变成0的时候，代码要有特殊处理。</p>
-<p>小结今天，我和你介绍了MySQL的行锁，涉及了两阶段锁协议、死锁和死锁检测这两大部分内容。</p>
-<p>其中，我以两阶段协议为起点，和你一起讨论了在开发的时候如何安排正确的事务语句。</p>
-<p>这里的原则&#x2F;我给你的建议是：如果你的事务中需要锁多个行，要把最可能造成锁冲突、最可能影响并发度的锁的申请时机尽量往后放。</p>
-<p>但是，调整语句顺序并不能完全避免死锁。</p>
-<p>所以我们引入了死锁和死锁检测的概念，以及提供了三个方案，来减少死锁对数据库的影响。</p>
-<p>减少死锁的主要方向，就是控制访问相同资源的并发事务量。</p>
-<p>最后，我给你留下一个问题吧。</p>
-<p>如果你要删除一个表里面的前10000行数据，有以下三种方法可以做到：</p>
-<p>第一种，直接执行delete from T limit 10000;第二种，在一个连接中循环执行20次 delete from T limit 500;第三种，在20个连接中同时执行delete from T limit 500。</p>
-<p>你会选择哪一种方法呢？为什么呢？你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期我给你留的问题是：当备库用–single-transaction做逻辑备份的时候，如果从主库的binlog传来一个DDL语句会怎么样？假设这个DDL是针对表t1的， 这里我把备份过程中几个关键的语句列出来：</p>
-<p>Q1:SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;Q2:START TRANSACTION  WITH CONSISTENT SNAPSHOT；</p>
-<p>&#x2F;* other tables <em>&#x2F;Q3:SAVEPOINT sp;&#x2F;</em> 时刻 1 <em>&#x2F;Q4:show create table <code>t1</code>;&#x2F;</em> 时刻 2 <em>&#x2F;Q5:SELECT * FROM <code>t1</code>;&#x2F;</em> 时刻 3 <em>&#x2F;Q6:ROLLBACK TO SAVEPOINT sp;&#x2F;</em> 时刻 4 <em>&#x2F;&#x2F;</em> other tables *&#x2F;在备份开始的时候，为了确保RR（可重复读）隔离级别，再设置一次RR隔离级别(Q1);启动事务，这里用 WITH CONSISTENT SNAPSHOT确保这个语句执行完就可以得到一个一致性视图（Q2)；</p>
-<p>设置一个保存点，这个很重要（Q3）；</p>
-<p>show create 是为了拿到表结构(Q4)，然后正式导数据 （Q5），回滚到SAVEPOINT sp，在这里的作用是释放 t1的MDL锁 （Q6。</p>
-<p>当然这部分属于“超纲”，上文正文里面都没提到。</p>
-<p>DDL从主库传过来的时间按照效果不同，我打了四个时刻。</p>
-<p>题目设定为小表，我们假定到达后，如果开始执行，则很快能够执行完成。</p>
-<p>参考答案如下：</p>
-<ol>
-<li><p>如果在Q4语句执行之前到达，现象：没有影响，备份拿到的是DDL后的表结构。</p>
-</li>
-<li><p>如果在“时刻 2”到达，则表结构被改过，Q5执行的时候，报 Table definition has changed,please retry transaction，现象：mysqldump终止；</p>
-</li>
-<li><p>如果在“时刻2”和“时刻3”之间到达，mysqldump占着t1的MDL读锁，binlog被阻塞，现象：</p>
-</li>
-</ol>
-<p>主从延迟，直到Q6执行完成。</p>
-<ol start="4">
-<li>从“时刻4”开始，mysqldump释放了MDL读锁，现象：没有影响，备份拿到的是DDL前的表结构。</li>
-</ol>
+<p>上期问题时间我们在本文的开头回答了上期问题。</p>
+<p>有同学的回答中还说明了读提交隔离级别下，在语句执行完成后，是只有行锁的。</p>
+<p>而且语句执行完成后，InnoDB就会把不满足条件的行行锁去掉。</p>
+<p>当然了，c&#x3D;5这一行的行锁，还是会等到commit的时候才释放的。</p>
 
       
     </div>
@@ -2387,7 +2791,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2453,14 +2857,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">337</span>
+          <span class="site-state-item-count">350</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -2502,12 +2906,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">312k</span>
+    <span title="站点总字数">320k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">18:55</span>
+    <span title="站点阅读时长">19:23</span>
 </div>
 
 <!--
