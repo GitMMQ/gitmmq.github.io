@@ -192,6 +192,1145 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/25120.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/25120.html" class="post-title-link" itemprop="url">贪心算法-旅行商问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>有若干个城市，任何两个城市之间的距离都是确定的，现要求一旅行商从某城市出发必须经过每一个城市且只在一个城市逗留一次，最后回到出发的城市，问如何事先确定一条最短的线路已保证其旅行的费用最少？</p>
+<p>还有 背包、装箱 问题</p>
+<p>注： 递归，时间复杂度为n!</p>
+<h2 id="贪心算法"><a href="#贪心算法" class="headerlink" title="贪心算法"></a>贪心算法</h2><p>在对问题求解时，总是做出当前情况下的最好选择，否则将来可能会后悔，故名“贪心”。这是一种算法策略，每次选择得到的都是局部最优解。选择的策略必须具备无后效性，即某个状态以前的过程不会影响以后的状态，只与当前状态有关。 </p>
+<p>求解的问题分成若干个子问题，每一个子问题求解，得到子问题的局部最优解，子问题的局部最优解合成原问题的一个解</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>从某一个城市开始，每次选择一个城市，直到所有的城市被走完。 </p>
+</li>
+<li><p>每次在选择下一个城市的时候，只考虑当前情况，保证迄今为止经过的路径总距离最小。</p>
+<pre><code> 从问题的某一初始解出发；
+     while （能朝给定总目标前进一步）
+     &#123; 
+           利用可行的决策，求出可行解的一个解元素；
+     &#125;
+ 由所有解元素组合成问题的一个可行解
+</code></pre>
+</li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>不能保证最终为最优解</li>
+<li>不能用来求最大最小解问题</li>
+<li>无后效性</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package noah;
+ 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+ 
+public class TxTsp &#123;
+ 
+    private int cityNum; // 城市数量
+    private int[][] distance; // 距离矩阵
+ 
+    private int[] colable;//代表列，也表示是否走过，走过置0
+    private int[] row;//代表行，选过置0
+ 
+    public TxTsp(int n) &#123;
+        cityNum = n;
+    &#125;
+ 
+    private void init(String filename) throws IOException &#123;
+        // 读取数据
+        int[] x;
+        int[] y;
+        String strbuff;
+        BufferedReader data = new BufferedReader(new InputStreamReader(
+                new FileInputStream(filename)));
+        distance = new int[cityNum][cityNum];
+        x = new int[cityNum];
+        y = new int[cityNum];
+        for (int i = 0; i &lt; cityNum; i++) &#123;
+            // 读取一行数据，数据格式1 6734 1453
+            strbuff = data.readLine();
+            // 字符分割
+            String[] strcol = strbuff.split(&quot; &quot;);
+            x[i] = Integer.valueOf(strcol[1]);// x坐标
+            y[i] = Integer.valueOf(strcol[2]);// y坐标
+        &#125;
+        data.close();
+ 
+        // 计算距离矩阵
+        // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628
+        for (int i = 0; i &lt; cityNum - 1; i++) &#123;
+            distance[i][i] = 0; // 对角线为0
+            for (int j = i + 1; j &lt; cityNum; j++) &#123;
+                double rij = Math
+                        .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])
+                                * (y[i] - y[j])) / 10.0);
+                // 四舍五入，取整
+                int tij = (int) Math.round(rij);
+                if (tij &lt; rij) &#123;
+                    distance[i][j] = tij + 1;
+                    distance[j][i] = distance[i][j];
+                &#125; else &#123;
+                    distance[i][j] = tij;
+                    distance[j][i] = distance[i][j];
+                &#125;
+            &#125;
+        &#125;
+ 
+        distance[cityNum - 1][cityNum - 1] = 0;
+ 
+        colable = new int[cityNum];
+        colable[0] = 0;
+        for (int i = 1; i &lt; cityNum; i++) &#123;
+            colable[i] = 1;
+        &#125;
+ 
+        row = new int[cityNum];
+        for (int i = 0; i &lt; cityNum; i++) &#123;
+            row[i] = 1;
+        &#125;
+ 
+    &#125;
+    
+    public void solve()&#123;
+        
+        int[] temp = new int[cityNum];
+        String path=&quot;0&quot;;
+        
+        int s=0;//计算距离
+        int i=0;//当前节点
+        int j=0;//下一个节点
+        //默认从0开始
+        while(row[i]==1)&#123;
+            //复制一行
+            for (int k = 0; k &lt; cityNum; k++) &#123;
+                temp[k] = distance[i][k];
+                //System.out.print(temp[k]+&quot; &quot;);
+            &#125;
+            //System.out.println();
+            //选择下一个节点，要求不是已经走过，并且与i不同
+            j = selectmin(temp);
+            //找出下一节点
+            row[i] = 0;//行置0，表示已经选过
+            colable[j] = 0;//列0，表示已经走过
+            
+            path+=&quot;--&gt;&quot; + j;
+            //System.out.println(i + &quot;--&gt;&quot; + j);
+            //System.out.println(distance[i][j]);
+            s = s + distance[i][j];
+            i = j;//当前节点指向下一节点
+        &#125;
+        System.out.println(&quot;路径:&quot; + path);
+        System.out.println(&quot;总距离为:&quot; + s);
+        
+    &#125;
+    
+    public int selectmin(int[] p)&#123;
+        int j = 0, m = p[0], k = 0;
+        //寻找第一个可用节点，注意最后一次寻找，没有可用节点
+        while (colable[j] == 0) &#123;
+            j++;
+            //System.out.print(j+&quot; &quot;);
+            if(j&gt;=cityNum)&#123;
+                //没有可用节点，说明已结束，最后一次为 *--&gt;0
+                m = p[0];
+                break;
+                //或者直接return 0;
+            &#125;
+            else&#123;
+                m = p[j];
+            &#125;
+        &#125;
+        //从可用节点J开始往后扫描，找出距离最小节点
+        for (; j &lt; cityNum; j++) &#123;
+            if (colable[j] == 1) &#123;
+                if (m &gt;= p[j]) &#123;
+                    m = p[j];
+                    k = j;
+                &#125;
+            &#125;
+        &#125;
+        return k;
+    &#125;
+ 
+ 
+    public void printinit() &#123;
+        System.out.println(&quot;print begin....&quot;);
+        for (int i = 0; i &lt; cityNum; i++) &#123;
+            for (int j = 0; j &lt; cityNum; j++) &#123;
+                System.out.print(distance[i][j] + &quot; &quot;);
+            &#125;
+            System.out.println();
+        &#125;
+        System.out.println(&quot;print end....&quot;);
+    &#125;
+ 
+    public static void main(String[] args) throws IOException &#123;
+        System.out.println(&quot;Start....&quot;);
+        TxTsp ts = new TxTsp(48);
+        ts.init(&quot;c://data.txt&quot;);
+        //ts.printinit();
+        ts.solve();
+    &#125;
+&#125;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/1.html" class="post-title-link" itemprop="url">背包问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:08:07" itemprop="dateModified" datetime="2023-08-10T00:08:07+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>613</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>背包问题是动态规划领域中一个重要且经典的问题，涉及在限定容量的背包中如何选择物品，使得物品的总价值最大化或总重量最小化。主要有两类背包问题：0-1背包问题和完全背包问题。</p>
+<ol>
+<li><p><strong>0-1背包问题</strong>：每个物品要么被选择一次，要么不选。</p>
+</li>
+<li><p><strong>完全背包问题</strong>：每个物品可以被选择无限次。</p>
+</li>
+</ol>
+<p>以下是背包问题的一般步骤：</p>
+<ol>
+<li><p><strong>定义状态</strong>：通常使用一个二维数组 <code>dp[i][j]</code>，其中 <code>dp[i][j]</code> 表示前 <code>i</code> 个物品在背包容量为 <code>j</code> 时的最优解（价值或重量）。</p>
+</li>
+<li><p><strong>状态转移方程</strong>：对于每个物品，可以选择将其放入背包（如果容量允许），也可以选择不放入。状态转移方程通常为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i][j] = max(dp[i-1][j], dp[i-1][j-weight[i]] + value[i])</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>weight[i]</code> 表示第 <code>i</code> 个物品的重量，<code>value[i]</code> 表示第 <code>i</code> 个物品的价值。</p>
+</li>
+<li><p><strong>边界条件</strong>：初始时，当没有物品可选时，<code>dp[0][j]</code> 都应为 0，当背包容量为 0 时，<code>dp[i][0]</code> 也都为 0。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，逐步计算出大规模问题的最优解。</p>
+</li>
+</ol>
+<p>下面是一个0-1背包问题的 Java 代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">KnapsackProblem</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">knapsack</span><span class="params">(<span class="type">int</span>[] weights, <span class="type">int</span>[] values, <span class="type">int</span> capacity)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> weights.length;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>][capacity + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt;= capacity; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (weights[i - <span class="number">1</span>] &lt;= j) &#123;</span><br><span class="line">                    dp[i][j] = Math.max(dp[i - <span class="number">1</span>][j], dp[i - <span class="number">1</span>][j - weights[i - <span class="number">1</span>]] + values[i - <span class="number">1</span>]);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    dp[i][j] = dp[i - <span class="number">1</span>][j];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[n][capacity];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">KnapsackProblem</span> <span class="variable">knapsackProblem</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">KnapsackProblem</span>();</span><br><span class="line">        <span class="type">int</span>[] weights = &#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">        <span class="type">int</span>[] values = &#123;<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">capacity</span> <span class="operator">=</span> <span class="number">5</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxValue</span> <span class="operator">=</span> knapsackProblem.knapsack(weights, values, capacity);</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum value: &quot;</span> + maxValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用动态规划解决了0-1背包问题。通过遍历每个物品和背包容量，根据状态转移方程计算在当前情况下的最优解。最终，<code>dp[n][capacity]</code> 就是问题的最优解，表示在前 <code>n</code> 个物品中选择放入容量为 <code>capacity</code> 的背包所能获得的最大价值。</p>
+<p>请注意，背包问题的动态规划解法也可能因为问题的具体要求而有所变化，但通常都涵盖了上述的状态定义、状态转移方程和边界条件。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37887.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/37887.html" class="post-title-link" itemprop="url">线性dp LIS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:07:39" itemprop="dateModified" datetime="2023-08-10T00:07:39+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>579</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>线性动态规划（Linear Dynamic Programming）在许多问题中都有广泛的应用，其中一个典型的问题是最长递增子序列（Longest Increasing Subsequence，简称 LIS）问题。LIS 问题的目标是找到一个给定序列中的最长递增子序列的长度，其中递增子序列指的是序列中的元素按照顺序递增排列。</p>
+<p>以下是最长递增子序列问题的一般步骤：</p>
+<ol>
+<li><p><strong>定义状态</strong>：通常使用一个数组 <code>dp</code>，其中 <code>dp[i]</code> 表示以第 <code>i</code> 个元素为结尾的最长递增子序列的长度。</p>
+</li>
+<li><p><strong>状态转移方程</strong>：对于第 <code>i</code> 个元素，我们需要找到前面所有比它小的元素中，以它们为结尾的最长递增子序列的最大长度。状态转移方程可以表示为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i] = max(dp[j] + 1), 其中 0 &lt;= j &lt; i 且 nums[j] &lt; nums[i]</span><br></pre></td></tr></table></figure>
+
+<p>这意味着我们在计算 <code>dp[i]</code> 时，会考虑前面所有满足条件的 <code>dp[j]</code> 的最大值加 1。</p>
+</li>
+<li><p><strong>边界条件</strong>：初始时，每个元素自成一个长度为 1 的递增子序列，所以 <code>dp[i] = 1</code>。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，逐步计算出大规模问题的最优解。</p>
+</li>
+</ol>
+<p>下面是一个最长递增子序列问题的 Java 代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestIncreasingSubsequence</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        Arrays.fill(dp, <span class="number">1</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nums[j] &lt; nums[i]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i], dp[j] + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> len : dp) &#123;</span><br><span class="line">            maxLength = Math.max(maxLength, len);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> maxLength;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">LongestIncreasingSubsequence</span> <span class="variable">lis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LongestIncreasingSubsequence</span>();</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">10</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">101</span>, <span class="number">18</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> lis.lengthOfLIS(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of longest increasing subsequence: &quot;</span> + maxLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用动态规划解决了最长递增子序列问题。通过遍历每个元素，根据状态转移方程计算以当前元素为结尾的最长递增子序列长度。最终，我们在 <code>dp</code> 数组中找到最大的长度，即为最长递增子序列的长度。</p>
+<p>请注意，LIS 问题的动态规划解法可能因为问题的具体要求而有所变化，但通常都涵盖了上述的状态定义、状态转移方程和边界条件。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/11863.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/11863.html" class="post-title-link" itemprop="url">石子合并问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:07:02" itemprop="dateModified" datetime="2023-08-10T00:07:02+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>642</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>石子合并问题是一个经典的动态规划问题，其目标是找到一种合并方式，使得合并石子的总代价最小。在这个问题中，一开始有一排石子，每个石子有一个权值，合并两个相邻的石子可以获得它们的权值之和作为代价。问题的关键在于如何安排合并的顺序，以获得最小的总代价。</p>
+<p>下面是石子合并问题的一般步骤：</p>
+<ol>
+<li><p><strong>定义状态</strong>：通常使用一个二维数组 <code>dp[i][j]</code> 表示合并第 <code>i</code> 到第 <code>j</code> 个石子所需的最小代价。</p>
+</li>
+<li><p><strong>状态转移方程</strong>：假设要合并第 <code>i</code> 到第 <code>j</code> 个石子，可以将它们分为两部分：第 <code>i</code> 到 <code>k</code> 个石子和第 <code>k+1</code> 到 <code>j</code> 个石子，其中 <code>i &lt;= k &lt; j</code>。那么合并的代价就是将这两部分合并的代价加上这两部分的权值之和。状态转移方程可以表示为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i][j] = min(dp[i][k] + dp[k+1][j] + sum[i][j]), 其中 i &lt;= k &lt; j</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>sum[i][j]</code> 表示第 <code>i</code> 到第 <code>j</code> 个石子的权值之和。</p>
+</li>
+<li><p><strong>边界条件</strong>：当 <code>i == j</code> 时，只有一个石子，无需合并，所以 <code>dp[i][i] = 0</code>。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，逐步计算出大规模问题的最优解。</p>
+</li>
+</ol>
+<p>下面是一个简单的石子合并问题的 Java 代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StoneMergeProblem</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">mergeStones</span><span class="params">(<span class="type">int</span>[] stones)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> stones.length;</span><br><span class="line">        <span class="type">int</span>[] prefixSum = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            prefixSum[i] = prefixSum[i - <span class="number">1</span>] + stones[i - <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">2</span>; len &lt;= n; len++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt;= n - len; i++) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + len - <span class="number">1</span>;</span><br><span class="line">                dp[i][j] = Integer.MAX_VALUE;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> i; k &lt; j; k++) &#123;</span><br><span class="line">                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k + <span class="number">1</span>][j] + prefixSum[j + <span class="number">1</span>] - prefixSum[i]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[<span class="number">0</span>][n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">StoneMergeProblem</span> <span class="variable">problem</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StoneMergeProblem</span>();</span><br><span class="line">        <span class="type">int</span>[] stones = &#123;<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minCost</span> <span class="operator">=</span> problem.mergeStones(stones);</span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum cost to merge stones: &quot;</span> + minCost);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用了动态规划来解决石子合并问题。首先计算了石子的前缀和，然后使用二维数组 <code>dp</code> 来存储合并石子的最小代价。根据状态转移方程，我们通过计算不同的区间长度和区间起始位置，逐步填充 <code>dp</code> 数组，最终得到合并所有石子的最小代价。</p>
+<p>需要注意的是，石子合并问题的动态规划解法通常要结合问题的具体要求来确定状态转移方程，边界条件等。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/40386.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/40386.html" class="post-title-link" itemprop="url">环形DP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:06:08" itemprop="dateModified" datetime="2023-08-10T00:06:08+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>866</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>环形动态规划（Circular Dynamic Programming）是一种动态规划的应用，适用于解决环形问题，即问题中的元素或状态在某种意义上是循环的，首尾相连的。这类问题在动态规划中需要考虑元素之间的相互关系，以及环形带来的特殊情况。</p>
+<p>一般来说，环形动态规划的核心思想是将环形问题转化为线性问题，然后通过适当的状态转移方程和边界条件来求解。以下是环形动态规划的一般步骤：</p>
+<ol>
+<li><p><strong>问题转化</strong>：将环形问题转化为线性问题。可以通过复制一份原始数据，将环形结构“展开”成线性结构，从而将问题转化为已知的线性动态规划问题。</p>
+</li>
+<li><p><strong>定义状态</strong>：定义动态规划的状态，通常与问题的特性相关。对于环形问题，需要考虑首尾相连的情况，可能需要多设置一个状态来表示“首尾相连”的状态。</p>
+</li>
+<li><p><strong>确定状态转移方程</strong>：根据问题的性质，确定状态之间的转移关系。考虑环形结构，需要确保转移关系在环形首尾相连的情况下也能正确地进行。</p>
+</li>
+<li><p><strong>确定边界条件</strong>：环形问题的边界条件可能相对复杂，需要确保首尾相连的元素能够正确处理。这些边界条件可能需要在状态转移方程中单独处理。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，按照线性结构的顺序逐步计算状态，直到计算出整个环形结构的状态。</p>
+</li>
+</ol>
+<p>下面以一个具体问题为例，来说明环形动态规划的应用。假设有一个环形数组，每个元素代表一个房屋，每个房屋中有一定数量的金钱。由于房屋是环形排列的，意味着第一个和最后一个房屋也相邻。要求在不偷相邻房屋的情况下，计算可以偷到的最大金钱数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CircularDPExample</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">rob</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Calculate the maximum amount that can be robbed if starting from the first house.</span></span><br><span class="line">        <span class="type">int</span>[] dp1 = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        dp1[<span class="number">0</span>] = nums[<span class="number">0</span>];</span><br><span class="line">        dp1[<span class="number">1</span>] = Math.max(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            dp1[i] = Math.max(dp1[i - <span class="number">1</span>], dp1[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Calculate the maximum amount that can be robbed if starting from the second house.</span></span><br><span class="line">        <span class="type">int</span>[] dp2 = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        dp2[<span class="number">1</span>] = nums[<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp2[i] = Math.max(dp2[i - <span class="number">1</span>], dp2[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// The maximum amount that can be robbed will be the maximum of the two scenarios.</span></span><br><span class="line">        <span class="keyword">return</span> Math.max(dp1[n - <span class="number">2</span>], dp2[n - <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">CircularDPExample</span> <span class="variable">example</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CircularDPExample</span>();</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">2</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">3</span>, <span class="number">1</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxAmount</span> <span class="operator">=</span> example.rob(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum amount that can be robbed: &quot;</span> + maxAmount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们通过定义两个状态数组 <code>dp1</code> 和 <code>dp2</code>，分别表示从第一个房屋和第二个房屋开始偷窃时的最大金额。通过动态规划的思想，我们逐步计算出每个状态的最大金额，最终得到在不偷相邻房屋的情况下可以偷到的最大金钱数。</p>
+<p>请注意，以上仅是环形动态规划的一个简单例子。实际应用中，问题可能会更加复杂，需要根据问题的具体情况来定义状态、状态转移方程和边界条件。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/55387.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/55387.html" class="post-title-link" itemprop="url">状压DP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:04:52" itemprop="dateModified" datetime="2023-08-10T00:04:52+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>351</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>状压动态规划（Bitmask Dynamic Programming，状压DP）是一种优化技巧，通常用于解决组合优化问题，特别是集合的子集问题。以下是一个使用状压DP解决集合的最短路径问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BitmaskDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">shortestPath</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span>[][] dist)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">totalStates</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; n;  <span class="comment">// Total possible subsets</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][totalStates];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span>[] row : dp) &#123;</span><br><span class="line">            Arrays.fill(row, Integer.MAX_VALUE);</span><br><span class="line">        &#125;</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">0</span>;  <span class="comment">// Starting state: only the first city visited</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">mask</span> <span class="operator">=</span> <span class="number">1</span>; mask &lt; totalStates; mask++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">0</span>; u &lt; n; u++) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((mask &amp; (<span class="number">1</span> &lt;&lt; u)) != <span class="number">0</span>) &#123;  <span class="comment">// Check if u is in the current subset</span></span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">v</span> <span class="operator">=</span> <span class="number">0</span>; v &lt; n; v++) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (v != u &amp;&amp; (mask &amp; (<span class="number">1</span> &lt;&lt; v)) != <span class="number">0</span>) &#123;  <span class="comment">// Check if v is in the current subset and not equal to u</span></span><br><span class="line">                            dp[u][mask] = Math.min(dp[u][mask], dp[v][mask ^ (<span class="number">1</span> &lt;&lt; u)] + dist[v][u]);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">minPath</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">1</span>; u &lt; n; u++) &#123;</span><br><span class="line">            minPath = Math.min(minPath, dp[u][totalStates - <span class="number">1</span>] + dist[u][<span class="number">0</span>]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> minPath;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">4</span>;  <span class="comment">// Number of cities</span></span><br><span class="line">        <span class="type">int</span>[][] dist = &#123;</span><br><span class="line">            &#123;<span class="number">0</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>&#125;,</span><br><span class="line">            &#123;<span class="number">10</span>, <span class="number">0</span>, <span class="number">35</span>, <span class="number">25</span>&#125;,</span><br><span class="line">            &#123;<span class="number">15</span>, <span class="number">35</span>, <span class="number">0</span>, <span class="number">30</span>&#125;,</span><br><span class="line">            &#123;<span class="number">20</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">0</span>&#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">shortest</span> <span class="operator">=</span> shortestPath(n, dist);</span><br><span class="line">        System.out.println(<span class="string">&quot;Shortest Path: &quot;</span> + shortest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>shortestPath</code> 方法使用状压DP解决了集合的最短路径问题。算法通过构建一个二维数组 <code>dp</code> 来保存状态转移，从而计算最短路径。</p>
+<p>请注意，状压DP通常用于解决集合的子集问题，例如在TSP（Traveling Salesman Problem）中寻找最短路径。实际应用中，可能需要根据问题的需求进行适当的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/24306.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/24306.html" class="post-title-link" itemprop="url">深度优先广度优先</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>579</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h2><p>深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点压入栈中，stack（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；</p>
+</li>
+<li><p>将D节点弹出，没有子节点压入,此时E在栈的顶部，stack（E，C）；</p>
+</li>
+<li><p>将E节点弹出，同时将E的子节点I压入，stack（I,C）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void depthFirst() &#123;
+
+    Stack&lt;Map&lt;String, Object&gt;&gt; nodeStack = new Stack&lt;Map&lt;String, Object&gt;&gt;();
+
+    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
+
+    nodeStack.add(node);
+
+    while (!nodeStack.isEmpty()) &#123;
+
+        node = nodeStack.pop();
+
+        System.out.println(node);
+
+        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
+
+        if (children != null &amp;&amp; !children.isEmpty()) &#123;
+
+            for (Map child : children) &#123;
+
+                nodeStack.push(child);
+
+            &#125;
+
+        &#125;
+
+    &#125;
+
+&#125;
+</code></pre>
+<h2 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h2><p> 广度优先遍历各个节点，需要使用到队列（Queue）这种数据结构，queue的特点是先进先出，其实也可以使用双端队列，区别就是双端队列首尾都可以插入和弹出节点。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点插入队列中，queue（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点B，C插入队列中，此时B在队列首，C在队列尾部，queue（B，C）；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点D，E插入队列中，此时C在队列首，E在队列尾部，queue（C，D，E）;</p>
+</li>
+<li><p>将C节点弹出，同时将C的子节点F，G，H插入队列中，此时D在队列首，H在队列尾部，queue（D，E，F，G，H）；</p>
+</li>
+<li><p>将D节点弹出，D没有子节点，此时E在队列首，H在队列尾部，queue（E，F，G，H）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void breadthFirst() &#123;
+
+    Deque&lt;Map&lt;String, Object&gt;&gt; nodeDeque = new ArrayDeque&lt;Map&lt;String, Object&gt;&gt;();
+
+    Map&lt;String, Object&gt; node = new HashMap&lt;String, Object&gt;();
+
+    nodeDeque.add(node);
+
+    while (!nodeDeque.isEmpty()) &#123;
+
+        node = nodeDeque.peekFirst();
+
+        System.out.println(node);
+
+        //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+        List&lt;Map&lt;String, Object&gt;&gt; children = getChildren(node);
+
+        if (children != null &amp;&amp; !children.isEmpty()) &#123;
+
+            for (Map child : children) &#123;
+
+                nodeDeque.add(child);
+
+            &#125;
+
+        &#125;
+
+    &#125;
+
+&#125;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/51333.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/51333.html" class="post-title-link" itemprop="url">最长上升子序列最大连续子序列和，最长公共子串</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:04:22" itemprop="dateModified" datetime="2023-08-10T00:04:22+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>381</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>下面是分别解决最长上升子序列、最大连续子序列和和最长公共子串问题的Java代码示例：</p>
+<h3 id="最长上升子序列（Longest-Increasing-Subsequence）："><a href="#最长上升子序列（Longest-Increasing-Subsequence）：" class="headerlink" title="最长上升子序列（Longest Increasing Subsequence）："></a>最长上升子序列（Longest Increasing Subsequence）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestIncreasingSubsequence</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLen</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp[i] = <span class="number">1</span>;  <span class="comment">// Minimum length is 1 (the element itself)</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nums[i] &gt; nums[j]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i], dp[j] + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            maxLen = Math.max(maxLen, dp[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxLen;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">10</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">101</span>, <span class="number">18</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">lisLength</span> <span class="operator">=</span> lengthOfLIS(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of Longest Increasing Subsequence: &quot;</span> + lisLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最大连续子序列和（Maximum-Subarray-Sum）："><a href="#最大连续子序列和（Maximum-Subarray-Sum）：" class="headerlink" title="最大连续子序列和（Maximum Subarray Sum）："></a>最大连续子序列和（Maximum Subarray Sum）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaximumSubarraySum</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">maxSubArraySum</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxSum</span> <span class="operator">=</span> nums[<span class="number">0</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">currentSum</span> <span class="operator">=</span> nums[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            currentSum = Math.max(nums[i], currentSum + nums[i]);</span><br><span class="line">            maxSum = Math.max(maxSum, currentSum);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxSum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;-<span class="number">2</span>, <span class="number">1</span>, -<span class="number">3</span>, <span class="number">4</span>, -<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, -<span class="number">5</span>, <span class="number">4</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxSum</span> <span class="operator">=</span> maxSubArraySum(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum Subarray Sum: &quot;</span> + maxSum);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最长公共子串（Longest-Common-Substring）："><a href="#最长公共子串（Longest-Common-Substring）：" class="headerlink" title="最长公共子串（Longest Common Substring）："></a>最长公共子串（Longest Common Substring）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestCommonSubstring</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">longestCommonSubstring</span><span class="params">(String s1, String s2)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s1.length();</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> s2.length();</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m + <span class="number">1</span>][n + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= m; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt;= n; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (s1.charAt(i - <span class="number">1</span>) == s2.charAt(j - <span class="number">1</span>)) &#123;</span><br><span class="line">                    dp[i][j] = dp[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</span><br><span class="line">                    maxLength = Math.max(maxLength, dp[i][j]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxLength;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="string">&quot;ABABC&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span> <span class="string">&quot;BABCBA&quot;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">commonSubstringLength</span> <span class="operator">=</span> longestCommonSubstring(s1, s2);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of Longest Common Substring: &quot;</span> + commonSubstringLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些示例分别展示了如何解决最长上升子序列、最大连续子序列和和最长公共子串问题。实际应用中，根据问题的需求可能需要进行适当的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/13990.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/13990.html" class="post-title-link" itemprop="url">数位DP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:04:13" itemprop="dateModified" datetime="2023-08-10T00:04:13+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>306</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>数位动态规划（Digit Dynamic Programming，数位DP）是一种动态规划算法，用于解决涉及数字各位数的组合问题。以下是一个数位DP的Java代码示例，用于计算在区间 [1, N] 内，所有数字的各位之和等于给定值 K 的个数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DigitDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">countNumbersWithDigitSum</span><span class="params">(<span class="type">int</span> N, <span class="type">int</span> K)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[N + <span class="number">1</span>][K + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">MOD</span> <span class="operator">=</span> (<span class="type">int</span>) <span class="number">1e9</span> + <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt;= K; j++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">d</span> <span class="operator">=</span> <span class="number">0</span>; d &lt;= <span class="number">9</span>; d++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (j &gt;= d) &#123;</span><br><span class="line">                        dp[i][j] = (dp[i][j] + dp[i - <span class="number">1</span>][j - d]) % MOD;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">d</span> <span class="operator">=</span> <span class="number">1</span>; d &lt;= <span class="number">9</span>; d++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (K &gt;= d) &#123;</span><br><span class="line">                result = (result + dp[N][K - d]) % MOD;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">N</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">K</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> countNumbersWithDigitSum(N, K);</span><br><span class="line">        System.out.println(<span class="string">&quot;Count of numbers with digit sum &quot;</span> + K + <span class="string">&quot; in range [1, &quot;</span> + N + <span class="string">&quot;]: &quot;</span> + count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>countNumbersWithDigitSum</code> 方法使用数位DP解决了计算各个数字各位数之和等于给定值 K 的数字个数问题。算法通过构建一个二维数组 <code>dp</code> 来保存状态转移，从而计算符合条件的数字个数。</p>
+<p>这个示例是一个数位DP的实现，实际应用中可能需要根据不同的问题进行适当的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/58609.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -278,1237 +1417,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/18339.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/18339.html" class="post-title-link" itemprop="url">拉格朗日乘子法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-10 00:03:16" itemprop="dateModified" datetime="2023-08-10T00:03:16+08:00">2023-08-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>332</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>拉格朗日乘子法（Lagrange Multiplier Method）是一种优化算法，用于求解带有约束条件的优化问题。以下是一个使用拉格朗日乘子法求解约束最优化问题的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.*;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearConstraint;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearObjectiveFunction;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.Relationship;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimpleBounds;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimplexSolver;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.nonlinear.scalar.GoalType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LagrangeMultiplierMethod</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">// Objective function: f(x, y) = x + y</span></span><br><span class="line">        <span class="type">LinearObjectiveFunction</span> <span class="variable">objectiveFunction</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearObjectiveFunction</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">1</span>&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Constraints: 2x + y &gt;= 1, x + 2y &gt;= 1</span></span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">2</span>, <span class="number">1</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Bounds: x &gt;= 0, y &gt;= 0</span></span><br><span class="line">        <span class="type">SimpleBounds</span> <span class="variable">bounds</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleBounds</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="title class_">double</span>[]&#123;Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY&#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Solve the problem</span></span><br><span class="line">        <span class="type">LinearOptimizer</span> <span class="variable">optimizer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimplexSolver</span>();</span><br><span class="line">        <span class="type">PointValuePair</span> <span class="variable">solution</span> <span class="operator">=</span> optimizer.optimize(<span class="keyword">new</span> <span class="title class_">MaxIter</span>(<span class="number">100</span>),</span><br><span class="line">                objectiveFunction,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">LinearConstraintSet</span>(constraint1, constraint2),</span><br><span class="line">                GoalType.MAXIMIZE,</span><br><span class="line">                bounds);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Display the solution</span></span><br><span class="line">        <span class="type">double</span>[] point = solution.getPoint();</span><br><span class="line">        <span class="type">double</span> <span class="variable">optimalValue</span> <span class="operator">=</span> solution.getValue();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal solution:&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;x = &quot;</span> + point[<span class="number">0</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;y = &quot;</span> + point[<span class="number">1</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal value = &quot;</span> + optimalValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，我们使用了Apache Commons Math库来实现拉格朗日乘子法。我们定义了一个线性目标函数，一组线性约束条件和变量的边界范围，并通过线性规划求解器进行求解。这个示例求解了以下问题：</p>
-<p>最大化：f(x, y) &#x3D; x + y<br>约束条件：2x + y &gt;&#x3D; 1, x + 2y &gt;&#x3D; 1<br>变量范围：x &gt;&#x3D; 0, y &gt;&#x3D; 0</p>
-<p>请注意，实际应用中的问题可能更加复杂，代码也可能需要进行适当的调整。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/42854.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/42854.html" class="post-title-link" itemprop="url">图的遍历</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>901</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>/**
- * 无向图
- */
-public class NoDirectionGraph &#123;
- 
-    private int mMaxSize; //图中包含的最大顶点数
-    private GraphVertex[] vertexList; //顶点数组
-    private int[][] indicatorMat; //指示顶点之间的连通关系的邻接矩阵
-    private int nVertex; //当前实际保存的顶点数目
-    
-    
-    public NoDirectionGraph(int maxSize) &#123;
-        mMaxSize = maxSize;
-        vertexList = new GraphVertex[mMaxSize];
-        indicatorMat = new int[mMaxSize][mMaxSize];
-        nVertex = 0;
-        //初始化邻接矩阵元素为0
-        for(int j=0;j&lt;mMaxSize;j++) &#123;
-            for(int k=0;k&lt;mMaxSize;k++) &#123;
-                indicatorMat[j][k] = 0;
-            &#125;
-        &#125;
-    &#125;
-    
-    
-    public void addVertex(GraphVertex v) &#123;
-        if(nVertex &lt; mMaxSize) &#123;
-            vertexList[nVertex++] = v;
-            
-        &#125; else &#123;
-            System.out.println(&quot;---插入失败，顶点数量已达上限!&quot;);
-        &#125;
-    &#125;
-    
-    /**
-     * 修改邻接矩阵，添加新的边
-     * @param start
-     * @param end
-     */
-    public void addEdge(int start,int end) &#123;
-        indicatorMat[start][end] = 1;
-        indicatorMat[end][start] = 1;
-    &#125;
-    
-    /**
-     * 打印邻接矩阵
-     */
-    public void printIndicatorMat() &#123;
-        
-        for(int[] line:indicatorMat) &#123;
-            for(int i:line) &#123;
-                System.out.print(i + &quot; &quot;);
-            &#125;
-            System.out.println();
-        &#125;
-    &#125;
-    
-    /**
-     * 深度优先遍历
-     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
-     */
-    public void DFS(int vertexIndex) &#123;
-        ArrayStack stack = new ArrayStack();
-        //1.添加检索元素到栈中
-        vertexList[vertexIndex].setVisited(true);
-        stack.push(vertexIndex);
-        int nextVertexIndex = getNextVertexIndex(vertexIndex);
-        while(!stack.isEmpty()) &#123; //不断地压栈、出栈，直到栈为空(检索元素也没弹出了栈)为止
-            if(nextVertexIndex != -1) &#123;
-                vertexList[nextVertexIndex].setVisited(true);
-                stack.push(nextVertexIndex);
-                stack.printElems();
-            &#125; else &#123;
-                stack.pop();
-            &#125;
-            //检索当前栈顶元素是否包含其他未遍历过的节点
-            if(!stack.isEmpty()) &#123;
-                nextVertexIndex = getNextVertexIndex(stack.peek()); 
-            &#125;
-        &#125;
-    &#125;
-    
-    /**
-     * 得到当前顶点的下一个顶点所在行
-     * @param column
-     * @return
-     */
-    public int getNextVertexIndex(int column) &#123;
-        for(int i=0;i&lt;indicatorMat[column].length;i++) &#123;
-            if(indicatorMat[column][i] == 1 &amp;&amp; !vertexList[i].isVisited()) &#123;
-                return i;
-            &#125;
-        &#125;
-        return -1;
-    &#125;
-    
-    /**
-     * 广度优先遍历
-     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
-     */
-    public void BFS(int vertexIndex) &#123;
-        ChainQueue queue = new ChainQueue();
-        vertexList[vertexIndex].setVisited(true);
-        queue.insert(new QueueNode(vertexIndex));
-        int nextVertexIndex = getNextVertexIndex(vertexIndex);
-        while(!queue.isEmpty()) &#123;
-            if(nextVertexIndex != -1) &#123;
-                vertexList[nextVertexIndex].setVisited(true);
-                queue.insert(new QueueNode(nextVertexIndex));
-            &#125; else &#123;
-                queue.remove();
-            &#125;
-            if(!queue.isEmpty()) &#123;
-                nextVertexIndex = getNextVertexIndex(queue.peek().data);
-                queue.printElems();
-            &#125;
-        &#125;
-    &#125;
-&#125;
-
-
-
- 
-/**
- * 使用数组实现栈结构
- */
-public class ArrayStack &#123;
- 
-    private int[] tArray; 
-    private int topIndex = -1; //表示当前栈顶元素的索引位置
-    private int CAPACITY_STEP = 12; //数组容量扩展步长
-    
-    
-    public ArrayStack() &#123;
-        /***创建泛型数组的一种方法***/
-        tArray = new int[CAPACITY_STEP]; 
-    &#125;
-    
-    /**
-     * 弹出栈顶元素方法
-     * @return
-     */
-    public int pop() &#123;
-        if(isEmpty()) &#123;
-            System.out.println(&quot;错误，栈中元素为空，不能pop&quot;);
-            return -1;
-        &#125; else &#123;
-            int i = tArray[topIndex];
-            tArray[topIndex--] = -1; //擦除pop元素
-            return i;
-        &#125;
-    &#125;
-    
-    /**
-     * 向栈中插入一个元素
-     * @param t
-     */
-    public void push(int t) &#123;
-        //检查栈是否已满
-        if(topIndex == (tArray.length-1)) &#123;
-            //扩展容量
-            int[] tempArray = new int[tArray.length + CAPACITY_STEP];
-            for(int i=0;i&lt;tArray.length;i++) &#123;
-                tempArray[i] = tArray[i];
-            &#125;
-            tArray = tempArray;
-            tempArray = null;
-        &#125; else &#123;
-            topIndex ++;
-            tArray[topIndex] = t;
-        &#125;
-    &#125;
-    
-    /**
-     * 得到栈顶元素，但不弹出
-     * @return
-     */
-    public int peek() &#123;
-        if(isEmpty()) &#123;
-            System.out.println(&quot;错误，栈中元素为空，不能peek&quot;);
-            return -1;
-        &#125; else &#123;
-            return tArray[topIndex];
-        &#125;
-    &#125;
-    
-    /**
-     * 判断当前栈是否为空
-     * @return
-     */
-    public boolean isEmpty() &#123;
-        return (topIndex &lt; 0);
-    &#125;
-    
-    /**
-     * 打印栈中元素
-     */
-    public void printElems() &#123;
-        for(int i=0;i&lt;=topIndex;i++) &#123;
-            System.out.print(tArray[i] + &quot; &quot;);
-        &#125;
-        System.out.println();
-    &#125;
-&#125;
-
-
-/**
- * 使用链表实现队列
- */
-public class ChainQueue &#123;
-    private QueueNode head; // 指向队列头节点
-    private QueueNode tail; // 指向队列尾节点
-    private int size = 0; // 队列尺寸
- 
-    public ChainQueue() &#123;
- 
-    &#125;
- 
-    /**
-     * 插入新节点到队列尾
-     */
-    public void insert(QueueNode node) &#123;
- 
-        // 当然也可以这么写,添加tail.prev = node
-        if (head == null) &#123;
-            head = node;
-            tail = head;
-        &#125; else &#123;
-            node.next = tail;
-            tail.prev = node; // 双向连接，确保head.prev不为空
-            tail = node;
-        &#125;
-        size++;
-    &#125;
- 
-    /**
-     * 移除队列首节点
-     */
-    public QueueNode remove() &#123;
-        if (!isEmpty()) &#123;
-            QueueNode temp = head;
-            head = head.prev;
-            size--;
-            return temp;
-        &#125; else &#123;
-            System.out.println(&quot;异常操作，当前队列为空!&quot;);
-            return null;
-        &#125;
-    &#125;
- 
-    /**
-     * 队列是否为空
-     * 
-     * @return
-     */
-    public boolean isEmpty() &#123;
-        if (size &gt; 0) &#123;
-            return false;
-        &#125; else &#123;
-            return true;
-        &#125;
-    &#125;
- 
-    /**
-     * 返回队列首节点，但不移除
-     */
-    public QueueNode peek() &#123;
-        if (!isEmpty()) &#123;
-            return head;
-        &#125; else &#123;
-            System.out.println();
-            System.out.println(&quot;异常操作，当前队列为空!&quot;);
-            return null;
-        &#125;
-    &#125;
- 
-    /**
-     * 返回队列大小
-     * 
-     * @return
-     */
-    public int size() &#123;
-        return size;
-    &#125;
-    
-    /**
-     * 打印队列中的元素
-     */
-    public void printElems() &#123;
-        QueueNode tempNode = head;
-        while(tempNode != null) &#123;
-            System.out.print(tempNode.data + &quot; &quot;);
-            tempNode = tempNode.prev;
-        &#125;
-        System.out.println();
-    &#125;
-&#125;
- 
-/**
- * 节点类
- * 
- * @author wly
- * 
- */
-class QueueNode &#123;
-    QueueNode prev;
-    QueueNode next;
- 
-    int data;
- 
-    public QueueNode(int data) &#123;
-        this.data = data;
-    &#125;
- 
-    public int getData() &#123;
-        return data;
-    &#125;
- 
-    public void setData(int data) &#123;
-        this.data = data;
-    &#125;
- 
-    @Override
-    public String toString() &#123;
-        // TODO Auto-generated method stub
-        super.toString();
-        return data + &quot;&quot;;
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/4900.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/4900.html" class="post-title-link" itemprop="url">单调队列优化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-10 00:03:10" itemprop="dateModified" datetime="2023-08-10T00:03:10+08:00">2023-08-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>359</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>单调队列优化算法（Monotonic Queue Optimization）是一种优化技巧，通常用于解决一些需要维护滑动窗口中最大（最小）值的问题。以下是一个单调队列优化的Java代码示例，用于解决滑动窗口中的最大值问题：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayDeque;</span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MonotonicQueueOptimization</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span>[] maxSlidingWindow(<span class="type">int</span>[] nums, <span class="type">int</span> k) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] result = <span class="keyword">new</span> <span class="title class_">int</span>[n - k + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">resultIndex</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        Deque&lt;Integer&gt; deque = <span class="keyword">new</span> <span class="title class_">ArrayDeque</span>&lt;&gt;();  <span class="comment">// 存储元素的下标</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="comment">// 保持队列单调递减，从队尾弹出小于当前元素的下标</span></span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; deque.peekLast() &lt; i - k + <span class="number">1</span>) &#123;</span><br><span class="line">                deque.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保持队列单调递减，从队尾弹出小于当前元素的下标</span></span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; nums[deque.peekFirst()] &lt; nums[i]) &#123;</span><br><span class="line">                deque.pollFirst();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            deque.offerFirst(i);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 更新结果数组</span></span><br><span class="line">            <span class="keyword">if</span> (i &gt;= k - <span class="number">1</span>) &#123;</span><br><span class="line">                result[resultIndex++] = nums[deque.peekLast()];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">1</span>, <span class="number">3</span>, -<span class="number">1</span>, -<span class="number">3</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">7</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span>[] result = maxSlidingWindow(nums, k);</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">&quot;Max sliding window: &quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> num : result) &#123;</span><br><span class="line">            System.out.print(num + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>maxSlidingWindow</code> 方法使用单调队列优化解决了滑动窗口中的最大值问题。算法通过维护一个单调递减的队列来存储当前窗口内的元素下标，从而在常数时间内找到窗口内的最大值。</p>
-<p>请注意，单调队列优化通常适用于需要在滑动窗口内求最大值（最小值）的问题，可以根据问题的具体需求进行相应的修改。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/40091.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/40091.html" class="post-title-link" itemprop="url">区间DP</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-10 00:03:03" itemprop="dateModified" datetime="2023-08-10T00:03:03+08:00">2023-08-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>295</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>区间动态规划（Interval Dynamic Programming，简称区间DP）是一种动态规划算法，用于解决涉及区间的问题。以下是一个区间DP的Java代码示例，用于解决最长回文子序列问题：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IntervalDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">longestPalindromicSubsequence</span><span class="params">(String s)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> s.length();</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][n];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp[i][i] = <span class="number">1</span>; <span class="comment">// 单个字符是回文序列</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">2</span>; len &lt;= n; len++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt;= n - len; i++) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + len - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (s.charAt(i) == s.charAt(j)) &#123;</span><br><span class="line">                    dp[i][j] = dp[i + <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">2</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    dp[i][j] = Math.max(dp[i + <span class="number">1</span>][j], dp[i][j - <span class="number">1</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[<span class="number">0</span>][n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;bbbab&quot;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">longestPalindromeLen</span> <span class="operator">=</span> longestPalindromicSubsequence(s);</span><br><span class="line">        System.out.println(<span class="string">&quot;Longest Palindromic Subsequence Length: &quot;</span> + longestPalindromeLen);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>longestPalindromicSubsequence</code> 方法使用区间动态规划解决了最长回文子序列问题。通过构建一个二维数组 <code>dp[i][j]</code> 来保存字符串区间 <code>s[i..j]</code> 的最长回文子序列长度。通过填表过程，我们可以找到最长回文子序列的长度。</p>
-<p>这个示例是一个区间动态规划的实现，实际应用中可能需要根据不同的问题进行适当的修改。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/24685.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/24685.html" class="post-title-link" itemprop="url">关键路径算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:58:27" itemprop="dateModified" datetime="2023-08-09T23:58:27+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>404</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>关键路径算法（Critical Path Method，CPM）是一种用于项目管理的算法，用于确定项目中最长的路径，即关键路径，以及各个任务的最早开始时间和最晚开始时间。以下是一个关键路径算法的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Task</span> &#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="type">int</span> duration;</span><br><span class="line">    List&lt;Task&gt; dependencies;</span><br><span class="line"></span><br><span class="line">    Task(String name, <span class="type">int</span> duration) &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.duration = duration;</span><br><span class="line">        <span class="built_in">this</span>.dependencies = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">addDependency</span><span class="params">(Task dependency)</span> &#123;</span><br><span class="line">        dependencies.add(dependency);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CriticalPathMethod</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">calculateCriticalPath</span><span class="params">(List&lt;Task&gt; tasks)</span> &#123;</span><br><span class="line">        Map&lt;Task, Integer&gt; earliestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        Map&lt;Task, Integer&gt; latestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算最早开始时间</span></span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">earliestStartTime</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (Task dependency : task.dependencies) &#123;</span><br><span class="line">                earliestStartTime = Math.max(earliestStartTime, earliestStartTimes.get(dependency) + dependency.duration);</span><br><span class="line">            &#125;</span><br><span class="line">            earliestStartTimes.put(task, earliestStartTime);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算最晚开始时间</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">projectDuration</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            projectDuration = Math.max(projectDuration, earliestStartTimes.get(task) + task.duration);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            latestStartTimes.put(task, projectDuration - task.duration);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算关键路径</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Critical Path:&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            <span class="keyword">if</span> (earliestStartTimes.get(task).equals(latestStartTimes.get(task))) &#123;</span><br><span class="line">                System.out.println(task.name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Task</span> <span class="variable">A</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;A&quot;</span>, <span class="number">5</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">B</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;B&quot;</span>, <span class="number">3</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">C</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;C&quot;</span>, <span class="number">2</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">D</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;D&quot;</span>, <span class="number">4</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">E</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;E&quot;</span>, <span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">        B.addDependency(A);</span><br><span class="line">        C.addDependency(A);</span><br><span class="line">        D.addDependency(B);</span><br><span class="line">        D.addDependency(C);</span><br><span class="line">        E.addDependency(D);</span><br><span class="line"></span><br><span class="line">        List&lt;Task&gt; tasks = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(Arrays.asList(A, B, C, D, E));</span><br><span class="line"></span><br><span class="line">        calculateCriticalPath(tasks);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，我们使用关键路径算法来计算一个简单项目的关键路径。<code>Task</code> 类表示任务，其中包含任务名称、持续时间和依赖关系。<code>calculateCriticalPath</code> 方法计算每个任务的最早开始时间和最晚开始时间，并根据最早开始时间和最晚开始时间的差异来确定关键路径。</p>
-<p>这个示例是一个简化的关键路径算法实现，实际应用中可能需要考虑更多的细节和优化。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43734.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/43734.html" class="post-title-link" itemprop="url">兔子数列</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>444</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
-<ol>
-<li>初始状态：一对刚出生的兔子</li>
-<li>下一步：生长</li>
-<li><code>繁殖得到 一对刚出生的兔子-&gt; 第1步</code></li>
-</ol>
-<p>总结： 当月的兔子数&#x3D;上月兔子数+当月新生兔子  数列的当前列&#x3D;前两列之和</p>
-<h2 id="递归算法"><a href="#递归算法" class="headerlink" title="递归算法"></a>递归算法</h2><p>指数阶算法，效率较低，时间复杂度爆炸增量</p>
-<pre><code>    Fib1(int n)
-    
-    &#123; if(n&lt;1)
-    
-           return -1;
-    
-      if(n==1||n==2)
-    
-            return 1;
-    
-       return Fib1(n-1)+Fib1(n-2);
-    
-    &#125;
-    
-</code></pre>
-<h2 id="数组记录先两项值"><a href="#数组记录先两项值" class="headerlink" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
-<pre><code>Fib2(intn)
-&#123;
-    if(n&lt;1)
-        return-1;
-    int[] a=new int[n];
-    a[1]=1;
-    a[2]=1;
-    for(int i=3;i&lt;=n;i++)
-        a[i]=a[i-1]+a[i-2];
-        return a[n];
-     &#125;
-&#125;
-         
-    
-</code></pre>
-<h2 id="迭代法"><a href="#迭代法" class="headerlink" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
-<pre><code>Fib3(intn)
-&#123;
-    inti,s1,s2;
-    if(n&lt;1)
-        return-1;
-    if(n==1||n==2)
-        return1;
-    s1=1;s2=1;
-    for(i=3;i&lt;=n;i++)
-    &#123;
-        s2=s1+s2;//辗转相加法
-        s1=s2-s1;//记录前一项
-    &#125;
-    return s2;
- &#125;
- 
-</code></pre>
-<h2 id="矩阵乘法"><a href="#矩阵乘法" class="headerlink" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</code></p>
-<pre><code>   public static int ValueN(int n)&#123;
-         if(n&lt;1)&#123;
-             return 0;
-         &#125;
-         if(n==1 || n==2)&#123;
-             return 1;
-         &#125;
-          int [][] base=&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;;
-          int [][] res=matrixPower(base,n-2);
-          return res[0][0]+res[1][0];
-       &#125;
-       public static int[][] matrixPower(int[][] m,int p)&#123;
-           if(p==0)
-               return null;
-           if(p==1)
-               return m;
-           int[][] res=matrixPower(m,p&gt;&gt;1);
-           res=muliMatrix(res,res);
-           if((p&amp;1)==1)&#123;
-               res=muliMatrix(res,m);
-           &#125;
-           return res;
-       &#125;
-       //求两个矩阵相乘得到一个新的矩阵
-       public static int[][] muliMatrix(int[][] m1,int[][] m2)&#123;
-           int [][] res=new int[m1.length][m2[0].length];
-           for(int i=0;i&lt;m1.length;i++)&#123;
-               for(int j=0;j&lt;m2[0].length;j++)&#123;
-                   for(int k=0;k&lt;m2.length;k++)&#123;
-                       res[i][j]+=m1[i][k]*m2[k][j];
-                   &#125;
-               &#125;
-           &#125;
-           return res;
-       &#125;
-   &#125;
-  
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/47317.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/47317.html" class="post-title-link" itemprop="url">倍增</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:58:08" itemprop="dateModified" datetime="2023-08-09T23:58:08+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>370</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>倍增算法（也称为指数跳跃算法）是一种高效的算法，用于解决一些特定的查找问题，例如在数组中查找某个区间内的最小值或最大值。以下是一个倍增算法的Java代码示例，用于解决查找最小值的问题：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SparseTable</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) &#123;</span><br><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryMin</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">6</span>&#125;;</span><br><span class="line">        buildSparseTable(arr);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">5</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryMin(left, right);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum element in range [&quot;</span> + left + <span class="string">&quot;, &quot;</span> + right + <span class="string">&quot;]: &quot;</span> + minInRange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询指定范围内的最小值。<code>queryMin</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
-<p>倍增算法在一些特定的查找问题中非常有用，如查找最小值、最大值等。但请注意，它适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/42877.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/42877.html" class="post-title-link" itemprop="url">二分查找</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:57:32" itemprop="dateModified" datetime="2023-08-09T23:57:32+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>251</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>二分查找（Binary Search）是一种高效的搜索算法，用于在有序数组中查找特定元素。以下是一个二分查找的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BinarySearch</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">binarySearch</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> target)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> arr.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> left + (right - left) / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (arr[mid] == target) &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;  <span class="comment">// Element found</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; target) &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;  <span class="comment">// Search in the right half</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;  <span class="comment">// Search in the left half</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// Element not found</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">15</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">target</span> <span class="operator">=</span> <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> binarySearch(arr, target);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (result != -<span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Element &quot;</span> + target + <span class="string">&quot; found at index &quot;</span> + result);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Element &quot;</span> + target + <span class="string">&quot; not found in the array.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>binarySearch</code> 方法使用二分查找算法在有序数组中查找特定元素。算法通过比较目标值与中间元素的大小来逐步缩小搜索范围，直到找到目标元素或搜索范围为空。</p>
-<p>请注意，二分查找只适用于有序数组。如果数组无序，需要先进行排序操作。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/56550.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/56550.html" class="post-title-link" itemprop="url">RMQ算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:57:32" itemprop="dateModified" datetime="2023-08-09T23:57:32+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>350</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>RMQ（Range Minimum Query）算法用于解决在一个数组中查询指定范围内最小元素的问题。以下是一种常见的RMQ算法实现，使用稀疏表（Sparse Table）的方法来解决RMQ问题的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RMQAlgorithm</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) &#123;</span><br><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryRMQ</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">2</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">3</span>&#125;;</span><br><span class="line">        buildSparseTable(arr);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">4</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryRMQ(left, right);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum element in range [&quot;</span> + left + <span class="string">&quot;, &quot;</span> + right + <span class="string">&quot;]: &quot;</span> + minInRange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询最小元素。<code>queryRMQ</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
-<p>请注意，稀疏表只适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。在实际应用中，如果需要频繁修改数组，可以考虑其他数据结构如线段树。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1574,7 +1486,7 @@ class QueueNode &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">350</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1623,12 +1535,12 @@ class QueueNode &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">320k</span>
+    <span title="站点总字数">324k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">19:23</span>
+    <span title="站点阅读时长">19:37</span>
 </div>
 
 <!--

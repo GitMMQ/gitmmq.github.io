@@ -192,6 +192,887 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/54780.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/54780.html" class="post-title-link" itemprop="url">交叉验证</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:38:09" itemprop="dateModified" datetime="2023-08-09T22:38:09+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>388</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>交叉验证（Cross-Validation）是一种评估机器学习模型性能的方法，通过将数据集分成训练集和验证集来进行多次训练和测试。它有助于更准确地估计模型在未见过数据上的性能，并避免对单一验证集的过度拟合。</p>
+<p>常见的交叉验证方法包括K折交叉验证和留一交叉验证。其中，K折交叉验证将数据集分成K个子集，依次将每个子集作为验证集，其余作为训练集，重复K次；留一交叉验证是K折交叉验证的特例，其中K等于数据集大小。交叉验证的结果通常是各次验证的平均性能。</p>
+<p>以下是一个使用Python实现K折交叉验证的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建SVM分类器</span></span><br><span class="line">svm_model = SVC(kernel=<span class="string">&#x27;linear&#x27;</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行5折交叉验证</span></span><br><span class="line">scores = cross_val_score(svm_model, X, y, cv=<span class="number">5</span>)  <span class="comment"># cv参数指定折数</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Cross-Validation Scores:&quot;</span>, scores)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Mean Score:&quot;</span>, scores.mean())</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用<code>load_iris</code>函数加载鸢尾花数据集，并创建了一个线性SVM分类器。然后，使用<code>cross_val_score</code>函数进行5折交叉验证，得到每次验证的性能分数。最后，我们打印出各次分数和平均分数。</p>
+<p>通过交叉验证，可以更准确地估计模型的性能，并对模型进行调参。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37871.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/37871.html" class="post-title-link" itemprop="url">交叉熵</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:23:33" itemprop="dateModified" datetime="2023-08-09T22:23:33+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>384</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>交叉熵（Cross-Entropy）是一种常用的损失函数，用于衡量实际概率分布与预测概率分布之间的差异。在分类问题中，交叉熵可以用于衡量模型预测结果与真实标签之间的距离，从而进行模型的优化。</p>
+<p>以下是一个使用Python实现交叉熵计算的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy</span>(<span class="params">y_true, y_pred</span>):</span><br><span class="line">    epsilon = <span class="number">1e-15</span>  <span class="comment"># 用于避免取对数时出现无限大</span></span><br><span class="line">    y_pred = np.clip(y_pred, epsilon, <span class="number">1</span> - epsilon)  <span class="comment"># 对预测结果进行裁剪</span></span><br><span class="line">    ce = -np.<span class="built_in">sum</span>(y_true * np.log(y_pred))</span><br><span class="line">    <span class="keyword">return</span> ce</span><br><span class="line"></span><br><span class="line"><span class="comment"># 真实标签和预测概率分布</span></span><br><span class="line">y_true = np.array([<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">y_pred = np.array([<span class="number">0.1</span>, <span class="number">0.6</span>, <span class="number">0.2</span>, <span class="number">0.1</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算交叉熵</span></span><br><span class="line">ce = cross_entropy(y_true, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Cross-Entropy:&quot;</span>, ce)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们定义了一个<code>cross_entropy</code>函数，接受真实标签和预测概率分布作为输入，并计算交叉熵。为了避免取对数时出现无限大，我们使用了一个小的epsilon值进行裁剪。然后，通过对真实标签与对数化后的预测概率分布进行元素级相乘，最后对结果取负数并求和，得到交叉熵值。</p>
+<p>请注意，上述代码示例只是一个简单的交叉熵计算实现。在实际应用中，您可能需要处理更多情况，例如多类别问题、批量计算等。在深度学习中，交叉熵常作为损失函数，在优化过程中用于衡量预测结果与真实标签之间的误差。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/742.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/742.html" class="post-title-link" itemprop="url">中文分词</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:23:00" itemprop="dateModified" datetime="2023-08-09T22:23:00+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>基于字典、词库匹配</li>
+<li>基于词频度统计</li>
+<li>基于知识理解</li>
+</ul>
+<h2 id="字典、词库匹配"><a href="#字典、词库匹配" class="headerlink" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
+<ol>
+<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
+<li>机械分词法</li>
+</ol>
+<h3 id="最大正向匹配法"><a href="#最大正向匹配法" class="headerlink" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
+<h3 id="逆向最大匹配法"><a href="#逆向最大匹配法" class="headerlink" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
+<h3 id="最少切分法"><a href="#最少切分法" class="headerlink" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
+<h3 id="双向匹配法"><a href="#双向匹配法" class="headerlink" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
+<h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
+<h3 id="全切分和基于词的频度统计的分词方法"><a href="#全切分和基于词的频度统计的分词方法" class="headerlink" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
+<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
+<p>问题：</p>
+<ol>
+<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
+</li>
+<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
+</li>
+</ol>
+<p>解决方案：</p>
+<p>基于词的频度统计的分词方法：</p>
+<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
+<h2 id="基于知识理解"><a href="#基于知识理解" class="headerlink" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
+<h2 id="并行分词方法"><a href="#并行分词方法" class="headerlink" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+<p>在Python中，有许多库可以用于中文分词，其中最常用的是<code>jieba</code>库。以下是一个使用<code>jieba</code>库进行中文分词的示例代码：</p>
+<p>首先，确保已安装 <code>jieba</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install jieba</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输入文本</span></span><br><span class="line">text = <span class="string">&quot;今天天气不错，适合出去玩。&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用jieba分词</span></span><br><span class="line">seg_list = jieba.cut(text, cut_all=<span class="literal">False</span>)  <span class="comment"># cut_all=False表示精确模式分词</span></span><br><span class="line">seg_result = <span class="string">&quot; &quot;</span>.join(seg_list)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;分词结果:&quot;</span>, seg_result)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用了<code>jieba.cut</code>函数对输入文本进行中文分词。设置<code>cut_all=False</code>表示使用精确模式进行分词。然后，将分词结果用空格连接起来并打印出来。</p>
+<p><code>jieba</code>库支持更多的分词模式、自定义词典、停用词过滤等功能，以及支持并行分词，适用于不同的应用场景。在实际应用中，您可以根据需求对分词结果进行后续处理，比如进行文本分析、情感分析等。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/50689.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/50689.html" class="post-title-link" itemprop="url">xgboost</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:22:06" itemprop="dateModified" datetime="2023-08-09T22:22:06+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>403</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>XGBoost（eXtreme Gradient Boosting）是一种梯度提升树算法，被广泛应用于机器学习竞赛和实际项目中。它在GBDT的基础上进行了改进，引入了正则化项、并行处理、稀疏数据优化等特性，以提高模型的性能和泛化能力。</p>
+<p>以下是一个使用Python的<code>xgboost</code>库实现XGBoost的示例代码：</p>
+<p>首先，确保已安装 <code>xgboost</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install xgboost</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> xgboost <span class="keyword">as</span> xgb</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建XGBoost分类器</span></span><br><span class="line">xgb_model = xgb.XGBClassifier(objective=<span class="string">&#x27;multi:softmax&#x27;</span>, num_class=<span class="number">3</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">xgb_model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = xgb_model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;XGBoost Accuracy:&quot;</span>, accuracy)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用了<code>load_iris</code>函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个XGBoost分类器（<code>XGBClassifier</code>），并使用<code>fit</code>方法训练模型。接着，我们在测试集上进行预测并计算准确率。</p>
+<p>XGBoost有很多参数可以调整，包括树的深度、学习率、子样本比例、正则化项等。您可以根据实际问题进行调参，以达到更好的性能。请注意，XGBoost还支持回归问题，以及对稀疏数据和缺失值的处理。</p>
+<p>参考: [博客 xgboost原理]( <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhouxiaohui888/p/6008368.html">https://www.cnblogs.com/zhouxiaohui888/p/6008368.html</a> “xgboost”）</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://github.com/dmlc/xgboost" title="xgboost">github xgboost学习</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22038.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/22038.html" class="post-title-link" itemprop="url">svm</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:20:43" itemprop="dateModified" datetime="2023-08-09T22:20:43+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>644</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在特征空间上找到最佳的分离超平面使得训练集上正负样本间隔最大</p>
+<p>用来解决二分类问题的有监督学习算法</p>
+<p>引入了核方法之后SVM也可以用来解决非线性问题</p>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>硬间隔支持向量机（线性可分支持向量机）：当训练数据线性可分时，可通过硬间隔最大化学得一个线性可分支持向量机。</li>
+<li>软间隔支持向量机：当训练数据近似线性可分时，可通过软间隔最大化学得一个线性支持向量机。</li>
+<li>非线性支持向量机：当训练数据线性不可分时，可通过核方法以及软间隔最大化学得一个非线性支持向量机。</li>
+</ul>
+<p>支持向量机（Support Vector Machine，SVM）是一种常用的机器学习算法，主要用于分类和回归问题。SVM的核心思想是通过找到一个超平面（或者更一般地说，一个线性决策边界），将不同类别的数据点尽可能分开，同时最大化支持向量与超平面的距离（即间隔）。在分类问题中，SVM的目标是找到一个最优的超平面，使得不同类别的数据点都尽可能远离这个超平面。</p>
+<p>以下是一个使用Python和<code>scikit-learn</code>库实现SVM的示例代码：</p>
+<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = datasets.load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建SVM分类器</span></span><br><span class="line">svm_model = SVC(kernel=<span class="string">&#x27;linear&#x27;</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">svm_model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = svm_model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;SVM Accuracy:&quot;</span>, accuracy)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用了<code>datasets.load_iris</code>函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个线性SVM分类器（<code>SVC</code>），使用<code>fit</code>方法训练模型。接着，我们在测试集上进行预测并计算准确率。</p>
+<p>您可以通过调整参数（例如核函数、惩罚参数C等）来进一步优化SVM模型的性能。注意，SVM算法不仅适用于二元分类问题，还可以扩展到多类别分类和回归问题。</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://blog.csdn.net/liugan528/article/details/79448379" title="svm">svm</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/27391.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/27391.html" class="post-title-link" itemprop="url">softmax回归</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:20:14" itemprop="dateModified" datetime="2023-08-09T22:20:14+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>450</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Softmax回归是一种用于多类别分类的线性模型。它在输出层使用了Softmax函数，将线性组合的原始分数转化为类别的概率分布，从而进行多类别分类。Softmax回归常用于机器学习中的分类任务，尤其是在神经网络中作为输出层来处理多类别分类问题。</p>
+<p>以下是一个使用Python和TensorFlow库实现Softmax回归的简单示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据预处理</span></span><br><span class="line">scaler = StandardScaler()</span><br><span class="line">X = scaler.fit_transform(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建Softmax回归模型</span></span><br><span class="line">model = tf.keras.models.Sequential([</span><br><span class="line">    tf.keras.layers.Input(shape=(<span class="number">4</span>,)),  <span class="comment"># 输入层</span></span><br><span class="line">    tf.keras.layers.Dense(<span class="number">3</span>, activation=<span class="string">&#x27;softmax&#x27;</span>)  <span class="comment"># 输出层，3个类别</span></span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译模型</span></span><br><span class="line">model.<span class="built_in">compile</span>(optimizer=<span class="string">&#x27;adam&#x27;</span>, loss=<span class="string">&#x27;sparse_categorical_crossentropy&#x27;</span>, metrics=[<span class="string">&#x27;accuracy&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">model.fit(X_train, y_train, epochs=<span class="number">100</span>, batch_size=<span class="number">16</span>, verbose=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = model.predict(X_test)</span><br><span class="line">y_pred_classes = y_pred.argmax(axis=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred_classes)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Accuracy:&quot;</span>, accuracy)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们使用<code>load_iris</code>函数加载鸢尾花数据集，并进行数据预处理。然后，我们构建了一个包含输入层和输出层的Softmax回归模型。通过<code>compile</code>方法来指定优化器和损失函数。接着，使用<code>fit</code>方法来训练模型。最后，我们在测试集上进行预测并计算准确率。</p>
+<p>请注意，这只是一个简单的Softmax回归实现示例。在实际应用中，您可能需要考虑更复杂的模型结构、超参数调整以及更多的优化。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28677.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/28677.html" class="post-title-link" itemprop="url">机器学习-ResNet</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:19:29" itemprop="dateModified" datetime="2023-08-09T22:19:29+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>943</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ResNet（Residual Network）是一个深度卷积神经网络架构，由Kaiming He等人在2015年提出。它通过使用残差块（Residual Block）来解决深层网络的退化问题，允许在训练更深的神经网络时仍然能够获得更好的性能。</p>
+<p>ResNet引入了”跳跃连接”或”残差连接”的概念，即通过将前一层的输出直接添加到后续层的输出中，以便网络能够学习残差（剩余部分）。这种结构有助于避免梯度消失和梯度爆炸问题，使网络更容易优化。ResNet的核心思想是：通过层与层之间的直接捷径，网络可以学习原始输入和残差之间的映射，从而更轻松地适应更深的层次。</p>
+<p>深度网络的退化问题至少说明深度网络不容易训练。但是我们考虑这样一个事实：现在你有一个浅层网络，你想通过向上堆积新层来建立深层网络，一个极端情况是这些增加的层什么也不学习，仅仅复制浅层网络的特征，即这样新层是恒等映射（Identity mapping）。在这种情况下，深层网络应该至少和浅层网络性能一样，也不应该出现退化现象。好吧，你不得不承认肯定是目前的训练方法有问题，才使得深层网络很难去找到一个好的参数。</p>
+<p>这个有趣的假设让何博士灵感爆发，他提出了残差学习来解决退化问题。对于一个堆积层结构（几层堆积而成）当输入为时其学习到的特征记为，现在我们希望其可以学习到残差，这样其实原始的学习特征是。之所以这样是因为残差学习相比原始特征直接学习更容易。当残差为0时，此时堆积层仅仅做了恒等映射，至少网络性能不会下降，实际上残差不会为0，这也会使得堆积层在输入特征基础上学习到新的特征，从而拥有更好的性能。残差学习的结构如图4所示。这有点类似与电路中的“短路”，所以是一种短路连接（shortcutconnection）。</p>
+<p>以下是一个使用Python和TensorFlow库实现ResNet的简化版本的示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Input, Conv2D, BatchNormalization, ReLU, Add, GlobalAveragePooling2D, Dense</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Model</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">residual_block</span>(<span class="params">x, filters, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span></span>):</span><br><span class="line">    shortcut = x</span><br><span class="line">    <span class="comment"># 第一个卷积层</span></span><br><span class="line">    x = Conv2D(filters, kernel_size, strides=stride, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    <span class="comment"># 第二个卷积层</span></span><br><span class="line">    x = Conv2D(filters, kernel_size, strides=<span class="number">1</span>, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    <span class="comment"># 添加残差连接</span></span><br><span class="line">    <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> shortcut.shape[-<span class="number">1</span>] != filters:</span><br><span class="line">        shortcut = Conv2D(filters, kernel_size=<span class="number">1</span>, strides=stride, padding=<span class="string">&#x27;valid&#x27;</span>)(shortcut)</span><br><span class="line">        shortcut = BatchNormalization()(shortcut)</span><br><span class="line">    x = Add()([x, shortcut])</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_resnet</span>(<span class="params">input_shape, num_classes, num_blocks_list</span>):</span><br><span class="line">    input_layer = Input(shape=input_shape)</span><br><span class="line">    x = Conv2D(<span class="number">64</span>, <span class="number">7</span>, strides=<span class="number">2</span>, padding=<span class="string">&#x27;same&#x27;</span>)(input_layer)</span><br><span class="line">    x = BatchNormalization()(x)</span><br><span class="line">    x = ReLU()(x)</span><br><span class="line">    x = tf.keras.layers.MaxPooling2D(pool_size=<span class="number">3</span>, strides=<span class="number">2</span>, padding=<span class="string">&#x27;same&#x27;</span>)(x)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> num_blocks <span class="keyword">in</span> num_blocks_list:</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(num_blocks):</span><br><span class="line">            x = residual_block(x, <span class="number">64</span>)</span><br><span class="line">    </span><br><span class="line">    x = GlobalAveragePooling2D()(x)</span><br><span class="line">    x = Dense(num_classes, activation=<span class="string">&#x27;softmax&#x27;</span>)(x)</span><br><span class="line">    </span><br><span class="line">    model = Model(inputs=input_layer, outputs=x)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建ResNet模型</span></span><br><span class="line">input_shape = (<span class="number">224</span>, <span class="number">224</span>, <span class="number">3</span>)  <span class="comment"># 输入图像大小</span></span><br><span class="line">num_classes = <span class="number">1000</span>  <span class="comment"># 分类类别数</span></span><br><span class="line">num_blocks_list = [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>]  <span class="comment"># 每个stage的残差块数量</span></span><br><span class="line">resnet_model = build_resnet(input_shape, num_classes, num_blocks_list)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印模型结构</span></span><br><span class="line">resnet_model.summary()</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们定义了一个<code>residual_block</code>函数来实现残差块的构建，然后使用<code>build_resnet</code>函数来构建简化版本的ResNet模型。通过设置不同的<code>num_blocks_list</code>，可以调整每个stage中的残差块数量。最终，我们打印出ResNet模型的结构概要。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6463.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/6463.html" class="post-title-link" itemprop="url">hinge损失函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/35874.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/35874.html" class="post-title-link" itemprop="url">GMM模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:03:23" itemprop="dateModified" datetime="2023-08-09T22:03:23+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>385</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>高斯混合模型是一种混合模型，混合的基本分布是高斯分布</p>
+<p>参考《统计学习方法》</p>
+<p>高斯混合模型（Gaussian Mixture Model，GMM）是一种用于对数据进行建模的概率模型。它假设数据是由多个高斯分布（正态分布）组成的混合体，每个分布代表一个潜在的子群。GMM 在聚类、密度估计和异常检测等领域具有广泛的应用。</p>
+<p>以下是一个使用 Python 的 <code>scikit-learn</code> 库实现 GMM 的示例代码：</p>
+<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> sklearn.mixture <span class="keyword">import</span> GaussianMixture</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_blobs</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成示例数据</span></span><br><span class="line">n_samples = <span class="number">300</span></span><br><span class="line">X, y_true = make_blobs(n_samples=n_samples, centers=<span class="number">3</span>, cluster_std=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 GMM 模型</span></span><br><span class="line">gmm = GaussianMixture(n_components=<span class="number">3</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">gmm.fit(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预测每个样本所属的分布</span></span><br><span class="line">y_pred = gmm.predict(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制原始数据和 GMM 聚类结果</span></span><br><span class="line">plt.scatter(X[:, <span class="number">0</span>], X[:, <span class="number">1</span>], c=y_pred, s=<span class="number">40</span>, cmap=<span class="string">&#x27;viridis&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Feature 1&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Feature 2&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&#x27;GMM Clustering&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，我们首先使用 <code>make_blobs</code> 函数生成一个示例数据集，用于演示 GMM 的聚类效果。然后，我们创建了一个 GMM 模型，指定了期望的分布数量（<code>n_components</code>），并使用 <code>fit</code> 方法训练模型。最后，我们根据 GMM 模型的预测结果绘制了原始数据和聚类效果。</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmziscoming/p/5750849.html">浅显易懂的GMM模型及其训练过程</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/134.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -303,2792 +1184,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/2.html" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:00:43" itemprop="dateModified" datetime="2023-08-09T22:00:43+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>937</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <hr>
-<h2 id="title-机器学习-GAN"><a href="#title-机器学习-GAN" class="headerlink" title="title:机器学习-GAN"></a>title:机器学习-GAN</h2><p>Generative Adversarial Network，就是大家耳熟能详的 GAN，由 Ian Goodfellow 首先提出，在这两年更是深度学习中最热门的东西，仿佛什么东西都能由 GAN 做出来。我最近刚入门 GAN，看了些资料，做一些笔记。</p>
-<p>1.Generation<br>什么是生成（generation）？就是模型通过学习一些数据，然后生成类似的数据。让机器看一些动物图片，然后自己来产生动物的图片，这就是生成。</p>
-<p>以前就有很多可以用来生成的技术了，比如 auto-encoder（自编码器）</p>
-<p>你训练一个 encoder，把 input 转换成 code，然后训练一个 decoder，把 code 转换成一个 image，然后计算得到的 image 和 input 之间的 MSE（mean square error），训练完这个 model 之后，取出后半部分 NN Decoder，输入一个随机的 code，就能 generate 一个 image。</p>
-<p>但是 auto-encoder 生成 image 的效果，当然看着很别扭啦，一眼就能看出真假。所以后来还提出了比如VAE这样的生成模型，我对此也不是很了解，在这就不细说。</p>
-<p>上述的这些生成模型，其实有一个非常严重的弊端。比如 VAE，它生成的 image 是希望和 input 越相似越好，但是 model 是如何来衡量这个相似呢？model 会计算一个 loss，采用的大多是 MSE，即每一个像素上的均方差。loss 小真的表示相似嘛？</p>
-<p>生成对抗网络（Generative Adversarial Network，GAN）是一种深度学习模型，用于生成与训练数据相似的新数据。GAN 包括两个主要组件：生成器（Generator）和判别器（Discriminator）。生成器试图生成类似于真实数据的样本，而判别器试图区分生成的样本和真实样本。这两个组件通过对抗性训练相互竞争，最终生成具有高质量的新数据。</p>
-<p>以下是一个使用 Python 的 TensorFlow 库实现简单 GAN 的示例代码：</p>
-<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Dense, Flatten, Reshape</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成器模型</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_generator</span>(<span class="params">latent_dim, output_shape</span>):</span><br><span class="line">    model = Sequential([</span><br><span class="line">        Dense(<span class="number">128</span>, input_dim=latent_dim, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">256</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(np.prod(output_shape), activation=<span class="string">&#x27;sigmoid&#x27;</span>),</span><br><span class="line">        Reshape(output_shape)</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判别器模型</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_discriminator</span>(<span class="params">input_shape</span>):</span><br><span class="line">    model = Sequential([</span><br><span class="line">        Flatten(input_shape=input_shape),</span><br><span class="line">        Dense(<span class="number">256</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">128</span>, activation=<span class="string">&#x27;relu&#x27;</span>),</span><br><span class="line">        Dense(<span class="number">1</span>, activation=<span class="string">&#x27;sigmoid&#x27;</span>)</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成器和判别器的参数</span></span><br><span class="line">latent_dim = <span class="number">100</span></span><br><span class="line">input_shape = (<span class="number">28</span>, <span class="number">28</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建生成器和判别器</span></span><br><span class="line">generator = build_generator(latent_dim, input_shape)</span><br><span class="line">discriminator = build_discriminator(input_shape)</span><br><span class="line">discriminator.<span class="built_in">compile</span>(loss=<span class="string">&#x27;binary_crossentropy&#x27;</span>, optimizer=<span class="string">&#x27;adam&#x27;</span>, metrics=[<span class="string">&#x27;accuracy&#x27;</span>])</span><br><span class="line">discriminator.trainable = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建 GAN 模型</span></span><br><span class="line">gan_input = tf.keras.Input(shape=(latent_dim,))</span><br><span class="line">gan_output = discriminator(generator(gan_input))</span><br><span class="line">gan = tf.keras.Model(gan_input, gan_output)</span><br><span class="line">gan.<span class="built_in">compile</span>(loss=<span class="string">&#x27;binary_crossentropy&#x27;</span>, optimizer=<span class="string">&#x27;adam&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载 MNIST 数据集</span></span><br><span class="line">(x_train, _), (_, _) = tf.keras.datasets.mnist.load_data()</span><br><span class="line">x_train = x_train / <span class="number">255.0</span></span><br><span class="line">x_train = np.expand_dims(x_train, axis=-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练 GAN</span></span><br><span class="line">epochs = <span class="number">10000</span></span><br><span class="line">batch_size = <span class="number">32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="comment"># 生成随机噪声作为输入</span></span><br><span class="line">    noise = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, (batch_size, latent_dim))</span><br><span class="line">    <span class="comment"># 生成假图片</span></span><br><span class="line">    generated_images = generator.predict(noise)</span><br><span class="line">    <span class="comment"># 随机选择真实图片</span></span><br><span class="line">    real_images = x_train[np.random.randint(<span class="number">0</span>, x_train.shape[<span class="number">0</span>], batch_size)]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 训练判别器</span></span><br><span class="line">    d_loss_real = discriminator.train_on_batch(real_images, np.ones((batch_size, <span class="number">1</span>)))</span><br><span class="line">    d_loss_fake = discriminator.train_on_batch(generated_images, np.zeros((batch_size, <span class="number">1</span>)))</span><br><span class="line">    d_loss = <span class="number">0.5</span> * np.add(d_loss_real, d_loss_fake)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 训练生成器</span></span><br><span class="line">    noise = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, (batch_size, latent_dim))</span><br><span class="line">    g_loss = gan.train_on_batch(noise, np.ones((batch_size, <span class="number">1</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 打印损失</span></span><br><span class="line">    <span class="keyword">if</span> epoch % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;epoch&#125;</span>, D Loss: <span class="subst">&#123;d_loss[<span class="number">0</span>]&#125;</span>, G Loss: <span class="subst">&#123;g_loss&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 绘制生成的图片</span></span><br><span class="line">        <span class="keyword">if</span> epoch % <span class="number">1000</span> == <span class="number">0</span>:</span><br><span class="line">            generated_images = generated_images * <span class="number">255.0</span></span><br><span class="line">            generated_images = generated_images.astype(np.uint8)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">                plt.subplot(<span class="number">2</span>, <span class="number">2</span>, i+<span class="number">1</span>)</span><br><span class="line">                plt.imshow(generated_images[i].reshape(<span class="number">28</span>, <span class="number">28</span>), cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">            plt.show()</span><br></pre></td></tr></table></figure>
-
-<p>这个示例展示了如何使用 TensorFlow 实现简单的 GAN，生成手写数字图片。代码中首先定义了生成器和判别器模型，然后构建 GAN 模型。通过循环训练生成器和判别器，使它们相互竞争和优化，最终生成具有相似特征的新图片。</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bonelee/p/9166084.html" title="gan">gan</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2664.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/2664.html" class="post-title-link" itemprop="url">baggging</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 21:57:45" itemprop="dateModified" datetime="2023-08-09T21:57:45+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>438</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Bagging（Bootstrap Aggregating）是一种集成学习方法，旨在提高模型的稳定性和泛化能力。它通过随机从训练集中有放回地抽取样本，然后训练多个独立的基本模型，最终通过投票或取平均来融合这些模型的预测结果。随机样本抽取和多模型组合有助于减小模型的方差，提高整体性能。</p>
-<p>以下是使用 Python 的 <code>scikit-learn</code> 库实现 Bagging 的示例代码。我们将使用决策树作为基本模型：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> BaggingClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.tree <span class="keyword">import</span> DecisionTreeClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 Bagging 分类器，基本模型为决策树</span></span><br><span class="line">base_model = DecisionTreeClassifier(random_state=<span class="number">42</span>)</span><br><span class="line">bagging_model = BaggingClassifier(base_model, n_estimators=<span class="number">10</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">bagging_model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = bagging_model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Bagging Accuracy:&quot;</span>, accuracy)</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们使用了 <code>load_iris</code> 函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个 Bagging 分类器，基本模型选用了决策树。通过训练 Bagging 模型，然后在测试集上进行预测，并计算了预测的准确率。</p>
-<p>通过调整参数（如基本模型、基本模型数量等），您可以进一步优化 Bagging 模型的性能。请注意，Bagging 算法也适用于其他基本模型，例如随机森林中的决策树、KNN 等。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23014.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/23014.html" class="post-title-link" itemprop="url">数据结构-线性表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>938</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p><code>开始节点--&gt;  数据元素 ... --&gt; 终端节点</code></p>
-<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>clear、isEmpty、length、get、insert、remove、indexOf</p>
-<pre><code>public interface IList &#123;
-    // 线性表置空操作
-    public void clear();
-
-    // 判断线性表是否为空操作
-    public boolean isEmpty();
-
-    // 获取线性表中元素的长度操作
-    public int length();
-
-    // 获取指定位置上面的元素操作
-    public Object get(int i);
-
-    // 在指定位置上面插入元素的操作
-    public void insert(int i, Object x);
-
-    // 删除指定位置上面的元素的操作
-    public void remove(int i);
-
-    // 查找指定元素的位置首次出现的位置操作
-    public int indexOf(Object x);
-
-    // 显示线性表中的内容操作
-    public void display();
-&#125;
-</code></pre>
-<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><h3 id="顺序表"><a href="#顺序表" class="headerlink" title="顺序表"></a>顺序表</h3><p>顺序存储， 逻辑上相邻的数据元素，在物理存储上也是相邻的。 不便于插入和删除</p>
-<pre><code>   public class SqList implements IList &#123;
-       // 线性表存储空间
-       private Object[] listElem;
-       // 线性表的当前长度
-       private int curLen;
-   
-       // 顺序表类的构造函数，构造一个存储空间容量为maxSize的线性表
-       public SqList(int maxSize) &#123;
-           // TODO Auto-generated constructor stub
-           curLen = 0;
-           listElem = new Object[maxSize];
-       &#125;
-   
-       // 将一个已经存在的线性表置成空表
-       public void clear() &#123;
-           // TODO Auto-generated method stub
-           // 置顺序表的当前长度为0
-           curLen = 0;
-       &#125;
-   
-       // 判断线性表中的数据元素的个数是否为0，若为0则返回true，否则返回false
-       public boolean isEmpty() &#123;
-           // TODO Auto-generated method stub
-           return curLen == 0;
-       &#125;
-   
-       // 求线性表中的数据元素的个数并返回其值
-       public int length() &#123;
-           // TODO Auto-generated method stub
-           // 返回顺序表的当前长度
-           return curLen;
-       &#125;
-   
-       // 读取到线性表中的第i个数据元素并由函数返回其值，其中i的取值范围为0≤i≤length()-1，若i不在此范围则抛出异常
-       public Object get(int i) &#123;
-           // TODO Auto-generated method stub
-           if (i &lt; 0 || i &gt;= curLen) &#123;
-               throw new RuntimeException(&quot;第&quot; + i + &quot;个元素不存在&quot;);
-           &#125;
-           return listElem[i];
-       &#125;
-   
-       // 在线性表的第i个数据元素之前插入一个值位x的数据元素
-       public void insert(int i, Object x) &#123;
-           // TODO Auto-generated method stub
-           // 判断表是否满了
-           if (curLen == listElem.length) &#123;
-               throw new RuntimeException(&quot;存储空间已经满了，无法插入新的元素&quot;);
-           &#125;
-           // 插入的位置不合法
-           if (i &lt; 0 || i &gt; curLen) &#123;
-               throw new RuntimeException(&quot;插入的位置不合法&quot;);
-           &#125;
-           // 必须要从最后一个元素开始依次逐个后移动，直到第i个数据元素移动完毕为止。
-           for (int j = curLen; j &gt; i; j--) &#123;
-               listElem[j] = listElem[j - 1];
-           &#125;
-           listElem[i] = x;
-           curLen++;
-       &#125;
-   
-       public void remove(int i) &#123;
-           // TODO Auto-generated method stub
-           if (i &lt; 0 || i &gt; curLen - 1) &#123;
-               throw new RuntimeException(&quot;删除的位置不合法&quot;);
-           &#125;
-           for (int j = i; j &lt; curLen; j++) &#123;
-               listElem[j] = listElem[j+1];
-           &#125;
-           curLen--;
-       &#125;
-   
-       // 返回线性表中首次出现指定的数据元素的位序号，若线性表中不包含此数据元素，则返回-1
-       public int indexOf(Object x) &#123;
-           // TODO Auto-generated method stub
-           for (int i = 0; i &lt; curLen; i++) &#123;
-               if (listElem[i].equals(x)) &#123;
-                   return i;
-               &#125;
-           &#125;
-           return -1;
-       &#125;
-   
-       // 输出线性表中的数据元素
-       public void display() &#123;
-           // TODO Auto-generated method stub
-           for (int i = 0; i &lt; curLen; i++) &#123;
-               System.out.print(listElem[i] + &quot; &quot;);
-           &#125;
-           System.out.println();
-       &#125;
-   
-       // 测试
-       public static void main(String[] args) &#123;
-           SqList sqList = new SqList(10);
-           sqList.insert(0, &quot;a&quot;);
-           sqList.insert(1, &quot;z&quot;);
-           sqList.insert(2, &quot;d&quot;);
-           sqList.insert(3, &quot;m&quot;);
-           sqList.insert(4, &quot;z&quot;);
-           int order = sqList.indexOf(&quot;z&quot;);
-           if (order!=-1) &#123;
-               System.out.println(&quot;顺序表中第一次出现的值为z的数据元素的位置为：&quot;+order);
-           &#125;else &#123;
-               System.out.println(&quot;顺序表中不包括z元素&quot;);
-           &#125;
-       &#125;
-   &#125;
-</code></pre>
-<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p>链式存储，单向链表，节点保存下一个节点的引用，便于插入和删除</p>
-<pre><code>public class Node &#123;
-    // 存放结点的值
-    private Object data;
-    // 后继结点的引用
-    private Node next;
-
-    // 无参数时的构造函数
-    public Node() &#123;
-        // TODO Auto-generated constructor stub
-        this(null, null);
-    &#125;
-
-    // 带有一个参数时的构造函数
-    public Node(Object data) &#123;
-        this(data, null);
-    &#125;
-
-    // 带有两个参数时的构造函数
-    public Node(Object data, Node next) &#123;
-        this.data = data;
-        this.next = next;
-    &#125;
-
-    public Object getData() &#123;
-        return data;
-    &#125;
-
-    public void setData(Object data) &#123;
-        this.data = data;
-    &#125;
-
-    public Node getNext() &#123;
-        return next;
-    &#125;
-
-    public void setNext(Node next) &#123;
-        this.next = next;
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28769.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/28769.html" class="post-title-link" itemprop="url">红黑树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:46" itemprop="dateModified" datetime="2022-12-28T14:40:46+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>18 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>红黑树是特殊的二叉查找树</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
-<li>每个节点或者是黑色，或者是红色。</li>
-<li>根节点是黑色。</li>
-<li>每个叶子节点是黑色。 （这里叶子节点，是指为空的叶子节点！）</li>
-<li>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
-<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
-</ul>
-<p>注：确保没有一条路径会比其他路径长出俩倍。因而，红黑树是相对是接近平衡的二叉树。</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-    &#125;
-
-    ...
-&#125;
-
-public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-    &#125;
-
-    ...
-&#125;
-
-/* 
- * 对红黑树的节点(x)进行左旋转
- *
- * 左旋示意图(对节点x进行左旋)：
- *      px                              px
- *     /                               /
- *    x                               y                
- *   /  \      --(左旋)-.           / \                #
- *  lx   y                          x  ry     
- *     /   \                       /  \
- *    ly   ry                     lx  ly  
- *
- *
- */
-private void leftRotate(RBTNode&lt;T&gt; x) &#123;
-    // 设置x的右孩子为y
-    RBTNode&lt;T&gt; y = x.right;
-
-    // 将 “y的左孩子” 设为 “x的右孩子”；
-    // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
-    x.right = y.left;
-    if (y.left != null)
-        y.left.parent = x;
-
-    // 将 “x的父亲” 设为 “y的父亲”
-    y.parent = x.parent;
-
-    if (x.parent == null) &#123;
-        this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
-    &#125; else &#123;
-        if (x.parent.left == x)
-            x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-        else
-            x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-    &#125;
-    
-    // 将 “x” 设为 “y的左孩子”
-    y.left = x;
-    // 将 “x的父节点” 设为 “y”
-    x.parent = y;
-&#125;
-
-/* 
- * 对红黑树的节点(y)进行右旋转
- *
- * 右旋示意图(对节点y进行左旋)：
- *            py                               py
- *           /                                /
- *          y                                x                  
- *         /  \      --(右旋)-.            /  \                     #
- *        x   ry                           lx   y  
- *       / \                                   / \                   #
- *      lx  rx                                rx  ry
- * 
- */
-private void rightRotate(RBTNode&lt;T&gt; y) &#123;
-    // 设置x是当前节点的左孩子。
-    RBTNode&lt;T&gt; x = y.left;
-
-    // 将 “x的右孩子” 设为 “y的左孩子”；
-    // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
-    y.left = x.right;
-    if (x.right != null)
-        x.right.parent = y;
-
-    // 将 “y的父亲” 设为 “x的父亲”
-    x.parent = y.parent;
-
-    if (y.parent == null) &#123;
-        this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
-    &#125; else &#123;
-        if (y == y.parent.right)
-            y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
-        else
-            y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
-    &#125;
-
-    // 将 “y” 设为 “x的右孩子”
-    x.right = y;
-
-    // 将 “y的父节点” 设为 “x”
-    y.parent = x;
-&#125;
-
-/* 
- * 将结点插入到红黑树中
- *
- * 参数说明：
- *     node 插入的结点        // 对应《算法导论》中的node
- */
-private void insert(RBTNode&lt;T&gt; node) &#123;
-    int cmp;
-    RBTNode&lt;T&gt; y = null;
-    RBTNode&lt;T&gt; x = this.mRoot;
-
-    // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
-    while (x != null) &#123;
-        y = x;
-        cmp = node.key.compareTo(x.key);
-        if (cmp &lt; 0)
-            x = x.left;
-        else
-            x = x.right;
-    &#125;
-
-    node.parent = y;
-    if (y!=null) &#123;
-        cmp = node.key.compareTo(y.key);
-        if (cmp &lt; 0)
-            y.left = node;
-        else
-            y.right = node;
-    &#125; else &#123;
-        this.mRoot = node;
-    &#125;
-
-    // 2. 设置节点的颜色为红色
-    node.color = RED;
-
-    // 3. 将它重新修正为一颗二叉查找树
-    insertFixUp(node);
-&#125;
-
-/* 
- * 新建结点(key)，并将其插入到红黑树中
- *
- * 参数说明：
- *     key 插入结点的键值
- */
-public void insert(T key) &#123;
-    RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
-
-    // 如果新建结点失败，则返回。
-    if (node != null)
-        insert(node);
-&#125;
-
-
-/*
- * 红黑树插入修正函数
- *
- * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
- * 目的是将它重新塑造成一颗红黑树。
- *
- * 参数说明：
- *     node 插入的结点        // 对应《算法导论》中的z
- */
-private void insertFixUp(RBTNode&lt;T&gt; node) &#123;
-    RBTNode&lt;T&gt; parent, gparent;
-
-    // 若“父节点存在，并且父节点的颜色是红色”
-    while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) &#123;
-        gparent = parentOf(parent);
-
-        //若“父节点”是“祖父节点的左孩子”
-        if (parent == gparent.left) &#123;
-            // Case 1条件：叔叔节点是红色
-            RBTNode&lt;T&gt; uncle = gparent.right;
-            if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                setBlack(uncle);
-                setBlack(parent);
-                setRed(gparent);
-                node = gparent;
-                continue;
-            &#125;
-
-            // Case 2条件：叔叔是黑色，且当前节点是右孩子
-            if (parent.right == node) &#123;
-                RBTNode&lt;T&gt; tmp;
-                leftRotate(parent);
-                tmp = parent;
-                parent = node;
-                node = tmp;
-            &#125;
-
-            // Case 3条件：叔叔是黑色，且当前节点是左孩子。
-            setBlack(parent);
-            setRed(gparent);
-            rightRotate(gparent);
-        &#125; else &#123;    //若“z的父节点”是“z的祖父节点的右孩子”
-            // Case 1条件：叔叔节点是红色
-            RBTNode&lt;T&gt; uncle = gparent.left;
-            if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                setBlack(uncle);
-                setBlack(parent);
-                setRed(gparent);
-                node = gparent;
-                continue;
-            &#125;
-
-            // Case 2条件：叔叔是黑色，且当前节点是左孩子
-            if (parent.left == node) &#123;
-                RBTNode&lt;T&gt; tmp;
-                rightRotate(parent);
-                tmp = parent;
-                parent = node;
-                node = tmp;
-            &#125;
-
-            // Case 3条件：叔叔是黑色，且当前节点是右孩子。
-            setBlack(parent);
-            setRed(gparent);
-            leftRotate(gparent);
-        &#125;
-    &#125;
-
-    // 将根节点设为黑色
-    setBlack(this.mRoot);
-&#125;
-
-
-/* 
- * 删除结点(node)，并返回被删除的结点
- *
- * 参数说明：
- *     node 删除的结点
- */
-private void remove(RBTNode&lt;T&gt; node) &#123;
-    RBTNode&lt;T&gt; child, parent;
-    boolean color;
-
-    // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
-    if ( (node.left!=null) &amp;&amp; (node.right!=null) ) &#123;
-        // 被删节点的后继节点。(称为&quot;取代节点&quot;)
-        // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
-        RBTNode&lt;T&gt; replace = node;
-
-        // 获取后继节点
-        replace = replace.right;
-        while (replace.left != null)
-            replace = replace.left;
-
-        // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
-        if (parentOf(node)!=null) &#123;
-            if (parentOf(node).left == node)
-                parentOf(node).left = replace;
-            else
-                parentOf(node).right = replace;
-        &#125; else &#123;
-            // &quot;node节点&quot;是根节点，更新根节点。
-            this.mRoot = replace;
-        &#125;
-
-        // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
-        // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
-        child = replace.right;
-        parent = parentOf(replace);
-        // 保存&quot;取代节点&quot;的颜色
-        color = colorOf(replace);
-
-        // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
-        if (parent == node) &#123;
-            parent = replace;
-        &#125; else &#123;
-            // child不为空
-            if (child!=null)
-                setParent(child, parent);
-            parent.left = child;
-
-            replace.right = node.right;
-            setParent(node.right, replace);
-        &#125;
-
-        replace.parent = node.parent;
-        replace.color = node.color;
-        replace.left = node.left;
-        node.left.parent = replace;
-
-        if (color == BLACK)
-            removeFixUp(child, parent);
-
-        node = null;
-        return ;
-    &#125;
-
-    if (node.left !=null) &#123;
-        child = node.left;
-    &#125; else &#123;
-        child = node.right;
-    &#125;
-
-    parent = node.parent;
-    // 保存&quot;取代节点&quot;的颜色
-    color = node.color;
-
-    if (child!=null)
-        child.parent = parent;
-
-    // &quot;node节点&quot;不是根节点
-    if (parent!=null) &#123;
-        if (parent.left == node)
-            parent.left = child;
-        else
-            parent.right = child;
-    &#125; else &#123;
-        this.mRoot = child;
-    &#125;
-
-    if (color == BLACK)
-        removeFixUp(child, parent);
-    node = null;
-&#125;
-
-/* 
- * 删除结点(z)，并返回被删除的结点
- *
- * 参数说明：
- *     tree 红黑树的根结点
- *     z 删除的结点
- */
-public void remove(T key) &#123;
-    RBTNode&lt;T&gt; node; 
-
-    if ((node = search(mRoot, key)) != null)
-        remove(node);
-&#125;
-
-
-
-/*
- * 红黑树删除修正函数
- *
- * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
- * 目的是将它重新塑造成一颗红黑树。
- *
- * 参数说明：
- *     node 待修正的节点
- */
-private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-    RBTNode&lt;T&gt; other;
-
-    while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) &#123;
-        if (parent.left == node) &#123;
-            other = parent.right;
-            if (isRed(other)) &#123;
-                // Case 1: x的兄弟w是红色的  
-                setBlack(other);
-                setRed(parent);
-                leftRotate(parent);
-                other = parent.right;
-            &#125;
-
-            if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                (other.right==null || isBlack(other.right))) &#123;
-                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                setRed(other);
-                node = parent;
-                parent = parentOf(node);
-            &#125; else &#123;
-
-                if (other.right==null || isBlack(other.right)) &#123;
-                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                    setBlack(other.left);
-                    setRed(other);
-                    rightRotate(other);
-                    other = parent.right;
-                &#125;
-                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                setColor(other, colorOf(parent));
-                setBlack(parent);
-                setBlack(other.right);
-                leftRotate(parent);
-                node = this.mRoot;
-                break;
-            &#125;
-        &#125; else &#123;
-
-            other = parent.left;
-            if (isRed(other)) &#123;
-                // Case 1: x的兄弟w是红色的  
-                setBlack(other);
-                setRed(parent);
-                rightRotate(parent);
-                other = parent.left;
-            &#125;
-
-            if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                (other.right==null || isBlack(other.right))) &#123;
-                // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                setRed(other);
-                node = parent;
-                parent = parentOf(node);
-            &#125; else &#123;
-
-                if (other.left==null || isBlack(other.left)) &#123;
-                    // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                    setBlack(other.right);
-                    setRed(other);
-                    leftRotate(other);
-                    other = parent.left;
-                &#125;
-
-                // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                setColor(other, colorOf(parent));
-                setBlack(parent);
-                setBlack(other.left);
-                rightRotate(parent);
-                node = this.mRoot;
-                break;
-            &#125;
-        &#125;
-    &#125;
-
-    if (node!=null)
-        setBlack(node);
-&#125;
-</code></pre>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><pre><code>/**
- * Java 语言: 红黑树
- *
- * @author skywang
- * @date 2013/11/07
- */
-
-public class RBTree&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-
-    private RBTNode&lt;T&gt; mRoot;    // 根结点
-
-    private static final boolean RED   = false;
-    private static final boolean BLACK = true;
-
-    public class RBTNode&lt;T extends Comparable&lt;T&gt;&gt; &#123;
-        boolean color;        // 颜色
-        T key;                // 关键字(键值)
-        RBTNode&lt;T&gt; left;    // 左孩子
-        RBTNode&lt;T&gt; right;    // 右孩子
-        RBTNode&lt;T&gt; parent;    // 父结点
-
-        public RBTNode(T key, boolean color, RBTNode&lt;T&gt; parent, RBTNode&lt;T&gt; left, RBTNode&lt;T&gt; right) &#123;
-            this.key = key;
-            this.color = color;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        &#125;
-
-        public T getKey() &#123;
-            return key;
-        &#125;
-
-        public String toString() &#123;
-            return &quot;&quot;+key+(this.color==RED?&quot;(R)&quot;:&quot;B&quot;);
-        &#125;
-    &#125;
-
-    public RBTree() &#123;
-        mRoot=null;
-    &#125;
-
-    private RBTNode&lt;T&gt; parentOf(RBTNode&lt;T&gt; node) &#123;
-        return node!=null ? node.parent : null;
-    &#125;
-    private boolean colorOf(RBTNode&lt;T&gt; node) &#123;
-        return node!=null ? node.color : BLACK;
-    &#125;
-    private boolean isRed(RBTNode&lt;T&gt; node) &#123;
-        return ((node!=null)&amp;&amp;(node.color==RED)) ? true : false;
-    &#125;
-    private boolean isBlack(RBTNode&lt;T&gt; node) &#123;
-        return !isRed(node);
-    &#125;
-    private void setBlack(RBTNode&lt;T&gt; node) &#123;
-        if (node!=null)
-            node.color = BLACK;
-    &#125;
-    private void setRed(RBTNode&lt;T&gt; node) &#123;
-        if (node!=null)
-            node.color = RED;
-    &#125;
-    private void setParent(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-        if (node!=null)
-            node.parent = parent;
-    &#125;
-    private void setColor(RBTNode&lt;T&gt; node, boolean color) &#123;
-        if (node!=null)
-            node.color = color;
-    &#125;
-
-    /*
-     * 前序遍历&quot;红黑树&quot;
-     */
-    private void preOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null) &#123;
-            System.out.print(tree.key+&quot; &quot;);
-            preOrder(tree.left);
-            preOrder(tree.right);
-        &#125;
-    &#125;
-
-    public void preOrder() &#123;
-        preOrder(mRoot);
-    &#125;
-
-    /*
-     * 中序遍历&quot;红黑树&quot;
-     */
-    private void inOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null) &#123;
-            inOrder(tree.left);
-            System.out.print(tree.key+&quot; &quot;);
-            inOrder(tree.right);
-        &#125;
-    &#125;
-
-    public void inOrder() &#123;
-        inOrder(mRoot);
-    &#125;
-
-
-    /*
-     * 后序遍历&quot;红黑树&quot;
-     */
-    private void postOrder(RBTNode&lt;T&gt; tree) &#123;
-        if(tree != null)
-        &#123;
-            postOrder(tree.left);
-            postOrder(tree.right);
-            System.out.print(tree.key+&quot; &quot;);
-        &#125;
-    &#125;
-
-    public void postOrder() &#123;
-        postOrder(mRoot);
-    &#125;
-
-
-    /*
-     * (递归实现)查找&quot;红黑树x&quot;中键值为key的节点
-     */
-    private RBTNode&lt;T&gt; search(RBTNode&lt;T&gt; x, T key) &#123;
-        if (x==null)
-            return x;
-
-        int cmp = key.compareTo(x.key);
-        if (cmp &lt; 0)
-            return search(x.left, key);
-        else if (cmp &gt; 0)
-            return search(x.right, key);
-        else
-            return x;
-    &#125;
-
-    public RBTNode&lt;T&gt; search(T key) &#123;
-        return search(mRoot, key);
-    &#125;
-
-    /*
-     * (非递归实现)查找&quot;红黑树x&quot;中键值为key的节点
-     */
-    private RBTNode&lt;T&gt; iterativeSearch(RBTNode&lt;T&gt; x, T key) &#123;
-        while (x!=null) &#123;
-            int cmp = key.compareTo(x.key);
-
-            if (cmp &lt; 0) 
-                x = x.left;
-            else if (cmp &gt; 0) 
-                x = x.right;
-            else
-                return x;
-        &#125;
-
-        return x;
-    &#125;
-
-    public RBTNode&lt;T&gt; iterativeSearch(T key) &#123;
-        return iterativeSearch(mRoot, key);
-    &#125;
-
-    /* 
-     * 查找最小结点：返回tree为根结点的红黑树的最小结点。
-     */
-    private RBTNode&lt;T&gt; minimum(RBTNode&lt;T&gt; tree) &#123;
-        if (tree == null)
-            return null;
-
-        while(tree.left != null)
-            tree = tree.left;
-        return tree;
-    &#125;
-
-    public T minimum() &#123;
-        RBTNode&lt;T&gt; p = minimum(mRoot);
-        if (p != null)
-            return p.key;
-
-        return null;
-    &#125;
-     
-    /* 
-     * 查找最大结点：返回tree为根结点的红黑树的最大结点。
-     */
-    private RBTNode&lt;T&gt; maximum(RBTNode&lt;T&gt; tree) &#123;
-        if (tree == null)
-            return null;
-
-        while(tree.right != null)
-            tree = tree.right;
-        return tree;
-    &#125;
-
-    public T maximum() &#123;
-        RBTNode&lt;T&gt; p = maximum(mRoot);
-        if (p != null)
-            return p.key;
-
-        return null;
-    &#125;
-
-    /* 
-     * 找结点(x)的后继结点。即，查找&quot;红黑树中数据值大于该结点&quot;的&quot;最小结点&quot;。
-     */
-    public RBTNode&lt;T&gt; successor(RBTNode&lt;T&gt; x) &#123;
-        // 如果x存在右孩子，则&quot;x的后继结点&quot;为 &quot;以其右孩子为根的子树的最小结点&quot;。
-        if (x.right != null)
-            return minimum(x.right);
-
-        // 如果x没有右孩子。则x有以下两种可能：
-        // (01) x是&quot;一个左孩子&quot;，则&quot;x的后继结点&quot;为 &quot;它的父结点&quot;。
-        // (02) x是&quot;一个右孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有左孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的后继结点&quot;。
-        RBTNode&lt;T&gt; y = x.parent;
-        while ((y!=null) &amp;&amp; (x==y.right)) &#123;
-            x = y;
-            y = y.parent;
-        &#125;
-
-        return y;
-    &#125;
-     
-    /* 
-     * 找结点(x)的前驱结点。即，查找&quot;红黑树中数据值小于该结点&quot;的&quot;最大结点&quot;。
-     */
-    public RBTNode&lt;T&gt; predecessor(RBTNode&lt;T&gt; x) &#123;
-        // 如果x存在左孩子，则&quot;x的前驱结点&quot;为 &quot;以其左孩子为根的子树的最大结点&quot;。
-        if (x.left != null)
-            return maximum(x.left);
-
-        // 如果x没有左孩子。则x有以下两种可能：
-        // (01) x是&quot;一个右孩子&quot;，则&quot;x的前驱结点&quot;为 &quot;它的父结点&quot;。
-        // (01) x是&quot;一个左孩子&quot;，则查找&quot;x的最低的父结点，并且该父结点要具有右孩子&quot;，找到的这个&quot;最低的父结点&quot;就是&quot;x的前驱结点&quot;。
-        RBTNode&lt;T&gt; y = x.parent;
-        while ((y!=null) &amp;&amp; (x==y.left)) &#123;
-            x = y;
-            y = y.parent;
-        &#125;
-
-        return y;
-    &#125;
-
-    /* 
-     * 对红黑树的节点(x)进行左旋转
-     *
-     * 左旋示意图(对节点x进行左旋)：
-     *      px                              px
-     *     /                               /
-     *    x                               y                
-     *   /  \      --(左旋)-.           / \                #
-     *  lx   y                          x  ry     
-     *     /   \                       /  \
-     *    ly   ry                     lx  ly  
-     *
-     *
-     */
-    private void leftRotate(RBTNode&lt;T&gt; x) &#123;
-        // 设置x的右孩子为y
-        RBTNode&lt;T&gt; y = x.right;
-
-        // 将 “y的左孩子” 设为 “x的右孩子”；
-        // 如果y的左孩子非空，将 “x” 设为 “y的左孩子的父亲”
-        x.right = y.left;
-        if (y.left != null)
-            y.left.parent = x;
-
-        // 将 “x的父亲” 设为 “y的父亲”
-        y.parent = x.parent;
-
-        if (x.parent == null) &#123;
-            this.mRoot = y;            // 如果 “x的父亲” 是空节点，则将y设为根节点
-        &#125; else &#123;
-            if (x.parent.left == x)
-                x.parent.left = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-            else
-                x.parent.right = y;    // 如果 x是它父节点的左孩子，则将y设为“x的父节点的左孩子”
-        &#125;
-        
-        // 将 “x” 设为 “y的左孩子”
-        y.left = x;
-        // 将 “x的父节点” 设为 “y”
-        x.parent = y;
-    &#125;
-
-    /* 
-     * 对红黑树的节点(y)进行右旋转
-     *
-     * 右旋示意图(对节点y进行左旋)：
-     *            py                               py
-     *           /                                /
-     *          y                                x                  
-     *         /  \      --(右旋)-.            /  \                     #
-     *        x   ry                           lx   y  
-     *       / \                                   / \                   #
-     *      lx  rx                                rx  ry
-     * 
-     */
-    private void rightRotate(RBTNode&lt;T&gt; y) &#123;
-        // 设置x是当前节点的左孩子。
-        RBTNode&lt;T&gt; x = y.left;
-
-        // 将 “x的右孩子” 设为 “y的左孩子”；
-        // 如果&quot;x的右孩子&quot;不为空的话，将 “y” 设为 “x的右孩子的父亲”
-        y.left = x.right;
-        if (x.right != null)
-            x.right.parent = y;
-
-        // 将 “y的父亲” 设为 “x的父亲”
-        x.parent = y.parent;
-
-        if (y.parent == null) &#123;
-            this.mRoot = x;            // 如果 “y的父亲” 是空节点，则将x设为根节点
-        &#125; else &#123;
-            if (y == y.parent.right)
-                y.parent.right = x;    // 如果 y是它父节点的右孩子，则将x设为“y的父节点的右孩子”
-            else
-                y.parent.left = x;    // (y是它父节点的左孩子) 将x设为“x的父节点的左孩子”
-        &#125;
-
-        // 将 “y” 设为 “x的右孩子”
-        x.right = y;
-
-        // 将 “y的父节点” 设为 “x”
-        y.parent = x;
-    &#125;
-
-    /*
-     * 红黑树插入修正函数
-     *
-     * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
-     * 目的是将它重新塑造成一颗红黑树。
-     *
-     * 参数说明：
-     *     node 插入的结点        // 对应《算法导论》中的z
-     */
-    private void insertFixUp(RBTNode&lt;T&gt; node) &#123;
-        RBTNode&lt;T&gt; parent, gparent;
-
-        // 若“父节点存在，并且父节点的颜色是红色”
-        while (((parent = parentOf(node))!=null) &amp;&amp; isRed(parent)) &#123;
-            gparent = parentOf(parent);
-
-            //若“父节点”是“祖父节点的左孩子”
-            if (parent == gparent.left) &#123;
-                // Case 1条件：叔叔节点是红色
-                RBTNode&lt;T&gt; uncle = gparent.right;
-                if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                    setBlack(uncle);
-                    setBlack(parent);
-                    setRed(gparent);
-                    node = gparent;
-                    continue;
-                &#125;
-
-                // Case 2条件：叔叔是黑色，且当前节点是右孩子
-                if (parent.right == node) &#123;
-                    RBTNode&lt;T&gt; tmp;
-                    leftRotate(parent);
-                    tmp = parent;
-                    parent = node;
-                    node = tmp;
-                &#125;
-
-                // Case 3条件：叔叔是黑色，且当前节点是左孩子。
-                setBlack(parent);
-                setRed(gparent);
-                rightRotate(gparent);
-            &#125; else &#123;    //若“z的父节点”是“z的祖父节点的右孩子”
-                // Case 1条件：叔叔节点是红色
-                RBTNode&lt;T&gt; uncle = gparent.left;
-                if ((uncle!=null) &amp;&amp; isRed(uncle)) &#123;
-                    setBlack(uncle);
-                    setBlack(parent);
-                    setRed(gparent);
-                    node = gparent;
-                    continue;
-                &#125;
-
-                // Case 2条件：叔叔是黑色，且当前节点是左孩子
-                if (parent.left == node) &#123;
-                    RBTNode&lt;T&gt; tmp;
-                    rightRotate(parent);
-                    tmp = parent;
-                    parent = node;
-                    node = tmp;
-                &#125;
-
-                // Case 3条件：叔叔是黑色，且当前节点是右孩子。
-                setBlack(parent);
-                setRed(gparent);
-                leftRotate(gparent);
-            &#125;
-        &#125;
-
-        // 将根节点设为黑色
-        setBlack(this.mRoot);
-    &#125;
-
-    /* 
-     * 将结点插入到红黑树中
-     *
-     * 参数说明：
-     *     node 插入的结点        // 对应《算法导论》中的node
-     */
-    private void insert(RBTNode&lt;T&gt; node) &#123;
-        int cmp;
-        RBTNode&lt;T&gt; y = null;
-        RBTNode&lt;T&gt; x = this.mRoot;
-
-        // 1. 将红黑树当作一颗二叉查找树，将节点添加到二叉查找树中。
-        while (x != null) &#123;
-            y = x;
-            cmp = node.key.compareTo(x.key);
-            if (cmp &lt; 0)
-                x = x.left;
-            else
-                x = x.right;
-        &#125;
-
-        node.parent = y;
-        if (y!=null) &#123;
-            cmp = node.key.compareTo(y.key);
-            if (cmp &lt; 0)
-                y.left = node;
-            else
-                y.right = node;
-        &#125; else &#123;
-            this.mRoot = node;
-        &#125;
-
-        // 2. 设置节点的颜色为红色
-        node.color = RED;
-
-        // 3. 将它重新修正为一颗二叉查找树
-        insertFixUp(node);
-    &#125;
-
-    /* 
-     * 新建结点(key)，并将其插入到红黑树中
-     *
-     * 参数说明：
-     *     key 插入结点的键值
-     */
-    public void insert(T key) &#123;
-        RBTNode&lt;T&gt; node=new RBTNode&lt;T&gt;(key,BLACK,null,null,null);
-
-        // 如果新建结点失败，则返回。
-        if (node != null)
-            insert(node);
-    &#125;
-
-
-    /*
-     * 红黑树删除修正函数
-     *
-     * 在从红黑树中删除插入节点之后(红黑树失去平衡)，再调用该函数；
-     * 目的是将它重新塑造成一颗红黑树。
-     *
-     * 参数说明：
-     *     node 待修正的节点
-     */
-    private void removeFixUp(RBTNode&lt;T&gt; node, RBTNode&lt;T&gt; parent) &#123;
-        RBTNode&lt;T&gt; other;
-
-        while ((node==null || isBlack(node)) &amp;&amp; (node != this.mRoot)) &#123;
-            if (parent.left == node) &#123;
-                other = parent.right;
-                if (isRed(other)) &#123;
-                    // Case 1: x的兄弟w是红色的  
-                    setBlack(other);
-                    setRed(parent);
-                    leftRotate(parent);
-                    other = parent.right;
-                &#125;
-
-                if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                    (other.right==null || isBlack(other.right))) &#123;
-                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                    setRed(other);
-                    node = parent;
-                    parent = parentOf(node);
-                &#125; else &#123;
-
-                    if (other.right==null || isBlack(other.right)) &#123;
-                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                        setBlack(other.left);
-                        setRed(other);
-                        rightRotate(other);
-                        other = parent.right;
-                    &#125;
-                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                    setColor(other, colorOf(parent));
-                    setBlack(parent);
-                    setBlack(other.right);
-                    leftRotate(parent);
-                    node = this.mRoot;
-                    break;
-                &#125;
-            &#125; else &#123;
-
-                other = parent.left;
-                if (isRed(other)) &#123;
-                    // Case 1: x的兄弟w是红色的  
-                    setBlack(other);
-                    setRed(parent);
-                    rightRotate(parent);
-                    other = parent.left;
-                &#125;
-
-                if ((other.left==null || isBlack(other.left)) &amp;&amp;
-                    (other.right==null || isBlack(other.right))) &#123;
-                    // Case 2: x的兄弟w是黑色，且w的俩个孩子也都是黑色的  
-                    setRed(other);
-                    node = parent;
-                    parent = parentOf(node);
-                &#125; else &#123;
-
-                    if (other.left==null || isBlack(other.left)) &#123;
-                        // Case 3: x的兄弟w是黑色的，并且w的左孩子是红色，右孩子为黑色。  
-                        setBlack(other.right);
-                        setRed(other);
-                        leftRotate(other);
-                        other = parent.left;
-                    &#125;
-
-                    // Case 4: x的兄弟w是黑色的；并且w的右孩子是红色的，左孩子任意颜色。
-                    setColor(other, colorOf(parent));
-                    setBlack(parent);
-                    setBlack(other.left);
-                    rightRotate(parent);
-                    node = this.mRoot;
-                    break;
-                &#125;
-            &#125;
-        &#125;
-
-        if (node!=null)
-            setBlack(node);
-    &#125;
-
-    /* 
-     * 删除结点(node)，并返回被删除的结点
-     *
-     * 参数说明：
-     *     node 删除的结点
-     */
-    private void remove(RBTNode&lt;T&gt; node) &#123;
-        RBTNode&lt;T&gt; child, parent;
-        boolean color;
-
-        // 被删除节点的&quot;左右孩子都不为空&quot;的情况。
-        if ( (node.left!=null) &amp;&amp; (node.right!=null) ) &#123;
-            // 被删节点的后继节点。(称为&quot;取代节点&quot;)
-            // 用它来取代&quot;被删节点&quot;的位置，然后再将&quot;被删节点&quot;去掉。
-            RBTNode&lt;T&gt; replace = node;
-
-            // 获取后继节点
-            replace = replace.right;
-            while (replace.left != null)
-                replace = replace.left;
-
-            // &quot;node节点&quot;不是根节点(只有根节点不存在父节点)
-            if (parentOf(node)!=null) &#123;
-                if (parentOf(node).left == node)
-                    parentOf(node).left = replace;
-                else
-                    parentOf(node).right = replace;
-            &#125; else &#123;
-                // &quot;node节点&quot;是根节点，更新根节点。
-                this.mRoot = replace;
-            &#125;
-
-            // child是&quot;取代节点&quot;的右孩子，也是需要&quot;调整的节点&quot;。
-            // &quot;取代节点&quot;肯定不存在左孩子！因为它是一个后继节点。
-            child = replace.right;
-            parent = parentOf(replace);
-            // 保存&quot;取代节点&quot;的颜色
-            color = colorOf(replace);
-
-            // &quot;被删除节点&quot;是&quot;它的后继节点的父节点&quot;
-            if (parent == node) &#123;
-                parent = replace;
-            &#125; else &#123;
-                // child不为空
-                if (child!=null)
-                    setParent(child, parent);
-                parent.left = child;
-
-                replace.right = node.right;
-                setParent(node.right, replace);
-            &#125;
-
-            replace.parent = node.parent;
-            replace.color = node.color;
-            replace.left = node.left;
-            node.left.parent = replace;
-
-            if (color == BLACK)
-                removeFixUp(child, parent);
-
-            node = null;
-            return ;
-        &#125;
-
-        if (node.left !=null) &#123;
-            child = node.left;
-        &#125; else &#123;
-            child = node.right;
-        &#125;
-
-        parent = node.parent;
-        // 保存&quot;取代节点&quot;的颜色
-        color = node.color;
-
-        if (child!=null)
-            child.parent = parent;
-
-        // &quot;node节点&quot;不是根节点
-        if (parent!=null) &#123;
-            if (parent.left == node)
-                parent.left = child;
-            else
-                parent.right = child;
-        &#125; else &#123;
-            this.mRoot = child;
-        &#125;
-
-        if (color == BLACK)
-            removeFixUp(child, parent);
-        node = null;
-    &#125;
-
-    /* 
-     * 删除结点(z)，并返回被删除的结点
-     *
-     * 参数说明：
-     *     tree 红黑树的根结点
-     *     z 删除的结点
-     */
-    public void remove(T key) &#123;
-        RBTNode&lt;T&gt; node; 
-
-        if ((node = search(mRoot, key)) != null)
-            remove(node);
-    &#125;
-
-    /*
-     * 销毁红黑树
-     */
-    private void destroy(RBTNode&lt;T&gt; tree) &#123;
-        if (tree==null)
-            return ;
-
-        if (tree.left != null)
-            destroy(tree.left);
-        if (tree.right != null)
-            destroy(tree.right);
-
-        tree=null;
-    &#125;
-
-    public void clear() &#123;
-        destroy(mRoot);
-        mRoot = null;
-    &#125;
-
-    /*
-     * 打印&quot;红黑树&quot;
-     *
-     * key        -- 节点的键值 
-     * direction  --  0，表示该节点是根节点;
-     *               -1，表示该节点是它的父结点的左孩子;
-     *                1，表示该节点是它的父结点的右孩子。
-     */
-    private void print(RBTNode&lt;T&gt; tree, T key, int direction) &#123;
-
-        if(tree != null) &#123;
-
-            if(direction==0)    // tree是根节点
-                System.out.printf(&quot;%2d(B) is root\n&quot;, tree.key);
-            else                // tree是分支节点
-                System.out.printf(&quot;%2d(%s) is %2d&#39;s %6s child\n&quot;, tree.key, isRed(tree)?&quot;R&quot;:&quot;B&quot;, key, direction==1?&quot;right&quot; : &quot;left&quot;);
-
-            print(tree.left, tree.key, -1);
-            print(tree.right,tree.key,  1);
-        &#125;
-    &#125;
-
-    public void print() &#123;
-        if (mRoot != null)
-            print(mRoot, mRoot.key, 0);
-    &#125;
-&#125;
-
-/**
- * Java 语言: 二叉查找树
- *
- * @author skywang
- * @date 2013/11/07
- */
-public class RBTreeTest &#123;
-
-    private static final int a[] = &#123;10, 40, 30, 60, 90, 70, 20, 50, 80&#125;;
-    private static final boolean mDebugInsert = false;    // &quot;插入&quot;动作的检测开关(false，关闭；true，打开)
-    private static final boolean mDebugDelete = false;    // &quot;删除&quot;动作的检测开关(false，关闭；true，打开)
-
-    public static void main(String[] args) &#123;
-        int i, ilen = a.length;
-        RBTree&lt;Integer&gt; tree=new RBTree&lt;Integer&gt;();
-
-        System.out.printf(&quot;== 原始数据: &quot;);
-        for(i=0; i&lt;ilen; i++)
-            System.out.printf(&quot;%d &quot;, a[i]);
-        System.out.printf(&quot;\n&quot;);
-
-        for(i=0; i&lt;ilen; i++) &#123;
-            tree.insert(a[i]);
-            // 设置mDebugInsert=true,测试&quot;添加函数&quot;
-            if (mDebugInsert) &#123;
-                System.out.printf(&quot;== 添加节点: %d\n&quot;, a[i]);
-                System.out.printf(&quot;== 树的详细信息: \n&quot;);
-                tree.print();
-                System.out.printf(&quot;\n&quot;);
-            &#125;
-        &#125;
-
-        System.out.printf(&quot;== 前序遍历: &quot;);
-        tree.preOrder();
-
-        System.out.printf(&quot;\n== 中序遍历: &quot;);
-        tree.inOrder();
-
-        System.out.printf(&quot;\n== 后序遍历: &quot;);
-        tree.postOrder();
-        System.out.printf(&quot;\n&quot;);
-
-        System.out.printf(&quot;== 最小值: %s\n&quot;, tree.minimum());
-        System.out.printf(&quot;== 最大值: %s\n&quot;, tree.maximum());
-        System.out.printf(&quot;== 树的详细信息: \n&quot;);
-        tree.print();
-        System.out.printf(&quot;\n&quot;);
-
-        // 设置mDebugDelete=true,测试&quot;删除函数&quot;
-        if (mDebugDelete) &#123;
-            for(i=0; i&lt;ilen; i++)
-            &#123;
-                tree.remove(a[i]);
-
-                System.out.printf(&quot;== 删除节点: %d\n&quot;, a[i]);
-                System.out.printf(&quot;== 树的详细信息: \n&quot;);
-                tree.print();
-                System.out.printf(&quot;\n&quot;);
-            &#125;
-        &#125;
-
-        // 销毁二叉树
-        tree.clear();
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/44076.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/44076.html" class="post-title-link" itemprop="url">数据结构-矩阵压缩</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>751</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="对称矩阵的压缩"><a href="#对称矩阵的压缩" class="headerlink" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><p><code>n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素</code></p>
-<pre><code>//对称矩阵的压缩算法
-public class SymeMatric &#123;
-
-    double[] a;// 矩阵元素
-    int n; // 矩阵的阶数
-    int m;// 一维数组的元素的个数--长度
-
-    public SymeMatric(int n) &#123;
-        // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
-        // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
-        // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
-        // 所以一维数组的长度m的值为1,2,3...n的前n项和
-        m = n * (n + 1) / 2; 
-        a = new double[m];
-        this.n = n;
-    &#125;
-
-    // 通过一个二维数组来初始化
-    public void evalute(double[][] b) &#123;
-        int k = 0;
-        for (int i = 0; i &lt; n; i++) &#123;
-            for (int j = 0; j &lt; n; j++) &#123;
-                // i &gt;= j表示只保存下三角元素
-                if (i &gt;= j) &#123;
-                    a[k++] = b[i][j];
-                &#125;
-            &#125;
-        &#125;
-    &#125;
-
-    // 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
-    public void evalute(double[] b) &#123;
-        for (int k = 0; k &lt; m; k++) &#123;
-            a[k] = b[k];
-        &#125;
-    &#125;
-
-    // 对称矩阵相加
-    public SymeMatric add(SymeMatric b) &#123;
-        SymeMatric t = new SymeMatric(n);
-        int k;
-        for (int i = 1; i &lt;= n; i++) &#123;
-            for (int j = 1; j &lt;= n; j++) &#123;
-                if (i &gt;= j) &#123;
-                    k = i * (i - 1) / 2 + j - 1;
-                &#125; else &#123;
-                    k = j * (j - 1) / 2 + i - 1;
-                &#125;
-                // 求和
-                t.a[k] = a[k] + b.a[k];
-            &#125;
-        &#125;
-        return t;
-    &#125;
-
-    // 打印对称矩阵，这个才是关键！！
-    public void print() &#123;
-        int k;
-        for (int i = 1; i &lt;= n; i++) &#123;
-            for (int j = 1; j &lt;= n; j++) &#123;
-                if (i &gt;= j) &#123;
-                    k = i * (i - 1) / 2 + j - 1;
-                &#125; else &#123;
-                    k = j * (j - 1) / 2 + i - 1;
-                &#125;
-                System.out.print(&quot; &quot; + a[k]);
-            &#125;
-            System.out.println();
-        &#125;
-    &#125;
-
-&#125;
-</code></pre>
-<h2 id="三角矩阵的压缩"><a href="#三角矩阵的压缩" class="headerlink" title="三角矩阵的压缩"></a>三角矩阵的压缩</h2><p><code>m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</code></p>
-<h2 id="稀疏矩阵的压缩"><a href="#稀疏矩阵的压缩" class="headerlink" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
-<p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
-<pre><code>inal int _ROWS=5;		//定义行数
-final int _COLS=5;		//定义列数
-final int _NOTZERO=6;	//定义稀疏矩阵中不为零的个数
-int i,j,tmpRW,tmpCL,tmpNZ;
-int temp=1;
-int Sparse[][]=new int[_ROWS][_COLS];	//声明稀疏矩阵
-int Compress[][]=new int[_NOTZERO+1][3];//声明压缩矩阵
-    
-for(i=0;i&lt;_ROWS;i++) 		//将矩阵初始值都设为0
-    for(j=0;j&lt;_COLS;j++)
-        Sparse[i][j]=0;
-
-tmpNZ=_NOTZERO;			//产生随机稀疏矩阵
-for(i=1;i&lt;tmpNZ+1;i++) &#123;
-    tmpRW=(int)(Math.random()*100);
-    tmpRW=(tmpRW%_ROWS);
-    tmpCL=(int)(Math.random()*100);
-    tmpCL=(tmpCL%_COLS);
-    if(Sparse[tmpRW][tmpCL]!=0)
-        tmpNZ++;
-    Sparse[tmpRW][tmpCL]=i;
-&#125;
-
-/*开始压缩稀疏矩阵*/
-Compress[0][0]=_ROWS;
-Compress[0][1]=_COLS;
-Compress[0][2]=_NOTZERO;
-for(i=0;i&lt;_ROWS;i++) &#123;
-    for(j=0;j&lt;_COLS;j++) &#123;
-        if(Sparse[i][j]!=0)&#123;
-            Compress[temp][0]=i;
-            Compress[temp][1]=j;
-            Compress[temp][2]=Sparse[i][j];
-            temp++;
-        &#125;
-    &#125;
-&#125;
-    
-</code></pre>
-<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/gaosheng-221/p/6133443.html">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/46674.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/46674.html" class="post-title-link" itemprop="url">树堆</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>0</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/38791.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/38791.html" class="post-title-link" itemprop="url">树链</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>0</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/12863.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/12863.html" class="post-title-link" itemprop="url">数据结构-栈、队列</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>693</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出(LIFO, Last In First Out)</p>
-<h3 id="静态栈"><a href="#静态栈" class="headerlink" title="静态栈"></a>静态栈</h3><p>数组 栈大小固定</p>
-<h3 id="动态栈"><a href="#动态栈" class="headerlink" title="动态栈"></a>动态栈</h3><p>链表 栈大小不固定</p>
-<pre><code>public class Node &#123;
-
-    //数据域
-    public int data;
-
-    //指针域，指向下一个节点
-    public Node next;
-
-    public Node() &#123;
-    &#125;
-
-    public Node(int data) &#123;
-        this.data = data;
-    &#125;
-
-    public Node(int data, Node next) &#123;
-        this.data = data;
-        this.next = next;
-    &#125;
-    
-&#125;
-
-public class Stack &#123;
-
-    public Node stackTop;//栈顶
-    public Node stackBottom;//栈底
-
-    public Stack(Node stackTop, Node stackBottom) &#123;
-        this.stackTop = stackTop;
-        this.stackBottom = stackBottom;
-    &#125;
-
-    public Stack() &#123;
-    &#125;
-
-
-&#125;
-
-/**
- * 进栈
- *
- * @param stack 栈
- * @param value 要进栈的元素
- */
-public static void pushStack(Stack stack, int value) &#123;
-
-    // 封装数据成节点
-    Node newNode = new Node(value);
-
-
-    // 栈顶本来指向的节点交由新节点来指向
-    newNode.next = stack.stackTop;
-
-    // 栈顶指针指向新节点
-    stack.stackTop = newNode;
-
-&#125;
-
-
-/**
- * 遍历栈(只要栈顶指针不指向栈底指针，就一直输出)
- *
- * @param stack
- */
-public static void traverse(Stack stack) &#123;
-    Node stackTop = stack.stackTop;
-
-    while (stackTop != stack.stackBottom) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y：&quot; + stackTop.data);
-
-        stackTop = stackTop.next;
-    &#125;
-
-
-&#125;
-
-/**
- * 判断该栈是否为空
- *
- * @param stack
- */
-public static void isEmpty(Stack stack) &#123;
-    if (stack.stackTop == stack.stackBottom) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;该栈为空&quot;);
-    &#125; else &#123;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;该栈不为空&quot;);
-
-    &#125;
-
-&#125;
-
-/**
- * 出栈(将栈顶的指针指向下一个节点)
- * @param stack
- */
-public static void popStack(Stack stack) &#123;
-
-    // 栈不为空才能出栈
-    if (!isEmpty(stack)) &#123;
-
-        //栈顶元素
-        Node top = stack.stackTop;
-
-        // 栈顶指针指向下一个节点
-        stack.stackTop = top.next;
-
-        System.out.println(&quot;关注公众号：Java3y----&gt;出栈的元素是：&quot; + top.data);
-
-    &#125;
-&#125;
-
-/**
- * 清空栈
- * @param stack
- */
-public static void clearStack(Stack stack) &#123;
-
-    stack.stackTop = null;
-    stack.stackBottom = stack.stackTop;
-&#125;
-</code></pre>
-<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出(LILO, Last In Last Out)</p>
-<h3 id="静态队列"><a href="#静态队列" class="headerlink" title="静态队列"></a>静态队列</h3><p>数组实现循环队列，节省内存资源</p>
-<pre><code>public class Queue &#123;
-
-
-    //数组
-    public int [] arrays;
-
-    //指向第一个有效的元素
-    public int front = 0;
-
-    //指向有效数据的下一个元素(即指向无效的数据)
-    public int rear = 0;
-
-&#125;
-
-
-/**
- * 入队
- *
- * @param queue
- */
-public static void enQueue(Queue queue,int value) &#123;
-
-    // 不是满的队列才能入队
-    if (!isFull(queue)) &#123;
-
-        // 将新的元素插入到队尾中
-        queue.arrays[queue.rear] = value;
-
-        // rear节点移动到新的无效元素位置上
-        queue.rear = (queue.rear + 1) % queue.arrays.length;
-    &#125;
-&#125;
-
-/**
- * 出队
- *
- * @param queue
- */
-public static void outQueue(Queue queue) &#123;
-
-    //判断该队列是否为null
-    if (!isEmpty(queue)) &#123;
-
-
-        //不为空才出队
-        int value = queue.arrays[queue.front];
-        System.out.println(&quot;关注公众号：Java3y---&gt;出队的元素是：&quot; + value);
-
-        // front指针往后面移
-        queue.front = (queue.front + 1) % queue.arrays.length;
-
-    &#125;
-
-
-&#125;
-
-/**
- * 判断队列是否空，front和rear指针相等，就是空了
- * @param queue
- * @return
- */
-public static boolean isEmpty(Queue queue) &#123;
-    if (queue.rear  == queue.front) &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列空的！&quot;);
-        return true;
-    &#125; else &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列非空！&quot;);
-        return false;
-    &#125;
-&#125;
-        
-/**
- * 判断队列是否满了，front和rear指针紧挨着，就是满了
- * @param queue
- * @return
- */
-public static boolean isFull(Queue queue) &#123;
-    if ((queue.rear + 1) % queue.arrays.length == queue.front) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列满了！&quot;);
-        return true;
-    &#125; else &#123;
-        System.out.println(&quot;关注公众号：Java3y---&gt;此时队列没满了！&quot;);
-        return false;
-    &#125;
-&#125;
-
-/**
- * 遍历队列
- * @param queue
- *
- */
-public static void traverseQueue(Queue queue) &#123;
-
-    // front的位置
-    int i = queue.front;
-
-    while (i != queue.rear) &#123;
-
-        System.out.println(&quot;关注公众号：Java3y---&gt;&quot; + queue.arrays[i]);
-
-        //移动front
-        i = (i + 1) % queue.arrays.length;
-    &#125;
-
-&#125;
-    
-</code></pre>
-<h3 id="动态队列"><a href="#动态队列" class="headerlink" title="动态队列"></a>动态队列</h3><p>链表实现</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23384.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/23384.html" class="post-title-link" itemprop="url">树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:26+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>3.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>12 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>树由根节点(root)和若干子树(T1,T2, … Tm-1)构成的具有层次关系的数据结构。</p>
-<h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><p>节点的度 : 该节点子树个数，度为0的节点为叶子节点，度不为0的节点为分支节点</p>
-<p>树的度 : 树中的节点的度最大值为树的度</p>
-<p>节点的层次 : 根为第一层，往下依次递增</p>
-<p>树的深度 : 节点层次最大值为树的深度</p>
-<p>森林 : n棵不相交的树的集合为森林</p>
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>常用于实现二叉查找树、二叉堆</p>
-<ul>
-<li><p>每个节点至多有两颗子树（树的度&lt;&#x3D;2）,子树分左右</p>
-</li>
-<li><p>第i层至多有2i-1个节点，深度为k的二叉树，最多节点数2^k-1个节点（具有最多节点的称作满二叉树），其中每个节点都与深度k满二叉树中1-n节点对应，则为完全二叉树</p>
-</li>
-</ul>
-<p><img src="http://thyrsi.com/t6/626/1544146169x2890211738.jpg" alt="满二叉树"></p>
-<p><img src="http://thyrsi.com/t6/626/1544146212x2890211738.jpg" alt="完全二叉树"></p>
-<h2 id="二叉排序树"><a href="#二叉排序树" class="headerlink" title="二叉排序树"></a>二叉排序树</h2><ul>
-<li>左子树所有节点值小于根节点，右子树所有节点值大于根节点值</li>
-<li>左右子树都是二叉排序树</li>
-</ul>
-<h2 id="二叉平衡树-AVL"><a href="#二叉平衡树-AVL" class="headerlink" title="二叉平衡树 AVL"></a>二叉平衡树 AVL</h2><ul>
-<li>左右子树深度差不超过1</li>
-<li>左右子树都是二叉平衡树</li>
-</ul>
-<h2 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h2><p>最优二叉树</p>
-<p><a href="#hafman">代码实现</a></p>
-<h3 id="哈夫曼编码"><a href="#哈夫曼编码" class="headerlink" title="哈夫曼编码"></a>哈夫曼编码</h3><p>解决报文编码的问题，将字符串转换为唯一的二进制码，且二进制码的长度最小</p>
-<p>每个字符在字符串中出现频率为W，其编码长度为L，编码字符n个，则编码后二进制码的总长度为W1L1+W2L2+…+WnLn，利用哈夫曼树特性求总长最小编码</p>
-<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>平衡的多路查找树</p>
-<p>B树的阶：所有孩子节点树的最大值（m叉树：每个节点最多m棵子树）</p>
-<p>分支节点最少有两颗子树</p>
-<p>分支节点包含信息（n，A0，K1，A1，K2，A2，…，Kn，An），其中，n为结点中的关键字树，A为指向子树根结点的指针，K为关键字，且Ai-1所指子树中所有结点的关键字均小于Ki，An所指子树中所有结点的关键字均大于Kn；</p>
-<p>所有的叶子结点都出现在同一层次上，并且不带信息（可以看作是外部结点或查找失败的结点，实际上这些结点不存在，指向这些结点的指针为空</p>
-<h2 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h2><p>B+树是应文件系统所需而出的一种B-树的变型树。一棵m阶B+树和m阶的B-树的差异在于</p>
-<ol>
-<li><p>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点；</p>
-</li>
-<li><p>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</p>
-</li>
-</ol>
-<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><p>红黑树，一种二叉查找树，但在每个结点上增加一个存储位表示结点的颜色，可以是Red或Black。通过对任何一条从根到叶子的简单路径上各个结点的颜色进行约束，红黑树确保没有一条路径会比其他路径长出2倍，因而是近似于平衡的。树中每个结点包含5个属性：color、key、left、right和p。如果一个结点没有子节点或父节点，则该结点相应的指针属性值为NIL，我们可以把这些NIL视为指向二叉搜索树的叶节点（外部结点）的指针，而把带关键字的结点视为树的内部结点。</p>
-<h3 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h3><ol>
-<li>每个结点或是红色的，或是黑色的</li>
-<li>根结点是黑色的</li>
-<li>每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的</li>
-<li>如果一个结点是红色的，则它的两个子结点都是黑色的</li>
-<li>对每个结点，从该结点到其所有后代叶结点的简单路径上，均包含相同数目的黑色结点</li>
-<li>虽然本质上是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)</li>
-</ol>
-<h2 id="键树"><a href="#键树" class="headerlink" title="键树"></a>键树</h2><p>如果一个关键字可以表示成字符的序号，即字符串，那么可以用键树（keyword tree），又称数字搜索树或字符树，来表示这样的字符串的集合。键树的结构受启发于一部大型字典的“书边标目”。字典中标出首字母是 A，B，C，…，Z的单词所在页，再对各部分标出第二字母为A，B，C，…，Z的单词所在的页等等。<br>键树是一种特殊的查找树，它是一棵度大于等于2的树，树中的每个节点不是包含一个或几个关键字，而是只含有组成关键字的符号。<br>比如：如果关键字是数值，则节点中只包含一个数位；如果关键字是单词，则节点中只包含一个字母字符。根结点不代表任何字符，根以下第一层的结点对应于字符串的第一个字符，第二层的结点对应于字符串的第二个字符……每个字符串可由一个特殊的字符如“$”等作为字符串的结束符，用一个叶子结点来表示该特殊字符。把从根到叶子的路径上，所有结点（除根以外）对应的字符连接起来，就得到一个字符串。因此，每个叶子结点对应一个关键字。在叶子结点还可以包含一个指针，指向该关键字所对应的元素。整个字符串集合中的字符串的数目等于叶子结点的数目。如果一个集合中的关键字都具有这样的字符串特性，那么，该关键字集合就可采用这样一棵键树来表示。 </p>
-<p>键树的存储通常有两种方式： </p>
-<ol>
-<li>用树的孩子兄弟链来表示键树，称为双链树；每个Node有三个域：symbol域：存储关键字的一个字符；son域：存储指向第一棵子树的根的指针；brother域：存储指向右兄弟的指针。 </li>
-<li>用多重链表来表示键树，称为Trie树或字典树。</li>
-</ol>
-<h2 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h2><p>如果以树的多重链表来表示键树，则树的每个结点应包含d个（d为关键字符的基，如：字符集由英文大写字母构成时，则d&#x3D;26）指针域，此时的键树又称为字典树。<br>字典树典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。　<br>Tire树的三个基本性质： </p>
-<ol>
-<li>根节点不包含字符，除根节点外每一个节点都只包含一个字符； </li>
-<li>从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串； </li>
-<li>每个节点的所有子节点包含的字符都不相同。<br>Tire树的应用： </li>
-<li>串的快速检索<br>给出N个单词组成的熟词表，以及一篇全用小写英文书写的文章，请你按最早出现的顺序写出所有不在熟词表中的生词。在这道题中，我们可以用数组枚举，用哈希，用字典树，先把熟词建一棵树，然后读入文章进行比较，这种方法效率是比较高的。 </li>
-<li>“串”排序<br>给定N个互不相同的仅由一个单词构成的英文名，让你将他们按字典序从小到大输出。用字典树进行排序，采用数组的方式创建字典树，这棵树的每个结点的所有儿子很显然地按照其字母大小排序。对这棵树进行先序遍历即可。 </li>
-<li>最长公共前缀</li>
-</ol>
-<h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><p>所谓后缀树，就是包含一则字符串所有后缀的压缩了的字典树。先说说后缀的定义。给定一长度为n的字符串S&#x3D;S1S2..Si..Sn，和整数i，1 &lt;&#x3D; i &lt;&#x3D; n，子串SiSi+1…Sn都是字符串S的后缀。以字符串S&#x3D;XMADAMYX为例，它的长度为8，所以S[1..8],S[2..8], … , S[8..8]都算S的后缀，我们一般还把空字串也算成后缀。这样，我们一共有如下后缀。对于后缀S[i..n]，我们说这项后缀起始于i。<br>键树只适合前缀匹配和全字匹配，并不适合后缀和子串匹配，而后缀树在这方面则非常合适。它与键树的最大不同在于，后缀树的单词集合是由指定字符串的后缀子串构成。</p>
-<h2 id="区间树与线段树"><a href="#区间树与线段树" class="headerlink" title="区间树与线段树"></a>区间树与线段树</h2><p>区间树是在红黑树基础上进行扩展得到的支持以区间为元素的动态集合的操作，其中每个节点的关键值是区间的左端点。通过建立这种特定的结构，可是使区间的元素的查找和插入都可以在O(lgn)的时间内完成。相比于基础的红黑树数据结构，增加了一个max[x]，即以x为根的子树中所有区间的端点的最大值。<br>线段树是一种平衡二叉查找树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶结点。主要的处理思想是基于分治的思想。<br>设根节点的区间为[a,b),区间长度为L &#x3D; b - a，线段树的性质：<br>1）线段树是一个平衡树，树的高度为log(L)；<br>2）线段树把区间上的任意长度为L的线段都分成不超过2log(L)线段。</p>
-<h2 id="败者树与胜者树"><a href="#败者树与胜者树" class="headerlink" title="败者树与胜者树"></a>败者树与胜者树</h2><p>胜者树和败者树都是完全二叉树，是树形选择排序的一种变型。在胜者树、败者树中，每个叶子结点相当于一个选手，每个中间结点相当于一场比赛，每一层相当于一轮比赛。不同的是，胜者树中的每个非终端结点均表示其左、右孩子结点中的“胜者”；而在败者树中，父结点中记下刚进行完的这场比赛中的败者，而让胜者去参加更高一层的比赛</p>
-<p><span id="hafman">哈夫曼树代码实现</span></p>
-<pre><code>import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
- 
-public class HuffmanTree &#123;
- 
-    public static class Node&lt;E&gt; &#123;
-        E data;
-        double weight;
-        Node leftChild;
-        Node rightChild;
- 
-        public Node(E data, double weight) &#123;
-            super();
-            this.data = data;
-            this.weight = weight;
-        &#125;
- 
-        public String toString() &#123;
-            return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
-        &#125;
-    &#125;
- 
-    public static void main(String[] args) &#123;
-        List&lt;Node&gt; nodes = new ArrayList&lt;Node&gt;();
- 
-        nodes.add(new Node(&quot;A&quot;, 40.0));
-        nodes.add(new Node(&quot;B&quot;, 8.0));
-        nodes.add(new Node(&quot;C&quot;, 10.0));
-        nodes.add(new Node(&quot;D&quot;, 30.0));
-        nodes.add(new Node(&quot;E&quot;, 10.0));
-        nodes.add(new Node(&quot;F&quot;, 2.0));
-        
-        Node root = HuffmanTree.createTree(nodes);
-        
-        System.out.println(breadthFirst(root));
- 
-    &#125;
- 
-    /**
-     * 构造哈夫曼树
-     * 
-     * @param nodes
-     *            节点集合
-     * @return 构造出来的哈夫曼树的根节点
-     */
-    private static Node createTree(List&lt;Node&gt; nodes) &#123;
-        // 只要nodes数组中还有2个以上的节点
-        while (nodes.size() &gt; 1) &#123;
-            quickSort(nodes);
-            //获取权值最小的两个节点
-            Node left = nodes.get(nodes.size()-1);
-            Node right = nodes.get(nodes.size()-2);
-            
-            //生成新节点，新节点的权值为两个子节点的权值之和
-            Node parent = new Node(null, left.weight + right.weight);
-            
-            //让新节点作为两个权值最小节点的父节点
-            parent.leftChild = left;
-            parent.rightChild = right;
-            
-            //删除权值最小的两个节点
-            nodes.remove(nodes.size()-1);
-            nodes.remove(nodes.size()-1);
-            
-            //将新节点加入到集合中
-            nodes.add(parent);
-        &#125;
-        
-        return nodes.get(0);
-    &#125;
- 
-    /**
-     * 将指定集合中的i和j索引处的元素交换
-     * 
-     * @param nodes
-     * @param i
-     * @param j
-     */
-    private static void swap(List&lt;Node&gt; nodes, int i, int j) &#123;
-        Node tmp;
-        tmp = nodes.get(i);
-        nodes.set(i, nodes.get(j));
-        nodes.set(j, tmp);
-    &#125;
- 
-    /**
-     * 实现快速排序算法，用于对节点进行排序
-     * 
-     * @param nodes
-     * @param start
-     * @param end
-     */
-    private static void subSort(List&lt;Node&gt; nodes, int start, int end) &#123;
-        if (start &lt; end) &#123;
-            // 以第一个元素作为分界值
-            Node base = nodes.get(start);
-            // i从左边搜索，搜索大于分界值的元素的索引
-            int i = start;
-            // j从右边开始搜索，搜索小于分界值的元素的索引
-            int j = end + 1;
-            while (true) &#123;
-                // 找到大于分界值的元素的索引，或者i已经到了end处
-                while (i &lt; end &amp;&amp; nodes.get(++i).weight &gt;= base.weight)
-                    ;
-                // 找到小于分界值的元素的索引，或者j已经到了start处
-                while (j &gt; start &amp;&amp; nodes.get(--j).weight &lt;= base.weight)
-                    ;
- 
-                if (i &lt; j) &#123;
-                    swap(nodes, i, j);
-                &#125; else &#123;
-                    break;
-                &#125;
-            &#125;
- 
-            swap(nodes, start, j);
- 
-            //递归左边子序列
-            subSort(nodes, start, j - 1);
-            //递归右边子序列
-            subSort(nodes, j + 1, end);
-        &#125;
-    &#125;
-    
-    public static void quickSort(List&lt;Node&gt; nodes)&#123;
-        subSort(nodes, 0, nodes.size()-1);
-    &#125;
-    
-    //广度优先遍历
-    public static List&lt;Node&gt; breadthFirst(Node root)&#123;
-        Queue&lt;Node&gt; queue = new ArrayDeque&lt;Node&gt;();
-        List&lt;Node&gt; list = new ArrayList&lt;Node&gt;();
-        
-        if(root!=null)&#123;
-            //将根元素加入“队列”
-            queue.offer(root);
-        &#125;
-        
-        while(!queue.isEmpty())&#123;
-            //将该队列的“队尾”元素加入到list中
-            list.add(queue.peek());
-            Node p = queue.poll();
-            
-            //如果左子节点不为null，将它加入到队列
-            if(p.leftChild != null)&#123;
-                queue.offer(p.leftChild);
-            &#125;
-            
-            //如果右子节点不为null，将它加入到队列
-            if(p.rightChild != null)&#123;
-                queue.offer(p.rightChild);
-            &#125;
-        &#125;
-        
-        return list;
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -3154,7 +1253,7 @@ public class HuffmanTree &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">350</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -3203,12 +1302,12 @@ public class HuffmanTree &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">320k</span>
+    <span title="站点总字数">324k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">19:23</span>
+    <span title="站点阅读时长">19:37</span>
 </div>
 
 <!--

@@ -192,6 +192,1233 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/18339.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/18339.html" class="post-title-link" itemprop="url">拉格朗日乘子法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:03:16" itemprop="dateModified" datetime="2023-08-10T00:03:16+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>332</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>拉格朗日乘子法（Lagrange Multiplier Method）是一种优化算法，用于求解带有约束条件的优化问题。以下是一个使用拉格朗日乘子法求解约束最优化问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.*;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearConstraint;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearObjectiveFunction;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.Relationship;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimpleBounds;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimplexSolver;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.nonlinear.scalar.GoalType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LagrangeMultiplierMethod</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">// Objective function: f(x, y) = x + y</span></span><br><span class="line">        <span class="type">LinearObjectiveFunction</span> <span class="variable">objectiveFunction</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearObjectiveFunction</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">1</span>&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Constraints: 2x + y &gt;= 1, x + 2y &gt;= 1</span></span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">2</span>, <span class="number">1</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Bounds: x &gt;= 0, y &gt;= 0</span></span><br><span class="line">        <span class="type">SimpleBounds</span> <span class="variable">bounds</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleBounds</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="title class_">double</span>[]&#123;Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY&#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Solve the problem</span></span><br><span class="line">        <span class="type">LinearOptimizer</span> <span class="variable">optimizer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimplexSolver</span>();</span><br><span class="line">        <span class="type">PointValuePair</span> <span class="variable">solution</span> <span class="operator">=</span> optimizer.optimize(<span class="keyword">new</span> <span class="title class_">MaxIter</span>(<span class="number">100</span>),</span><br><span class="line">                objectiveFunction,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">LinearConstraintSet</span>(constraint1, constraint2),</span><br><span class="line">                GoalType.MAXIMIZE,</span><br><span class="line">                bounds);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Display the solution</span></span><br><span class="line">        <span class="type">double</span>[] point = solution.getPoint();</span><br><span class="line">        <span class="type">double</span> <span class="variable">optimalValue</span> <span class="operator">=</span> solution.getValue();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal solution:&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;x = &quot;</span> + point[<span class="number">0</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;y = &quot;</span> + point[<span class="number">1</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal value = &quot;</span> + optimalValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用了Apache Commons Math库来实现拉格朗日乘子法。我们定义了一个线性目标函数，一组线性约束条件和变量的边界范围，并通过线性规划求解器进行求解。这个示例求解了以下问题：</p>
+<p>最大化：f(x, y) &#x3D; x + y<br>约束条件：2x + y &gt;&#x3D; 1, x + 2y &gt;&#x3D; 1<br>变量范围：x &gt;&#x3D; 0, y &gt;&#x3D; 0</p>
+<p>请注意，实际应用中的问题可能更加复杂，代码也可能需要进行适当的调整。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/42854.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/42854.html" class="post-title-link" itemprop="url">图的遍历</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>901</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>/**
+ * 无向图
+ */
+public class NoDirectionGraph &#123;
+ 
+    private int mMaxSize; //图中包含的最大顶点数
+    private GraphVertex[] vertexList; //顶点数组
+    private int[][] indicatorMat; //指示顶点之间的连通关系的邻接矩阵
+    private int nVertex; //当前实际保存的顶点数目
+    
+    
+    public NoDirectionGraph(int maxSize) &#123;
+        mMaxSize = maxSize;
+        vertexList = new GraphVertex[mMaxSize];
+        indicatorMat = new int[mMaxSize][mMaxSize];
+        nVertex = 0;
+        //初始化邻接矩阵元素为0
+        for(int j=0;j&lt;mMaxSize;j++) &#123;
+            for(int k=0;k&lt;mMaxSize;k++) &#123;
+                indicatorMat[j][k] = 0;
+            &#125;
+        &#125;
+    &#125;
+    
+    
+    public void addVertex(GraphVertex v) &#123;
+        if(nVertex &lt; mMaxSize) &#123;
+            vertexList[nVertex++] = v;
+            
+        &#125; else &#123;
+            System.out.println(&quot;---插入失败，顶点数量已达上限!&quot;);
+        &#125;
+    &#125;
+    
+    /**
+     * 修改邻接矩阵，添加新的边
+     * @param start
+     * @param end
+     */
+    public void addEdge(int start,int end) &#123;
+        indicatorMat[start][end] = 1;
+        indicatorMat[end][start] = 1;
+    &#125;
+    
+    /**
+     * 打印邻接矩阵
+     */
+    public void printIndicatorMat() &#123;
+        
+        for(int[] line:indicatorMat) &#123;
+            for(int i:line) &#123;
+                System.out.print(i + &quot; &quot;);
+            &#125;
+            System.out.println();
+        &#125;
+    &#125;
+    
+    /**
+     * 深度优先遍历
+     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
+     */
+    public void DFS(int vertexIndex) &#123;
+        ArrayStack stack = new ArrayStack();
+        //1.添加检索元素到栈中
+        vertexList[vertexIndex].setVisited(true);
+        stack.push(vertexIndex);
+        int nextVertexIndex = getNextVertexIndex(vertexIndex);
+        while(!stack.isEmpty()) &#123; //不断地压栈、出栈，直到栈为空(检索元素也没弹出了栈)为止
+            if(nextVertexIndex != -1) &#123;
+                vertexList[nextVertexIndex].setVisited(true);
+                stack.push(nextVertexIndex);
+                stack.printElems();
+            &#125; else &#123;
+                stack.pop();
+            &#125;
+            //检索当前栈顶元素是否包含其他未遍历过的节点
+            if(!stack.isEmpty()) &#123;
+                nextVertexIndex = getNextVertexIndex(stack.peek()); 
+            &#125;
+        &#125;
+    &#125;
+    
+    /**
+     * 得到当前顶点的下一个顶点所在行
+     * @param column
+     * @return
+     */
+    public int getNextVertexIndex(int column) &#123;
+        for(int i=0;i&lt;indicatorMat[column].length;i++) &#123;
+            if(indicatorMat[column][i] == 1 &amp;&amp; !vertexList[i].isVisited()) &#123;
+                return i;
+            &#125;
+        &#125;
+        return -1;
+    &#125;
+    
+    /**
+     * 广度优先遍历
+     * @param vertexIndex 表示要遍历的起点,即图的邻接矩阵中的行数
+     */
+    public void BFS(int vertexIndex) &#123;
+        ChainQueue queue = new ChainQueue();
+        vertexList[vertexIndex].setVisited(true);
+        queue.insert(new QueueNode(vertexIndex));
+        int nextVertexIndex = getNextVertexIndex(vertexIndex);
+        while(!queue.isEmpty()) &#123;
+            if(nextVertexIndex != -1) &#123;
+                vertexList[nextVertexIndex].setVisited(true);
+                queue.insert(new QueueNode(nextVertexIndex));
+            &#125; else &#123;
+                queue.remove();
+            &#125;
+            if(!queue.isEmpty()) &#123;
+                nextVertexIndex = getNextVertexIndex(queue.peek().data);
+                queue.printElems();
+            &#125;
+        &#125;
+    &#125;
+&#125;
+
+
+
+ 
+/**
+ * 使用数组实现栈结构
+ */
+public class ArrayStack &#123;
+ 
+    private int[] tArray; 
+    private int topIndex = -1; //表示当前栈顶元素的索引位置
+    private int CAPACITY_STEP = 12; //数组容量扩展步长
+    
+    
+    public ArrayStack() &#123;
+        /***创建泛型数组的一种方法***/
+        tArray = new int[CAPACITY_STEP]; 
+    &#125;
+    
+    /**
+     * 弹出栈顶元素方法
+     * @return
+     */
+    public int pop() &#123;
+        if(isEmpty()) &#123;
+            System.out.println(&quot;错误，栈中元素为空，不能pop&quot;);
+            return -1;
+        &#125; else &#123;
+            int i = tArray[topIndex];
+            tArray[topIndex--] = -1; //擦除pop元素
+            return i;
+        &#125;
+    &#125;
+    
+    /**
+     * 向栈中插入一个元素
+     * @param t
+     */
+    public void push(int t) &#123;
+        //检查栈是否已满
+        if(topIndex == (tArray.length-1)) &#123;
+            //扩展容量
+            int[] tempArray = new int[tArray.length + CAPACITY_STEP];
+            for(int i=0;i&lt;tArray.length;i++) &#123;
+                tempArray[i] = tArray[i];
+            &#125;
+            tArray = tempArray;
+            tempArray = null;
+        &#125; else &#123;
+            topIndex ++;
+            tArray[topIndex] = t;
+        &#125;
+    &#125;
+    
+    /**
+     * 得到栈顶元素，但不弹出
+     * @return
+     */
+    public int peek() &#123;
+        if(isEmpty()) &#123;
+            System.out.println(&quot;错误，栈中元素为空，不能peek&quot;);
+            return -1;
+        &#125; else &#123;
+            return tArray[topIndex];
+        &#125;
+    &#125;
+    
+    /**
+     * 判断当前栈是否为空
+     * @return
+     */
+    public boolean isEmpty() &#123;
+        return (topIndex &lt; 0);
+    &#125;
+    
+    /**
+     * 打印栈中元素
+     */
+    public void printElems() &#123;
+        for(int i=0;i&lt;=topIndex;i++) &#123;
+            System.out.print(tArray[i] + &quot; &quot;);
+        &#125;
+        System.out.println();
+    &#125;
+&#125;
+
+
+/**
+ * 使用链表实现队列
+ */
+public class ChainQueue &#123;
+    private QueueNode head; // 指向队列头节点
+    private QueueNode tail; // 指向队列尾节点
+    private int size = 0; // 队列尺寸
+ 
+    public ChainQueue() &#123;
+ 
+    &#125;
+ 
+    /**
+     * 插入新节点到队列尾
+     */
+    public void insert(QueueNode node) &#123;
+ 
+        // 当然也可以这么写,添加tail.prev = node
+        if (head == null) &#123;
+            head = node;
+            tail = head;
+        &#125; else &#123;
+            node.next = tail;
+            tail.prev = node; // 双向连接，确保head.prev不为空
+            tail = node;
+        &#125;
+        size++;
+    &#125;
+ 
+    /**
+     * 移除队列首节点
+     */
+    public QueueNode remove() &#123;
+        if (!isEmpty()) &#123;
+            QueueNode temp = head;
+            head = head.prev;
+            size--;
+            return temp;
+        &#125; else &#123;
+            System.out.println(&quot;异常操作，当前队列为空!&quot;);
+            return null;
+        &#125;
+    &#125;
+ 
+    /**
+     * 队列是否为空
+     * 
+     * @return
+     */
+    public boolean isEmpty() &#123;
+        if (size &gt; 0) &#123;
+            return false;
+        &#125; else &#123;
+            return true;
+        &#125;
+    &#125;
+ 
+    /**
+     * 返回队列首节点，但不移除
+     */
+    public QueueNode peek() &#123;
+        if (!isEmpty()) &#123;
+            return head;
+        &#125; else &#123;
+            System.out.println();
+            System.out.println(&quot;异常操作，当前队列为空!&quot;);
+            return null;
+        &#125;
+    &#125;
+ 
+    /**
+     * 返回队列大小
+     * 
+     * @return
+     */
+    public int size() &#123;
+        return size;
+    &#125;
+    
+    /**
+     * 打印队列中的元素
+     */
+    public void printElems() &#123;
+        QueueNode tempNode = head;
+        while(tempNode != null) &#123;
+            System.out.print(tempNode.data + &quot; &quot;);
+            tempNode = tempNode.prev;
+        &#125;
+        System.out.println();
+    &#125;
+&#125;
+ 
+/**
+ * 节点类
+ * 
+ * @author wly
+ * 
+ */
+class QueueNode &#123;
+    QueueNode prev;
+    QueueNode next;
+ 
+    int data;
+ 
+    public QueueNode(int data) &#123;
+        this.data = data;
+    &#125;
+ 
+    public int getData() &#123;
+        return data;
+    &#125;
+ 
+    public void setData(int data) &#123;
+        this.data = data;
+    &#125;
+ 
+    @Override
+    public String toString() &#123;
+        // TODO Auto-generated method stub
+        super.toString();
+        return data + &quot;&quot;;
+    &#125;
+&#125;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/4900.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/4900.html" class="post-title-link" itemprop="url">单调队列优化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:03:10" itemprop="dateModified" datetime="2023-08-10T00:03:10+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>359</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>单调队列优化算法（Monotonic Queue Optimization）是一种优化技巧，通常用于解决一些需要维护滑动窗口中最大（最小）值的问题。以下是一个单调队列优化的Java代码示例，用于解决滑动窗口中的最大值问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayDeque;</span><br><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MonotonicQueueOptimization</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span>[] maxSlidingWindow(<span class="type">int</span>[] nums, <span class="type">int</span> k) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] result = <span class="keyword">new</span> <span class="title class_">int</span>[n - k + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">resultIndex</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        Deque&lt;Integer&gt; deque = <span class="keyword">new</span> <span class="title class_">ArrayDeque</span>&lt;&gt;();  <span class="comment">// 存储元素的下标</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="comment">// 保持队列单调递减，从队尾弹出小于当前元素的下标</span></span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; deque.peekLast() &lt; i - k + <span class="number">1</span>) &#123;</span><br><span class="line">                deque.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保持队列单调递减，从队尾弹出小于当前元素的下标</span></span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; nums[deque.peekFirst()] &lt; nums[i]) &#123;</span><br><span class="line">                deque.pollFirst();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            deque.offerFirst(i);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 更新结果数组</span></span><br><span class="line">            <span class="keyword">if</span> (i &gt;= k - <span class="number">1</span>) &#123;</span><br><span class="line">                result[resultIndex++] = nums[deque.peekLast()];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">1</span>, <span class="number">3</span>, -<span class="number">1</span>, -<span class="number">3</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">7</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span>[] result = maxSlidingWindow(nums, k);</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">&quot;Max sliding window: &quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> num : result) &#123;</span><br><span class="line">            System.out.print(num + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>maxSlidingWindow</code> 方法使用单调队列优化解决了滑动窗口中的最大值问题。算法通过维护一个单调递减的队列来存储当前窗口内的元素下标，从而在常数时间内找到窗口内的最大值。</p>
+<p>请注意，单调队列优化通常适用于需要在滑动窗口内求最大值（最小值）的问题，可以根据问题的具体需求进行相应的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/40091.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/40091.html" class="post-title-link" itemprop="url">区间DP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-10 00:03:03" itemprop="dateModified" datetime="2023-08-10T00:03:03+08:00">2023-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>295</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>区间动态规划（Interval Dynamic Programming，简称区间DP）是一种动态规划算法，用于解决涉及区间的问题。以下是一个区间DP的Java代码示例，用于解决最长回文子序列问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IntervalDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">longestPalindromicSubsequence</span><span class="params">(String s)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> s.length();</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][n];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp[i][i] = <span class="number">1</span>; <span class="comment">// 单个字符是回文序列</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">2</span>; len &lt;= n; len++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt;= n - len; i++) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + len - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (s.charAt(i) == s.charAt(j)) &#123;</span><br><span class="line">                    dp[i][j] = dp[i + <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">2</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    dp[i][j] = Math.max(dp[i + <span class="number">1</span>][j], dp[i][j - <span class="number">1</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[<span class="number">0</span>][n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;bbbab&quot;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">longestPalindromeLen</span> <span class="operator">=</span> longestPalindromicSubsequence(s);</span><br><span class="line">        System.out.println(<span class="string">&quot;Longest Palindromic Subsequence Length: &quot;</span> + longestPalindromeLen);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>longestPalindromicSubsequence</code> 方法使用区间动态规划解决了最长回文子序列问题。通过构建一个二维数组 <code>dp[i][j]</code> 来保存字符串区间 <code>s[i..j]</code> 的最长回文子序列长度。通过填表过程，我们可以找到最长回文子序列的长度。</p>
+<p>这个示例是一个区间动态规划的实现，实际应用中可能需要根据不同的问题进行适当的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/24685.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/24685.html" class="post-title-link" itemprop="url">关键路径算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:58:27" itemprop="dateModified" datetime="2023-08-09T23:58:27+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>404</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键路径算法（Critical Path Method，CPM）是一种用于项目管理的算法，用于确定项目中最长的路径，即关键路径，以及各个任务的最早开始时间和最晚开始时间。以下是一个关键路径算法的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Task</span> &#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="type">int</span> duration;</span><br><span class="line">    List&lt;Task&gt; dependencies;</span><br><span class="line"></span><br><span class="line">    Task(String name, <span class="type">int</span> duration) &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.duration = duration;</span><br><span class="line">        <span class="built_in">this</span>.dependencies = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">addDependency</span><span class="params">(Task dependency)</span> &#123;</span><br><span class="line">        dependencies.add(dependency);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CriticalPathMethod</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">calculateCriticalPath</span><span class="params">(List&lt;Task&gt; tasks)</span> &#123;</span><br><span class="line">        Map&lt;Task, Integer&gt; earliestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        Map&lt;Task, Integer&gt; latestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算最早开始时间</span></span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">earliestStartTime</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (Task dependency : task.dependencies) &#123;</span><br><span class="line">                earliestStartTime = Math.max(earliestStartTime, earliestStartTimes.get(dependency) + dependency.duration);</span><br><span class="line">            &#125;</span><br><span class="line">            earliestStartTimes.put(task, earliestStartTime);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算最晚开始时间</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">projectDuration</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            projectDuration = Math.max(projectDuration, earliestStartTimes.get(task) + task.duration);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            latestStartTimes.put(task, projectDuration - task.duration);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算关键路径</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Critical Path:&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (Task task : tasks) &#123;</span><br><span class="line">            <span class="keyword">if</span> (earliestStartTimes.get(task).equals(latestStartTimes.get(task))) &#123;</span><br><span class="line">                System.out.println(task.name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Task</span> <span class="variable">A</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;A&quot;</span>, <span class="number">5</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">B</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;B&quot;</span>, <span class="number">3</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">C</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;C&quot;</span>, <span class="number">2</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">D</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;D&quot;</span>, <span class="number">4</span>);</span><br><span class="line">        <span class="type">Task</span> <span class="variable">E</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">&quot;E&quot;</span>, <span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">        B.addDependency(A);</span><br><span class="line">        C.addDependency(A);</span><br><span class="line">        D.addDependency(B);</span><br><span class="line">        D.addDependency(C);</span><br><span class="line">        E.addDependency(D);</span><br><span class="line"></span><br><span class="line">        List&lt;Task&gt; tasks = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(Arrays.asList(A, B, C, D, E));</span><br><span class="line"></span><br><span class="line">        calculateCriticalPath(tasks);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用关键路径算法来计算一个简单项目的关键路径。<code>Task</code> 类表示任务，其中包含任务名称、持续时间和依赖关系。<code>calculateCriticalPath</code> 方法计算每个任务的最早开始时间和最晚开始时间，并根据最早开始时间和最晚开始时间的差异来确定关键路径。</p>
+<p>这个示例是一个简化的关键路径算法实现，实际应用中可能需要考虑更多的细节和优化。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43734.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/43734.html" class="post-title-link" itemprop="url">兔子数列</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>444</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
+<ol>
+<li>初始状态：一对刚出生的兔子</li>
+<li>下一步：生长</li>
+<li><code>繁殖得到 一对刚出生的兔子-&gt; 第1步</code></li>
+</ol>
+<p>总结： 当月的兔子数&#x3D;上月兔子数+当月新生兔子  数列的当前列&#x3D;前两列之和</p>
+<h2 id="递归算法"><a href="#递归算法" class="headerlink" title="递归算法"></a>递归算法</h2><p>指数阶算法，效率较低，时间复杂度爆炸增量</p>
+<pre><code>    Fib1(int n)
+    
+    &#123; if(n&lt;1)
+    
+           return -1;
+    
+      if(n==1||n==2)
+    
+            return 1;
+    
+       return Fib1(n-1)+Fib1(n-2);
+    
+    &#125;
+    
+</code></pre>
+<h2 id="数组记录先两项值"><a href="#数组记录先两项值" class="headerlink" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
+<pre><code>Fib2(intn)
+&#123;
+    if(n&lt;1)
+        return-1;
+    int[] a=new int[n];
+    a[1]=1;
+    a[2]=1;
+    for(int i=3;i&lt;=n;i++)
+        a[i]=a[i-1]+a[i-2];
+        return a[n];
+     &#125;
+&#125;
+         
+    
+</code></pre>
+<h2 id="迭代法"><a href="#迭代法" class="headerlink" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
+<pre><code>Fib3(intn)
+&#123;
+    inti,s1,s2;
+    if(n&lt;1)
+        return-1;
+    if(n==1||n==2)
+        return1;
+    s1=1;s2=1;
+    for(i=3;i&lt;=n;i++)
+    &#123;
+        s2=s1+s2;//辗转相加法
+        s1=s2-s1;//记录前一项
+    &#125;
+    return s2;
+ &#125;
+ 
+</code></pre>
+<h2 id="矩阵乘法"><a href="#矩阵乘法" class="headerlink" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;的n-2次幂的乘积, 可通过递推求证</code></p>
+<pre><code>   public static int ValueN(int n)&#123;
+         if(n&lt;1)&#123;
+             return 0;
+         &#125;
+         if(n==1 || n==2)&#123;
+             return 1;
+         &#125;
+          int [][] base=&#123;&#123;1,1&#125;,&#123;1,0&#125;&#125;;
+          int [][] res=matrixPower(base,n-2);
+          return res[0][0]+res[1][0];
+       &#125;
+       public static int[][] matrixPower(int[][] m,int p)&#123;
+           if(p==0)
+               return null;
+           if(p==1)
+               return m;
+           int[][] res=matrixPower(m,p&gt;&gt;1);
+           res=muliMatrix(res,res);
+           if((p&amp;1)==1)&#123;
+               res=muliMatrix(res,m);
+           &#125;
+           return res;
+       &#125;
+       //求两个矩阵相乘得到一个新的矩阵
+       public static int[][] muliMatrix(int[][] m1,int[][] m2)&#123;
+           int [][] res=new int[m1.length][m2[0].length];
+           for(int i=0;i&lt;m1.length;i++)&#123;
+               for(int j=0;j&lt;m2[0].length;j++)&#123;
+                   for(int k=0;k&lt;m2.length;k++)&#123;
+                       res[i][j]+=m1[i][k]*m2[k][j];
+                   &#125;
+               &#125;
+           &#125;
+           return res;
+       &#125;
+   &#125;
+  
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/47317.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/47317.html" class="post-title-link" itemprop="url">倍增</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:58:08" itemprop="dateModified" datetime="2023-08-09T23:58:08+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>370</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>倍增算法（也称为指数跳跃算法）是一种高效的算法，用于解决一些特定的查找问题，例如在数组中查找某个区间内的最小值或最大值。以下是一个倍增算法的Java代码示例，用于解决查找最小值的问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SparseTable</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) &#123;</span><br><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryMin</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">6</span>&#125;;</span><br><span class="line">        buildSparseTable(arr);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">5</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryMin(left, right);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum element in range [&quot;</span> + left + <span class="string">&quot;, &quot;</span> + right + <span class="string">&quot;]: &quot;</span> + minInRange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询指定范围内的最小值。<code>queryMin</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
+<p>倍增算法在一些特定的查找问题中非常有用，如查找最小值、最大值等。但请注意，它适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/42877.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/42877.html" class="post-title-link" itemprop="url">二分查找</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:57:32" itemprop="dateModified" datetime="2023-08-09T23:57:32+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>251</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>二分查找（Binary Search）是一种高效的搜索算法，用于在有序数组中查找特定元素。以下是一个二分查找的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BinarySearch</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">binarySearch</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> target)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> arr.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> left + (right - left) / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (arr[mid] == target) &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;  <span class="comment">// Element found</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; target) &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;  <span class="comment">// Search in the right half</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;  <span class="comment">// Search in the left half</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// Element not found</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">15</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">target</span> <span class="operator">=</span> <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> binarySearch(arr, target);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (result != -<span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Element &quot;</span> + target + <span class="string">&quot; found at index &quot;</span> + result);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Element &quot;</span> + target + <span class="string">&quot; not found in the array.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>binarySearch</code> 方法使用二分查找算法在有序数组中查找特定元素。算法通过比较目标值与中间元素的大小来逐步缩小搜索范围，直到找到目标元素或搜索范围为空。</p>
+<p>请注意，二分查找只适用于有序数组。如果数组无序，需要先进行排序操作。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/56550.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/56550.html" class="post-title-link" itemprop="url">RMQ算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 23:57:32" itemprop="dateModified" datetime="2023-08-09T23:57:32+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>350</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>RMQ（Range Minimum Query）算法用于解决在一个数组中查询指定范围内最小元素的问题。以下是一种常见的RMQ算法实现，使用稀疏表（Sparse Table）的方法来解决RMQ问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RMQAlgorithm</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) &#123;</span><br><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryRMQ</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">2</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">3</span>&#125;;</span><br><span class="line">        buildSparseTable(arr);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">4</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryRMQ(left, right);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum element in range [&quot;</span> + left + <span class="string">&quot;, &quot;</span> + right + <span class="string">&quot;]: &quot;</span> + minInRange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询最小元素。<code>queryRMQ</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
+<p>请注意，稀疏表只适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。在实际应用中，如果需要频繁修改数组，可以考虑其他数据结构如线段树。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/46211.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -278,1012 +1505,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/53370.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/53370.html" class="post-title-link" itemprop="url">LCA最近公共祖先算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:55:55" itemprop="dateModified" datetime="2023-08-09T23:55:55+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>299</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在树（如二叉树）中，LCA（Lowest Common Ancestor）指的是两个节点的最近公共祖先节点。以下是一个二叉树中寻找LCA的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TreeNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    TreeNode left;</span><br><span class="line">    TreeNode right;</span><br><span class="line"></span><br><span class="line">    TreeNode(<span class="type">int</span> val) &#123;</span><br><span class="line">        <span class="built_in">this</span>.val = val;</span><br><span class="line">        <span class="built_in">this</span>.left = <span class="literal">null</span>;</span><br><span class="line">        <span class="built_in">this</span>.right = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LowestCommonAncestor</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> TreeNode <span class="title function_">findLCA</span><span class="params">(TreeNode root, TreeNode node1, TreeNode node2)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span> || root == node1 || root == node2) &#123;</span><br><span class="line">            <span class="keyword">return</span> root;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">leftLCA</span> <span class="operator">=</span> findLCA(root.left, node1, node2);</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">rightLCA</span> <span class="operator">=</span> findLCA(root.right, node1, node2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (leftLCA != <span class="literal">null</span> &amp;&amp; rightLCA != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> root;  <span class="comment">// root is the LCA</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> (leftLCA != <span class="literal">null</span>) ? leftLCA : rightLCA;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">3</span>);</span><br><span class="line">        root.left = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">5</span>);</span><br><span class="line">        root.right = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">1</span>);</span><br><span class="line">        root.left.left = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">6</span>);</span><br><span class="line">        root.left.right = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">2</span>);</span><br><span class="line">        root.right.left = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">0</span>);</span><br><span class="line">        root.right.right = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">8</span>);</span><br><span class="line">        root.left.right.left = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">7</span>);</span><br><span class="line">        root.left.right.right = <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">node1</span> <span class="operator">=</span> root.left;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">node2</span> <span class="operator">=</span> root.right;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">lca</span> <span class="operator">=</span> findLCA(root, node1, node2);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Lowest Common Ancestor of &quot;</span> + node1.val + <span class="string">&quot; and &quot;</span> + node2.val + <span class="string">&quot; is: &quot;</span> + lca.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，<code>findLCA</code> 方法使用递归的方式在二叉树中寻找两个给定节点的最近公共祖先。它首先检查根节点是否为其中之一，然后递归搜索左子树和右子树，最终找到最近公共祖先。</p>
-<p>请注意，这个示例是基于二叉树的LCA算法，实际应用中可能需要根据具体的数据结构和问题进行适当的修改。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/35921.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/35921.html" class="post-title-link" itemprop="url">KMP算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>698</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>KMP算法解决的是字符串模式匹配定位问题</p>
-<p>主串：  ABACBFG  —i<br>模式串：ABAD     —j</p>
-<h2 id="简单算法："><a href="#简单算法：" class="headerlink" title="简单算法："></a>简单算法：</h2><p>从左到右一个一个匹配，遇到不匹配，i回到i-j+1,j回到0，重新匹配（不考虑模式串本身特性–最大前后缀数）</p>
-<pre><code>/**
-
- * @param ts 主串
-
- * @param ps 模式串
-
- * @return 如果找到，返回在主串中第一个字符出现的下标，否则为-1
-
- */
-
-public static int bf(String ts, String ps) &#123;
-
-    char[] t = ts.toCharArray();
-
-    char[] p = ps.toCharArray();
-
-    int i = 0; // 主串的位置
-
-    int j = 0; // 模式串的位置
-
-    while (i &lt; t.length &amp;&amp; j &lt; p.length) &#123;
-
-       if (t[i] == p[j]) &#123; // 当两个字符相同，就比较下一个
-
-           i++;
-
-           j++;
-
-       &#125; else &#123;
-
-           i = i - j + 1; // 一旦不匹配，i后退
-
-           j = 0; // j归0
-
-       &#125;
-
-    &#125;
-
-    if (j == p.length) &#123;
-
-       return i - j;
-
-    &#125; else &#123;
-
-       return -1;
-
-    &#125;
-
-&#125;
-</code></pre>
-<p>优化：考虑先前匹配的结果和模式串的特点（最长前缀），i可以不动，只移动j，到位置k</p>
-<h2 id="寻找k"><a href="#寻找k" class="headerlink" title="寻找k"></a>寻找k</h2><p>规律： 最前面的k个字符和j之前的最后k个字符是一样的</p>
-<p> <img src="http://thyrsi.com/t6/625/1543997868x1822611383.jpg" alt="alt text" title="示例"></p>
-<h2 id="推导："><a href="#推导：" class="headerlink" title="推导："></a>推导：</h2><pre><code>T[i] != P[j] 
-T[i-j ~ i-1] == P[0 ~ j-1] 
-P[0 ~ k-1] == P[j-k ~ j-1]
-==&gt; T[i-k ~ i-1] == P[0 ~ k-1]
-</code></pre>
-<h3 id="由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k"><a href="#由于每个j对应的k都可能不同，可以找到一个j-k对应关系-next-j-k" class="headerlink" title="由于每个j对应的k都可能不同，可以找到一个j~k对应关系 next[j] = k"></a>由于每个j对应的k都可能不同，可以找到一个j~k对应关系 <code>next[j] = k</code></h3><h2 id="四个规则"><a href="#四个规则" class="headerlink" title="四个规则"></a>四个规则</h2><ol>
-<li>j在最左边了，匹配失败，i指针后移</li>
-<li><code>P[0 ~ k-1] == p[j-k ~ j-1] 且 P[k] == P[j]时，next[j+1] == k + 1 == next[j] + 1，找到最大公共前后缀数</code></li>
-<li><code>P[0 ~ k-1] == p[j-k ~ j-1] 且 P[k] != P[j]时，k=next[k]（在位置k不匹配了，往下找不到更长的前缀字串了，但可以根据k找到最长前后缀数）</code></li>
-</ol>
-<blockquote>
-<p>递归思想: 不匹配，递归找不匹配位置k前面有没有相同前缀后缀，一直找到next[0]&#x3D;-1为止，此时next[j]&#x3D;k+1&#x3D;-1+1&#x3D;0</p>
-</blockquote>
-<p><img src="http://thyrsi.com/t6/625/1543997916x1822611383.jpg" alt="alt text"></p>
-<pre><code>public static int[] getNext(String ps) &#123;
-
-    char[] p = ps.toCharArray();
-
-    int[] next = new int[p.length];
-
-    next[0] = -1;
-
-    int j = 0;
-
-    int k = -1;
-
-    while (j &lt; p.length - 1) &#123;
-
-       if (k == -1 || p[j] == p[k]) &#123;
-
-           next[++j] = ++k;
-
-       &#125; else &#123;
-
-           k = next[k];
-
-       &#125;
-
-    &#125;
-
-    return next;
-
-&#125;
-</code></pre>
-<h3 id="当P-j-x3D-x3D-P-next-j-已经与主串不匹配-96"><a href="#当P-j-x3D-x3D-P-next-j-已经与主串不匹配-96" class="headerlink" title="当P[j] &#x3D;&#x3D; P[next[j]],已经与主串不匹配&#96;"></a>当P[j] &#x3D;&#x3D; P[next[j]],已经与主串不匹配&#96;</h3><pre><code>public static int[] getNext(String ps) &#123;
-
-    char[] p = ps.toCharArray();
-
-    int[] next = new int[p.length];
-
-    next[0] = -1;
-
-    int j = 0;
-
-    int k = -1;
-
-    while (j &lt; p.length - 1) &#123;
-
-       if (k == -1 || p[j] == p[k]) &#123;
-
-           if (p[++j] == p[++k]) &#123; // 当两个字符相等时要跳过
-
-              next[j] = next[k];
-
-           &#125; else &#123;
-
-              next[j] = k;
-
-           &#125;
-
-       &#125; else &#123;
-
-           k = next[k];
-
-       &#125;
-
-    &#125;
-
-    return next;
-
-&#125;
-</code></pre>
-<h2 id="匹配过程"><a href="#匹配过程" class="headerlink" title="匹配过程"></a>匹配过程</h2><pre><code>public static int KMP(String ts, String ps) &#123;
-
-    char[] t = ts.toCharArray();
-
-    char[] p = ps.toCharArray();
-
-    int i = 0; // 主串的位置
-
-    int j = 0; // 模式串的位置
-
-    int[] next = getNext(ps);
-
-    while (i &lt; t.length &amp;&amp; j &lt; p.length) &#123;
-
-       if (j == -1 || t[i] == p[j]) &#123; // 当j为-1时，要移动的是i，当然j也要归0
-
-           i++;
-
-           j++;
-
-       &#125; else &#123;
-
-           // i不需要回溯了
-
-           // i = i - j + 1;
-
-           j = next[j]; // j回到指定位置
-
-       &#125;
-
-    &#125;
-
-    if (j == p.length) &#123;
-
-       return i - j;
-
-    &#125; else &#123;
-
-       return -1;
-
-    &#125;
-
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/55519.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/55519.html" class="post-title-link" itemprop="url">EM算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>29</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>极大似然估计：应用广泛的参数估计方法</p>
-<p>链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bigmoyan/p/4550375.html">EM算法详细推导和讲解</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/145.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/145.html" class="post-title-link" itemprop="url">DP 树的最小支配集，最小点覆盖与最大独立集</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 23:54:53" itemprop="dateModified" datetime="2023-08-09T23:54:53+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>378</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在图论中，树的最小支配集（Minimum Dominating Set）、最小点覆盖（Minimum Vertex Cover）和最大独立集（Maximum Independent Set）是经典的问题，可以使用动态规划来解决。下面是使用动态规划求解这些问题的Java代码示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TreeNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    List&lt;TreeNode&gt; children;</span><br><span class="line"></span><br><span class="line">    TreeNode(<span class="type">int</span> val) &#123;</span><br><span class="line">        <span class="built_in">this</span>.val = val;</span><br><span class="line">        <span class="built_in">this</span>.children = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TreeProblems</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 最小支配集问题</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">minDominatingSet</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">int</span> <span class="variable">take</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">notTake</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (TreeNode child : root.children) &#123;</span><br><span class="line">            take += minDominatingSet(child);</span><br><span class="line">            <span class="keyword">for</span> (TreeNode grandchild : child.children) &#123;</span><br><span class="line">                notTake += minDominatingSet(grandchild);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> Math.min(take, notTake);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 最小点覆盖问题</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">minVertexCover</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">take</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">notTake</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (TreeNode child : root.children) &#123;</span><br><span class="line">            take += minVertexCover(child);</span><br><span class="line">            notTake += child.children.size() &gt; <span class="number">0</span> ? minVertexCover(child.children.get(<span class="number">0</span>)) : <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Math.min(take, notTake);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 最大独立集问题</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">maxIndependentSet</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">take</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">notTake</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (TreeNode child : root.children) &#123;</span><br><span class="line">            take += maxIndependentSet(child);</span><br><span class="line">            <span class="keyword">for</span> (TreeNode grandchild : child.children) &#123;</span><br><span class="line">                notTake += maxIndependentSet(grandchild);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Math.max(take, notTake);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">child1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">2</span>);</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">child2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">3</span>);</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">child3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">4</span>);</span><br><span class="line">        </span><br><span class="line">        root.children.add(child1);</span><br><span class="line">        root.children.add(child2);</span><br><span class="line">        root.children.add(child3);</span><br><span class="line">        </span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">grandchild1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">5</span>);</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">grandchild2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(<span class="number">6</span>);</span><br><span class="line">        </span><br><span class="line">        child1.children.add(grandchild1);</span><br><span class="line">        child2.children.add(grandchild2);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum Dominating Set: &quot;</span> + minDominatingSet(root));</span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum Vertex Cover: &quot;</span> + minVertexCover(root));</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum Independent Set: &quot;</span> + maxIndependentSet(root));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个示例中，我们定义了一个简单的树结构（<code>TreeNode</code>），并使用动态规划方法解决了最小支配集、最小点覆盖和最大独立集问题。每个问题都是通过递归计算来实现的。请注意，实际应用中的树结构可能会更加复杂，代码也会相应地调整。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/47295.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/47295.html" class="post-title-link" itemprop="url">随机森林</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:54:59" itemprop="dateModified" datetime="2023-08-09T22:54:59+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>387</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>随机森林（Random Forest）是一种集成学习方法，通过组合多个决策树来提高预测准确性和泛化能力。以下是使用Python实现随机森林的示例代码，使用了<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, classification_report</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建随机森林分类器</span></span><br><span class="line">model = RandomForestClassifier(n_estimators=<span class="number">100</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率和分类报告</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br><span class="line">classification_rep = classification_report(y_test, y_pred, target_names=iris.target_names)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Accuracy:&quot;</span>, accuracy)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Classification Report:\n&quot;</span>, classification_rep)</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们首先加载了鸢尾花数据集，然后使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，我们创建了一个随机森林分类器，并通过设置<code>n_estimators</code>参数来指定包含的决策树数量。使用<code>fit</code>方法训练模型，在测试集上进行预测，并计算了模型的准确率和分类报告。</p>
-<p>随机森林的优点之一是可以处理分类和回归问题，并且不容易过拟合。在实际应用中，您可以根据问题的需求调整超参数，如树的数量、最大深度等，以达到更好的性能。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/60504.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/60504.html" class="post-title-link" itemprop="url">逻辑回归</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:54:23" itemprop="dateModified" datetime="2023-08-09T22:54:23+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>429</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="线性"><a href="#线性" class="headerlink" title="线性"></a>线性</h2><p>logistic回归又称logistic回归分析，是一种广义的线性回归分析模型</p>
-<p>逻辑回归是一种用于分类问题的机器学习算法，它可以预测一个二元分类目标变量的概率。以下是使用Python实现逻辑回归的示例代码，使用了<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LogisticRegression</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, confusion_matrix, classification_report</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建示例数据</span></span><br><span class="line">np.random.seed(<span class="number">0</span>)</span><br><span class="line">X = np.random.rand(<span class="number">100</span>, <span class="number">2</span>) * <span class="number">10</span></span><br><span class="line">y = (X[:, <span class="number">0</span>] + X[:, <span class="number">1</span>] &gt; <span class="number">10</span>).astype(<span class="built_in">int</span>)  <span class="comment"># 根据线性关系生成二元分类标签</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建逻辑回归模型</span></span><br><span class="line">model = LogisticRegression()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算准确率和混淆矩阵</span></span><br><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br><span class="line">conf_matrix = confusion_matrix(y_test, y_pred)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Accuracy:&quot;</span>, accuracy)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Confusion Matrix:\n&quot;</span>, conf_matrix)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Classification Report:\n&quot;</span>, classification_report(y_test, y_pred))</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们首先创建了一个示例数据集，其中包含两个特征，根据一个线性关系生成了二元分类标签。然后，使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，我们创建了一个逻辑回归模型，并使用<code>fit</code>方法训练模型。在测试集上进行预测，并计算了模型的准确率、混淆矩阵和分类报告。</p>
-<p>请注意，这只是一个简单的逻辑回归示例。在实际应用中，您可能需要调整超参数、进行特征工程等，以达到更好的分类性能。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23220.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/23220.html" class="post-title-link" itemprop="url">词袋模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:53:45" itemprop="dateModified" datetime="2023-08-09T22:53:45+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>396</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>词袋模型（Bag-of-Words Model）是一种用于表示文本数据的方法，它将文本看作是一个包含单词的集合，忽略了单词的顺序和语法结构，只关注单词的频次或存在与否。以下是使用Python实现词袋模型的示例代码，使用了<code>CountVectorizer</code>类从<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例文本数据</span></span><br><span class="line">corpus = [</span><br><span class="line">    <span class="string">&quot;This is the first document.&quot;</span>,</span><br><span class="line">    <span class="string">&quot;This document is the second document.&quot;</span>,</span><br><span class="line">    <span class="string">&quot;And this is the third one.&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Is this the first document?&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建词袋模型</span></span><br><span class="line">vectorizer = CountVectorizer()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将文本数据转换为词袋表示</span></span><br><span class="line">X = vectorizer.fit_transform(corpus)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取词汇表和词频矩阵</span></span><br><span class="line">vocabulary = vectorizer.get_feature_names_out()</span><br><span class="line">word_frequency_matrix = X.toarray()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印词汇表和词频矩阵</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Vocabulary:&quot;</span>, vocabulary)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Word Frequency Matrix:\n&quot;</span>, word_frequency_matrix)</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们首先定义了一个包含多个文本文档的示例文本数据。然后，使用<code>CountVectorizer</code>类将文本数据转换为词袋表示，得到一个词频矩阵。词汇表是所有文本数据中出现的不同单词的集合，而词频矩阵记录了每个文档中每个单词的出现频次。</p>
-<p>请注意，词袋模型忽略了单词的顺序和语法结构，因此它可能无法捕捉到一些文本中的上下文信息。在实际应用中，您可能还需要考虑去除停用词、使用TF-IDF等进一步处理，以提高文本表示的效果。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/52662.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/52662.html" class="post-title-link" itemprop="url">线性回归</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:53:33" itemprop="dateModified" datetime="2023-08-09T22:53:33+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>476</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>线性回归是一种用于建模和预测连续型目标变量与一个或多个自变量之间关系的统计方法。以下是使用Python实现简单线性回归的示例代码，使用了<code>numpy</code>和<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>numpy</code> 和 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy scikit-learn</span><br></pre></td></tr></table></figure>
-
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> mean_squared_error</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成示例数据</span></span><br><span class="line">np.random.seed(<span class="number">0</span>)</span><br><span class="line">X = np.random.rand(<span class="number">100</span>, <span class="number">1</span>) * <span class="number">10</span></span><br><span class="line">y = <span class="number">2</span> * X + <span class="number">3</span> + np.random.randn(<span class="number">100</span>, <span class="number">1</span>) * <span class="number">2</span>  <span class="comment"># 使用线性关系生成目标变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建线性回归模型</span></span><br><span class="line">model = LinearRegression()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练模型</span></span><br><span class="line">model.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br><span class="line">y_pred = model.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算均方误差</span></span><br><span class="line">mse = mean_squared_error(y_test, y_pred)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Mean Squared Error:&quot;</span>, mse)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制数据和拟合的直线</span></span><br><span class="line">plt.scatter(X_test, y_test, color=<span class="string">&#x27;blue&#x27;</span>, label=<span class="string">&#x27;Actual&#x27;</span>)</span><br><span class="line">plt.plot(X_test, y_pred, color=<span class="string">&#x27;red&#x27;</span>, label=<span class="string">&#x27;Predicted&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;X&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;y&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&#x27;Linear Regression&#x27;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印模型参数（斜率和截距）</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Slope (Coefficient):&quot;</span>, model.coef_[<span class="number">0</span>])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Intercept:&quot;</span>, model.intercept_)</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们首先生成了一个示例数据集，其中包含一个自变量（特征）和一个目标变量。然后，我们使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，创建了一个线性回归模型，并使用<code>fit</code>方法训练模型。在测试集上进行预测，并计算均方误差来衡量模型性能。</p>
-<p>最后，我们绘制了测试集数据和模型预测的拟合直线，并打印了模型的斜率（系数）和截距。</p>
-<p>请注意，这只是一个简单的线性回归示例。在实际应用中，您可能需要考虑特征选择、模型评估、多元线性回归等问题，以获得更好的预测结果。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/25124.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/25124.html" class="post-title-link" itemprop="url">留一验证</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-09 22:52:01" itemprop="dateModified" datetime="2023-08-09T22:52:01+08:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>328</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>留一验证（Leave-One-Out Cross-Validation，LOOCV）是交叉验证的一种特殊形式，其中每个样本都被单独留出作为验证集，其余样本用于训练模型。这样可以有效地评估模型在每个样本上的性能。</p>
-<p>以下是使用Python实现留一验证的示例代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> LeaveOneOut</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LogisticRegression</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br><span class="line">iris = load_iris()</span><br><span class="line">X, y = iris.data, iris.target</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建逻辑回归模型</span></span><br><span class="line">model = LogisticRegression()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化计数器</span></span><br><span class="line">correct_predictions = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用留一验证进行模型评估</span></span><br><span class="line">loo = LeaveOneOut()</span><br><span class="line"><span class="keyword">for</span> train_index, test_index <span class="keyword">in</span> loo.split(X):</span><br><span class="line">    X_train, X_test = X[train_index], X[test_index]</span><br><span class="line">    y_train, y_test = y[train_index], y[test_index]</span><br><span class="line">    </span><br><span class="line">    model.fit(X_train, y_train)</span><br><span class="line">    y_pred = model.predict(X_test)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> y_pred == y_test:</span><br><span class="line">        correct_predictions += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">accuracy = correct_predictions / <span class="built_in">len</span>(X)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Accuracy:&quot;</span>, accuracy)</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，我们使用了<code>load_iris</code>函数加载鸢尾花数据集，并创建了一个逻辑回归模型。然后，使用<code>LeaveOneOut</code>对象进行留一验证，对每个样本进行模型训练和测试，计算预测准确率。</p>
-<p>请注意，留一验证是一种非常耗时的交叉验证方法，特别是在大型数据集上。在实际应用中，您可能会考虑使用其他交叉验证方法，如K折交叉验证，以在计算资源和性能之间找到平衡。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1349,7 +1574,7 @@ P[0 ~ k-1] == P[j-k ~ j-1]
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">350</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1398,12 +1623,12 @@ P[0 ~ k-1] == P[j-k ~ j-1]
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">320k</span>
+    <span title="站点总字数">324k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">19:23</span>
+    <span title="站点阅读时长">19:37</span>
 </div>
 
 <!--

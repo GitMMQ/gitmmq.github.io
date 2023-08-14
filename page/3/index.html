@@ -192,6 +192,807 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/3c17bf11.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/3c17bf11.html" class="post-title-link" itemprop="url">Zookeeper服务注册与订阅</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-14 23:12:20 / 修改时间：23:28:31" itemprop="dateCreated datePublished" datetime="2023-08-14T23:12:20+08:00">2023-08-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>524</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ZooKeeper在服务注册与订阅（服务发现）方面，通常会使用有序临时节点来实现。当一个服务实例启动时，它会在ZooKeeper中创建一个临时节点来表示自己的存在。其他服务可以通过监听这些节点的变化来实现实时的服务发现。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper实现服务注册与订阅的基本逻辑。</p>
+<p>首先，确保你的项目中引入了ZooKeeper客户端库依赖。常用的ZooKeeper客户端库包括<code>zookeeper</code>和<code>curator</code>。</p>
+<p>示例代码基于<code>curator</code>库来实现服务注册与订阅：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.nodes.PersistentEphemeralNode;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServiceRegistry</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String basePath;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">ServiceRegistry</span><span class="params">(String connectString, String basePath)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br><span class="line">        <span class="built_in">this</span>.basePath = basePath;</span><br><span class="line">        client.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">registerService</span><span class="params">(String serviceName, String serviceAddress)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">servicePath</span> <span class="operator">=</span> basePath + <span class="string">&quot;/&quot;</span> + serviceName;</span><br><span class="line">        <span class="type">PersistentEphemeralNode</span> <span class="variable">node</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PersistentEphemeralNode</span>(client, PersistentEphemeralNode.Mode.EPHEMERAL, servicePath, serviceAddress.getBytes());</span><br><span class="line">        node.start();</span><br><span class="line">        node.waitForInitialCreate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> &#123;</span><br><span class="line">        CloseableUtils.closeQuietly(client);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，<code>ServiceRegistry</code>类用于服务注册，它会创建一个临时节点来表示服务实例。当服务实例启动时，可以调用<code>registerService</code>方法来注册自己的信息。</p>
+<p>下面是一个简单的服务订阅示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.ChildData;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCache;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;</span><br><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServiceSubscriber</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String basePath;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">ServiceSubscriber</span><span class="params">(String connectString, String basePath)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br><span class="line">        <span class="built_in">this</span>.basePath = basePath;</span><br><span class="line">        client.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">subscribe</span><span class="params">(String serviceName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">servicePath</span> <span class="operator">=</span> basePath + <span class="string">&quot;/&quot;</span> + serviceName;</span><br><span class="line"></span><br><span class="line">        <span class="type">PathChildrenCache</span> <span class="variable">cache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PathChildrenCache</span>(client, servicePath, <span class="literal">true</span>);</span><br><span class="line">        <span class="type">PathChildrenCacheListener</span> <span class="variable">listener</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PathChildrenCacheListener</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">childEvent</span><span class="params">(CuratorFramework curatorFramework, PathChildrenCacheEvent event)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">                <span class="keyword">if</span> (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) &#123;</span><br><span class="line">                    <span class="type">ChildData</span> <span class="variable">data</span> <span class="operator">=</span> event.getData();</span><br><span class="line">                    <span class="type">String</span> <span class="variable">serviceAddress</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(data.getData());</span><br><span class="line">                    System.out.println(<span class="string">&quot;New service added: &quot;</span> + serviceAddress);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        cache.getListenable().addListener(listener);</span><br><span class="line">        cache.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> &#123;</span><br><span class="line">        CloseableUtils.closeQuietly(client);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，<code>ServiceSubscriber</code>类用于订阅服务信息变化。它会监听指定服务的节点变化，并在有新服务实例加入时输出服务地址。</p>
+<p>请注意，这只是一个基本的示例代码，实际项目中还需要考虑更多的异常处理、线程安全等问题。同时，还可以使用更高级的ZooKeeper客户端库，如Apache Curator，来简化操作和提供更多的特性。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/daad87b1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/daad87b1.html" class="post-title-link" itemprop="url">Zookeeper快速入门</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-14 23:11:05 / 修改时间：23:28:31" itemprop="dateCreated datePublished" datetime="2023-08-14T23:11:05+08:00">2023-08-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>699</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Apache ZooKeeper是一个分布式的开源协调服务，用于管理大规模分布式系统中的配置、同步、命名等任务。它提供了一组简单而强大的API，用于处理复杂的分布式系统的协调问题。以下是一些典型的ZooKeeper应用场景实战示例：</p>
+<ol>
+<li><p><strong>分布式配置管理：</strong><br>ZooKeeper可用于管理分布式系统的配置信息。例如，你可以将数据库连接字符串、缓存配置等保存在ZooKeeper节点中，并在分布式应用中动态获取这些配置信息。</p>
+</li>
+<li><p><strong>分布式锁：</strong><br>ZooKeeper的有序节点特性使得它非常适合实现分布式锁。你可以在ZooKeeper中创建一个临时有序节点，节点的顺序会根据创建顺序自动排序。应用可以根据节点顺序来决定谁获得了锁。</p>
+</li>
+<li><p><strong>选举：</strong><br>ZooKeeper可以用于在分布式系统中进行领导者选举。多个节点可以在ZooKeeper中创建临时节点，谁创建成功谁就成为领导者。当一个节点宕机时，相应的临时节点会被删除，触发新一轮的选举。</p>
+</li>
+<li><p><strong>服务发现：</strong><br>在微服务架构中，服务发现是一个重要的问题。ZooKeeper可以用于注册和发现服务。每个服务实例可以在ZooKeeper中创建一个临时节点，其他服务可以通过监听节点变化来实时获取可用的服务实例。</p>
+</li>
+<li><p><strong>分布式同步：</strong><br>ZooKeeper提供的有序节点和监视功能可以用于实现分布式系统的同步机制。节点的创建和删除会触发事件通知，应用可以根据这些通知来进行同步操作。</p>
+</li>
+<li><p><strong>协调任务分配：</strong><br>在分布式任务调度场景中，ZooKeeper可以帮助协调任务的分配和执行。任务调度器可以通过ZooKeeper来进行任务的分配、状态的维护以及故障处理。</p>
+</li>
+<li><p><strong>消息队列：</strong><br>虽然ZooKeeper不是专门的消息队列系统，但可以借助其有序节点和事件通知功能来实现简单的消息队列。每个消息可以被看作一个有序节点，消息的消费者可以监听节点变化以获取消息。</p>
+</li>
+</ol>
+<p>这些只是ZooKeeper的一些典型应用场景，实际中还可以根据具体需求进行扩展。需要注意的是，虽然ZooKeeper在很多分布式系统场景下非常有用，但随着分布式系统技术的发展，也有一些替代方案出现，如etcd、Consul等。选择合适的工具要根据实际需求和技术背景进行权衡。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/676b1804.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/676b1804.html" class="post-title-link" itemprop="url">tensorflow使用指南</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-05 22:43:02 / 修改时间：23:14:20" itemprop="dateCreated datePublished" datetime="2023-01-05T22:43:02+08:00">2023-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>151</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>可以安装Anaconda<br>通过Anaconda Prompts进入conda 命令行</p>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><h2 id="更换为国内源"><a href="#更换为国内源" class="headerlink" title="更换为国内源"></a>更换为国内源</h2><h3 id="清华源"><a href="#清华源" class="headerlink" title="清华源"></a>清华源</h3><p>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/">http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</a><br>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/</a></p>
+<h3 id="中科大源"><a href="#中科大源" class="headerlink" title="中科大源"></a>中科大源</h3><p>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/pkgs/main/">https://mirrors.ustc.edu.cn/anaconda/pkgs/main/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/pkgs/free/">https://mirrors.ustc.edu.cn/anaconda/pkgs/free/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/">https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/">https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/">https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/">https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/">https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/</a></p>
+<h3 id="搜索时显示通道地址"><a href="#搜索时显示通道地址" class="headerlink" title="搜索时显示通道地址"></a>搜索时显示通道地址</h3><p>conda config –set show_channel_urls yes</p>
+<h3 id="还原原始通道"><a href="#还原原始通道" class="headerlink" title="还原原始通道"></a>还原原始通道</h3><p>conda config –remove-key channels</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/936ee6a2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/936ee6a2.html" class="post-title-link" itemprop="url">pytorch使用指南</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-05 22:34:55 / 修改时间：23:14:20" itemprop="dateCreated datePublished" datetime="2023-01-05T22:34:55+08:00">2023-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>44</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="安装构建"><a href="#安装构建" class="headerlink" title="安装构建"></a>安装构建</h1><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/source_windows">https://www.tensorflow.org/install/source_windows</a></p>
+<h1 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h1><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/learn#prepare-data">https://www.tensorflow.org/learn#prepare-data</a></p>
+<h1 id="调试模型"><a href="#调试模型" class="headerlink" title="调试模型"></a>调试模型</h1><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/learn#build-models">https://www.tensorflow.org/learn#build-models</a></p>
+<h1 id="部署模型"><a href="#部署模型" class="headerlink" title="部署模型"></a>部署模型</h1><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/learn#deploy-models">https://www.tensorflow.org/learn#deploy-models</a></p>
+<h1 id="生产应用"><a href="#生产应用" class="headerlink" title="生产应用"></a>生产应用</h1><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/learn#implement-mlops">https://www.tensorflow.org/learn#implement-mlops</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1d208056.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/1d208056.html" class="post-title-link" itemprop="url">conda使用指南</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-05 22:32:24 / 修改时间：23:28:33" itemprop="dateCreated datePublished" datetime="2023-01-05T22:32:24+08:00">2023-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>498</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>可以安装Anaconda<br>通过Anaconda Prompts进入conda 命令行</p>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><h2 id="更换为国内源"><a href="#更换为国内源" class="headerlink" title="更换为国内源"></a>更换为国内源</h2><h3 id="清华源"><a href="#清华源" class="headerlink" title="清华源"></a>清华源</h3><p>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/">http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</a><br>conda config –add channels <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/</a></p>
+<h3 id="中科大源"><a href="#中科大源" class="headerlink" title="中科大源"></a>中科大源</h3><p>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/pkgs/main/">https://mirrors.ustc.edu.cn/anaconda/pkgs/main/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/pkgs/free/">https://mirrors.ustc.edu.cn/anaconda/pkgs/free/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/">https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/">https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/">https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/">https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/</a><br>conda config –add channels <a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/">https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/</a><br>conda config –set show_channel_urls yes<br>conda config –remove-key channels</p>
+<h3 id="常用命令-1"><a href="#常用命令-1" class="headerlink" title="常用命令"></a>常用命令</h3><p>1.验证conda是否被安装：conda –version(查看conda版本的一个命令)<br>2.更新conda至最新的版本:conda update conda<br>3.conda –help:查看conda帮助信息<br>4.conda list:查看当前环境中已安装的包信息<br>5.conda search –full-name 包名  精确查找可供安装的包版本<br>6.conda search 包名的一部分名称  模糊查找可供安装的包版本<br>7.conda install 包名  在当前环境中安装包(当使用conda install无法进行安装时，可以使用pip install进行安装,pip install无法安装的时候，可以使用conda install 安装)<br>8.conda remove 包名   卸载当前环境中的包<br>9.conda update –all   更新所有包<br>10.conda update 包名   更新指定包</p>
+<p>默认情况下，新创建的环境将会被保存在&#x2F;Users&#x2F;<user_name>&#x2F;anaconda3&#x2F;env目录下，其中，<user_name>为当前用户的用户名。<br>创建新的环境<br>conda create –name 新的python环境的名称<br>conda create –name 新的python环境的名称 python&#x3D;要安装的python版本<br>conda create –name 新的python环境的名称 python&#x3D;要安装的python版本 要安装的包名</user_name></user_name></p>
+<p>切换环境<br>activate python环境名称   切换到xx环境中<br>deactivate python环境名称  退出xx环境</p>
+<p>conda env list ：显示已创建的环境<br>conda create –name 新的虚拟环境名称 –clone 要克隆的虚拟环境名称<br>conda remove –name 虚拟环境的名称 –all</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/bcc8f365.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/bcc8f365.html" class="post-title-link" itemprop="url">cuda安装</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-05 22:29:43 / 修改时间：23:16:55" itemprop="dateCreated datePublished" datetime="2023-01-05T22:29:43+08:00">2023-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>237</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h2 id="默认安装位置"><a href="#默认安装位置" class="headerlink" title="默认安装位置"></a>默认安装位置</h2><p>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA</p>
+<p>nvcc –version 查看安装版本（环境变量配置）</p>
+<h2 id="cuda下载地址"><a href="#cuda下载地址" class="headerlink" title="cuda下载地址"></a>cuda下载地址</h2><h3 id="最新版本"><a href="#最新版本" class="headerlink" title="最新版本"></a>最新版本</h3><p><a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10">https://developer.nvidia.com/cuda-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10</a></p>
+<h3 id="历史版本"><a href="#历史版本" class="headerlink" title="历史版本"></a>历史版本</h3><p><a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-toolkit-archive">https://developer.nvidia.com/cuda-toolkit-archive</a></p>
+<h2 id="cudnn下载地址"><a href="#cudnn下载地址" class="headerlink" title="cudnn下载地址"></a>cudnn下载地址</h2><p><a target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">https://developer.nvidia.com/rdp/cudnn-download</a></p>
+<h3 id="版本关系和查看"><a href="#版本关系和查看" class="headerlink" title="版本关系和查看"></a>版本关系和查看</h3><p>cuda： Compute Unified Device Architecture，是一种有NVIDIA推出的通用并行计算架构， 该架构使GPU能够解决复杂的计算问题。</p>
+<p>cudnn： 是NVIDIA 推出的用于深度神经网络的GPU加速库，他强调性能，易用性和低内存开销。</p>
+<p>cuda和cudnn的关系： cudnn是基于cuda架构开发的专门用于深度神经网络的GPU加速库。cuda可以理解为一个大的商圈，但这个商圈是空的，还未装修。cudnn可以理解为装修后的房间，例如负一楼专门针对游乐（深度神经网络）装修成大型游乐厂。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/39a747bc.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/39a747bc.html" class="post-title-link" itemprop="url">一些好的技术博客</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-29 14:57:44" itemprop="dateCreated datePublished" datetime="2022-12-29T14:57:44+08:00">2022-12-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-05 23:14:20" itemprop="dateModified" datetime="2023-01-05T23:14:20+08:00">2023-01-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/records/" itemprop="url" rel="index"><span itemprop="name">records</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>19</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>陈梓瀚 <a target="_blank" rel="noopener" href="http://cppblog.com/vczh">http://cppblog.com/vczh</a></p>
+<p>赵劼 <a target="_blank" rel="noopener" href="http://blog.zhaojie.me/">http://blog.zhaojie.me/</a></p>
+<p>martin <a target="_blank" rel="noopener" href="https://www.martinfowler.com/">https://www.martinfowler.com/</a></p>
+<p>jakewharton <a target="_blank" rel="noopener" href="https://jakewharton.com/">https://jakewharton.com/</a></p>
+<p>stallman <a target="_blank" rel="noopener" href="https://stallman.org/">https://stallman.org/</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23a4cdd8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/23a4cdd8.html" class="post-title-link" itemprop="url">JAVA-volatile关键字</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-29 14:54:44" itemprop="dateCreated datePublished" datetime="2022-12-29T14:54:44+08:00">2022-12-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-05 23:14:20" itemprop="dateModified" datetime="2023-01-05T23:14:20+08:00">2023-01-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>139</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Volatile是Java虚拟机提供的-轻量级-的同步机制"><a href="#Volatile是Java虚拟机提供的-轻量级-的同步机制" class="headerlink" title="Volatile是Java虚拟机提供的**轻量级**的同步机制"></a>Volatile是Java虚拟机提供的**<code>轻量级</code>**的同步机制</h1><h2 id="三大特性"><a href="#三大特性" class="headerlink" title="三大特性"></a>三大特性</h2><ul>
+<li>保证可见性</li>
+<li>不保证原子性</li>
+<li>禁止指令重排</li>
+</ul>
+<h3 id="内存可见性"><a href="#内存可见性" class="headerlink" title="内存可见性"></a>内存可见性</h3><p>volatile修饰的变量，不拷贝副本到工作内存，直接操作主内存，任何修改都可以其他线程读取到。<br>volatile的可以保证写入和读取 64 位值（long类型和double类型 ）的原子性。</p>
+<p>单例中 volatile  + synchronized 的作用</p>
+<pre><code>volatile 可见性、禁止指令重排
+synchronized保证操作的原子性、一致性和可见性。
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/0.html" class="post-title-link" itemprop="url">神经网络</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-29 14:44:04" itemprop="dateCreated datePublished" datetime="2022-12-29T14:44:04+08:00">2022-12-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-09 22:56:46" itemprop="dateModified" datetime="2023-08-09T22:56:46+08:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>257</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <hr>
+<h2 id="title-主成分分析"><a href="#title-主成分分析" class="headerlink" title="title:主成分分析"></a>title:主成分分析</h2><h1 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h1><p>1、神经网络最好设计成三层结构（输入层、隐藏层、输出层）<br>2、如果隐藏非要设计多层，保持每层的神经元数量相同<br>3、输入层神经元的数量与特性个数相同<br>4、输出层的神经元数量与输出结果的要求相关。比如10分类网络的输出层神经元数量是10个<br>5、隐层神经元的数量越多效果越好，但是过多的话，会增加计算量。最好多于输入层神经元的数量</p>
+<h1 id="训练步骤"><a href="#训练步骤" class="headerlink" title="训练步骤"></a>训练步骤</h1><p>1、随机初始化所有权重矩阵<br>2、向前传播计算所有层的激活值<br>3、计算损失成本<br>4、反向传播计算更新权重<br>5、使用“梯度检验”确认反向传播计算是否足够有效。(注意：一旦确认有效，立即关闭“梯度检验”)<br>6、使用梯度下降或任何有效算法获得最优权重矩阵</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -287,1051 +1088,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/0.html" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-29 14:35:23" itemprop="dateCreated datePublished" datetime="2022-12-29T14:35:23+08:00">2022-12-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-05 22:51:16" itemprop="dateModified" datetime="2023-01-05T22:51:16+08:00">2023-01-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>1.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <hr>
-<h2 id="title-机器学习的10个项目"><a href="#title-机器学习的10个项目" class="headerlink" title="title:机器学习的10个项目"></a>title:机器学习的10个项目</h2><h1 id="Deepy"><a href="#Deepy" class="headerlink" title="Deepy"></a>Deepy</h1><p>   Deepy 由 Raphael Shu 开发，是一个基于 Theano 扩展深度学习框架，它提供了一个简洁的、高阶的组件（如 LSTMs）、批规范化、自动编码等功能。Deepy 宣称其框架是十分简洁明了的，它的官方文档和示例也同样如此。<br>   Deepy 工作原理：在给定训练数据和参数（随机初始化）下运行模型，将错误（或梯度）反馈并更新参数，这个过程反复进行。 </p>
-<h1 id="MLxtend"><a href="#MLxtend" class="headerlink" title="MLxtend"></a>MLxtend</h1><p>   MLxtend 由 Sebastian Raschka 开发，是一系列有效工具的集合，也是针对机器学习任务的扩展。Sebastian Raschka 提到 MLxtend 本质上是一些有效的工具集，也是与机器学习和数据科学相关的参考资料。他提到开发 MLxtend 主要是基于以下几个原因：<br>   一些其他地方找不到的特定算法（如序列特征选择算法、多数表决分类器、叠加预估、绘图决策区域等）<br>   用于教学目的（逻辑回归、Softmax 回归、多层感知器、PCA、PCA 内核等）这些实现主要关注于代码的可读性，而不是单纯的效率<br>   打包便利：tensorflow、Softmax 回归和多层感知器<br>   MLxtend 基本上是 Sebastian Raschka 所写的一个机器学习运行常用的库，其中很多功能的实现都与 scikit-learn 的 API 相似，但作者仍在持续更新中，且作者表示所有的新增特性与创新的算法都会一起打包在 MLxtend 中。</p>
-<h1 id="Datacleaner"><a href="#Datacleaner" class="headerlink" title="Datacleaner"></a>Datacleaner</h1><p>   datacleaner 由 Randal Olson 开发，他认为自己开发的 datacleaner 是一个“能自动清除数据集并且让它们便于分析的 Python 工具。”他认为：datacleaner 所做的将会节约你大量的编码和清理数据的时间。<br>   datacleaner 还处于开发过程中，但目前已经能够处理以下常规（传统方式下耗时量巨大的）数据清洗任务：<br>   在列的基础上，用模式或中位数替换丢失的值<br>   用数值等价物对非数值变量进行编码等</p>
-<h1 id="Auto-sklearn"><a href="#Auto-sklearn" class="headerlink" title="Auto-sklearn"></a>Auto-sklearn</h1><p>   auto-sklearn 由德国弗莱堡大学机器学习自动算法小组开发，是针对 Scikit-learn 环境的自动机器学习工具。<br>   auto-sklearn 能将机器学习用户从算法选择和高参数调整中解救出来，它利用了近期在贝叶斯优化、元学习和集成构筑上研究的优势。其大致工作原理如下：</p>
-<h1 id="Deep-Mining"><a href="#Deep-Mining" class="headerlink" title="Deep Mining"></a>Deep Mining</h1><p>   Deep Mining 由来自 MIT CSAIL 实验室的 Sebastien Dubois 开发，是一个机器学习深管道自动调谐器。为了尽快实现最好的分类精度，该软件将迭代、智能地测试一些超参数集。<br>   另外值得一提的是文件夹 GCP-HPO 包含所有高斯过程（GCP）的实现代码以及基于其基础上的超参数优化（HPO）。高斯过程（GCP）可以看作是一种改进的版本。这项新技术被证明优于基于 GP 的超参数优化，已经远比随机搜索表现要好。</p>
-<h1 id="Rusty-Machine"><a href="#Rusty-Machine" class="headerlink" title="Rusty Machine"></a>Rusty Machine</h1><p>   Rusty Machine 是基于 Rust 的机器学习方法，Rust 是由 Mozilla 赞助开发的一种与C和 C++ 较为相似的计算机编程语言，其号称“Rust 是一种系统的编程语言，运行速度极快，可以防止错误，并保证线程安全。”<br>   Rusty Machine 的开发者是否活跃，目前支持一系列想学习技术，包括：线性回归、逻辑回归、k-均值聚类、神经网络、支持向量机等等。<br>   Rusty Machine 还支持数据结构，如内置向量和矩阵。作为一种常见的模型接口，Rusty Machine 为每个支持的模型提供了训练和预测的功能。</p>
-<h1 id="Scikit-image"><a href="#Scikit-image" class="headerlink" title="Scikit-image"></a>Scikit-image</h1><p>   scikit-image 图像是针对 SciPy 使用 Python 的图像处理方法。scikit-image 是机器学习吗？它其实是一个机器学习项目（没有确切地表示他们必须用机器学习方法），scikit-image 就属于数据处理和准备工具这一类。该项目包括一些图像处理算法，如点检测、滤波、特征选择和形态学等。</p>
-<h1 id="NLP-Compromise"><a href="#NLP-Compromise" class="headerlink" title="NLP Compromise"></a>NLP Compromise</h1><p>   NLP Compromise 是由 Java 语言编写的，其在浏览器中进行自然语言处理过程。NLP Compromise 非常容易安装和使用，以下是它的一个使用范例：</p>
-<h1 id="Datatest"><a href="#Datatest" class="headerlink" title="Datatest"></a>Datatest</h1><p>   Datatest 是一个依靠数据冲突的测试集，其由 Python 编写。<br>   Datatest 扩展了数据校正的测试工具标准数据库<br>   Datatest 是一种寻找数据冲突和准备的不同方式，如果你的大部分时间都被花在这个任务上，也许换一种新的方法是值得的。</p>
-<h1 id="GoLearn"><a href="#GoLearn" class="headerlink" title="GoLearn"></a>GoLearn</h1><pre><code>GoLearn 是一种针对 Go 语言的机器学习库，自称 Go 语言机器学习的“内置电池”学习库。简洁、易定制是其追求的目标。
-对于一些想分支出来的 Python 用户或者想尝试下机器学习的 Go 语言用户来说，GoLearn 是一个不错的选项。GoLearn 实现了熟悉的 Scikit-learn 适应/预测界面，可实现快速预估测试和交换。
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/8c2e92d2.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/8c2e92d2.html" class="post-title-link" itemprop="url">plt绘图</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-29 14:32:51" itemprop="dateCreated datePublished" datetime="2022-12-29T14:32:51+08:00">2022-12-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-05 22:51:16" itemprop="dateModified" datetime="2023-01-05T22:51:16+08:00">2023-01-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>53</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="example"><a href="#example" class="headerlink" title="example"></a>example</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplotasplt</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line">r_basicdx=redis.Redis(host=<span class="string">&#x27;172.20.3.52&#x27;</span>,port=<span class="number">6373</span>,db=<span class="number">1</span>)</span><br><span class="line">l_basicdx=redis.Redis(host=<span class="string">&#x27;127.0.0.1&#x27;</span>,port=<span class="number">6379</span>,db=<span class="number">1</span>)</span><br><span class="line">keys=r_basicdx.keys()</span><br><span class="line">forkeyinkeys:</span><br><span class="line">value=r_basicdx.get(key)</span><br><span class="line">l_basicdx.<span class="built_in">set</span>(key,value)</span><br><span class="line">image=pickle.loads(value)</span><br><span class="line">f=plt.figure()</span><br><span class="line">ax=f.add_subplot(<span class="number">111</span>)</span><br><span class="line">ax.text(<span class="number">0.1</span>,<span class="number">0.9</span>,key,ha=<span class="string">&#x27;center&#x27;</span>,va=<span class="string">&#x27;center&#x27;</span>,transform=ax.transAxes)</span><br><span class="line">plt.imshow(image)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/0.html" class="post-title-link" itemprop="url">tensorflow安装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-29 14:31:03" itemprop="dateCreated datePublished" datetime="2022-12-29T14:31:03+08:00">2022-12-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-06 16:19:57" itemprop="dateModified" datetime="2023-01-06T16:19:57+08:00">2023-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="下载与安装"><a href="#下载与安装" class="headerlink" title="下载与安装"></a>下载与安装</h1><p>你可以使用我们提供的 Pip, Docker, Virtualenv, Anaconda 或 源码编译的方法安装 TensorFlow.<br>Pip 安装<br>Pip 是一个 Python 的软件包安装与管理工具.<br>在安装 TensorFlow 过程中要涉及安装或升级的包详见 列表<br>首先安装 pip (或 Python3 的 pip3 ):</p>
-<h1 id="Ubuntu-x2F-Linux-64-bit"><a href="#Ubuntu-x2F-Linux-64-bit" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit"></a>Ubuntu&#x2F;Linux 64-bit</h1><p>$ sudo apt-get install python-pip python-dev</p>
-<h1 id="Mac-OS-X"><a href="#Mac-OS-X" class="headerlink" title="Mac OS X"></a>Mac OS X</h1><p>$ sudo easy_install pip<br>安装 TensorFlow :</p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-CPU-only-Python-2-7"><a href="#Ubuntu-x2F-Linux-64-bit-CPU-only-Python-2-7" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, CPU only, Python 2.7:"></a>Ubuntu&#x2F;Linux 64-bit, CPU only, Python 2.7:</h1><p>$ sudo pip install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</a></p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-2-7-Requires-CUDA-toolkit-7-5-and-CuDNN-v4"><a href="#Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-2-7-Requires-CUDA-toolkit-7-5-and-CuDNN-v4" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 2.7. Requires CUDA toolkit 7.5 and CuDNN v4."></a>Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 2.7. Requires CUDA toolkit 7.5 and CuDNN v4.</h1><h1 id="For-other-versions-see-“Install-from-sources”-below"><a href="#For-other-versions-see-“Install-from-sources”-below" class="headerlink" title="For other versions, see “Install from sources” below."></a>For other versions, see “Install from sources” below.</h1><p>$ sudo pip install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</a></p>
-<h1 id="Mac-OS-X-CPU-only"><a href="#Mac-OS-X-CPU-only" class="headerlink" title="Mac OS X, CPU only:"></a>Mac OS X, CPU only:</h1><p>$ sudo easy_install –upgrade six<br>$ sudo pip install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0-py2-none-any.whl">https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0-py2-none-any.whl</a><br>如果是 Python3 :</p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-CPU-only-Python-3-4"><a href="#Ubuntu-x2F-Linux-64-bit-CPU-only-Python-3-4" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, CPU only, Python 3.4:"></a>Ubuntu&#x2F;Linux 64-bit, CPU only, Python 3.4:</h1><p>$ sudo pip3 install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp34-cp34m-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp34-cp34m-linux_x86_64.whl</a></p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-3-4-Requires-CUDA-toolkit-7-5-and-CuDNN-v4"><a href="#Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-3-4-Requires-CUDA-toolkit-7-5-and-CuDNN-v4" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 3.4. Requires CUDA toolkit 7.5 and CuDNN v4."></a>Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 3.4. Requires CUDA toolkit 7.5 and CuDNN v4.</h1><h1 id="For-other-versions-see-“Install-from-sources”-below-1"><a href="#For-other-versions-see-“Install-from-sources”-below-1" class="headerlink" title="For other versions, see “Install from sources” below."></a>For other versions, see “Install from sources” below.</h1><p>$ sudo pip3 install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0-cp34-cp34m-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0-cp34-cp34m-linux_x86_64.whl</a></p>
-<h1 id="Mac-OS-X-CPU-only-1"><a href="#Mac-OS-X-CPU-only-1" class="headerlink" title="Mac OS X, CPU only:"></a>Mac OS X, CPU only:</h1><p>$ sudo easy_install –upgrade six<br>$ sudo pip3 install –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0-py3-none-any.whl">https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0-py3-none-any.whl</a><br>备注：如果之前安装过 TensorFlow &lt; 0.7.1 的版本,应该先使用 pip uninstall 卸载 TensorFlow 和 protobuf ,保证获取的是一个最新 protobuf 依赖下的安装包.<br>之后可以测试一下.<br>基于 Docker 的安装<br>我们也支持通过 Docker 运行 TensorFlow. 该方式的优点是不用操心软件依赖问题.<br>首先, 安装 Docker. 一旦 Docker 已经启动运行, 可以通过命令启动一个容器:<br>$ docker run -it b.gcr.io&#x2F;tensorflow&#x2F;tensorflow<br>该命令将启动一个已经安装好 TensorFlow 及相关依赖的容器.<br>其它镜像<br>默认的 Docker 镜像只包含启动和运行 TensorFlow 所需依赖库的一个最小集. 我们额外提供了 下面的容器, 该容器同样可以通过上述 docker run 命令安装:<br>b.gcr.io&#x2F;tensorflow&#x2F;tensorflow-full: 镜像中的 TensorFlow 是从源代码完整安装的, 包含了编译和运行 TensorFlow 所需的全部工具. 在该镜像上, 可以直接使用源代码进行实验, 而不需要再安装上述的任何依赖.<br>基于 VirtualEnv 的安装<br>我们推荐使用 virtualenv 创建一个隔离的容器, 来安装 TensorFlow. 这是可选的, 但是这样做能使排查安装问题变得更容易.<br>首先, 安装所有必备工具:</p>
-<h1 id="在-Linux-上"><a href="#在-Linux-上" class="headerlink" title="在 Linux 上:"></a>在 Linux 上:</h1><p>$ sudo apt-get install python-pip python-dev python-virtualenv</p>
-<h1 id="在-Mac-上"><a href="#在-Mac-上" class="headerlink" title="在 Mac 上:"></a>在 Mac 上:</h1><p>$ sudo easy_install pip  # 如果还没有安装 pip<br>$ sudo pip install –upgrade virtualenv<br>接下来, 建立一个全新的 virtualenv 环境. 为了将环境建在 ~&#x2F;tensorflow 目录下, 执行:<br>$ virtualenv –system-site-packages ~&#x2F;tensorflow<br>$ cd ~&#x2F;tensorflow<br>然后, 激活 virtualenv:<br>$ source bin&#x2F;activate  # 如果使用 bash<br>$ source bin&#x2F;activate.csh  # 如果使用 csh<br>(tensorflow)$  # 终端提示符应该发生变化<br>在 virtualenv 内, 安装 TensorFlow:<br>(tensorflow)$ pip install –upgrade &lt;$url_to_binary.whl&gt;<br>接下来, 使用类似命令运行 TensorFlow 程序:<br>(tensorflow)$ cd tensorflow&#x2F;models&#x2F;image&#x2F;mnist<br>(tensorflow)$ python convolutional.py</p>
-<h1 id="当使用完-TensorFlow"><a href="#当使用完-TensorFlow" class="headerlink" title="当使用完 TensorFlow"></a>当使用完 TensorFlow</h1><p>(tensorflow)$ deactivate  # 停用 virtualenv</p>
-<p>$  # 你的命令提示符会恢复原样<br>基于 Anaconda 的安装<br>Anaconda 是一个集成许多第三方科学计算库的 Python 科学计算环境,Anaconda 使用 conda 作为自己的包管理工具,同时具有自己的计算环境,类似 Virtualenv.<br>和 Virtualenv 一样,不同 Python 工程需要的依赖包,conda 将他们存储在不同的地方。 TensorFlow 上安装的 Anaconda 不会对之前安装的 Python 包进行覆盖.<br>安装 Anaconda<br>建立一个 conda 计算环境<br>激活环境,使用 conda 安装 TensorFlow<br>安装成功后,每次使用 TensorFlow 的时候需要激活 conda 环境<br>安装 Anaconda :<br>参考 Anaconda 的下载页面的指导<br>建立一个 conda 计算环境名字叫tensorflow:</p>
-<h1 id="Python-2-7"><a href="#Python-2-7" class="headerlink" title="Python 2.7"></a>Python 2.7</h1><p>$ conda create -n tensorflow python&#x3D;2.7</p>
-<h1 id="Python-3-4"><a href="#Python-3-4" class="headerlink" title="Python 3.4"></a>Python 3.4</h1><p>$ conda create -n tensorflow python&#x3D;3.4<br>激活tensorflow环境,然后使用其中的 pip 安装 TensorFlow. 当使用easy_install使用–ignore-installed标记防止错误的产生。<br>$ source activate tensorflow<br>(tensorflow)$  # Your prompt should change</p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-CPU-only-Python-2-7-1"><a href="#Ubuntu-x2F-Linux-64-bit-CPU-only-Python-2-7-1" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, CPU only, Python 2.7:"></a>Ubuntu&#x2F;Linux 64-bit, CPU only, Python 2.7:</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0rc0-cp27-none-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0rc0-cp27-none-linux_x86_64.whl</a></p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-2-7-Requires-CUDA-toolkit-7-5-and-CuDNN-v4-1"><a href="#Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-2-7-Requires-CUDA-toolkit-7-5-and-CuDNN-v4-1" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 2.7. Requires CUDA toolkit 7.5 and CuDNN v4."></a>Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 2.7. Requires CUDA toolkit 7.5 and CuDNN v4.</h1><h1 id="For-other-versions-see-“Install-from-sources”-below-2"><a href="#For-other-versions-see-“Install-from-sources”-below-2" class="headerlink" title="For other versions, see “Install from sources” below."></a>For other versions, see “Install from sources” below.</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0rc0-cp27-none-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0rc0-cp27-none-linux_x86_64.whl</a></p>
-<h1 id="Mac-OS-X-CPU-only-2"><a href="#Mac-OS-X-CPU-only-2" class="headerlink" title="Mac OS X, CPU only:"></a>Mac OS X, CPU only:</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0rc0-py2-none-any.whl">https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0rc0-py2-none-any.whl</a><br>对于 Python 3.x :<br>$ source activate tensorflow<br>(tensorflow)$  # Your prompt should change</p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-CPU-only-Python-3-4-1"><a href="#Ubuntu-x2F-Linux-64-bit-CPU-only-Python-3-4-1" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, CPU only, Python 3.4:"></a>Ubuntu&#x2F;Linux 64-bit, CPU only, Python 3.4:</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0rc0-cp34-cp34m-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0rc0-cp34-cp34m-linux_x86_64.whl</a></p>
-<h1 id="Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-3-4-Requires-CUDA-toolkit-7-5-and-CuDNN-v4-1"><a href="#Ubuntu-x2F-Linux-64-bit-GPU-enabled-Python-3-4-Requires-CUDA-toolkit-7-5-and-CuDNN-v4-1" class="headerlink" title="Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 3.4. Requires CUDA toolkit 7.5 and CuDNN v4."></a>Ubuntu&#x2F;Linux 64-bit, GPU enabled, Python 3.4. Requires CUDA toolkit 7.5 and CuDNN v4.</h1><h1 id="For-other-versions-see-“Install-from-sources”-below-3"><a href="#For-other-versions-see-“Install-from-sources”-below-3" class="headerlink" title="For other versions, see “Install from sources” below."></a>For other versions, see “Install from sources” below.</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0rc0-cp34-cp34m-linux_x86_64.whl">https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0rc0-cp34-cp34m-linux_x86_64.whl</a></p>
-<h1 id="Mac-OS-X-CPU-only-3"><a href="#Mac-OS-X-CPU-only-3" class="headerlink" title="Mac OS X, CPU only:"></a>Mac OS X, CPU only:</h1><p>(tensorflow)$ pip install –ignore-installed –upgrade <a target="_blank" rel="noopener" href="https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0rc0-py3-none-any.whl">https://storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0rc0-py3-none-any.whl</a><br>conda 环境激活后,你可以测试<br>当你不用 TensorFlow 的时候,关闭环境:<br>(tensorflow)$ source deactivate</p>
-<p>$  # Your prompt should change back<br>再次使用的时候再激活 :-)<br>$ source activate tensorflow<br>(tensorflow)$  # Your prompt should change.</p>
-<h1 id="Run-Python-programs-that-use-TensorFlow"><a href="#Run-Python-programs-that-use-TensorFlow" class="headerlink" title="Run Python programs that use TensorFlow."></a>Run Python programs that use TensorFlow.</h1><p>…</p>
-<h1 id="When-you-are-done-using-TensorFlow-deactivate-the-environment"><a href="#When-you-are-done-using-TensorFlow-deactivate-the-environment" class="headerlink" title="When you are done using TensorFlow, deactivate the environment."></a>When you are done using TensorFlow, deactivate the environment.</h1><p>(tensorflow)$ source deactivate</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28981.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/28981.html" class="post-title-link" itemprop="url">量化交易</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/quant/" itemprop="url" rel="index"><span itemprop="name">quant</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>813</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>投资决策模型化，基于历史数据验证，交易自动执行</p>
-<p>股市波动，长期、短期、相对</p>
-<h2 id="投资指标"><a href="#投资指标" class="headerlink" title="投资指标"></a>投资指标</h2><h3 id="风险收益率"><a href="#风险收益率" class="headerlink" title="风险收益率"></a>风险收益率</h3><p>夏普率&#x3D;（收益-无风险利率）&#x2F;波动率</p>
-<h3 id="胜率赔率"><a href="#胜率赔率" class="headerlink" title="胜率赔率"></a>胜率赔率</h3><p>胜率是指出手赚钱次数与总出手次数之比</p>
-<p>赔率是指平均每次出手赚到的钱除以平均每次出手赔的钱，也叫做盈亏比</p>
-<h2 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h2><h3 id="阿尔法策略"><a href="#阿尔法策略" class="headerlink" title="阿尔法策略"></a>阿尔法策略</h3><p>优点：不管指数是涨还是下跌，都能赚钱的一种方法，具体的操作思路是找出市场里最优秀的品种，做多这些品种，然后做空相应多的指数，这样就锁定了最优秀的品种带来的收益，而把指数带来的波动进行了平抑。<br>缺点：回撤和收益都比较小的交易策略</p>
-<h3 id="程序化CTA"><a href="#程序化CTA" class="headerlink" title="程序化CTA"></a>程序化CTA</h3><p>优点：适合大众使用的程序化交易方法，是指将交易策略的思想设计成完整的逻辑运行体系，然后用合适的计算机语言编写成程序，有计算机进行自动交易。程序化交易的优点是，将交易模式系统化，制度化，排除人性的心理障碍，确保交易策略的执行行。挣的是趋势的钱，挣的是纪律的钱，但因为趋势不常有，所以这是一种低胜率，高赔率的方法。</p>
-<p>入场条件、出场条件，品种选择、时机选择，资金管理</p>
-<h3 id="统计套利"><a href="#统计套利" class="headerlink" title="统计套利"></a>统计套利</h3><p>通过计算某些关联品种之间出现了价差的扩大，那就可以在品种之间进行配对交易，从而进行套利</p>
-<h3 id="低风险套利"><a href="#低风险套利" class="headerlink" title="低风险套利"></a>低风险套利</h3><p>ETF套利也是一种低风险套利，比如某个ETF指数基金现在的价格是2.1，而如果我们用一揽子股票来组成这个ETF指数基金，价格是2块，那么我们就可以在市场上卖出基金，买入股票，来得到这0.1的差价。这些套利比较容易执行，收入也很可观，而且风险很小。</p>
-<h3 id="高频交易"><a href="#高频交易" class="headerlink" title="高频交易"></a>高频交易</h3><p>利用计算机处理市场微观结构层面的不均衡性，往往交易次数多，持仓时间短，可能会送大量交易指令，又快速撤单，再反向做交易获得收益，每笔交易平均利润小但稳定。</p>
-<p>优点是总收益率极高，当日平仓降低隔夜风险，隔夜资金利息收入降低资金成本，绩效评估周期短。</p>
-<h3 id="算法交易"><a href="#算法交易" class="headerlink" title="算法交易"></a>算法交易</h3><p>降低冲击成本的一种被动的程序化交易，通过科学的成本估算模型和交易实施算法，将一个大额的交易拆分成系列小额交易 在合理的时间点分别执行，以此来尽量减少 对市场价格造成的冲击，降低交易成本，而且还能帮助机构投资者快速增加交易量。适合的对象包括大小非减持者，大宗交易接盘出货，“大宗交易-融券卖出”套利者，Alpha套利者，套期保值者，日以上级别程序化交易者等。</p>
-<p>参考：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/2c470ef5d083">https://www.jianshu.com/p/2c470ef5d083</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7457.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/7457.html" class="post-title-link" itemprop="url">设计模式-策略模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pattern/" itemprop="url" rel="index"><span itemprop="name">pattern</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>181</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>开发过程中，需要根据不同场景选择不同算法和策略。</p>
-<p>将需要经常改变的部分抽象提取为接口，通过引用该接口，就可以调用该接口实现类的行为，即具体策略。实现了策略具体实现和调用者的隔离。</p>
-<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
-<li>可以动态改变对象行为</li>
-</ol>
-<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
-<li>使用哪种策略需要调用者自己决定</li>
-<li>产生很多策略类</li>
-</ol>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><pre><code>public interface IStrategy &#123;
-    public void doSomething();
-&#125;
-
-public class Strategy1 implements IStrategy &#123;
-    @Override
-    public void doSomething() &#123;
-
-    &#125;
-&#125;
-
-public class Strategy2 implements IStrategy &#123;
-    @Override
-    public void doSomething() &#123;
-
-    &#125;
-&#125;
-
-public class Context implements IStrategy &#123;
-
-    private IStrategy strategy;
-
-    public Context(IStrategy strategy)&#123;
-        this.strategy = strategy;
-    &#125;
-
-    @Override
-    public void doSomething() &#123;
-        strategy.doSomething();
-    &#125;
-&#125;
-
-public static void main(String[] args) &#123;
-    IStrategy strategy = new Strategy1();
-    Context context = new Context(strategy);
-    context.doSomething();
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/40592.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/40592.html" class="post-title-link" itemprop="url">设计模式-模板方法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pattern/" itemprop="url" rel="index"><span itemprop="name">pattern</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>142</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>流程相同，执行过程中有差别</p>
-<p>可用于定义算法骨架，将一些实现放到子类中实现，达到不用改变算法结构，重新实现算法的目的</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package template;
-
-public abstract class Model &#123;
-    /**
-     * 类似的行为、逻辑
-     */
-    protected abstract void start();
-
-    protected abstract void stop();
-
-    /**
-     * 固定的流程  模板化
-     */
-    final public void excet()&#123;
-        this.start();
-        this.stop();
-    &#125;
-&#125;
-
-package template;
-
-public class Ocar extends Model &#123;
-    @Override
-    protected void start() &#123;
-
-    &#125;
-
-    @Override
-    protected void stop() &#123;
-
-    &#125;
-&#125;
-
-package template;
-
-public class Wcar extends Model &#123;
-    @Override
-    protected void start() &#123;
-
-    &#125;
-
-    @Override
-    protected void stop() &#123;
-
-    &#125;
-&#125;
-
-package template;
-
-public class Client &#123;
-    public static void main(String[] args) &#123;
-        Model wcar=new Wcar();
-        wcar.excet();
-
-        Model ocar=new Ocar();
-        ocar.excet();
-    &#125;
-
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/36157.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/36157.html" class="post-title-link" itemprop="url">设计模式-委派模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pattern/" itemprop="url" rel="index"><span itemprop="name">pattern</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>155</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>代理模式+策略模式，典型 Spring 中的 DispatcherServlet</p>
-<p>用户将任务全权委派给代理负责，代理负责根据策略任务调度具体的执行单元</p>
-<h2 id="执行单元"><a href="#执行单元" class="headerlink" title="执行单元"></a>执行单元</h2><pre><code>/**
- * 执行单元实现的接口
- */
-public interface ITarget &#123;
-
-    void doSomething(String command);
-
-&#125;
-
-/**
- * 执行单元A
- */
-public class TargetA implements ITarget &#123;
-    @Override
-    public void doSomething(String command) &#123;
-
-    &#125;
-&#125;
-
-/**
- * 执行单元B
- */
-public class TargetB implements ITarget &#123;
-    @Override
-    public void doSomething(String command) &#123;
-        
-    &#125;
-&#125;
-</code></pre>
-<h2 id="执行单元调度者"><a href="#执行单元调度者" class="headerlink" title="执行单元调度者"></a>执行单元调度者</h2><pre><code>public class Manager &#123;
-    private Map&lt;String ,ITarget&gt; targets = new HashMap&lt;String ,ITarget&gt;();
-
-    public Manager()&#123;
-        targets.put(&quot;commandA&quot;,new TargetA());
-        targets.put(&quot;commandB&quot;,new TargetB());
-    &#125;
-
-    public void dispatch(String command)&#123;
-        targets.get(command).doSomething(command);
-    &#125;
-&#125;
-</code></pre>
-<h2 id="使用者"><a href="#使用者" class="headerlink" title="使用者"></a>使用者</h2><pre><code>public class Boss &#123;
-    
-    public static void main(String[] args) &#123;
-        Manager manager = new Manager();
-        manager.dispatch(&quot;Command1&quot;);
-    &#125;
-
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/41018.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/41018.html" class="post-title-link" itemprop="url">设计模式-原型模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pattern/" itemprop="url" rel="index"><span itemprop="name">pattern</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>209</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>使用原型对象的方法创建对象的实列，创建的实例equals原型</p>
-<p>final 类型修饰的成员变量不能进行深度拷贝</p>
-<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><ul>
-<li>类初始化需要消化非常多的资源，这个资源包括数据、硬件资源等</li>
-<li>构造对象需要非常繁琐的数据准备或访问权限，则可以使用原型模式</li>
-<li>工厂模式中使用</li>
-<li>共有信息很多</li>
-</ul>
-<h2 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h2><p>对象内引用原先原型的对象</p>
-<h2 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h2><p>对象内引用也拷贝一份</p>
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>package prototype;
-
-//Cloneable 标记对象可拷贝
-public class PersonClone implements Cloneable &#123;
-
-    @Override //Override Object方法
-    public PersonClone clone()&#123;
-        try &#123;
-            //clone 不会调用构造方法
-            return (PersonClone)super.clone();
-        &#125; catch (CloneNotSupportedException e) &#123;
-            e.printStackTrace();
-        &#125;
-        return null;
-    &#125;
-&#125;
-
-
-package prototype;
-
-public class MainClass &#123;
-    public static void main(String[] args) &#123;
-        PersonClone personClone = new PersonClone();
-        PersonClone clone = personClone.clone();
-        System.out.println(personClone.hashCode());
-        System.out.println(clone.hashCode());
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/19482.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/19482.html" class="post-title-link" itemprop="url">设计模式-单例模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-27 17:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T17:31:27+08:00">2022-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pattern/" itemprop="url" rel="index"><span itemprop="name">pattern</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>110</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="线程安全问题"><a href="#线程安全问题" class="headerlink" title="线程安全问题"></a>线程安全问题</h2><p>volatile：保证多线程下的可见性</p>
-<blockquote>
-<p>读volatile：每当子线程读取volatile变量时，都会从主线程重新拷贝一份<br>写volatile: 每当子线程修改volatile变量时，都会在修改后同步到主线程去</p>
-</blockquote>
-<p>synchronized：对象锁、类锁、方法锁（其它篇有介绍）</p>
-<pre><code>public class Singleton &#123;
-
-    private static volatile Singleton instance;
-
-    private Singleton()&#123;
-    &#125;
-
-    public static Singleton getInstance()&#123;
-        if(instance == null)&#123;
-            synchronized(Singleton.class)&#123;
-                if(instance == null)&#123;
-                    instance = new Singleton();
-                &#125;
-            &#125;
-        &#125;
-        return instance;
-    &#125;
-&#125;
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1397,7 +1157,7 @@ public class MainClass &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">350</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1446,12 +1206,12 @@ public class MainClass &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">320k</span>
+    <span title="站点总字数">324k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">19:23</span>
+    <span title="站点阅读时长">19:37</span>
 </div>
 
 <!--
