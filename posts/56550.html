@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="recording">
+  <meta name="description" content="RMQ（Range Minimum Query）算法用于解决在一个数组中查询指定范围内最小元素的问题。以下是一种常见的RMQ算法实现，使用稀疏表（Sparse Table）的方法来解决RMQ问题的Java代码示例： 123456789101112131415161718192021222324252627282930313233343536public class RMQAlgorithm &amp;#1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RMQ算法">
 <meta property="og:url" content="https://www.fastolf.com/posts/56550.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="recording">
+<meta property="og:description" content="RMQ（Range Minimum Query）算法用于解决在一个数组中查询指定范围内最小元素的问题。以下是一种常见的RMQ算法实现，使用稀疏表（Sparse Table）的方法来解决RMQ问题的Java代码示例： 123456789101112131415161718192021222324252627282930313233343536public class RMQAlgorithm &amp;#1">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-12-27T09:31:27.420Z">
-<meta property="article:modified_time" content="2022-12-28T06:40:43.811Z">
+<meta property="article:modified_time" content="2023-08-09T15:57:32.328Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech;Data;Vision">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-09 23:57:32" itemprop="dateModified" datetime="2023-08-09T23:57:32+08:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,7 +249,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>350</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -267,7 +267,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>RMQ（Range Minimum Query）算法用于解决在一个数组中查询指定范围内最小元素的问题。以下是一种常见的RMQ算法实现，使用稀疏表（Sparse Table）的方法来解决RMQ问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RMQAlgorithm</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) &#123;</span><br><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryRMQ</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] arr = &#123;<span class="number">2</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">3</span>&#125;;</span><br><span class="line">        buildSparseTable(arr);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">4</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryRMQ(left, right);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum element in range [&quot;</span> + left + <span class="string">&quot;, &quot;</span> + right + <span class="string">&quot;]: &quot;</span> + minInRange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询最小元素。<code>queryRMQ</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
+<p>请注意，稀疏表只适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。在实际应用中，如果需要频繁修改数组，可以考虑其他数据结构如线段树。</p>
+
     </div>
 
     
@@ -367,7 +372,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -409,12 +414,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">302k</span>
+    <span title="站点总字数">312k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">18:19</span>
+    <span title="站点阅读时长">18:55</span>
 </div>
 
 <!--

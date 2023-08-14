@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:07:39" itemprop="dateModified" datetime="2023-08-10T00:07:39+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,13 +240,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>579</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -258,7 +258,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>线性动态规划（Linear Dynamic Programming）在许多问题中都有广泛的应用，其中一个典型的问题是最长递增子序列（Longest Increasing Subsequence，简称 LIS）问题。LIS 问题的目标是找到一个给定序列中的最长递增子序列的长度，其中递增子序列指的是序列中的元素按照顺序递增排列。</p>
+<p>以下是最长递增子序列问题的一般步骤：</p>
+<ol>
+<li><p><strong>定义状态</strong>：通常使用一个数组 <code>dp</code>，其中 <code>dp[i]</code> 表示以第 <code>i</code> 个元素为结尾的最长递增子序列的长度。</p>
+</li>
+<li><p><strong>状态转移方程</strong>：对于第 <code>i</code> 个元素，我们需要找到前面所有比它小的元素中，以它们为结尾的最长递增子序列的最大长度。状态转移方程可以表示为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i] = max(dp[j] + 1), 其中 0 &lt;= j &lt; i 且 nums[j] &lt; nums[i]</span><br></pre></td></tr></table></figure>
+
+<p>这意味着我们在计算 <code>dp[i]</code> 时，会考虑前面所有满足条件的 <code>dp[j]</code> 的最大值加 1。</p>
+</li>
+<li><p><strong>边界条件</strong>：初始时，每个元素自成一个长度为 1 的递增子序列，所以 <code>dp[i] = 1</code>。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，逐步计算出大规模问题的最优解。</p>
+</li>
+</ol>
+<p>下面是一个最长递增子序列问题的 Java 代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestIncreasingSubsequence</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        Arrays.fill(dp, <span class="number">1</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nums[j] &lt; nums[i]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i], dp[j] + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> len : dp) &#123;</span><br><span class="line">            maxLength = Math.max(maxLength, len);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> maxLength;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">LongestIncreasingSubsequence</span> <span class="variable">lis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LongestIncreasingSubsequence</span>();</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">10</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">101</span>, <span class="number">18</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> lis.lengthOfLIS(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of longest increasing subsequence: &quot;</span> + maxLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用动态规划解决了最长递增子序列问题。通过遍历每个元素，根据状态转移方程计算以当前元素为结尾的最长递增子序列长度。最终，我们在 <code>dp</code> 数组中找到最大的长度，即为最长递增子序列的长度。</p>
+<p>请注意，LIS 问题的动态规划解法可能因为问题的具体要求而有所变化，但通常都涵盖了上述的状态定义、状态转移方程和边界条件。</p>
+
       
     </div>
 
@@ -308,7 +328,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:07:02" itemprop="dateModified" datetime="2023-08-10T00:07:02+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -325,13 +345,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>642</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -343,7 +363,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>石子合并问题是一个经典的动态规划问题，其目标是找到一种合并方式，使得合并石子的总代价最小。在这个问题中，一开始有一排石子，每个石子有一个权值，合并两个相邻的石子可以获得它们的权值之和作为代价。问题的关键在于如何安排合并的顺序，以获得最小的总代价。</p>
+<p>下面是石子合并问题的一般步骤：</p>
+<ol>
+<li><p><strong>定义状态</strong>：通常使用一个二维数组 <code>dp[i][j]</code> 表示合并第 <code>i</code> 到第 <code>j</code> 个石子所需的最小代价。</p>
+</li>
+<li><p><strong>状态转移方程</strong>：假设要合并第 <code>i</code> 到第 <code>j</code> 个石子，可以将它们分为两部分：第 <code>i</code> 到 <code>k</code> 个石子和第 <code>k+1</code> 到 <code>j</code> 个石子，其中 <code>i &lt;= k &lt; j</code>。那么合并的代价就是将这两部分合并的代价加上这两部分的权值之和。状态转移方程可以表示为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i][j] = min(dp[i][k] + dp[k+1][j] + sum[i][j]), 其中 i &lt;= k &lt; j</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>sum[i][j]</code> 表示第 <code>i</code> 到第 <code>j</code> 个石子的权值之和。</p>
+</li>
+<li><p><strong>边界条件</strong>：当 <code>i == j</code> 时，只有一个石子，无需合并，所以 <code>dp[i][i] = 0</code>。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，逐步计算出大规模问题的最优解。</p>
+</li>
+</ol>
+<p>下面是一个简单的石子合并问题的 Java 代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StoneMergeProblem</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">mergeStones</span><span class="params">(<span class="type">int</span>[] stones)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> stones.length;</span><br><span class="line">        <span class="type">int</span>[] prefixSum = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            prefixSum[i] = prefixSum[i - <span class="number">1</span>] + stones[i - <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">2</span>; len &lt;= n; len++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt;= n - len; i++) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + len - <span class="number">1</span>;</span><br><span class="line">                dp[i][j] = Integer.MAX_VALUE;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> i; k &lt; j; k++) &#123;</span><br><span class="line">                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k + <span class="number">1</span>][j] + prefixSum[j + <span class="number">1</span>] - prefixSum[i]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[<span class="number">0</span>][n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">StoneMergeProblem</span> <span class="variable">problem</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StoneMergeProblem</span>();</span><br><span class="line">        <span class="type">int</span>[] stones = &#123;<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">minCost</span> <span class="operator">=</span> problem.mergeStones(stones);</span><br><span class="line">        System.out.println(<span class="string">&quot;Minimum cost to merge stones: &quot;</span> + minCost);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用了动态规划来解决石子合并问题。首先计算了石子的前缀和，然后使用二维数组 <code>dp</code> 来存储合并石子的最小代价。根据状态转移方程，我们通过计算不同的区间长度和区间起始位置，逐步填充 <code>dp</code> 数组，最终得到合并所有石子的最小代价。</p>
+<p>需要注意的是，石子合并问题的动态规划解法通常要结合问题的具体要求来确定状态转移方程，边界条件等。</p>
+
       
     </div>
 
@@ -393,7 +433,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:06:08" itemprop="dateModified" datetime="2023-08-10T00:06:08+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -410,13 +450,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>866</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -428,7 +468,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>环形动态规划（Circular Dynamic Programming）是一种动态规划的应用，适用于解决环形问题，即问题中的元素或状态在某种意义上是循环的，首尾相连的。这类问题在动态规划中需要考虑元素之间的相互关系，以及环形带来的特殊情况。</p>
+<p>一般来说，环形动态规划的核心思想是将环形问题转化为线性问题，然后通过适当的状态转移方程和边界条件来求解。以下是环形动态规划的一般步骤：</p>
+<ol>
+<li><p><strong>问题转化</strong>：将环形问题转化为线性问题。可以通过复制一份原始数据，将环形结构“展开”成线性结构，从而将问题转化为已知的线性动态规划问题。</p>
+</li>
+<li><p><strong>定义状态</strong>：定义动态规划的状态，通常与问题的特性相关。对于环形问题，需要考虑首尾相连的情况，可能需要多设置一个状态来表示“首尾相连”的状态。</p>
+</li>
+<li><p><strong>确定状态转移方程</strong>：根据问题的性质，确定状态之间的转移关系。考虑环形结构，需要确保转移关系在环形首尾相连的情况下也能正确地进行。</p>
+</li>
+<li><p><strong>确定边界条件</strong>：环形问题的边界条件可能相对复杂，需要确保首尾相连的元素能够正确处理。这些边界条件可能需要在状态转移方程中单独处理。</p>
+</li>
+<li><p><strong>计算顺序</strong>：通常从小规模问题开始，按照线性结构的顺序逐步计算状态，直到计算出整个环形结构的状态。</p>
+</li>
+</ol>
+<p>下面以一个具体问题为例，来说明环形动态规划的应用。假设有一个环形数组，每个元素代表一个房屋，每个房屋中有一定数量的金钱。由于房屋是环形排列的，意味着第一个和最后一个房屋也相邻。要求在不偷相邻房屋的情况下，计算可以偷到的最大金钱数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CircularDPExample</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">rob</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Calculate the maximum amount that can be robbed if starting from the first house.</span></span><br><span class="line">        <span class="type">int</span>[] dp1 = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        dp1[<span class="number">0</span>] = nums[<span class="number">0</span>];</span><br><span class="line">        dp1[<span class="number">1</span>] = Math.max(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            dp1[i] = Math.max(dp1[i - <span class="number">1</span>], dp1[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Calculate the maximum amount that can be robbed if starting from the second house.</span></span><br><span class="line">        <span class="type">int</span>[] dp2 = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        dp2[<span class="number">1</span>] = nums[<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp2[i] = Math.max(dp2[i - <span class="number">1</span>], dp2[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// The maximum amount that can be robbed will be the maximum of the two scenarios.</span></span><br><span class="line">        <span class="keyword">return</span> Math.max(dp1[n - <span class="number">2</span>], dp2[n - <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">CircularDPExample</span> <span class="variable">example</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CircularDPExample</span>();</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">2</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">3</span>, <span class="number">1</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxAmount</span> <span class="operator">=</span> example.rob(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum amount that can be robbed: &quot;</span> + maxAmount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们通过定义两个状态数组 <code>dp1</code> 和 <code>dp2</code>，分别表示从第一个房屋和第二个房屋开始偷窃时的最大金额。通过动态规划的思想，我们逐步计算出每个状态的最大金额，最终得到在不偷相邻房屋的情况下可以偷到的最大金钱数。</p>
+<p>请注意，以上仅是环形动态规划的一个简单例子。实际应用中，问题可能会更加复杂，需要根据问题的具体情况来定义状态、状态转移方程和边界条件。</p>
+
       
     </div>
 
@@ -478,7 +537,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:04:52" itemprop="dateModified" datetime="2023-08-10T00:04:52+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -495,7 +554,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>351</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -513,7 +572,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>状压动态规划（Bitmask Dynamic Programming，状压DP）是一种优化技巧，通常用于解决组合优化问题，特别是集合的子集问题。以下是一个使用状压DP解决集合的最短路径问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BitmaskDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">shortestPath</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span>[][] dist)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">totalStates</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; n;  <span class="comment">// Total possible subsets</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][totalStates];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span>[] row : dp) &#123;</span><br><span class="line">            Arrays.fill(row, Integer.MAX_VALUE);</span><br><span class="line">        &#125;</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">0</span>;  <span class="comment">// Starting state: only the first city visited</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">mask</span> <span class="operator">=</span> <span class="number">1</span>; mask &lt; totalStates; mask++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">0</span>; u &lt; n; u++) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((mask &amp; (<span class="number">1</span> &lt;&lt; u)) != <span class="number">0</span>) &#123;  <span class="comment">// Check if u is in the current subset</span></span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">v</span> <span class="operator">=</span> <span class="number">0</span>; v &lt; n; v++) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (v != u &amp;&amp; (mask &amp; (<span class="number">1</span> &lt;&lt; v)) != <span class="number">0</span>) &#123;  <span class="comment">// Check if v is in the current subset and not equal to u</span></span><br><span class="line">                            dp[u][mask] = Math.min(dp[u][mask], dp[v][mask ^ (<span class="number">1</span> &lt;&lt; u)] + dist[v][u]);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">minPath</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">1</span>; u &lt; n; u++) &#123;</span><br><span class="line">            minPath = Math.min(minPath, dp[u][totalStates - <span class="number">1</span>] + dist[u][<span class="number">0</span>]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> minPath;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">4</span>;  <span class="comment">// Number of cities</span></span><br><span class="line">        <span class="type">int</span>[][] dist = &#123;</span><br><span class="line">            &#123;<span class="number">0</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>&#125;,</span><br><span class="line">            &#123;<span class="number">10</span>, <span class="number">0</span>, <span class="number">35</span>, <span class="number">25</span>&#125;,</span><br><span class="line">            &#123;<span class="number">15</span>, <span class="number">35</span>, <span class="number">0</span>, <span class="number">30</span>&#125;,</span><br><span class="line">            &#123;<span class="number">20</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">0</span>&#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">shortest</span> <span class="operator">=</span> shortestPath(n, dist);</span><br><span class="line">        System.out.println(<span class="string">&quot;Shortest Path: &quot;</span> + shortest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>shortestPath</code> 方法使用状压DP解决了集合的最短路径问题。算法通过构建一个二维数组 <code>dp</code> 来保存状态转移，从而计算最短路径。</p>
+<p>请注意，状压DP通常用于解决集合的子集问题，例如在TSP（Traveling Salesman Problem）中寻找最短路径。实际应用中，可能需要根据问题的需求进行适当的修改。</p>
+
       
     </div>
 
@@ -740,7 +804,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:04:22" itemprop="dateModified" datetime="2023-08-10T00:04:22+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -757,7 +821,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>381</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -775,7 +839,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>下面是分别解决最长上升子序列、最大连续子序列和和最长公共子串问题的Java代码示例：</p>
+<h3 id="最长上升子序列（Longest-Increasing-Subsequence）："><a href="#最长上升子序列（Longest-Increasing-Subsequence）：" class="headerlink" title="最长上升子序列（Longest Increasing Subsequence）："></a>最长上升子序列（Longest Increasing Subsequence）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestIncreasingSubsequence</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLen</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp[i] = <span class="number">1</span>;  <span class="comment">// Minimum length is 1 (the element itself)</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nums[i] &gt; nums[j]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i], dp[j] + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            maxLen = Math.max(maxLen, dp[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxLen;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;<span class="number">10</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">101</span>, <span class="number">18</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">lisLength</span> <span class="operator">=</span> lengthOfLIS(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of Longest Increasing Subsequence: &quot;</span> + lisLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最大连续子序列和（Maximum-Subarray-Sum）："><a href="#最大连续子序列和（Maximum-Subarray-Sum）：" class="headerlink" title="最大连续子序列和（Maximum Subarray Sum）："></a>最大连续子序列和（Maximum Subarray Sum）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaximumSubarraySum</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">maxSubArraySum</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxSum</span> <span class="operator">=</span> nums[<span class="number">0</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">currentSum</span> <span class="operator">=</span> nums[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            currentSum = Math.max(nums[i], currentSum + nums[i]);</span><br><span class="line">            maxSum = Math.max(maxSum, currentSum);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxSum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] nums = &#123;-<span class="number">2</span>, <span class="number">1</span>, -<span class="number">3</span>, <span class="number">4</span>, -<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, -<span class="number">5</span>, <span class="number">4</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxSum</span> <span class="operator">=</span> maxSubArraySum(nums);</span><br><span class="line">        System.out.println(<span class="string">&quot;Maximum Subarray Sum: &quot;</span> + maxSum);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最长公共子串（Longest-Common-Substring）："><a href="#最长公共子串（Longest-Common-Substring）：" class="headerlink" title="最长公共子串（Longest Common Substring）："></a>最长公共子串（Longest Common Substring）：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LongestCommonSubstring</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">longestCommonSubstring</span><span class="params">(String s1, String s2)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s1.length();</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> s2.length();</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m + <span class="number">1</span>][n + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">maxLength</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= m; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt;= n; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (s1.charAt(i - <span class="number">1</span>) == s2.charAt(j - <span class="number">1</span>)) &#123;</span><br><span class="line">                    dp[i][j] = dp[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</span><br><span class="line">                    maxLength = Math.max(maxLength, dp[i][j]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> maxLength;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="string">&quot;ABABC&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span> <span class="string">&quot;BABCBA&quot;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">commonSubstringLength</span> <span class="operator">=</span> longestCommonSubstring(s1, s2);</span><br><span class="line">        System.out.println(<span class="string">&quot;Length of Longest Common Substring: &quot;</span> + commonSubstringLength);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些示例分别展示了如何解决最长上升子序列、最大连续子序列和和最长公共子串问题。实际应用中，根据问题的需求可能需要进行适当的修改。</p>
+
       
     </div>
 
@@ -825,7 +897,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:04:13" itemprop="dateModified" datetime="2023-08-10T00:04:13+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -842,7 +914,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>306</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -860,7 +932,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>数位动态规划（Digit Dynamic Programming，数位DP）是一种动态规划算法，用于解决涉及数字各位数的组合问题。以下是一个数位DP的Java代码示例，用于计算在区间 [1, N] 内，所有数字的各位之和等于给定值 K 的个数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DigitDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">countNumbersWithDigitSum</span><span class="params">(<span class="type">int</span> N, <span class="type">int</span> K)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[N + <span class="number">1</span>][K + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">MOD</span> <span class="operator">=</span> (<span class="type">int</span>) <span class="number">1e9</span> + <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt;= K; j++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">d</span> <span class="operator">=</span> <span class="number">0</span>; d &lt;= <span class="number">9</span>; d++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (j &gt;= d) &#123;</span><br><span class="line">                        dp[i][j] = (dp[i][j] + dp[i - <span class="number">1</span>][j - d]) % MOD;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">d</span> <span class="operator">=</span> <span class="number">1</span>; d &lt;= <span class="number">9</span>; d++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (K &gt;= d) &#123;</span><br><span class="line">                result = (result + dp[N][K - d]) % MOD;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">N</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">K</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> countNumbersWithDigitSum(N, K);</span><br><span class="line">        System.out.println(<span class="string">&quot;Count of numbers with digit sum &quot;</span> + K + <span class="string">&quot; in range [1, &quot;</span> + N + <span class="string">&quot;]: &quot;</span> + count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>countNumbersWithDigitSum</code> 方法使用数位DP解决了计算各个数字各位数之和等于给定值 K 的数字个数问题。算法通过构建一个二维数组 <code>dp</code> 来保存状态转移，从而计算符合条件的数字个数。</p>
+<p>这个示例是一个数位DP的实现，实际应用中可能需要根据不同的问题进行适当的修改。</p>
+
       
     </div>
 
@@ -910,7 +987,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:03:25" itemprop="dateModified" datetime="2023-08-10T00:03:25+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -927,7 +1004,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>273</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -945,7 +1022,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>插头DP（Socket DP）是一种动态规划算法，通常用于解决一些组合优化问题，如硬币找零问题、背包问题等。以下是一个插头DP的Java代码示例，用于解决硬币找零问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SocketDP</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">coinChange</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[amount + <span class="number">1</span>];</span><br><span class="line">        Arrays.fill(dp, amount + <span class="number">1</span>);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> coin; i &lt;= amount; i++) &#123;</span><br><span class="line">                dp[i] = Math.min(dp[i], dp[i - coin] + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[amount] &gt; amount ? -<span class="number">1</span> : dp[amount];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] coins = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>&#125;;</span><br><span class="line">        <span class="type">int</span> <span class="variable">amount</span> <span class="operator">=</span> <span class="number">11</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">minCoins</span> <span class="operator">=</span> coinChange(coins, amount);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (minCoins == -<span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;It&#x27;s impossible to make the amount with the given coins.&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Minimum number of coins to make amount &quot;</span> + amount + <span class="string">&quot;: &quot;</span> + minCoins);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>coinChange</code> 方法使用插头DP解决了硬币找零问题。算法通过构建一个一维数组 <code>dp</code> 来保存每个金额所需的最小硬币数量。通过逐步填表，我们可以找到构成给定金额的最少硬币数量。</p>
+<p>这个示例是一个插头DP的实现，实际应用中可能需要根据不同的问题进行适当的修改。</p>
+
       
     </div>
 
@@ -995,7 +1077,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-28 14:40:43" itemprop="dateModified" datetime="2022-12-28T14:40:43+08:00">2022-12-28</time>
+                <time title="修改时间：2023-08-10 00:03:16" itemprop="dateModified" datetime="2023-08-10T00:03:16+08:00">2023-08-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1012,7 +1094,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>0</span>
+              <span>332</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1030,7 +1112,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>拉格朗日乘子法（Lagrange Multiplier Method）是一种优化算法，用于求解带有约束条件的优化问题。以下是一个使用拉格朗日乘子法求解约束最优化问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.*;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearConstraint;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.LinearObjectiveFunction;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.Relationship;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimpleBounds;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.linear.SimplexSolver;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.math3.optim.nonlinear.scalar.GoalType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LagrangeMultiplierMethod</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">// Objective function: f(x, y) = x + y</span></span><br><span class="line">        <span class="type">LinearObjectiveFunction</span> <span class="variable">objectiveFunction</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearObjectiveFunction</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">1</span>&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Constraints: 2x + y &gt;= 1, x + 2y &gt;= 1</span></span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">2</span>, <span class="number">1</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line">        <span class="type">LinearConstraint</span> <span class="variable">constraint2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinearConstraint</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>&#125;, Relationship.GEQ, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Bounds: x &gt;= 0, y &gt;= 0</span></span><br><span class="line">        <span class="type">SimpleBounds</span> <span class="variable">bounds</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleBounds</span>(<span class="keyword">new</span> <span class="title class_">double</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="title class_">double</span>[]&#123;Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY&#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Solve the problem</span></span><br><span class="line">        <span class="type">LinearOptimizer</span> <span class="variable">optimizer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimplexSolver</span>();</span><br><span class="line">        <span class="type">PointValuePair</span> <span class="variable">solution</span> <span class="operator">=</span> optimizer.optimize(<span class="keyword">new</span> <span class="title class_">MaxIter</span>(<span class="number">100</span>),</span><br><span class="line">                objectiveFunction,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">LinearConstraintSet</span>(constraint1, constraint2),</span><br><span class="line">                GoalType.MAXIMIZE,</span><br><span class="line">                bounds);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Display the solution</span></span><br><span class="line">        <span class="type">double</span>[] point = solution.getPoint();</span><br><span class="line">        <span class="type">double</span> <span class="variable">optimalValue</span> <span class="operator">=</span> solution.getValue();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal solution:&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;x = &quot;</span> + point[<span class="number">0</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;y = &quot;</span> + point[<span class="number">1</span>]);</span><br><span class="line">        System.out.println(<span class="string">&quot;Optimal value = &quot;</span> + optimalValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用了Apache Commons Math库来实现拉格朗日乘子法。我们定义了一个线性目标函数，一组线性约束条件和变量的边界范围，并通过线性规划求解器进行求解。这个示例求解了以下问题：</p>
+<p>最大化：f(x, y) &#x3D; x + y<br>约束条件：2x + y &gt;&#x3D; 1, x + 2y &gt;&#x3D; 1<br>变量范围：x &gt;&#x3D; 0, y &gt;&#x3D; 0</p>
+<p>请注意，实际应用中的问题可能更加复杂，代码也可能需要进行适当的调整。</p>
+
       
     </div>
 
@@ -1536,7 +1624,7 @@ class QueueNode &#123;
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1578,12 +1666,12 @@ class QueueNode &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">302k</span>
+    <span title="站点总字数">312k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">18:19</span>
+    <span title="站点阅读时长">18:55</span>
 </div>
 
 <!--
