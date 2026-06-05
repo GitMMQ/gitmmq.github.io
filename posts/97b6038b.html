@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.4.2">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,40 +14,33 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
-  </script>
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-  <meta name="description" content="问题解析幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。 今天，我们就从这个问题说起吧。 为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。 建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）： 这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。 上期我留给你的问题是，下面的语句序列，是怎么加锁的，加">
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="问题解析幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。 今天，我们就从这个问题说起吧。 为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。 建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）： 这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。 上期我留给你的问题是，下面的语句序列，是怎么加锁的，加">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql-幻读是什么幻读有什么问题">
 <meta property="og:url" content="https://www.fastolf.com/posts/97b6038b.html">
 <meta property="og:site_name" content="Qi">
 <meta property="og:description" content="问题解析幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。 今天，我们就从这个问题说起吧。 为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。 建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）： 这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。 上期我留给你的问题是，下面的语句序列，是怎么加锁的，加">
-<meta property="og:locale">
-<meta property="article:published_time" content="2019-11-24T22:13:13.000Z">
-<meta property="article:modified_time" content="2023-01-18T15:34:38.951Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-24T06:13:13.000Z">
+<meta property="article:modified_time" content="2023-01-17T23:34:38.951Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
 
+
 <link rel="canonical" href="https://www.fastolf.com/posts/97b6038b.html">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'zh-Hans'
-  };
-</script>
-<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>mysql-幻读是什么幻读有什么问题 | Qi</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/97b6038b.html","path":"posts/97b6038b.html","title":"mysql-幻读是什么幻读有什么问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>mysql-幻读是什么幻读有什么问题 | Qi</title>
   
 
 
@@ -54,57 +48,62 @@
 
 
 
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
   </div>
 
   <div class="site-meta">
 
     <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Qi</h1>
-      <span class="logo-line-after"><i></i></span>
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
   </div>
 
   <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
@@ -112,34 +111,8 @@
 
 
 
-
 <nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -151,112 +124,151 @@
 
   <div class="search-pop-overlay">
     <div class="popup search-popup">
-        <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result">
-  <div id="no-result">
-    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
-  </div>
-</div>
-
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
     </div>
   </div>
 
-</div>
-    </header>
+</header>
+        
+  
+  <aside class="sidebar">
 
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">365</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
   </div>
 
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
+        </div>
+      </div>
+    </div>
 
     
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/97b6038b.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="mysql-幻读是什么幻读有什么问题 | Qi">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           mysql-幻读是什么幻读有什么问题
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-25 06:13:13" itemprop="dateCreated datePublished" datetime="2019-11-25T06:13:13+08:00">2019-11-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-01-18 23:34:38" itemprop="dateModified" datetime="2023-01-18T23:34:38+08:00">2023-01-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
+      <time title="创建时间：2019-11-24 14:13:13" itemprop="dateCreated datePublished" datetime="2019-11-24T14:13:13+08:00">2019-11-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+        </span>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>18 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -264,31 +276,28 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="问题解析"><a href="#问题解析" class="headerlink" title="问题解析"></a>问题解析</h1><p>幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。</p>
+    <div class="post-body" itemprop="articleBody"><h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。</p>
 <p>今天，我们就从这个问题说起吧。</p>
 <p>为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。</p>
 <p>建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）：</p>
 <p>这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。</p>
-<p>上期我留给你的问题是，下面的语句序列，是怎么加锁的，加的锁又是什么时候释放的呢？CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY &#96;c  ̀(̀ c )̀) ENGINE&#x3D;InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);比较好理解的是，这个语句会命中d&#x3D;5的这一行，对应的主键id&#x3D;5，因此在select 语句执行完成后，id&#x3D;5这一行会加一个写锁，而且由于两阶段锁协议，这个写锁会在执行commit语句的时候释放。</p>
+<p>上期我留给你的问题是，下面的语句序列，是怎么加锁的，加的锁又是什么时候释放的呢？CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY `c  ̀(̀ c )̀) ENGINE=InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);比较好理解的是，这个语句会命中d=5的这一行，对应的主键id=5，因此在select 语句执行完成后，id=5这一行会加一个写锁，而且由于两阶段锁协议，这个写锁会在执行commit语句的时候释放。</p>
 <p>由于字段d上没有索引，因此这条查询语句会做全表扫描。</p>
 <p>那么，其他被扫描到的，但是不满足条件的5行记录上，会不会被加锁呢？我们知道，InnoDB的默认事务隔离级别是可重复读，所以本文接下来没有特殊说明的部分，都是设定在可重复读隔离级别下。</p>
-<p>幻读是什么？现在，我们就来分析一下，如果只在id&#x3D;5这一行加锁，而其他行的不加锁的话，会怎么样。</p>
+<p>幻读是什么？现在，我们就来分析一下，如果只在id=5这一行加锁，而其他行的不加锁的话，会怎么样。</p>
 <p>下面先来看一下这个场景（注意：这是我假设的一个场景）：</p>
-<p>图 1 假设只在id&#x3D;5这一行加行锁可以看到，session A里执行了三次查询，分别是Q1、Q2和Q3。</p>
-<p>它们的SQL语句相同，都是select * from t where d&#x3D;5 for update。</p>
-<p>这个语句的意思你应该很清楚了，查所有d&#x3D;5的行，而且使用的是当前读，并且加上写锁。</p>
+<p>图 1 假设只在id=5这一行加行锁可以看到，session A里执行了三次查询，分别是Q1、Q2和Q3。</p>
+<p>它们的SQL语句相同，都是select * from t where d=5 for update。</p>
+<p>这个语句的意思你应该很清楚了，查所有d=5的行，而且使用的是当前读，并且加上写锁。</p>
 <p>现在，我们来看一下这三条SQL语句，分别会返回什么结果。</p>
 <ol>
-<li>Q1只返回id&#x3D;5这一行；</li>
+<li>Q1只返回id=5这一行；</li>
 </ol>
-<p>begin;select * from t where d&#x3D;5 for update;commit;2. 在T2时刻，session B把id&#x3D;0这一行的d值改成了5，因此T3时刻Q2查出来的是id&#x3D;0和id&#x3D;5这两行；</p>
+<p>begin;select * from t where d=5 for update;commit;2. 在T2时刻，session B把id=0这一行的d值改成了5，因此T3时刻Q2查出来的是id=0和id=5这两行；</p>
 <ol start="3">
-<li>在T4时刻，session C又插入一行（1,1,5），因此T5时刻Q3查出来的是id&#x3D;0、id&#x3D;1和id&#x3D;5的这三行。</li>
+<li>在T4时刻，session C又插入一行（1,1,5），因此T5时刻Q3查出来的是id=0、id=1和id=5的这三行。</li>
 </ol>
-<p>其中，Q3读到id&#x3D;1这一行的现象，被称为“幻读”。</p>
+<p>其中，Q3读到id=1这一行的现象，被称为“幻读”。</p>
 <p>也就是说，幻读指的是一个事务在前后两次查询同一个范围的时候，后一次查询看到了前一次查询没有看到的行。</p>
 <p>这里，我需要对“幻读”做一个说明：</p>
 <ol>
@@ -305,23 +314,23 @@
 <p>并且，session B和sessionC的两条语句，执行后就会提交，所以Q2和Q3就是应该看到这两个事务的操作效果，而且也看到了，这跟事务的可见性规则并不矛盾。</p>
 <p>但是，这是不是真的没问题呢？不，这里还真就有问题。</p>
 <p>幻读有什么问题？首先是语义上的。</p>
-<p>session A在T1时刻就声明了，“我要把所有d&#x3D;5的行锁住，不准别的事务进行读写操作”。</p>
+<p>session A在T1时刻就声明了，“我要把所有d=5的行锁住，不准别的事务进行读写操作”。</p>
 <p>而实际上，这个语义被破坏了。</p>
 <p>如果现在这样看感觉还不明显的话，我再往session B和session C里面分别加一条SQL语句，你再看看会出现什么现象。</p>
-<p>图 2 假设只在id&#x3D;5这一行加行锁–语义被破坏session B的第二条语句update t set c&#x3D;5 where id&#x3D;0，语义是“我把id&#x3D;0、d&#x3D;5这一行的c值，改成了5”。</p>
-<p>由于在T1时刻，session A 还只是给id&#x3D;5这一行加了行锁， 并没有给id&#x3D;0这行加上锁。</p>
+<p>图 2 假设只在id=5这一行加行锁–语义被破坏session B的第二条语句update t set c=5 where id=0，语义是“我把id=0、d=5这一行的c值，改成了5”。</p>
+<p>由于在T1时刻，session A 还只是给id=5这一行加了行锁， 并没有给id=0这行加上锁。</p>
 <p>因此，session B在T2时刻，是可以执行这两条update语句的。</p>
-<p>这样，就破坏了 session A 里Q1语句要锁住所有d&#x3D;5的行的加锁声明。</p>
-<p>session C也是一样的道理，对id&#x3D;1这一行的修改，也是破坏了Q1的加锁声明。</p>
+<p>这样，就破坏了 session A 里Q1语句要锁住所有d=5的行的加锁声明。</p>
+<p>session C也是一样的道理，对id=1这一行的修改，也是破坏了Q1的加锁声明。</p>
 <p>其次，是数据一致性的问题。</p>
 <p>我们知道，锁的设计是为了保证数据的一致性。</p>
 <p>而这个一致性，不止是数据库内部数据状态在此刻的一致性，还包含了数据和日志在逻辑上的一致性。</p>
-<p>为了说明这个问题，我给session A在T1时刻再加一个更新语句，即：update t set d&#x3D;100 whered&#x3D;5。</p>
-<p>图 3 假设只在id&#x3D;5这一行加行锁–数据一致性问题update的加锁语义和select …for update 是一致的，所以这时候加上这条update语句也很合理。</p>
-<p>session A声明说“要给d&#x3D;5的语句加上锁”，就是为了要更新数据，新加的这条update语句就是把它认为加上了锁的这一行的d值修改成了100。</p>
+<p>为了说明这个问题，我给session A在T1时刻再加一个更新语句，即：update t set d=100 whered=5。</p>
+<p>图 3 假设只在id=5这一行加行锁–数据一致性问题update的加锁语义和select …for update 是一致的，所以这时候加上这条update语句也很合理。</p>
+<p>session A声明说“要给d=5的语句加上锁”，就是为了要更新数据，新加的这条update语句就是把它认为加上了锁的这一行的d值修改成了100。</p>
 <p>现在，我们来分析一下图3执行完成后，数据库里会是什么结果。</p>
 <ol>
-<li>经过T1时刻，id&#x3D;5这一行变成 (5,5,100)，当然这个结果最终是在T6时刻正式提交的;2. 经过T2时刻，id&#x3D;0这一行变成(0,5,5);3. 经过T4时刻，表里面多了一行(1,5,5);4. 其他行跟这个执行序列无关，保持不变。</li>
+<li>经过T1时刻，id=5这一行变成 (5,5,100)，当然这个结果最终是在T6时刻正式提交的;2. 经过T2时刻，id=0这一行变成(0,5,5);3. 经过T4时刻，表里面多了一行(1,5,5);4. 其他行跟这个执行序列无关，保持不变。</li>
 </ol>
 <p>这样看，这些数据也没啥问题，但是我们再来看看这时候binlog里面的内容。</p>
 <ol>
@@ -329,26 +338,26 @@
 </li>
 <li><p>T4时刻，session C事务提交，写入了两条语句；</p>
 </li>
-<li><p>T6时刻，session A事务提交，写入了update t set d&#x3D;100 where d&#x3D;5 这条语句。</p>
+<li><p>T6时刻，session A事务提交，写入了update t set d=100 where d=5 这条语句。</p>
 </li>
 </ol>
 <p>我统一放到一起的话，就是这样的：</p>
 <p>好，你应该看出问题了。</p>
 <p>这个语句序列，不论是拿到备库去执行，还是以后用binlog来克隆一个库，这三行的结果，都变成了 (0,5,100)、(1,5,100)和(5,5,100)。</p>
-<p>也就是说，id&#x3D;0和id&#x3D;1这两行，发生了数据不一致。</p>
+<p>也就是说，id=0和id=1这两行，发生了数据不一致。</p>
 <p>这个问题很严重，是不行的。</p>
-<p>到这里，我们再回顾一下，这个数据不一致到底是怎么引入的？我们分析一下可以知道，这是我们假设“select * from t where d&#x3D;5 for update这条语句只给d&#x3D;5这一行，也就是id&#x3D;5的这一行加锁”导致的。</p>
+<p>到这里，我们再回顾一下，这个数据不一致到底是怎么引入的？我们分析一下可以知道，这是我们假设“select * from t where d=5 for update这条语句只给d=5这一行，也就是id=5的这一行加锁”导致的。</p>
 <p>所以我们认为，上面的设定不合理，要改。</p>
 <p>那怎么改呢？我们把扫描过程中碰到的行，也都加上写锁，再来看看执行效果。</p>
-<p>update t set d&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,0,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,5,5)</em>&#x2F;insert into t values(1,1,5); &#x2F;<em>(1,1,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;1; &#x2F;<em>(1,5,5)</em>&#x2F;update t set d&#x3D;100 where d&#x3D;5;&#x2F;<em>所有d&#x3D;5的行，d改成100</em>&#x2F;图 4 假设扫描到的行都被加上了行锁由于session A把所有的行都加了写锁，所以session B在执行第一个update语句的时候就被锁住了。</p>
+<p>update t set d=5 where id=0; /<em>(0,0,5)</em>/update t set c=5 where id=0; /<em>(0,5,5)</em>/insert into t values(1,1,5); /<em>(1,1,5)</em>/update t set c=5 where id=1; /<em>(1,5,5)</em>/update t set d=100 where d=5;/<em>所有d=5的行，d改成100</em>/图 4 假设扫描到的行都被加上了行锁由于session A把所有的行都加了写锁，所以session B在执行第一个update语句的时候就被锁住了。</p>
 <p>需要等到T6时刻session A提交以后，session B才能继续执行。</p>
-<p>这样对于id&#x3D;0这一行，在数据库里的最终结果还是 (0,5,5)。</p>
+<p>这样对于id=0这一行，在数据库里的最终结果还是 (0,5,5)。</p>
 <p>在binlog里面，执行序列是这样的：</p>
-<p>可以看到，按照日志顺序执行，id&#x3D;0这一行的最终结果也是(0,5,5)。</p>
-<p>所以，id&#x3D;0这一行的问题解决了。</p>
-<p>但同时你也可以看到，id&#x3D;1这一行，在数据库里面的结果是(1,5,5)，而根据binlog的执行结果是(1,5,100)，也就是说幻读的问题还是没有解决。</p>
-<p>为什么我们已经这么“凶残”地，把所有的记录都上了锁，还是阻止不了id&#x3D;1这一行的插入和更新呢？原因很简单。</p>
-<p>在T3时刻，我们给所有行加锁的时候，id&#x3D;1这一行还不存在，不存在也就加不上锁。</p>
+<p>可以看到，按照日志顺序执行，id=0这一行的最终结果也是(0,5,5)。</p>
+<p>所以，id=0这一行的问题解决了。</p>
+<p>但同时你也可以看到，id=1这一行，在数据库里面的结果是(1,5,5)，而根据binlog的执行结果是(1,5,100)，也就是说幻读的问题还是没有解决。</p>
+<p>为什么我们已经这么“凶残”地，把所有的记录都上了锁，还是阻止不了id=1这一行的插入和更新呢？原因很简单。</p>
+<p>在T3时刻，我们给所有行加锁的时候，id=1这一行还不存在，不存在也就加不上锁。</p>
 <p>也就是说，即使把所有的记录都加上锁，还是阻止不了新插入的记录，这也是为什么“幻读”会被单独拿出来解决的原因。</p>
 <p>到这里，其实我们刚说明完文章的标题 ：幻读的定义和幻读有什么问题。</p>
 <p>接下来，我们再看看InnoDB怎么解决幻读的问题。</p>
@@ -356,7 +365,7 @@
 <p>因此，为了解决幻读问题，InnoDB只好引入新的锁，也就是间隙锁(GapLock)。</p>
 <p>顾名思义，间隙锁，锁的就是两个值之间的空隙。</p>
 <p>比如文章开头的表t，初始化插入了6个记录，这就产生了7个间隙。</p>
-<p>insert into t values(1,1,5); &#x2F;<em>(1,1,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;1; &#x2F;<em>(1,5,5)</em>&#x2F;update t set d&#x3D;100 where d&#x3D;5;&#x2F;<em>所有d&#x3D;5的行，d改成100</em>&#x2F;update t set d&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,0,5)</em>&#x2F;update t set c&#x3D;5 where id&#x3D;0; &#x2F;<em>(0,5,5)</em>&#x2F;图 5 表t主键索引上的行锁和间隙锁这样，当你执行 select * from t where d&#x3D;5 for update的时候，就不止是给数据库中已有的6个记录加上了行锁，还同时加了7个间隙锁。</p>
+<p>insert into t values(1,1,5); /<em>(1,1,5)</em>/update t set c=5 where id=1; /<em>(1,5,5)</em>/update t set d=100 where d=5;/<em>所有d=5的行，d改成100</em>/update t set d=5 where id=0; /<em>(0,0,5)</em>/update t set c=5 where id=0; /<em>(0,5,5)</em>/图 5 表t主键索引上的行锁和间隙锁这样，当你执行 select * from t where d=5 for update的时候，就不止是给数据库中已有的6个记录加上了行锁，还同时加了7个间隙锁。</p>
 <p>这样就确保了无法再插入新的记录。</p>
 <p>也就是说这时候，在一行行扫描的过程中，不仅将给行加上了行锁，还给行两边的空隙，也加上了间隙锁。</p>
 <p>现在你知道了，数据行是可以加上锁的实体，数据行之间的间隙，也是可以加上锁的实体。</p>
@@ -368,7 +377,7 @@
 <p>间隙锁之间都不存在冲突关系。</p>
 <p>这句话不太好理解，我给你举个例子：</p>
 <p>图7 间隙锁之间不互锁这里session B并不会被堵住。</p>
-<p>因为表t里并没有c&#x3D;7这个记录，因此session A加的是间隙锁(5,10)。</p>
+<p>因为表t里并没有c=7这个记录，因此session A加的是间隙锁(5,10)。</p>
 <p>而session B也是在这个间隙加的间隙锁。</p>
 <p>它们有共同的目标，即：保护这个间隙，不允许插入值。</p>
 <p>但，它们之间是不冲突的。</p>
@@ -380,15 +389,15 @@
 <p>在前面的文章中，就有同学提到了这个问题。</p>
 <p>我把他的问题转述一下，对应到我们这个例子的表来说，业务逻辑这样的：任意锁住一行，如果这一行不存在的话就插入，如果存在这一行就更新它的数据，代码如下：</p>
 <p>备注：这篇文章中，如果没有特别说明，我们把间隙锁记为开区间，把next-key lock记为前开后闭区间。</p>
-<p>begin;select * from t where id&#x3D;N for update;&#x2F;<em>如果行不存在</em>&#x2F;insert into t values(N,N,N);&#x2F;<em>如果行存在</em>&#x2F;update t set d&#x3D;N set id&#x3D;N;commit;可能你会说，这个不是insert … on duplicate key update 就能解决吗？但其实在有多个唯一键的时候，这个方法是不能满足这位提问同学的需求的。</p>
+<p>begin;select * from t where id=N for update;/<em>如果行不存在</em>/insert into t values(N,N,N);/<em>如果行存在</em>/update t set d=N set id=N;commit;可能你会说，这个不是insert … on duplicate key update 就能解决吗？但其实在有多个唯一键的时候，这个方法是不能满足这位提问同学的需求的。</p>
 <p>至于为什么，我会在后面的文章中再展开说明。</p>
 <p>现在，我们就只讨论这个逻辑。</p>
 <p>这个同学碰到的现象是，这个逻辑一旦有并发，就会碰到死锁。</p>
-<p>你一定也觉得奇怪，这个逻辑每次操作前用for update锁起来，已经是最严格的模式了，怎么还会有死锁呢？这里，我用两个session来模拟并发，并假设N&#x3D;9。</p>
+<p>你一定也觉得奇怪，这个逻辑每次操作前用for update锁起来，已经是最严格的模式了，怎么还会有死锁呢？这里，我用两个session来模拟并发，并假设N=9。</p>
 <p>图8 间隙锁导致的死锁你看到了，其实都不需要用到后面的update语句，就已经形成死锁了。</p>
 <p>我们按语句执行顺序来分析一下：</p>
 <ol>
-<li><p>session A 执行select … for update语句，由于id&#x3D;9这一行并不存在，因此会加上间隙锁(5,10);2. session B 执行select … for update语句，同样会加上间隙锁(5,10)，间隙锁之间不会冲突，因此这个语句可以执行成功；</p>
+<li><p>session A 执行select … for update语句，由于id=9这一行并不存在，因此会加上间隙锁(5,10);2. session B 执行select … for update语句，同样会加上间隙锁(5,10)，间隙锁之间不会冲突，因此这个语句可以执行成功；</p>
 </li>
 <li><p>session B 试图插入一行(9,9,9)，被session A的间隙锁挡住了，只好进入等待；</p>
 </li>
@@ -404,7 +413,7 @@
 <p>所以，你如果把隔离级别设置为读提交的话，就没有间隙锁了。</p>
 <p>但同时，你要解决可能出现的数据和日志不一致问题，需要把binlog格式设置为row。</p>
 <p>这，也是现在不少公司使用的配置组合。</p>
-<p>前面文章的评论区有同学留言说，他们公司就使用的是读提交隔离级别加binlog_format&#x3D;row的组合。</p>
+<p>前面文章的评论区有同学留言说，他们公司就使用的是读提交隔离级别加binlog_format=row的组合。</p>
 <p>他曾问他们公司的DBA说，你为什么要这么配置。</p>
 <p>DBA直接答复说，因为大家都这么用呀。</p>
 <p>所以，这个同学在评论区就问说，这个配置到底合不合理。</p>
@@ -429,7 +438,7 @@
 <p>上期问题时间我们在本文的开头回答了上期问题。</p>
 <p>有同学的回答中还说明了读提交隔离级别下，在语句执行完成后，是只有行锁的。</p>
 <p>而且语句执行完成后，InnoDB就会把不满足条件的行行锁去掉。</p>
-<p>当然了，c&#x3D;5这一行的行锁，还是会等到commit的时候才释放的。</p>
+<p>当然了，c=5这一行的行锁，还是会等到commit的时候才释放的。</p>
 
     </div>
 
@@ -437,181 +446,50 @@
     
     
 
-      <footer class="post-footer">
+    <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/mysql/" rel="tag"># mysql</a>
           </div>
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/posts/f5203c05.html" rel="prev" title="mysql-为什么我只查一行的语句也执行这么慢">
-      <i class="fa fa-chevron-left"></i> mysql-为什么我只查一行的语句也执行这么慢
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/e1607c99.html" rel="next" title="mysql-为什么我只改一行的语句锁这么多">
-      mysql-为什么我只改一行的语句锁这么多 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/f5203c05.html" rel="prev" title="mysql-为什么我只查一行的语句也执行这么慢">
+                  <i class="fa fa-angle-left"></i> mysql-为什么我只查一行的语句也执行这么慢
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/e1607c99.html" rel="next" title="mysql-为什么我只改一行的语句锁这么多">
+                  mysql-为什么我只改一行的语句锁这么多 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
           </div>
-          
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">问题解析</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Meng Qi</p>
-  <div class="site-description" itemprop="description">recording</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">359</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">15</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">18</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
+    </footer>
+  </article>
 </div>
 
 
 
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
 
 
-      </div>
-    </main>
 
-    <footer class="footer">
-      <div class="footer-inner">
-        
+</div>
+  </main>
 
-        
+  <footer class="footer">
+    <div class="footer-inner">
 
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2023</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
     </span>
-    <span title="站点总字数">324k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">19:37</span>
-</div>
-
-<!--
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+    <span class="author" itemprop="copyrightHolder">true</span>
   </div>
--->
-
-<div>
-<span id="timeDate">loading...</span><span id="times">loading...</span>
-<script>
-    var now = new Date();
-    function createtime() {
-        var grt= new Date("1/1/2018 00:00:00");
-        now.setTime(now.getTime()+250);
-        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
-        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
-        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
-        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
-        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
-        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
-        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
-        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
-    }
-setInterval("createtime()",250);
-</script>
-</div>
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -619,8 +497,7 @@ setInterval("createtime()",250);
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -629,68 +506,37 @@ setInterval("createtime()",250);
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
-
-
-
+    </div>
+  </footer>
 
   
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
 
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 
-
-
-  
-<script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 <div class="moon-menu">
   <div class="moon-menu-items">
-    
     <div id="moon-menu-item-back2bottom" class="moon-menu-item">
-      <i class='fas fa-chevron-down'></i>    </div>
-    
+      <i class="fas fa-chevron-down"></i>
+    </div>
     <div id="moon-menu-item-back2top" class="moon-menu-item">
-      <i class='fas fa-chevron-up'></i>    </div>
-    
+      <i class="fas fa-chevron-up"></i>
+    </div>
   </div>
   <div class="moon-menu-button">
     <svg class="moon-menu-bg">
@@ -698,10 +544,12 @@ setInterval("createtime()",250);
       <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
     </svg>
     <div class="moon-menu-content">
-      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
       <div class="moon-menu-text"></div>
     </div>
   </div>
-</div><script src="/js/injector.js"></script>
+</div>
+<script src="/js/injector.js"></script>
+
 </body>
 </html>
