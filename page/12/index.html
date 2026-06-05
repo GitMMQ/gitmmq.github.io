@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">365</span>
+          <span class="site-state-item-count">367</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,261 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/32086.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/32086.html" class="post-title-link" itemprop="url">234树</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>平衡树，子节点数目可以达到4个</p>
+<h2 id="特点"><a class="headerlink" href="#特点" title="特点"></a>特点</h2><ol>
+<li><p>若父节点中存有1个数据项，则必有2个子节点。</p>
+</li>
+<li><p>若父节点中存有2个数据项，则必有3个子节点。</p>
+</li>
+<li><p>若父节点中存有3个数据项，则必有4个子节点。</p>
+</li>
+</ol>
+<h2 id="构造"><a class="headerlink" href="#构造" title="构造"></a>构造</h2><p>插入数据：</p>
+<ul>
+<li><p>未满节点直接插入</p>
+</li>
+<li><p>满节点 ABC 分裂 A不变 B到父节点 C到右侧</p>
+</li>
+</ul>
+<h2 id="代码实现"><a class="headerlink" href="#代码实现" title="代码实现"></a>代码实现</h2><pre><code>class Node
+{
+private static final int ORDER = 4;
+private int numItems;//节点中实际存储的数据项数目，其值一定不大于3
+private Node parent;
+private Node childArray[] = new Node[ORDER];//子节点数组
+private DataItem itemArray[] = new DataItem[ORDER-1];//存储数据项数组
+//-------------------------------------------------------------
+// 把参数中的节点作为子节点，与当前节点进行连接
+public void connectChild(int childNum, Node child)
+   {
+   childArray[childNum] = child;
+   if(child != null)
+      child.parent = this;//当前节点作为父节点
+   }
+//-------------------------------------------------------------
+// 断开参数确定的节点与当前节点的连接，这个节点一定是当前节点的子节点。
+public Node disconnectChild(int childNum)
+   {
+   Node tempNode = childArray[childNum];
+   childArray[childNum] = null; //断开连接
+   return tempNode;//返回要这个子节点
+   }
+//-------------------------------------------------------------
+public Node getChild(int childNum)//获取相应的子节点
+   { return childArray[childNum]; }
+//-------------------------------------------------------------
+public Node getParent()//获取父节点
+   { return parent; }
+//-------------------------------------------------------------
+public boolean isLeaf()//是否是叶结点
+   { return (childArray[0]==null) ? true : false; }//叶结点没有子节点
+//-------------------------------------------------------------
+public int getNumItems()//获取实际存储的数据项数目
+  { return numItems; }
+//-------------------------------------------------------------
+public DataItem getItem(int index)   // 获取具体的数据项
+   { return itemArray[index]; }
+//-------------------------------------------------------------
+public boolean isFull()//该节点是否已满
+   { return (numItems==ORDER-1) ? true : false; }
+//-------------------------------------------------------------
+public int findItem(long key)       // 查找
+   {                                    
+   for(int j=0; j&lt;ORDER-1; j++)         // 遍历数组
+      {                                 
+      if(itemArray[j] == null)          // 数组未满，未找到
+         break;
+      else if(itemArray[j].dData == key)
+         return j;
+      }
+   return -1;
+   }  // end findItem
+//-------------------------------------------------------------
+public int insertItem(DataItem newItem)//节点未满的插入
+   {
+   numItems++;                          
+   long newKey = newItem.dData;         // 获得关键字
+ 
+<p>   for(int j=ORDER-2; j&gt;=0; j–)        // 因为节点未满，所以从倒数第二项向前查找<br/>      {<br/>      if(itemArray[j] == null)          // 没存数据<br/>         continue;<br/>      else<br/>         {<br/>         long itsKey = itemArray[j].dData;//获得关键字<br/>         if(newKey &lt; itsKey)            //插入位置在其前面，但未必相邻<br/>            itemArray[j+1] = itemArray[j]; //当前数据项后移<br/>         else<br/>            {<br/>            itemArray[j+1] = newItem;   // 在其后位置插入<br/>            return j+1;                 // 返回插入的位置下标<br/>            }                           //    new item<br/>         }  // end else (not null)<br/>      }  // end for                     // shifted all items,<br/>   //若上述代码没有执行返回操作，那么这是空节点（只有初始时根是这个情况）<br/>   itemArray[0] = newItem;              // insert new item<br/>   return 0;<br/>   }  // end insertItem()<br/>//————————————————————-<br/>public DataItem removeItem()        // 移除数据项，从后向前移除<br/>   {<br/>   // 假设节点非空<br/>   DataItem temp = itemArray[numItems-1];  // 要移除的数据项<br/>   itemArray[numItems-1] = null;           // 移除<br/>   numItems–;                             // 数据项数目减一<br/>   return temp;                            // 返回要移除的数据项<br/>   }<br/>//————————————————————-<br/>public void displayNode()           // format “/24/56/74/“<br/>   {<br/>   for(int j=0; j&lt;numItems; j++)<br/>      itemArray[j].displayItem();   // “/56”<br/>   System.out.println(“/“);         // final “/“<br/>   }<br/>//————————————————————-<br/>}  // end class Node<br/>////////////////////////////////////////////////////////////////</p>
+<p>class Tree234<br/>{<br/>private Node root = new Node();            // 创建树的根<br/>//————————————————————-<br/>//获取查找的下一个节点<br/>public Node getNextChild(Node theNode, long theValue)<br/>{<br/>int j;<br/>// 假设这个节点不是叶结点<br/>int numItems = theNode.getNumItems();//获得当前节点的数据项数目<br/>for(j=0; j&lt;numItems; j++)<br/>   {<br/>   if( theValue &lt; theNode.getItem(j).dData )<br/>      return theNode.getChild(j);  // 返回相应的节点<br/>   }  // end for<br/>return theNode.getChild(j);        // 此时j=numItems<br/>}<br/>//————————————————————-<br/>public int find(long key)<br/>   {<br/>   Node curNode = root;<br/>   int childNumber;<br/>   while(true)<br/>      {<br/>      if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行<br/>         return childNumber;               // found it<br/>      else if( curNode.isLeaf() )//叶结点上也没找到<br/>         return -1;                        // can’t find it<br/>      else                                 // 不是叶结点，则继续向下查找<br/>         curNode = getNextChild(curNode, key);<br/>      }  // end while<br/>   }<br/>//————————————————————-<br/>// 插入数据项<br/>public void insert(long dValue)<br/>   {<br/>   Node curNode = root;//当前节点标志<br/>   DataItem tempItem = new DataItem(dValue);//插入数据项封装</p>
+<p>   while(true)<br/>      {<br/>      if( curNode.isFull() )               // 是满节点<br/>         {<br/>         split(curNode);                   // 分裂<br/>         curNode = curNode.getParent();    // 回到分裂出的父节点上<br/>                                           // 继续向下查找<br/>         curNode = getNextChild(curNode, dValue);<br/>         }  // end if(node is full)<br/>//后面的操作中节点都未满，否则先执行上面的代码<br/>      else if( curNode.isLeaf() )          // 是叶结点，非满<br/>         break;                            // 跳出，直接插入</p>
+<pre><code>  else
+     curNode = getNextChild(curNode, dValue);//向下查找
+  }  // end while
+</code></pre>
+<p>   curNode.insertItem(tempItem);       // 此时节点一定不满，直接插入数据项，<br/>   }  // end insert()<br/>//————————————————————-<br/>public void split(Node thisNode)     // 分裂<br/>   {<br/>   // 操作中节点一定是满节点，否则不会执行该操作<br/>   DataItem itemB, itemC;<br/>   Node parent, child2, child3;<br/>   int itemIndex;</p>
+<p>   itemC = thisNode.removeItem();    // 移除最右边的两个数据项，并保存为B和C<br/>   itemB = thisNode.removeItem();    //<br/>   child2 = thisNode.disconnectChild(2); // //断开最右边两个子节点的链接<br/>   child3 = thisNode.disconnectChild(3); // </p>
+<p>   Node newRight = new Node();       //新建一个节点，作为当前节点的兄弟节点</p>
+<p>   if(thisNode==root)                // 是根<br/>      {<br/>      root = new Node();                // 新建一个根<br/>      parent = root;                    // 把新根设为父节点<br/>      root.connectChild(0, thisNode);   // 连接父节点和子节点<br/>      }<br/>   else                              // 不是根<br/>      parent = thisNode.getParent();    // 获取父节点</p>
+<p>   itemIndex = parent.insertItem(itemB); // 把B插入父节点中，返回插入位置<br/>   int n = parent.getNumItems();         // 获得总数据项数目</p>
+<p>   for(int j=n-1; j&gt;itemIndex; j–)          //从后向前移除<br/>      {<br/>      Node temp = parent.disconnectChild(j); // 断开连接<br/>      parent.connectChild(j+1, temp);        // 连接到新的位置<br/>      }</p>
+<p>   parent.connectChild(itemIndex+1, newRight);//连接到新位置</p>
+<p>   // 处理兄弟节点<br/>   newRight.insertItem(itemC);       // 将C放入兄弟节点中<br/>   newRight.connectChild(0, child2); // 把子节点中最右边的两个连接到兄弟节点上<br/>   newRight.connectChild(1, child3); //<br/>   }  // end split()<br/>//————————————————————-<br/>// gets appropriate child of node during search for value</p>
+<p>public void displayTree()<br/>   {<br/>   recDisplayTree(root, 0, 0);<br/>   }<br/>//————————————————————-<br/>private void recDisplayTree(Node thisNode, int level,<br/>                                           int childNumber)<br/>   {<br/>   System.out.print(“level=”+level+” child=”+childNumber+” “);<br/>   thisNode.displayNode();               // display this node</p>
+<p>   // call ourselves for each child of this node<br/>   int numItems = thisNode.getNumItems();<br/>   for(int j=0; j&lt;numItems+1; j++)<br/>      {<br/>      Node nextNode = thisNode.getChild(j);<br/>      if(nextNode != null)<br/>         recDisplayTree(nextNode, level+1, j);<br/>      else<br/>         return;<br/>      }<br/>   }  // end recDisplayTree()<br/>//————————————————————-<br/>}  // end class Tree234<br/>////////////////////////////////////////////////////////////////</p>
+<p>import java.io.*;</p>
+<p>class Tree234App<br/>{<br/>public static void main(String[] args) throws IOException<br/>   {<br/>   long value;<br/>   Tree234 theTree = new Tree234();</p>
+<p>   theTree.insert(50);<br/>   theTree.insert(40);<br/>   theTree.insert(60);<br/>   theTree.insert(30);<br/>   theTree.insert(70);</p>
+<p>   while(true)<br/>      {<br/>      System.out.print(“Enter first letter of “);<br/>      System.out.print(“show, insert, or find: “);<br/>      char choice = getChar();<br/>      switch(choice)<br/>         {<br/>         case ‘s’:<br/>            theTree.displayTree();<br/>            break;<br/>         case ‘i’:<br/>            System.out.print(“Enter value to insert: “);<br/>            value = getInt();<br/>            theTree.insert(value);<br/>            break;<br/>         case ‘f’:<br/>            System.out.print(“Enter value to find: “);<br/>            value = getInt();<br/>            int found = theTree.find(value);<br/>            if(found != -1)<br/>               System.out.println(“Found “+value);<br/>            else<br/>               System.out.println(“Could not find “+value);<br/>            break;<br/>         default:<br/>            System.out.print(“Invalid entry\n”);<br/>         }  // end switch<br/>      }  // end while<br/>   }  // end main()<br/>//————————————————————–<br/>public static String getString() throws IOException<br/>   {<br/>   InputStreamReader isr = new InputStreamReader(System.in);<br/>   BufferedReader br = new BufferedReader(isr);<br/>   String s = br.readLine();<br/>   return s;<br/>   }<br/>//————————————————————–<br/>public static char getChar() throws IOException<br/>   {<br/>   String s = getString();<br/>   return s.charAt(0);<br/>   }</p>
+<p>//————————————————————-<br/>public static int getInt() throws IOException<br/>   {<br/>   String s = getString();<br/>   return Integer.parseInt(s);<br/>   }<br/>//————————————————————-<br/>}  // end class Tree234App<br/>////////////////////////////////////////////////////////////////<br/></p></code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/8756.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/8756.html" class="post-title-link" itemprop="url">排序-选择排序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>选择排序（Selection Sort）是一种简单直观的排序算法，它在每一轮中选择未排序部分中的最小（或最大）元素，并将其放置在已排序部分的末尾。以下是一个选择排序的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SelectionSort</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">selectionSort</span><span class="params">(<span class="type">int</span>[] arr)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n - <span class="number">1</span>; i++) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">minIndex</span> <span class="operator">=</span> i;</span><br/><span class="line"></span><br/><span class="line">            <span class="comment">// 找到未排序部分的最小值索引</span></span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt; n; j++) {</span><br/><span class="line">                <span class="keyword">if</span> (arr[j] &lt; arr[minIndex]) {</span><br/><span class="line">                    minIndex = j;</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line"></span><br/><span class="line">            <span class="comment">// 将最小值与未排序部分的第一个元素交换</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> arr[minIndex];</span><br/><span class="line">            arr[minIndex] = arr[i];</span><br/><span class="line">            arr[i] = temp;</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span>[] arr = {<span class="number">64</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>};</span><br/><span class="line">        System.out.println(<span class="string">"Original array: "</span> + Arrays.toString(arr));</span><br/><span class="line"></span><br/><span class="line">        selectionSort(arr);</span><br/><span class="line"></span><br/><span class="line">        System.out.println(<span class="string">"Sorted array: "</span> + Arrays.toString(arr));</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在这个示例中，<code>selectionSort</code> 方法使用选择排序算法对整数数组进行排序。它从未排序部分中选择最小值，并将其与未排序部分的第一个元素交换。通过多次迭代，每次选择一个最小值，最终数组会变得有序。</p>
+<p>尽管选择排序的时间复杂度较高（O(n^2)），但它在简单场景中具有一定的实用性。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -832,264 +1087,6 @@
           <p>基数排序（Radix Sort）是一种非比较性的排序算法，它将数据按照位数逐个分配到不同的桶中，从而实现排序。以下是一个基数排序的Java代码示例：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RadixSort</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">radixSort</span><span class="params">(<span class="type">int</span>[] arr)</span> {</span><br/><span class="line">        <span class="keyword">if</span> (arr == <span class="literal">null</span> || arr.length &lt;= <span class="number">1</span>) {</span><br/><span class="line">            <span class="keyword">return</span>;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> Arrays.stream(arr).max().getAsInt();</span><br/><span class="line">        <span class="type">int</span> <span class="variable">exp</span> <span class="operator">=</span> <span class="number">1</span>;</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">while</span> (max / exp &gt; <span class="number">0</span>) {</span><br/><span class="line">            countingSortByDigit(arr, exp);</span><br/><span class="line">            exp *= <span class="number">10</span>;</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">countingSortByDigit</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> exp)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br/><span class="line">        <span class="type">int</span>[] output = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br/><span class="line">        <span class="type">int</span>[] count = <span class="keyword">new</span> <span class="title class_">int</span>[<span class="number">10</span>];</span><br/><span class="line"></span><br/><span class="line">        Arrays.fill(count, <span class="number">0</span>);</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">digit</span> <span class="operator">=</span> (arr[i] / exp) % <span class="number">10</span>;</span><br/><span class="line">            count[digit]++;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; <span class="number">10</span>; i++) {</span><br/><span class="line">            count[i] += count[i - <span class="number">1</span>];</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">digit</span> <span class="operator">=</span> (arr[i] / exp) % <span class="number">10</span>;</span><br/><span class="line">            output[count[digit] - <span class="number">1</span>] = arr[i];</span><br/><span class="line">            count[digit]--;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        System.arraycopy(output, <span class="number">0</span>, arr, <span class="number">0</span>, n);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span>[] arr = {<span class="number">170</span>, <span class="number">45</span>, <span class="number">75</span>, <span class="number">90</span>, <span class="number">802</span>, <span class="number">24</span>, <span class="number">2</span>, <span class="number">66</span>};</span><br/><span class="line">        System.out.println(<span class="string">"Original array: "</span> + Arrays.toString(arr));</span><br/><span class="line">        </span><br/><span class="line">        radixSort(arr);</span><br/><span class="line">        </span><br/><span class="line">        System.out.println(<span class="string">"Sorted array: "</span> + Arrays.toString(arr));</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 <p>在这个示例中，<code>radixSort</code> 方法使用基数排序算法来对整数数组进行排序。首先，找到数组中的最大值以确定需要进行几轮排序（根据位数）。然后，通过 <code>countingSortByDigit</code> 方法对数组按照当前位上的数字进行计数排序。最后，将排序后的结果拷贝回原始数组。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/29014.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/29014.html" class="post-title-link" itemprop="url">加密-md5</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>MD5 和SHA-1 是目前使用比较广泛的散列(Hash)函数，也是在消息认证和数字签名中普遍使用的两种加密算法。本文基于AVR 高速嵌入式单片机，实现了MD5和SHA-1 两种加密算法的比较，并对算法进行了汇编语言的优化和改进。根据实验结果，对两种算法的优缺点进行了比较和分析。 0 引言 随着信息技术和Internet 的迅速发展，信息安全和可靠性问题越来越重要。现在信息安全面临两大基本攻击：被动式攻击（获取消息的内容、业务流分析）和主动攻击（假冒、消息的篡改、业务拒绝）。前者主要靠加密和解密技术进行有效处理，而后者就要靠消息认证来处理。在金融交易、电子商务、电子信件、手机用户信息的确认等领域，数据完整性确认和数据来源的真伪鉴定都是很重要的安全服务。实现这些安全服务的最好方法就是使用加密函数中的单项散列（Hash）函数。单项散列（Hash）函数是一种单项密码体制，它是一个从明文到密文的不可逆函数，也就是说，是无法解密的。通常应用在只需要加密、不需要解密的特殊应用场合。单项散列（Hash）函数H(M)作用于一任意长度的消息M，它返回一固定长度的散列值h:h=H(M)作为初始消息的独一无二的“数字指纹”，从而能保证数据的完整性和惟一性。 3.1 MD5 与SHA-1 的比较 由于MD5 与SHA-1均是从MD4 发展而来，它们的结构和强度等特性有很多相似之处，表（1）是对MD5 与SHA-1 的结构比较。SHA-1与MD5 的最大区别在于其摘要比MD5 摘要长 32 比特。对于强行攻击，产生任何一个报文使之摘要等于给定报文摘要的难度：MD5 是2128 数量级的操作，SHA-1 是2160 数量级的操作。产生具有相同摘要的两个报文的难度：MD5是 264 是数量级的操作，SHA-1 是280 数量级的操作。因而,SHA-1 对强行攻击的强度更大。但由于SHA-1 的循环步骤比MD5 多（80:64）且要处理的缓存大（160 比特:128 比特），SHA-1 的运行速度比MD5 慢。 5 结束语 MD5 和SHA-1 是单项散列函数的典型代表，它们广泛地应用在信息安全和数字签名等各个领域。从而有效地抗击了信息的主动式攻击，本文基于AVR 单片机实现了这两种算法，并结合汇编语言尽心了优化，取得了较好的效果。根据信息安全的要求的不同层次可以灵活选择这两种算法从而达到实际目的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/56223.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/56223.html" class="post-title-link" itemprop="url">redis统计信息--INFO</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>显示关于redis服务器的状态报告和统计数值</p>
-<pre><code>    redis&gt; INFO
-    # Server
-    redis_version:2.9.11 //服务器版本
-    redis_git_sha1:937384d0
-    redis_git_dirty:0
-    redis_build_id:8e9509442863f22
-    redis_mode:standalone  //mode
-    os:Linux 3.13.0-35-generic x86_64
-    arch_bits:64
-    multiplexing_api:epoll //事件处理机制
-    gcc_version:4.8.2
-    process_id:4716 //进程ID
-    run_id:26186aac3f2380aaee9eef21cc50aecd542d97dc  //随机标识符（用于 Sentinel 和集群）
-    tcp_port:6379   //监听端口号
-    uptime_in_seconds:362  //启动以来，经过的秒数
-    uptime_in_days:0  //启动以来，经过的天数
-    hz:10  //serverCron运行频率，此值越大表示redis对"间歇性task"的执行次数越频繁(次数/秒)
-    lru_clock:1725349  //以分钟为单位进行自增的时钟，用于 LRU 管理
-    config_file:
-    
-<pre><code># Clients
-connected_clients:1  //已连接客户端的数量（不包括通过从属服务器连接的客户端）
-client_longest_output_list:0  //当前连接的客户端当中，最长的输出列表
-client_biggest_input_buf:0  //当前连接的客户端当中，最大输入缓存
-blocked_clients:0 //正在等待阻塞命令（BLPOP、BRPOP、BRPOPLPUSH）的客户端的数量
-
-# Memory
-used_memory:508536  //由 Redis 分配器分配的内存总量，以字节（byte）为单位
-used_memory_human:496.62K  //以人类可读的格式返回 Redis 分配的内存总量
-used_memory_rss:7974912  //从操作系统的角度，返回 Redis 已分配的内存总量（俗称常驻集大小）。这个值和 top 、 ps 等命令的输出一致。
-//理想情况下， used_memory_rss 的值应该只比 used_memory 稍微高一点儿  
-//当 rss &amp;gt; used ，且两者的值相差较大时，表示存在（内部或外部的）内存碎片
-//当 used &amp;gt; rss 时，表示 Redis 的部分内存被操作系统换出到交换空间了，在这种情况下，操作可能会产生明显的延迟。
-used_memory_peak:508536 //Redis 的内存消耗峰值（以字节为单位）
-used_memory_peak_human:496.62K //以人类可读的格式返回 Redis 的内存消耗峰值
-used_memory_lua:33792  // Lua 引擎所使用的内存大小（以字节为单位）
-mem_fragmentation_ratio:15.68  //used_memory_rss 和 used_memory 之间的比率
-mem_allocator:jemalloc-3.2.0  //在编译时指定的， Redis 所使用的内存分配器。可以是 libc 、 jemalloc 或者 tcmalloc
-
-# Persistence
-loading:0  //一个标志值，记录了服务器是否正在载入持久化文件  
-rdb_changes_since_last_save:6 //距离最近一次成功创建持久化文件之后，经过了多少秒
-rdb_bgsave_in_progress:0 //一个标志值，记录了服务器是否正在创建 RDB 文件
-rdb_last_save_time:1411011131 //最近一次成功创建 RDB 文件的 UNIX 时间戳
-rdb_last_bgsave_status:ok //一个标志值，记录了最近一次创建 RDB 文件的结果是成功还是失败
-rdb_last_bgsave_time_sec:-1 //记录了最近一次创建 RDB 文件耗费的秒数
-rdb_current_bgsave_time_sec:-1 // 如果服务器正在创建 RDB 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
-aof_enabled:0 //标志值，记录了 AOF 是否处于打开状态。
-  //如果 AOF 持久化功能处于开启状态，那么这个部分还会加上以下域：    
-  // aof_current_size : AOF 文件目前的大小。
-  // aof_base_size : 服务器启动时或者 AOF 重写最近一次执行之后，AOF 文件的大小。
-  // aof_pending_rewrite : 一个标志值，记录了是否有 AOF 重写操作在等待 RDB 文件创建完毕之后执行。
-  // aof_buffer_length : AOF 缓冲区的大小。
-  // aof_rewrite_buffer_length : AOF 重写缓冲区的大小。
-  // aof_pending_bio_fsync : 后台 I/O 队列里面，等待执行的 fsync 调用数量。
-  // aof_delayed_fsync : 被延迟的 fsync 调用数量。
-aof_rewrite_in_progress:0 //一个标志值，记录了服务器是否正在创建 AOF 文件。
-aof_rewrite_scheduled:0 //一个标志值，记录了在 RDB 文件创建完毕之后，是否需要执行预约的 AOF 重写操作
-aof_last_rewrite_time_sec:-1 //最近一次创建 AOF 文件耗费的时长。
-aof_current_rewrite_time_sec:-1 //如果服务器正在创建 AOF 文件，那么这个域记录的就是当前的创建操作已经耗费的秒
-aof_last_bgrewrite_status:ok //一个标志值，记录了最近一次创建 AOF 文件的结果是成功还是失败。
-aof_last_write_status:ok //
-
-# Stats
-total_connections_received:2 //服务器已接受的连接请求数量
-total_commands_processed:4 //服务器已执行的命令数量
-instantaneous_ops_per_sec:0 //服务器每秒钟执行的命令数量
-rejected_connections:0 //因为最大客户端数量限制而被拒绝的连接请求数量
-sync_full:0 
-sync_partial_ok:0 
-sync_partial_err:0
-expired_keys:0 //因为过期而被自动删除的数据库键数量
-evicted_keys:0 //因为最大内存容量限制而被驱逐（evict）的键数量。
-keyspace_hits:0 //查找数据库键成功的次数。
-keyspace_misses:0 //查找数据库键失败的次数。
-pubsub_channels:0 //目前被订阅的频道数量。
-pubsub_patterns:0 //目前被订阅的模式数量。
-latest_fork_usec:0 //最近一次 fork() 操作耗费的毫秒数。
-migrate_cached_sockets:0
-
-# Replication
-role:master //如果当前服务器没有在复制任何其他服务器，那么这个域的值就是 master ；否则的话，这个域的值就是 slave 。注意，在创建复制链的时候，一个从服务器也可能是另一个服务器的主服务器。
-connected_slaves:0
-master_repl_offset:0
-repl_backlog_active:0
-repl_backlog_size:1048576
-repl_backlog_first_byte_offset:0
-repl_backlog_histlen:0
-
-# CPU
-used_cpu_sys:0.21  // Redis 服务器耗费的系统 CPU 。
-used_cpu_user:0.17  // Redis 服务器耗费的用户 CPU 。
-used_cpu_sys_children:0.00 //后台进程耗费的系统 CPU 。
-used_cpu_user_children:0.00 //后台进程耗费的用户 CPU 。
-
-# Cluster
-cluster_enabled:0  //一个标志值，记录集群功能是否已经开启
-
-# Keyspace
-db0:keys=2,expires=0,avg_ttl=0 //部分记录了数据库相关的统计信息，比如数据库的键数量、数据库已经被删除的过期键数量等。
-</code></pre>
-<p></p></code></pre>
 
       
     </div>

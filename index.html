@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">365</span>
+          <span class="site-state-item-count">367</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -6334,6 +6334,479 @@ instruction: |
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/cd4fe79f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/cd4fe79f.html" class="post-title-link" itemprop="url">Claude Code 全面介绍：架构设计、应用与优缺点</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 18:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T18:00:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Claude-Code-全面介绍-A-Comprehensive-Introduction-to-Claude-Code"><a href="#Claude-Code-全面介绍-A-Comprehensive-Introduction-to-Claude-Code" class="headerlink" title="Claude Code 全面介绍 &#x2F; A Comprehensive Introduction to Claude Code"></a>Claude Code 全面介绍 &#x2F; A Comprehensive Introduction to Claude Code</h1><blockquote>
+<p><strong>Anthropic 推出的智能体编程工具：架构、应用与权衡</strong><br><strong>Anthropic’s agentic coding tool: architecture, applications, and trade-offs</strong></p>
+</blockquote>
+<hr>
+<h2 id="一、概述-Overview"><a href="#一、概述-Overview" class="headerlink" title="一、概述 &#x2F; Overview"></a>一、概述 &#x2F; Overview</h2><p><strong>中文：</strong> Claude Code 是 Anthropic 于 2025 年发布的<strong>智能体编程工具（Agentic Coding Tool）</strong>。它并非新的 AI 模型，而是围绕 Claude 系列模型（Opus、Sonnet、Haiku）构建的<strong>编排层（Orchestration Layer）</strong>，使 AI 能够自主读取代码库、编辑文件、执行 Shell 命令、调用外部服务，并在多步任务中持续迭代，直到目标完成。</p>
+<p>与传统代码补全工具（如 GitHub Copilot）或 IDE 内嵌助手（如 Cursor）不同，Claude Code 的核心范式是<strong>从「建议」转向「自主执行」</strong>：用户用自然语言描述目标，系统负责规划、执行、验证与修正。</p>
+<p><strong>English:</strong> Claude Code is an <strong>agentic coding tool</strong> released by Anthropic in 2025. It is not a new AI model, but an <strong>orchestration layer</strong> built around the Claude model family (Opus, Sonnet, Haiku), enabling AI to autonomously read codebases, edit files, run shell commands, call external services, and iterate across multi-step tasks until the goal is achieved.</p>
+<p>Unlike traditional code completion tools (e.g., GitHub Copilot) or IDE-embedded assistants (e.g., Cursor), Claude Code’s core paradigm shifts from <strong>“suggestion” to “autonomous execution”</strong>: users describe goals in natural language, and the system handles planning, execution, verification, and correction.</p>
+<p><strong>可用形态 &#x2F; Available Interfaces:</strong></p>
+<table>
+<thead>
+<tr>
+<th>形态 &#x2F; Interface</th>
+<th>说明 &#x2F; Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>终端 CLI &#x2F; Terminal CLI</td>
+<td>核心形态，与现有开发工具链深度集成</td>
+</tr>
+<tr>
+<td>IDE 扩展 &#x2F; IDE Extension</td>
+<td>VS Code、JetBrains 等，支持内联 diff、@-mentions</td>
+</tr>
+<tr>
+<td>桌面应用 &#x2F; Desktop App</td>
+<td>可视化 diff、多会话并行、定时任务</td>
+</tr>
+<tr>
+<td>浏览器 &#x2F; Web</td>
+<td>无需本地环境，支持云端长任务</td>
+</tr>
+<tr>
+<td>CI&#x2F;CD</td>
+<td>GitHub Actions、SDK 集成，自动化 PR 与代码审查</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、架构设计-Architecture-Design"><a href="#二、架构设计-Architecture-Design" class="headerlink" title="二、架构设计 &#x2F; Architecture Design"></a>二、架构设计 &#x2F; Architecture Design</h2><h3 id="2-1-核心哲学：简单循环-厚重基础设施-Core-Philosophy-Simple-Loop-Heavy-Infrastructure"><a href="#2-1-核心哲学：简单循环-厚重基础设施-Core-Philosophy-Simple-Loop-Heavy-Infrastructure" class="headerlink" title="2.1 核心哲学：简单循环 + 厚重基础设施 &#x2F; Core Philosophy: Simple Loop + Heavy Infrastructure"></a>2.1 核心哲学：简单循环 + 厚重基础设施 &#x2F; Core Philosophy: Simple Loop + Heavy Infrastructure</h3><p><strong>中文：</strong> Claude Code 的架构有一个反直觉的特点：据学术研究分析，其代码库中仅约 <strong>1.6%</strong> 是 AI 决策逻辑，其余 <strong>98.4%</strong> 是确定性的基础设施——权限门控、上下文管理、工具路由、恢复逻辑等。核心智能体循环极其简单：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">while (model_requests_tool) &#123;</span><br><span class="line">    call_model();</span><br><span class="line">    dispatch_tools();</span><br><span class="line">    check_stop_conditions();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>真正的工程复杂度在于<strong>围绕循环构建的系统（Harness）</strong>，而非循环本身。</p>
+<p><strong>English:</strong> Claude Code’s architecture has a counterintuitive characteristic: according to academic source analysis, only about <strong>1.6%</strong> of its codebase is AI decision logic; the remaining <strong>98.4%</strong> is deterministic infrastructure—permission gates, context management, tool routing, recovery logic, and more. The core agent loop is remarkably simple:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">while (model_requests_tool) &#123;</span><br><span class="line">    call_model();</span><br><span class="line">    dispatch_tools();</span><br><span class="line">    check_stop_conditions();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The real engineering complexity lies in the <strong>harness built around the loop</strong>, not in the loop itself.</p>
+<hr>
+<h3 id="2-2-系统分层-System-Layers"><a href="#2-2-系统分层-System-Layers" class="headerlink" title="2.2 系统分层 &#x2F; System Layers"></a>2.2 系统分层 &#x2F; System Layers</h3><p><strong>中文：</strong> 系统可分解为 <strong>7 个组件</strong>，跨越 <strong>5 个架构层</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│  用户层 / User Layer                                     │</span><br><span class="line">│  开发者 / Developer                                      │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  接口层 / Interface Layer                                │</span><br><span class="line">│  Terminal CLI │ IDE Extension │ Desktop App │ Web/CI-CD │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  智能体层 / Agent Layer                                   │</span><br><span class="line">│  Agent Loop (while-tool_call)                           │</span><br><span class="line">│  Permission System (7 modes + ML classifier)          │</span><br><span class="line">│  Context Management (5-layer compaction)                │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  工具层 / Tool Layer                                      │</span><br><span class="line">│  Built-in Tools │ Subagents │ MCP │ Skills &amp; Plugins     │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  持久化层 / Persistence Layer                             │</span><br><span class="line">│  Session Storage (JSONL) │ CLAUDE.md │ File-based Memory│</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>English:</strong> The system decomposes into <strong>7 components</strong> across <strong>5 architectural layers</strong>: User → Interfaces → Agent Loop → Permission System → Tools → State &amp; Persistence → Execution Environment.</p>
+<hr>
+<h3 id="2-3-九步回合流水线-Nine-Step-Turn-Pipeline"><a href="#2-3-九步回合流水线-Nine-Step-Turn-Pipeline" class="headerlink" title="2.3 九步回合流水线 &#x2F; Nine-Step Turn Pipeline"></a>2.3 九步回合流水线 &#x2F; Nine-Step Turn Pipeline</h3><p><strong>中文：</strong> 每一轮交互遵循严格的九步流水线：</p>
+<table>
+<thead>
+<tr>
+<th>步骤 &#x2F; Step</th>
+<th>名称 &#x2F; Name</th>
+<th>功能 &#x2F; Function</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>设置解析 &#x2F; Settings Resolution</td>
+<td>加载配置、环境变量、权限模式</td>
+</tr>
+<tr>
+<td>2</td>
+<td>状态初始化 &#x2F; State Initialization</td>
+<td>恢复会话状态、工作目录</td>
+</tr>
+<tr>
+<td>3</td>
+<td>上下文组装 &#x2F; Context Assembly</td>
+<td>从 9 个有序来源构建上下文窗口</td>
+</tr>
+<tr>
+<td>4</td>
+<td>上下文压缩 &#x2F; Context Compaction</td>
+<td>五层压缩管道，防止超出 token 限制</td>
+</tr>
+<tr>
+<td>5</td>
+<td>模型调用 &#x2F; Model Call</td>
+<td>向 Claude API 发送请求</td>
+</tr>
+<tr>
+<td>6</td>
+<td>工具分发 &#x2F; Tool Dispatch</td>
+<td>解析模型返回的工具调用</td>
+</tr>
+<tr>
+<td>7</td>
+<td>权限门控 &#x2F; Permission Gate</td>
+<td>评估操作是否需要用户批准</td>
+</tr>
+<tr>
+<td>8</td>
+<td>工具执行 &#x2F; Tool Execution</td>
+<td>在沙箱&#x2F;本地环境中执行</td>
+</tr>
+<tr>
+<td>9</td>
+<td>停止条件检查 &#x2F; Stop Check</td>
+<td>判断是否完成任务或需继续</td>
+</tr>
+</tbody></table>
+<p><strong>English:</strong> Each interaction round follows a strict nine-step pipeline: Settings Resolution → State Initialization → Context Assembly → Context Compaction → Model Call → Tool Dispatch → Permission Gate → Tool Execution → Stop Condition Check.</p>
+<hr>
+<h3 id="2-4-内置工具集-Built-in-Tool-Set"><a href="#2-4-内置工具集-Built-in-Tool-Set" class="headerlink" title="2.4 内置工具集 &#x2F; Built-in Tool Set"></a>2.4 内置工具集 &#x2F; Built-in Tool Set</h3><p><strong>中文：</strong> Claude Code 的核心工具集精简而强大，遵循「搜索，不索引（Search, Don’t Index）」哲学——使用 ripgrep 而非向量数据库进行代码搜索，以降低运维复杂度与安全风险。</p>
+<table>
+<thead>
+<tr>
+<th>工具 &#x2F; Tool</th>
+<th>功能 &#x2F; Function</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Bash</code></td>
+<td>通用适配器，执行任意 Shell 命令</td>
+</tr>
+<tr>
+<td><code>Read</code></td>
+<td>读取文件内容</td>
+</tr>
+<tr>
+<td><code>Edit</code> &#x2F; <code>Write</code></td>
+<td>编辑或创建文件</td>
+</tr>
+<tr>
+<td><code>Grep</code></td>
+<td>基于 ripgrep 的内容搜索</td>
+</tr>
+<tr>
+<td><code>Glob</code></td>
+<td>文件名模式匹配</td>
+</tr>
+<tr>
+<td><code>Task</code></td>
+<td>生成子智能体，隔离上下文执行子任务</td>
+</tr>
+<tr>
+<td><code>TodoWrite</code></td>
+<td>任务列表管理，追踪多步进度</td>
+</tr>
+</tbody></table>
+<p><strong>English:</strong> Claude Code’s core toolset is lean yet powerful, following a <strong>“Search, Don’t Index”</strong> philosophy—using ripgrep rather than vector databases for code search, reducing operational complexity and security risks. The eight core tools are listed in the table above.</p>
+<hr>
+<h3 id="2-5-权限系统-Permission-System"><a href="#2-5-权限系统-Permission-System" class="headerlink" title="2.5 权限系统 &#x2F; Permission System"></a>2.5 权限系统 &#x2F; Permission System</h3><p><strong>中文：</strong> 权限系统是 Claude Code 安全架构的核心，采用**拒绝优先（Deny-First）**规则引擎，提供 <strong>7 种权限模式</strong>，形成渐进的信任光谱：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plan → default → acceptEdits → auto → dontAsk → bypassPermissions</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>plan</strong>：仅规划，不执行任何修改操作</li>
+<li><strong>default</strong>：每次危险操作需用户确认</li>
+<li><strong>acceptEdits</strong>：自动接受文件编辑，其他操作需确认</li>
+<li><strong>auto</strong>：ML 分类器（yoloClassifier）自动筛选低风险操作</li>
+<li><strong>dontAsk</strong>：不再询问，自动执行（高风险）</li>
+<li><strong>bypassPermissions</strong>：跳过所有权限检查（仅限受信环境）</li>
+</ul>
+<p>据 Anthropic 内部数据，用户对 Claude 请求的批准率高达 <strong>93%</strong>，系统设计大量代码来处理剩余 7% 的边缘情况。</p>
+<p><strong>English:</strong> The permission system is the core of Claude Code’s security architecture, using a <strong>deny-first</strong> rule engine with <strong>7 permission modes</strong> forming a graduated trust spectrum (see above). According to Anthropic internal data, users approve Claude’s requests <strong>93%</strong> of the time; the system invests significant engineering in handling the remaining 7% edge cases.</p>
+<hr>
+<h3 id="2-6-上下文管理-Context-Management"><a href="#2-6-上下文管理-Context-Management" class="headerlink" title="2.6 上下文管理 &#x2F; Context Management"></a>2.6 上下文管理 &#x2F; Context Management</h3><p><strong>中文：</strong> Claude Code 在固定上下文窗口（约 200K tokens，因模型而异）内运行，采用<strong>五层压缩管道</strong>主动管理上下文：</p>
+<ol>
+<li><strong>预算削减 &#x2F; Budget Reduction</strong> — 按优先级裁剪低价值内容</li>
+<li><strong>Snip</strong> — 截断过长的工具输出</li>
+<li><strong>Microcompact</strong> — 压缩重复或冗余信息</li>
+<li><strong>Context Collapse</strong> — 合并相似上下文片段</li>
+<li><strong>Auto-Compact</strong> — LLM 驱动的智能摘要</li>
+</ol>
+<p><strong>CLAUDE.md 层级体系</strong>（4 级）提供持久化项目上下文：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">~/.claude/CLAUDE.md          → 全局用户偏好</span><br><span class="line">./CLAUDE.md                  → 项目根目录规则</span><br><span class="line">./src/CLAUDE.md              → 子目录特定规则</span><br><span class="line">./src/module/CLAUDE.md       → 模块级规则</span><br></pre></td></tr></table></figure>
+
+<p>记忆系统采用<strong>纯文件存储</strong>（Markdown 文件），无向量数据库，完全可检查、可编辑、可版本控制。</p>
+<p><strong>English:</strong> Claude Code operates within a fixed context window (~200K tokens, varying by model), using a <strong>five-layer compaction pipeline</strong> for proactive context management (listed above). The <strong>CLAUDE.md hierarchy</strong> (4 levels) provides persistent project context, and the memory system uses <strong>file-based storage</strong> (Markdown files) with no vector database—fully inspectable, editable, and version-controllable.</p>
+<hr>
+<h3 id="2-7-扩展机制-Extension-Mechanisms"><a href="#2-7-扩展机制-Extension-Mechanisms" class="headerlink" title="2.7 扩展机制 &#x2F; Extension Mechanisms"></a>2.7 扩展机制 &#x2F; Extension Mechanisms</h3><p><strong>中文：</strong> Claude Code 提供四种扩展机制，形成可定制的智能体平台：</p>
+<table>
+<thead>
+<tr>
+<th>机制 &#x2F; Mechanism</th>
+<th>说明 &#x2F; Description</th>
+<th>典型用途 &#x2F; Use Case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MCP</strong></td>
+<td>Model Context Protocol，连接外部服务</td>
+<td>查询数据库、发送 Slack 消息、控制浏览器</td>
+</tr>
+<tr>
+<td><strong>Skills</strong></td>
+<td>可复用的知识与工作流</td>
+<td>代码审查流程、部署检查清单</td>
+</tr>
+<tr>
+<td><strong>Hooks</strong></td>
+<td>27 种生命周期事件拦截</td>
+<td>每次文件编辑后运行 ESLint</td>
+</tr>
+<tr>
+<td><strong>Plugins</strong></td>
+<td>打包分发上述功能的安装单元</td>
+<td>跨项目复用、团队共享</td>
+</tr>
+</tbody></table>
+<p><strong>子智能体（Subagents）</strong> 通过 <code>Task</code> 工具生成，在隔离的上下文窗口中运行，仅向父智能体返回摘要，防止上下文爆炸。更新的 <strong>Agent Teams</strong> 功能支持多会话协作，共享任务与点对点通信。</p>
+<p><strong>English:</strong> Claude Code provides four extension mechanisms forming a customizable agent platform (see table). <strong>Subagents</strong> spawn via the <code>Task</code> tool, running in isolated context windows and returning only summaries to the parent. The newer <strong>Agent Teams</strong> feature supports multi-session collaboration with shared tasks and peer-to-peer messaging.</p>
+<hr>
+<h3 id="2-8-会话存储-Session-Storage"><a href="#2-8-会话存储-Session-Storage" class="headerlink" title="2.8 会话存储 &#x2F; Session Storage"></a>2.8 会话存储 &#x2F; Session Storage</h3><p><strong>中文：</strong> 所有交互以 <strong>append-only JSONL</strong> 格式持久化，支持确定性审计与回放。子智能体隔离可通过 <strong>Git Worktrees</strong> 实现，确保并行智能体互不干扰。</p>
+<p><strong>English:</strong> All interactions are persisted in <strong>append-only JSONL</strong> format, enabling deterministic auditing and replay. Subagent isolation can be achieved via <strong>Git Worktrees</strong>, ensuring parallel agents do not interfere with each other.</p>
+<hr>
+<h2 id="三、应用场景-Application-Scenarios"><a href="#三、应用场景-Application-Scenarios" class="headerlink" title="三、应用场景 &#x2F; Application Scenarios"></a>三、应用场景 &#x2F; Application Scenarios</h2><h3 id="3-1-复杂多文件重构-Complex-Multi-File-Refactoring"><a href="#3-1-复杂多文件重构-Complex-Multi-File-Refactoring" class="headerlink" title="3.1 复杂多文件重构 &#x2F; Complex Multi-File Refactoring"></a>3.1 复杂多文件重构 &#x2F; Complex Multi-File Refactoring</h3><p><strong>中文：</strong> 当需要在数十个文件间协调修改时（如认证层重构、API 版本迁移），Claude Code 可自主规划变更顺序、逐文件执行、运行测试验证，并在失败时自动修正。</p>
+<p><strong>English:</strong> When coordinated changes across dozens of files are needed (e.g., auth layer refactoring, API version migration), Claude Code autonomously plans change order, executes file by file, runs tests for verification, and auto-corrects on failure.</p>
+<hr>
+<h3 id="3-2-测试驱动开发循环-Test-Driven-Development-Loop"><a href="#3-2-测试驱动开发循环-Test-Driven-Development-Loop" class="headerlink" title="3.2 测试驱动开发循环 &#x2F; Test-Driven Development Loop"></a>3.2 测试驱动开发循环 &#x2F; Test-Driven Development Loop</h3><p><strong>中文：</strong> Claude Code 可编写测试 → 运行测试 → 读取失败输出 → 修复实现 → 再次运行，形成完整的 TDD 闭环，无需人工介入每一步。</p>
+<p><strong>English:</strong> Claude Code can write tests → run tests → read failure output → fix implementation → run again, forming a complete TDD loop without human intervention at each step.</p>
+<hr>
+<h3 id="3-3-Git-工作流自动化-Git-Workflow-Automation"><a href="#3-3-Git-工作流自动化-Git-Workflow-Automation" class="headerlink" title="3.3 Git 工作流自动化 &#x2F; Git Workflow Automation"></a>3.3 Git 工作流自动化 &#x2F; Git Workflow Automation</h3><p><strong>中文：</strong> 从读取 Issue、编写代码、运行测试到提交 PR，Claude Code 可端到端处理整个开发流程，与 GitHub、GitLab 深度集成。</p>
+<p><strong>English:</strong> From reading issues, writing code, and running tests to submitting PRs, Claude Code can handle the entire development workflow end-to-end, with deep GitHub and GitLab integration.</p>
+<hr>
+<h3 id="3-4-代码库探索与文档-Codebase-Exploration-Documentation"><a href="#3-4-代码库探索与文档-Codebase-Exploration-Documentation" class="headerlink" title="3.4 代码库探索与文档 &#x2F; Codebase Exploration &amp; Documentation"></a>3.4 代码库探索与文档 &#x2F; Codebase Exploration &amp; Documentation</h3><p><strong>中文：</strong> 利用 agentic search（基于 grep，非 RAG），Claude Code 可在数秒内映射并解释整个代码库结构，生成架构文档或 onboarding 指南。</p>
+<p><strong>English:</strong> Using agentic search (grep-based, not RAG), Claude Code can map and explain entire codebase structure in seconds, generating architecture docs or onboarding guides.</p>
+<hr>
+<h3 id="3-5-CI-CD-与自动化-CI-CD-Automation"><a href="#3-5-CI-CD-与自动化-CI-CD-Automation" class="headerlink" title="3.5 CI&#x2F;CD 与自动化 &#x2F; CI&#x2F;CD &amp; Automation"></a>3.5 CI&#x2F;CD 与自动化 &#x2F; CI&#x2F;CD &amp; Automation</h3><p><strong>中文：</strong> 通过 GitHub Actions 集成或 SDK，Claude Code 可在 CI 流水线中自动审查 PR、修复 lint 错误、更新依赖，实现「无人值守」的代码维护。</p>
+<p><strong>English:</strong> Via GitHub Actions integration or SDK, Claude Code can automatically review PRs, fix lint errors, and update dependencies in CI pipelines, enabling “unattended” code maintenance.</p>
+<hr>
+<h3 id="3-6-团队知识沉淀-Team-Knowledge-Capture"><a href="#3-6-团队知识沉淀-Team-Knowledge-Capture" class="headerlink" title="3.6 团队知识沉淀 &#x2F; Team Knowledge Capture"></a>3.6 团队知识沉淀 &#x2F; Team Knowledge Capture</h3><p><strong>中文：</strong> 通过 <code>CLAUDE.md</code>、Skills 和 Hooks，团队可将编码规范、审查流程、部署检查清单固化为可复用的智能体能力，新成员快速获得团队最佳实践。</p>
+<p><strong>English:</strong> Through <code>CLAUDE.md</code>, Skills, and Hooks, teams can codify coding standards, review processes, and deployment checklists into reusable agent capabilities, giving new members rapid access to team best practices.</p>
+<hr>
+<h2 id="四、优缺点分析-Pros-and-Cons-Analysis"><a href="#四、优缺点分析-Pros-and-Cons-Analysis" class="headerlink" title="四、优缺点分析 &#x2F; Pros and Cons Analysis"></a>四、优缺点分析 &#x2F; Pros and Cons Analysis</h2><h3 id="4-1-优点-Advantages"><a href="#4-1-优点-Advantages" class="headerlink" title="4.1 优点 &#x2F; Advantages"></a>4.1 优点 &#x2F; Advantages</h3><table>
+<thead>
+<tr>
+<th>维度 &#x2F; Dimension</th>
+<th>中文</th>
+<th>English</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>高自主性</strong></td>
+<td>可委托完整的多步任务，从规划到验证全程自主执行，适合「委派模式」工作流</td>
+<td>Can delegate complete multi-step tasks, autonomously executing from planning to verification—ideal for “delegation mode” workflows</td>
+</tr>
+<tr>
+<td><strong>终端原生集成</strong></td>
+<td>与现有 CLI 工具链（git、docker、kubectl 等）无缝协作，无需切换界面</td>
+<td>Seamlessly works with existing CLI toolchain (git, docker, kubectl, etc.) without context switching</td>
+</tr>
+<tr>
+<td><strong>上下文持久化</strong></td>
+<td>CLAUDE.md 层级 + 文件记忆，跨会话保持项目知识与编码规范</td>
+<td>CLAUDE.md hierarchy + file memory maintains project knowledge and coding standards across sessions</td>
+</tr>
+<tr>
+<td><strong>安全权限模型</strong></td>
+<td>7 级权限模式 + ML 分类器，在自主性与安全性间取得平衡</td>
+<td>7-level permission modes + ML classifier balance autonomy and security</td>
+</tr>
+<tr>
+<td><strong>高度可扩展</strong></td>
+<td>MCP、Skills、Hooks、Plugins 四层扩展，可连接任意外部系统</td>
+<td>MCP, Skills, Hooks, Plugins—four extension layers connecting to any external system</td>
+</tr>
+<tr>
+<td><strong>子智能体隔离</strong></td>
+<td>Task 工具 + Git Worktrees 支持并行任务，互不干扰</td>
+<td>Task tool + Git Worktrees enable parallel tasks without interference</td>
+</tr>
+<tr>
+<td><strong>审计可追溯</strong></td>
+<td>append-only JSONL 会话存储，每次交互可回放、可审计</td>
+<td>Append-only JSONL session storage enables replay and audit of every interaction</td>
+</tr>
+<tr>
+<td><strong>复杂任务效率高</strong></td>
+<td>对于跨多文件、需执行命令的复杂任务，token 效率优于交互式 IDE 工具</td>
+<td>Higher token efficiency than interactive IDE tools for complex multi-file, command-executing tasks</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="4-2-缺点与局限-Disadvantages-Limitations"><a href="#4-2-缺点与局限-Disadvantages-Limitations" class="headerlink" title="4.2 缺点与局限 &#x2F; Disadvantages &amp; Limitations"></a>4.2 缺点与局限 &#x2F; Disadvantages &amp; Limitations</h3><table>
+<thead>
+<tr>
+<th>维度 &#x2F; Dimension</th>
+<th>中文</th>
+<th>English</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>模型绑定</strong></td>
+<td>仅支持 Anthropic Claude 模型，无法切换至 GPT、Gemini 等</td>
+<td>Only supports Anthropic Claude models; cannot switch to GPT, Gemini, etc.</td>
+</tr>
+<tr>
+<td><strong>学习曲线陡峭</strong></td>
+<td>终端优先的设计对不熟悉 CLI 的开发者不够友好</td>
+<td>Terminal-first design is less friendly to developers unfamiliar with CLI</td>
+</tr>
+<tr>
+<td><strong>非实时补全</strong></td>
+<td>不适合「边写边提示下一行」的编码场景，那是 Cursor 等 IDE 工具的强项</td>
+<td>Not suited for “suggest next line while typing” scenarios—that’s the strength of IDE tools like Cursor</td>
+</tr>
+<tr>
+<td><strong>使用配额限制</strong></td>
+<td>Pro&#x2F;Max 计划有滚动窗口与周限额，重度用户可能受限</td>
+<td>Pro&#x2F;Max plans have rolling window and weekly limits that may constrain power users</td>
+</tr>
+<tr>
+<td><strong>成本考量</strong></td>
+<td>复杂自主任务的 API 调用量较大，重度使用成本高于 IDE 订阅制工具</td>
+<td>Complex autonomous tasks consume significant API calls; heavy usage costs more than IDE subscription tools</td>
+</tr>
+<tr>
+<td><strong>GUI 体验有限</strong></td>
+<td>终端版缺乏可视化 diff（桌面应用和 IDE 扩展可部分弥补）</td>
+<td>Terminal version lacks visual diff (partially addressed by desktop app and IDE extensions)</td>
+</tr>
+<tr>
+<td><strong>网络依赖</strong></td>
+<td>核心功能需联网调用 Claude API，离线不可用</td>
+<td>Core functionality requires internet for Claude API calls; offline use not supported</td>
+</tr>
+<tr>
+<td><strong>长任务不确定性</strong></td>
+<td>自主执行的长任务可能偏离预期，需中途干预或重新定向</td>
+<td>Long autonomous tasks may drift from expectations, requiring mid-course intervention</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、与其他工具的定位对比-Positioning-vs-Other-Tools"><a href="#五、与其他工具的定位对比-Positioning-vs-Other-Tools" class="headerlink" title="五、与其他工具的定位对比 &#x2F; Positioning vs. Other Tools"></a>五、与其他工具的定位对比 &#x2F; Positioning vs. Other Tools</h2><p><strong>中文：</strong></p>
+<p>Claude Code 与 Cursor 等 IDE 工具并非竞争关系，而是覆盖同一工作流的不同环节：</p>
+<table>
+<thead>
+<tr>
+<th>场景 &#x2F; Scenario</th>
+<th>更适合的工具 &#x2F; Better Tool</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>边写代码边获得行级建议</td>
+<td><strong>Cursor</strong>（交互式、人在回路）</td>
+</tr>
+<tr>
+<td>委托完整的多步开发任务</td>
+<td><strong>Claude Code</strong>（自主式、智能体驱动）</td>
+</tr>
+<tr>
+<td>快速 inline 编辑</td>
+<td><strong>Cursor</strong></td>
+</tr>
+<tr>
+<td>大规模跨文件重构</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+<tr>
+<td>实时 Tab 补全</td>
+<td><strong>Cursor</strong></td>
+</tr>
+<tr>
+<td>自动化测试-修复循环</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+<tr>
+<td>可视化 diff 审查</td>
+<td><strong>Cursor &#x2F; Claude Code Desktop</strong></td>
+</tr>
+<tr>
+<td>CI&#x2F;CD 无人值守自动化</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+</tbody></table>
+<p><strong>English:</strong></p>
+<p>Claude Code and IDE tools like Cursor are not competitors—they cover different parts of the same workflow (see table above). The key insight: <strong>Cursor is a force multiplier on your keystrokes; Claude Code is a delegate for whole jobs.</strong></p>
+<hr>
+<h2 id="六、设计启示-Design-Insights-for-Agent-Builders"><a href="#六、设计启示-Design-Insights-for-Agent-Builders" class="headerlink" title="六、设计启示 &#x2F; Design Insights for Agent Builders"></a>六、设计启示 &#x2F; Design Insights for Agent Builders</h2><p><strong>中文：</strong> Claude Code 的架构为构建 AI 智能体系统提供了重要启示：</p>
+<ol>
+<li><strong>模型是小部分，基础设施是大头</strong> — 投资应集中在 Harness（权限、上下文、工具路由）而非模型调用本身</li>
+<li><strong>简单循环足够</strong> — 无需 DAG、分类器或 RAG；让模型决定一切</li>
+<li><strong>搜索优于索引</strong> — grep 比向量搜索更简单、更安全、在 agentic 场景下同样有效</li>
+<li><strong>权限是产品特性，不是障碍</strong> — 93% 批准率说明用户信任自主性，但 7% 的边缘情况值得大量工程投入</li>
+<li><strong>文件即记忆</strong> — 可检查、可编辑、可版本控制的 Markdown 优于黑盒向量数据库</li>
+<li><strong>扩展性决定平台价值</strong> — MCP、Skills、Hooks、Plugins 四层机制使 Claude Code 从工具演变为平台</li>
+</ol>
+<p><strong>English:</strong> Claude Code’s architecture offers key insights for building AI agent systems (listed above). As frontier models converge, <strong>harness + model co-optimization</strong> is the differentiator.</p>
+<hr>
+<h2 id="七、总结-Summary"><a href="#七、总结-Summary" class="headerlink" title="七、总结 &#x2F; Summary"></a>七、总结 &#x2F; Summary</h2><p><strong>中文：</strong> Claude Code 代表了 AI 辅助编程从「自动补全」到「自主智能体」的范式转变。其架构哲学——<strong>简单循环 + 厚重基础设施</strong>——证明了一个反直觉的事实：构建优秀智能体系统的关键，不在于更复杂的 AI 逻辑，而在于更可靠的确定性系统。对于需要委托复杂、多步、跨文件开发任务的团队，Claude Code 是目前最成熟的终端原生智能体编程解决方案。</p>
+<p><strong>English:</strong> Claude Code represents the paradigm shift in AI-assisted programming from “autocomplete” to “autonomous agent.” Its architectural philosophy—<strong>simple loop + heavy infrastructure</strong>—proves a counterintuitive truth: the key to building excellent agent systems lies not in more complex AI logic, but in more reliable deterministic systems. For teams needing to delegate complex, multi-step, cross-file development tasks, Claude Code is currently the most mature terminal-native agentic coding solution.</p>
+<hr>
+<h2 id="参考资料-References"><a href="#参考资料-References" class="headerlink" title="参考资料 &#x2F; References"></a>参考资料 &#x2F; References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/overview">Claude Code Official Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code Works (Official)</a></li>
+<li><a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/features-overview">Extend Claude Code - Features Overview</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2604.14228">Dive into Claude Code (arXiv Academic Paper)</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/VILA-Lab/Dive-into-Claude-Code">VILA-Lab&#x2F;Dive-into-Claude-Code (GitHub)</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e601e6a8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -6480,264 +6953,6 @@ instruction: |
 <h2 id="八、总结"><a class="headerlink" href="#八、总结" title="八、总结"></a>八、总结 | Summary</h2>
 <p><strong>中文</strong>：LLM Wiki 是一种<strong>用 LLM 编译并维护个人知识库</strong>的方法论。它适合深度研究、长期学习、项目沉淀等需要<strong>综合与连接</strong>的场景，是对传统 RAG「每次从头检索」思路的有益补充。成功关键在于清晰的 Schema、高质量的原料，以及定期的 Lint 与人工校验。</p>
 <p><strong>English</strong>: LLM Wiki is a methodology for <strong>compiling and maintaining a personal knowledge base with LLMs</strong>. It fits deep research, long-term learning, and project documentation where <strong>synthesis and connection</strong> matter. Success depends on a clear schema, high-quality sources, and regular Lint plus human verification.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/lora-finetune-novel-writing-qwen-llamafactory.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/lora-finetune-novel-writing-qwen-llamafactory.html" class="post-title-link" itemprop="url">LoRA 微调小说写作小模型：Qwen-1.8B-Chat + LLaMA Factory 同款文风续写</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2026-06-05 07:30:00" itemprop="dateCreated datePublished" datetime="2026-06-05T07:30:00+08:00">2026-06-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>大模型「会写」和「写得像你」是两回事。通用模型能讲故事，但很难稳定复现某一本书的文风、句式、叙事节奏和人物口吻。</p>
-<p>这篇文章用 <strong>Qwen-1.8B-Chat + LLaMA Factory + LoRA</strong>，在消费级 GPU 上微调一个小模型，让它学会你指定小说的写作风格，实现<strong>同款风格续写</strong>。</p>
-<h2 id="我们要让模型学会什么"><a class="headerlink" href="#我们要让模型学会什么" title="我们要让模型学会什么"></a>我们要让模型学会什么</h2><p>小说风格不是单一维度，训练数据要覆盖这些层面：</p>
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>说明</th>
-<th>数据体现</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>文风</td>
-<td>用词习惯、修辞密度、叙述视角</td>
-<td>原文段落本身</td>
-</tr>
-<tr>
-<td>句式</td>
-<td>长短句交替、断句节奏、对话与描写比例</td>
-<td>连续上下文</td>
-</tr>
-<tr>
-<td>叙事节奏</td>
-<td>铺垫—冲突—转折的信息密度</td>
-<td>多轮续写样本</td>
-</tr>
-<tr>
-<td>人物口吻</td>
-<td>不同角色说话方式、语气词、口头禅</td>
-<td>带角色标注的对话</td>
-</tr>
-</tbody></table>
-<p>LoRA 只更新少量参数，适合在 1.8B 小模型上<strong>注入风格</strong>，而不是重新学一遍中文。</p>
-<h2 id="方案概览"><a class="headerlink" href="#方案概览" title="方案概览"></a>方案概览</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/></pre></td><td class="code"><pre><span class="line">小说原文 (.txt)</span><br/><span class="line">    ↓ 切分 + 构造指令样本</span><br/><span class="line">训练集 (alpaca/sharegpt json)</span><br/><span class="line">    ↓ LLaMA Factory LoRA SFT</span><br/><span class="line">Qwen-1.8B-Chat + LoRA 适配器</span><br/><span class="line">    ↓ 加载推理</span><br/><span class="line">同款风格续写 / 对话写作</span><br/></pre></td></tr></table></figure>
-<p><strong>为什么选 Qwen-1.8B-Chat？</strong></p>
-<ul>
-<li>体量小，6GB 显存即可 LoRA 微调</li>
-<li>中文能力强，适合小说语料</li>
-<li>与 LLaMA Factory 的 <code>qwen</code> 模板原生兼容</li>
-</ul>
-<p><strong>为什么选 LoRA？</strong></p>
-<ul>
-<li>只训练低秩矩阵，显存占用低</li>
-<li>适配器文件通常几十到几百 MB，方便切换不同「文风」</li>
-<li>不破坏基座模型的通用能力</li>
-</ul>
-<h2 id="环境准备"><a class="headerlink" href="#环境准备" title="环境准备"></a>环境准备</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/></pre></td><td class="code"><pre><span class="line"><span class="comment"># 建议 Python 3.10+</span></span><br/><span class="line">git <span class="built_in">clone</span> --depth 1 https://github.com/hiyouga/LLaMA-Factory.git</span><br/><span class="line"><span class="built_in">cd</span> LLaMA-Factory</span><br/><span class="line">pip install -e <span class="string">".[torch,metrics]"</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 可选：4bit 量化训练（显存更省）</span></span><br/><span class="line">pip install bitsandbytes</span><br/></pre></td></tr></table></figure>
-<p>硬件建议：</p>
-<table>
-<thead>
-<tr>
-<th>配置</th>
-<th>全参数</th>
-<th>LoRA</th>
-<th>QLoRA (4bit)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>6GB 显存</td>
-<td>❌</td>
-<td>✅</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>12GB+ 显存</td>
-<td>❌</td>
-<td>✅ 舒适</td>
-<td>✅</td>
-</tr>
-</tbody></table>
-<h2 id="第一步：把小说变成训练数据"><a class="headerlink" href="#第一步：把小说变成训练数据" title="第一步：把小说变成训练数据"></a>第一步：把小说变成训练数据</h2><p>核心思路：<strong>不要只丢原文</strong>，要构造「指令 → 风格化输出」的监督样本。</p>
-<h3 id="1-清洗与切分原文"><a class="headerlink" href="#1-清洗与切分原文" title="1. 清洗与切分原文"></a>1. 清洗与切分原文</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br/><span class="line"><span class="keyword">import</span> re</span><br/><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">load_novel</span>(<span class="params">path: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br/><span class="line">    text = Path(path).read_text(encoding=<span class="string">"utf-8"</span>)</span><br/><span class="line">    text = re.sub(<span class="string">r"\s+"</span>, <span class="string">"\n"</span>, text.strip())</span><br/><span class="line">    <span class="keyword">return</span> text</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">split_chunks</span>(<span class="params">text: <span class="built_in">str</span>, chunk_size: <span class="built_in">int</span> = <span class="number">800</span>, overlap: <span class="built_in">int</span> = <span class="number">120</span></span>):</span><br/><span class="line">    <span class="string">"""按字数切分，保留上下文重叠，利于学习叙事节奏。"""</span></span><br/><span class="line">    chunks = []</span><br/><span class="line">    start = <span class="number">0</span></span><br/><span class="line">    <span class="keyword">while</span> start &lt; <span class="built_in">len</span>(text):</span><br/><span class="line">        end = <span class="built_in">min</span>(start + chunk_size, <span class="built_in">len</span>(text))</span><br/><span class="line">        chunks.append(text[start:end])</span><br/><span class="line">        <span class="keyword">if</span> end == <span class="built_in">len</span>(text):</span><br/><span class="line">            <span class="keyword">break</span></span><br/><span class="line">        start = end - overlap</span><br/><span class="line">    <span class="keyword">return</span> chunks</span><br/></pre></td></tr></table></figure>
-<h3 id="2-构造三类训练样本"><a class="headerlink" href="#2-构造三类训练样本" title="2. 构造三类训练样本"></a>2. 构造三类训练样本</h3><p><strong>A. 文风续写（主样本）</strong></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br/><span class="line">  <span class="attr">"instruction"</span><span class="punctuation">:</span> <span class="string">"请用以下小说的文风续写故事，保持叙述视角、句式节奏和用词习惯一致。"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"input"</span><span class="punctuation">:</span> <span class="string">"前情：\n{context}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"output"</span><span class="punctuation">:</span> <span class="string">"{continuation}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"system"</span><span class="punctuation">:</span> <span class="string">"你是一位擅长模仿指定小说文风的写作助手，注重叙事节奏与人物口吻。"</span></span><br/><span class="line"><span class="punctuation">}</span></span><br/></pre></td></tr></table></figure>
-<p><strong>B. 人物口吻对话</strong></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br/><span class="line">  <span class="attr">"instruction"</span><span class="punctuation">:</span> <span class="string">"请以【{character}】的口吻回应对话，保持该角色一贯的说话方式。"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"input"</span><span class="punctuation">:</span> <span class="string">"场景：{scene}\n对方说：{line}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"output"</span><span class="punctuation">:</span> <span class="string">"{reply}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"system"</span><span class="punctuation">:</span> <span class="string">"你正在扮演小说中的角色，回答必须符合人物性格和语言习惯。"</span></span><br/><span class="line"><span class="punctuation">}</span></span><br/></pre></td></tr></table></figure>
-<p><strong>C. 风格改写（强化句式）</strong></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br/><span class="line">  <span class="attr">"instruction"</span><span class="punctuation">:</span> <span class="string">"将下面这段文字改写成目标小说的文风，不改变情节，只调整措辞、节奏和修辞。"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"input"</span><span class="punctuation">:</span> <span class="string">"{neutral_text}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"output"</span><span class="punctuation">:</span> <span class="string">"{styled_text}"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"system"</span><span class="punctuation">:</span> <span class="string">"你是文风迁移助手，输出应贴近目标小说的叙述风格。"</span></span><br/><span class="line"><span class="punctuation">}</span></span><br/></pre></td></tr></table></figure>
-<h3 id="3-生成数据集脚本"><a class="headerlink" href="#3-生成数据集脚本" title="3. 生成数据集脚本"></a>3. 生成数据集脚本</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">build_style_samples</span>(<span class="params">chunks: <span class="built_in">list</span>[<span class="built_in">str</span>]</span>) -&gt; <span class="built_in">list</span>[<span class="built_in">dict</span>]:</span><br/><span class="line">    samples = []</span><br/><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(chunks) - <span class="number">1</span>):</span><br/><span class="line">        context = chunks[i]</span><br/><span class="line">        continuation = chunks[i + <span class="number">1</span>][:<span class="number">500</span>]  <span class="comment"># 续写目标不宜过长</span></span><br/><span class="line">        samples.append({</span><br/><span class="line">            <span class="string">"instruction"</span>: <span class="string">"请用以下小说的文风续写故事，保持叙述视角、句式节奏和用词习惯一致。"</span>,</span><br/><span class="line">            <span class="string">"input"</span>: <span class="string">f"前情：\n<span class="subst">{context}</span>"</span>,</span><br/><span class="line">            <span class="string">"output"</span>: continuation,</span><br/><span class="line">            <span class="string">"system"</span>: <span class="string">"你是一位擅长模仿指定小说文风的写作助手，注重叙事节奏与人物口吻。"</span></span><br/><span class="line">        })</span><br/><span class="line">    <span class="keyword">return</span> samples</span><br/><span class="line"></span><br/><span class="line">chunks = split_chunks(load_novel(<span class="string">"novel.txt"</span>))</span><br/><span class="line">dataset = build_style_samples(chunks)</span><br/><span class="line"></span><br/><span class="line">Path(<span class="string">"data/novel_style.json"</span>).write_text(</span><br/><span class="line">    json.dumps(dataset, ensure_ascii=<span class="literal">False</span>, indent=<span class="number">2</span>),</span><br/><span class="line">    encoding=<span class="string">"utf-8"</span></span><br/><span class="line">)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">f"生成 <span class="subst">{<span class="built_in">len</span>(dataset)}</span> 条样本"</span>)</span><br/></pre></td></tr></table></figure>
-<p>数据量建议：</p>
-<ul>
-<li><strong>最少</strong>：500 条高质量样本（约 3～5 万字小说）</li>
-<li><strong>推荐</strong>：2000～5000 条（多章节、多场景）</li>
-<li>样本要覆盖：叙述段、对话段、高潮段、日常段</li>
-</ul>
-<h2 id="第二步：注册数据集"><a class="headerlink" href="#第二步：注册数据集" title="第二步：注册数据集"></a>第二步：注册数据集</h2><p>在 <code>LLaMA-Factory/data/dataset_info.json</code> 中添加：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/></pre></td><td class="code"><pre><span class="line"><span class="attr">"novel_style"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br/><span class="line">  <span class="attr">"file_name"</span><span class="punctuation">:</span> <span class="string">"novel_style.json"</span><span class="punctuation">,</span></span><br/><span class="line">  <span class="attr">"columns"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br/><span class="line">    <span class="attr">"prompt"</span><span class="punctuation">:</span> <span class="string">"instruction"</span><span class="punctuation">,</span></span><br/><span class="line">    <span class="attr">"query"</span><span class="punctuation">:</span> <span class="string">"input"</span><span class="punctuation">,</span></span><br/><span class="line">    <span class="attr">"response"</span><span class="punctuation">:</span> <span class="string">"output"</span><span class="punctuation">,</span></span><br/><span class="line">    <span class="attr">"system"</span><span class="punctuation">:</span> <span class="string">"system"</span></span><br/><span class="line">  <span class="punctuation">}</span></span><br/><span class="line"><span class="punctuation">}</span></span><br/></pre></td></tr></table></figure>
-<h2 id="第三步：LoRA-微调配置"><a class="headerlink" href="#第三步：LoRA-微调配置" title="第三步：LoRA 微调配置"></a>第三步：LoRA 微调配置</h2><p>新建 <code>examples/train_lora/qwen1_8b_novel_lora.yaml</code>：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/></pre></td><td class="code"><pre><span class="line"><span class="comment">### model</span></span><br/><span class="line"><span class="attr">model_name_or_path:</span> <span class="string">Qwen/Qwen-1_8B-Chat</span></span><br/><span class="line"><span class="attr">trust_remote_code:</span> <span class="literal">true</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment">### method</span></span><br/><span class="line"><span class="attr">stage:</span> <span class="string">sft</span></span><br/><span class="line"><span class="attr">do_train:</span> <span class="literal">true</span></span><br/><span class="line"><span class="attr">finetuning_type:</span> <span class="string">lora</span></span><br/><span class="line"><span class="attr">lora_rank:</span> <span class="number">16</span></span><br/><span class="line"><span class="attr">lora_alpha:</span> <span class="number">32</span></span><br/><span class="line"><span class="attr">lora_dropout:</span> <span class="number">0.05</span></span><br/><span class="line"><span class="attr">lora_target:</span> <span class="string">all</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment">### dataset</span></span><br/><span class="line"><span class="attr">dataset:</span> <span class="string">novel_style</span></span><br/><span class="line"><span class="attr">template:</span> <span class="string">qwen</span></span><br/><span class="line"><span class="attr">cutoff_len:</span> <span class="number">2048</span></span><br/><span class="line"><span class="attr">max_samples:</span> <span class="number">10000</span></span><br/><span class="line"><span class="attr">overwrite_cache:</span> <span class="literal">true</span></span><br/><span class="line"><span class="attr">preprocessing_num_workers:</span> <span class="number">4</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment">### output</span></span><br/><span class="line"><span class="attr">output_dir:</span> <span class="string">saves/qwen1_8b_novel_lora</span></span><br/><span class="line"><span class="attr">logging_steps:</span> <span class="number">10</span></span><br/><span class="line"><span class="attr">save_steps:</span> <span class="number">200</span></span><br/><span class="line"><span class="attr">plot_loss:</span> <span class="literal">true</span></span><br/><span class="line"><span class="attr">overwrite_output_dir:</span> <span class="literal">true</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment">### train</span></span><br/><span class="line"><span class="attr">per_device_train_batch_size:</span> <span class="number">2</span></span><br/><span class="line"><span class="attr">gradient_accumulation_steps:</span> <span class="number">8</span></span><br/><span class="line"><span class="attr">learning_rate:</span> <span class="number">2.0e-4</span></span><br/><span class="line"><span class="attr">num_train_epochs:</span> <span class="number">3.0</span></span><br/><span class="line"><span class="attr">lr_scheduler_type:</span> <span class="string">cosine</span></span><br/><span class="line"><span class="attr">warmup_ratio:</span> <span class="number">0.05</span></span><br/><span class="line"><span class="attr">bf16:</span> <span class="literal">true</span></span><br/><span class="line"><span class="attr">ddp_timeout:</span> <span class="number">180000000</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment">### eval</span></span><br/><span class="line"><span class="attr">val_size:</span> <span class="number">0.05</span></span><br/><span class="line"><span class="attr">per_device_eval_batch_size:</span> <span class="number">1</span></span><br/><span class="line"><span class="attr">eval_strategy:</span> <span class="string">steps</span></span><br/><span class="line"><span class="attr">eval_steps:</span> <span class="number">200</span></span><br/></pre></td></tr></table></figure>
-<p>参数说明：</p>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>建议值</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>lora_rank</code></td>
-<td>8～32</td>
-<td>越大表达能力越强，显存越高</td>
-</tr>
-<tr>
-<td><code>cutoff_len</code></td>
-<td>2048</td>
-<td>覆盖更长上下文，利于学叙事节奏</td>
-</tr>
-<tr>
-<td><code>learning_rate</code></td>
-<td>1e-4 ~ 3e-4</td>
-<td>风格学习常用偏高学习率</td>
-</tr>
-<tr>
-<td><code>num_train_epochs</code></td>
-<td>2～5</td>
-<td>样本少可多轮，注意过拟合</td>
-</tr>
-</tbody></table>
-<p>显存不足时，改用 QLoRA：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/></pre></td><td class="code"><pre><span class="line"><span class="attr">finetuning_type:</span> <span class="string">lora</span></span><br/><span class="line"><span class="attr">quantization_bit:</span> <span class="number">4</span></span><br/></pre></td></tr></table></figure>
-<h2 id="第四步：启动训练"><a class="headerlink" href="#第四步：启动训练" title="第四步：启动训练"></a>第四步：启动训练</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> LLaMA-Factory</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 单卡训练</span></span><br/><span class="line">CUDA_VISIBLE_DEVICES=0 llamafactory-cli train examples/train_lora/qwen1_8b_novel_lora.yaml</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 或使用 Web UI</span></span><br/><span class="line">llamafactory-cli webui</span><br/></pre></td></tr></table></figure>
-<p>训练时关注：</p>
-<ol>
-<li><strong>loss 稳定下降</strong>：通常在 0.5～1.5 区间收敛</li>
-<li><strong>验证集 loss 不再下降时停止</strong>：避免只会「背诵」训练集</li>
-<li><strong>抽查生成</strong>：用同一 prompt 对比第 1 epoch 和第 3 epoch 输出</li>
-</ol>
-<h2 id="第五步：推理与同款风格写作"><a class="headerlink" href="#第五步：推理与同款风格写作" title="第五步：推理与同款风格写作"></a>第五步：推理与同款风格写作</h2><h3 id="命令行推理"><a class="headerlink" href="#命令行推理" title="命令行推理"></a>命令行推理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/></pre></td><td class="code"><pre><span class="line">CUDA_VISIBLE_DEVICES=0 llamafactory-cli chat \</span><br/><span class="line">  --model_name_or_path Qwen/Qwen-1_8B-Chat \</span><br/><span class="line">  --adapter_name_or_path saves/qwen1_8b_novel_lora \</span><br/><span class="line">  --template qwen \</span><br/><span class="line">  --finetuning_type lora</span><br/></pre></td></tr></table></figure>
-<h3 id="Python-加载"><a class="headerlink" href="#Python-加载" title="Python 加载"></a>Python 加载</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> AutoModelForCausalLM, AutoTokenizer</span><br/><span class="line"><span class="keyword">from</span> peft <span class="keyword">import</span> PeftModel</span><br/><span class="line"></span><br/><span class="line">base = <span class="string">"Qwen/Qwen-1_8B-Chat"</span></span><br/><span class="line">lora = <span class="string">"saves/qwen1_8b_novel_lora"</span></span><br/><span class="line"></span><br/><span class="line">tokenizer = AutoTokenizer.from_pretrained(base, trust_remote_code=<span class="literal">True</span>)</span><br/><span class="line">model = AutoModelForCausalLM.from_pretrained(</span><br/><span class="line">    base, device_map=<span class="string">"auto"</span>, trust_remote_code=<span class="literal">True</span></span><br/><span class="line">)</span><br/><span class="line">model = PeftModel.from_pretrained(model, lora)</span><br/><span class="line">model.<span class="built_in">eval</span>()</span><br/><span class="line"></span><br/><span class="line">prompt = <span class="string">"""请用训练小说的文风续写以下内容，保持叙事节奏和人物口吻：</span></span><br/><span class="line"><span class="string"></span></span><br/><span class="line"><span class="string">前情：</span></span><br/><span class="line"><span class="string">雨停之后，巷口的青石板还泛着潮气。她站在门廊下，没有回头。"""</span></span><br/><span class="line"></span><br/><span class="line">messages = [</span><br/><span class="line">    {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"你是一位擅长模仿指定小说文风的写作助手。"</span>},</span><br/><span class="line">    {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: prompt},</span><br/><span class="line">]</span><br/><span class="line">text = tokenizer.apply_chat_template(messages, tokenize=<span class="literal">False</span>, add_generation_prompt=<span class="literal">True</span>)</span><br/><span class="line">inputs = tokenizer([text], return_tensors=<span class="string">"pt"</span>).to(model.device)</span><br/><span class="line"></span><br/><span class="line">outputs = model.generate(**inputs, max_new_tokens=<span class="number">512</span>, temperature=<span class="number">0.8</span>, top_p=<span class="number">0.9</span>)</span><br/><span class="line"><span class="built_in">print</span>(tokenizer.decode(outputs[<span class="number">0</span>][inputs[<span class="string">"input_ids"</span>].shape[<span class="number">1</span>]:], skip_special_tokens=<span class="literal">True</span>))</span><br/></pre></td></tr></table></figure>
-<h3 id="导出合并模型（可选）"><a class="headerlink" href="#导出合并模型（可选）" title="导出合并模型（可选）"></a>导出合并模型（可选）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/></pre></td><td class="code"><pre><span class="line">CUDA_VISIBLE_DEVICES=0 llamafactory-cli <span class="built_in">export</span> \</span><br/><span class="line">  --model_name_or_path Qwen/Qwen-1_8B-Chat \</span><br/><span class="line">  --adapter_name_or_path saves/qwen1_8b_novel_lora \</span><br/><span class="line">  --template qwen \</span><br/><span class="line">  --finetuning_type lora \</span><br/><span class="line">  --export_dir exports/qwen1_8b_novel_merged \</span><br/><span class="line">  --export_size 2 \</span><br/><span class="line">  --export_legacy_format <span class="literal">false</span></span><br/></pre></td></tr></table></figure>
-<h2 id="效果调优：四个实战技巧"><a class="headerlink" href="#效果调优：四个实战技巧" title="效果调优：四个实战技巧"></a>效果调优：四个实战技巧</h2><h3 id="1-用「多粒度」样本，不要只续写"><a class="headerlink" href="#1-用「多粒度」样本，不要只续写" title="1. 用「多粒度」样本，不要只续写"></a>1. 用「多粒度」样本，不要只续写</h3><p>只喂「上文 → 下文」容易学会情节复述，学不会口吻。建议三类样本比例为：</p>
-<ul>
-<li>文风续写 60%</li>
-<li>角色对话 25%</li>
-<li>风格改写 15%</li>
-</ul>
-<h3 id="2-控制续写目标长度"><a class="headerlink" href="#2-控制续写目标长度" title="2. 控制续写目标长度"></a>2. 控制续写目标长度</h3><p><code>output</code> 建议 200～600 字。太长会稀释风格信号，太短学不到叙事节奏。</p>
-<h3 id="3-推理温度按任务切换"><a class="headerlink" href="#3-推理温度按任务切换" title="3. 推理温度按任务切换"></a>3. 推理温度按任务切换</h3><table>
-<thead>
-<tr>
-<th>任务</th>
-<th>temperature</th>
-<th>top_p</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>仿写/续写</td>
-<td>0.7～0.9</td>
-<td>0.85～0.95</td>
-</tr>
-<tr>
-<td>角色对话</td>
-<td>0.8～1.0</td>
-<td>0.9</td>
-</tr>
-<tr>
-<td>风格改写</td>
-<td>0.5～0.7</td>
-<td>0.8</td>
-</tr>
-</tbody></table>
-<h3 id="4-多适配器管理不同文风"><a class="headerlink" href="#4-多适配器管理不同文风" title="4. 多适配器管理不同文风"></a>4. 多适配器管理不同文风</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/></pre></td><td class="code"><pre><span class="line">saves/</span><br/><span class="line">├── qwen1_8b_wuxia_lora/     # 武侠风</span><br/><span class="line">├── qwen1_8b_romance_lora/   # 言情风</span><br/><span class="line">└── qwen1_8b_scifi_lora/     # 科幻风</span><br/></pre></td></tr></table></figure>
-<p>推理时切换 <code>adapter_name_or_path</code> 即可，基座模型不用重复加载。</p>
-<h2 id="常见问题"><a class="headerlink" href="#常见问题" title="常见问题"></a>常见问题</h2><p><strong>Q：生成内容像训练集原文拼凑？</strong></p>
-<p>过拟合。减少 epoch、增大 <code>lora_dropout</code>、扩充样本多样性。</p>
-<p><strong>Q：风格像了，但逻辑不通？</strong></p>
-<p>1.8B 容量有限，复杂长篇规划能力弱。建议用于<strong>段落级续写</strong>，而非整章大纲生成。</p>
-<p><strong>Q：对话口吻不像某个角色？</strong></p>
-<p>增加带角色名的对话样本，并在 <code>instruction</code> 中显式写出角色身份。</p>
-<p><strong>Q：显存不够？</strong></p>
-<p>启用 <code>quantization_bit: 4</code>，或将 <code>per_device_train_batch_size</code> 设为 1、<code>gradient_accumulation_steps</code> 调大。</p>
-<h2 id="总结"><a class="headerlink" href="#总结" title="总结"></a>总结</h2><p>用 Qwen-1.8B-Chat + LLaMA Factory 做 LoRA 微调，是在有限算力下实现「同款文风写作」的务实路线：</p>
-<ol>
-<li>把小说切成<strong>风格监督样本</strong>，而不只是原文堆砌</li>
-<li>覆盖文风、句式、节奏、口吻四个维度</li>
-<li>LoRA 低成本注入风格，基座能力保留</li>
-<li>推理时通过 prompt + 温度控制输出质量</li>
-</ol>
-<p>小模型不会替代顶尖大模型的全局构思能力，但在<strong>风格化续写、角色对话、章节仿写</strong>这类任务上，微调后的 1.8B 往往比未微调的 7B 更「像你」。</p>
-<p>如果你要针对某本具体小说做数据集，核心就一句话：<strong>让模型看到的每一条样本，都在回答「如何用这种风格写」</strong>。</p>
 
       
     </div>
