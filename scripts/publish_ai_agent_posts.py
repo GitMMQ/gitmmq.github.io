@@ -21,9 +21,9 @@ CATEGORY = "mechine"
 TZ = timezone(timedelta(hours=8))
 BASE_DATE_BATCH1 = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
 BASE_DATE_BATCH2 = datetime(2026, 6, 6, 10, 0, 0, tzinfo=TZ)
-TOTAL_POST_COUNT = 372  # 360 original + 4 batch1 + 8 batch2
+TOTAL_POST_COUNT = 372  # updated at runtime after posts are written
 ORIGINAL_TAG_COUNT = 18
-MECHINE_CATEGORY_COUNT = 44  # 32 original + 12 AI agent series
+MECHINE_CATEGORY_COUNT = 44  # updated at runtime
 TAG_CLOUD_SIZE = {
     12: ('24px', '#363636'),
     1: ('12px', '#ccc'),
@@ -190,6 +190,46 @@ def already_indexed(content: str, pid: str) -> bool:
     return f"/posts/{pid}.html" in content
 
 
+def find_insert_point(text: str, markers: list[str], *, default: int = -1) -> int:
+    for marker in markers:
+        pos = text.find(marker)
+        if pos != -1:
+            return pos
+    return default
+
+
+INDEX_MARKERS = [
+    '  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">\n'
+    '    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e601e6a8.html">',
+    '    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-learning-roadmap-index.html">',
+    '<div class="post-block">',
+]
+
+ARCHIVE_MARKERS = [
+    """  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2026-06-05T10:00:00+08:00"
+              content="2026-06-05">
+          06-05
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/posts/e601e6a8.html" itemprop="url">
+            <span itemprop="name">LLM Wiki 介绍：思想、意义、应用场景与优缺点</span>
+          </a>
+      </div>
+
+    </header>
+  </article>""",
+    '    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-learning-roadmap-index.html">',
+    '<article itemscope itemtype="http://schema.org/Article"',
+]
+
+
 def tag_dir_name(tag: str) -> str:
     if re.fullmatch(r"[\x00-\x7f]+", tag):
         return tag.replace(" ", "-")
@@ -284,25 +324,41 @@ def patch_sidebar_site_state(content: str, *, tag_count: int | None = None) -> s
 
 
 def render_tag_page(template: str, tag: str, posts: list[dict], tag_count: int) -> str:
-    slug = tag_dir_name(tag)
     page = template
-    page = page.replace("标签: hexo", f"标签: {tag}")
-    page = page.replace("https://www.fastolf.com/tags/hexo/index.html", tag_href(tag).rstrip("/") + "/index.html")
-    page = page.replace('href="https://www.fastolf.com/tags/hexo/"', f'href="https://www.fastolf.com{tag_href(tag)}"')
-    page = page.replace("<title>标签: hexo | Qi", f"<title>标签: {html.escape(tag)} | Qi")
-    page = page.replace(
-        """        <h2 class="collection-header">hexo
-          <small>标签</small>
-        </h2>""",
-        f"""        <h2 class="collection-header">{html.escape(tag)}
-          <small>标签</small>
-        </h2>""",
-    )
+    for label in ("hexo", "MCP"):
+        page = page.replace(f"标签: {label}", f"标签: {tag}")
+        page = page.replace(
+            f"https://www.fastolf.com/tags/{label}/index.html",
+            tag_href(tag).rstrip("/") + "/index.html",
+        )
+        page = page.replace(
+            f'href="https://www.fastolf.com/tags/{label}/"',
+            f'href="https://www.fastolf.com{tag_href(tag)}"',
+        )
+        page = page.replace(f"<title>标签: {label} | Qi", f"<title>标签: {html.escape(tag)} | Qi")
+        for heading in ("h1", "h2"):
+            old = (
+                f'        <{heading} class="collection-header">{label}\n'
+                f"          <small>标签</small>\n"
+                f"        </{heading}>"
+            )
+            new = (
+                f'        <{heading} class="collection-header">{html.escape(tag)}\n'
+                f"          <small>标签</small>\n"
+                f"        </{heading}>"
+            )
+            page = page.replace(old, new)
 
-    articles_start = """        </h2>
+    articles_start_markers = [
+        """        </h1>
       </div>
 
-      """
+      """,
+        """        </h2>
+      </div>
+
+      """,
+    ]
     articles_end = """    </div>
   </div>
   
@@ -310,7 +366,16 @@ def render_tag_page(template: str, tag: str, posts: list[dict], tag_count: int) 
   
 
 """
-    start_idx = page.index(articles_start) + len(articles_start)
+    start_idx = -1
+    articles_start = ""
+    for marker in articles_start_markers:
+        pos = page.find(marker)
+        if pos != -1:
+            start_idx = pos + len(marker)
+            articles_start = marker
+            break
+    if start_idx < 0:
+        raise ValueError(f"tag page template missing articles block for tag {tag}")
     end_idx = page.index(articles_end, start_idx)
     page = page[:start_idx] + tag_articles_html(posts) + page[end_idx:]
     return patch_sidebar_site_state(page, tag_count=tag_count)
@@ -710,28 +775,32 @@ def main() -> None:
         out.write_text(html_page, encoding="utf-8")
         print(f"Wrote {out.name} ({post['title']})")
 
-    # Update e601e6a8 next link to first article in this series
+    # Update e601e6a8 next link to first article in this series (optional legacy post)
     first_post = rendered_posts[0]
-    llm_post = (ROOT / "posts" / "e601e6a8.html").read_text(encoding="utf-8")
-    llm_post = re.sub(
-        r'<div class="post-nav-item">\s*<a href="/posts/[^"]+\.html" rel="next"[^>]*>.*?</a></div>',
-        (
-            f'<div class="post-nav-item">\n'
-            f'    <a href="/posts/{first_post["pid"]}.html" rel="next" title="{html.escape(first_post["title"])}">\n'
-            f'      {html.escape(first_post["title"])} <i class="fa fa-chevron-right"></i>\n'
-            f"    </a></div>"
-        ),
-        llm_post,
-        count=1,
-        flags=re.DOTALL,
-    )
-    (ROOT / "posts" / "e601e6a8.html").write_text(llm_post, encoding="utf-8")
+    llm_post_path = ROOT / "posts" / "e601e6a8.html"
+    if llm_post_path.exists():
+        llm_post = llm_post_path.read_text(encoding="utf-8")
+        llm_post = re.sub(
+            r'<div class="post-nav-item">\s*<a href="/posts/[^"]+\.html" rel="next"[^>]*>.*?</a></div>',
+            (
+                f'<div class="post-nav-item">\n'
+                f'    <a href="/posts/{first_post["pid"]}.html" rel="next" title="{html.escape(first_post["title"])}">\n'
+                f'      {html.escape(first_post["title"])} <i class="fa fa-chevron-right"></i>\n'
+                f"    </a></div>"
+            ),
+            llm_post,
+            count=1,
+            flags=re.DOTALL,
+        )
+        llm_post_path.write_text(llm_post, encoding="utf-8")
+
+    total_post_count = len(list((ROOT / "posts").glob("*.html")))
 
     # index.html - prepend home blocks (idempotent: only missing posts)
     index = (ROOT / "index.html").read_text(encoding="utf-8")
-    marker = '  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">\n    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e601e6a8.html">'
+    index_pos = find_insert_point(index, INDEX_MARKERS)
     missing_desc = [p for p in rendered_posts_desc if not already_indexed(index, p["pid"])]
-    if missing_desc:
+    if missing_desc and index_pos >= 0:
         blocks = "".join(
             home_article_block(
                 pid=p["pid"],
@@ -743,37 +812,16 @@ def main() -> None:
             )
             for p in missing_desc
         )
-        index = index.replace(marker, blocks + "\n" + marker, 1)
+        index = index[:index_pos] + blocks + "\n" + index[index_pos:]
     index = re.sub(
         r'(<span class="site-state-item-count">)\d+(</span>)',
-        rf"\g<1>{TOTAL_POST_COUNT}\g<2>",
+        rf"\g<1>{total_post_count}\g<2>",
         index,
         count=1,
     )
     (ROOT / "index.html").write_text(index, encoding="utf-8")
 
-    # archives/index.html
-    archives = (ROOT / "archives" / "index.html").read_text(encoding="utf-8")
-    arch_marker = """  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2026-06-05T10:00:00+08:00"
-              content="2026-06-05">
-          06-05
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/e601e6a8.html" itemprop="url">
-            <span itemprop="name">LLM Wiki 介绍：思想、意义、应用场景与优缺点</span>
-          </a>
-      </div>
-
-    </header>
-  </article>"""
-    def prepend_archive_blocks(content: str, marker: str, blocks: str) -> str:
+    def prepend_archive_blocks(content: str) -> str:
         missing = [p for p in rendered_posts_desc if not already_indexed(content, p["pid"])]
         if not missing:
             return content
@@ -781,73 +829,45 @@ def main() -> None:
             archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
             for p in missing
         )
-        return content.replace(marker, new_blocks + marker, 1)
+        pos = find_insert_point(content, ARCHIVE_MARKERS)
+        if pos < 0:
+            return content
+        return content[:pos] + new_blocks + content[pos:]
 
-    arch_blocks_all = "".join(
-        archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
-        for p in rendered_posts_desc
-    )
-    archives = prepend_archive_blocks(archives, arch_marker, arch_blocks_all)
+    # archives/index.html
+    archives = (ROOT / "archives" / "index.html").read_text(encoding="utf-8")
+    archives = prepend_archive_blocks(archives)
     (ROOT / "archives" / "index.html").write_text(archives, encoding="utf-8")
 
-    # archives/2026/index.html — insert before first 2026-06-05 LLM Wiki entry
+    # archives/2026/index.html
     arch2026 = (ROOT / "archives" / "2026" / "index.html").read_text(encoding="utf-8")
-    arch2026_marker = """  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2026-06-05T10:00:00+08:00"
-              content="2026-06-05">
-          06-05
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/e601e6a8.html" itemprop="url">
-            <span itemprop="name">LLM Wiki 介绍：思想、意义、应用场景与优缺点</span>
-          </a>
-      </div>
-
-    </header>
-  </article>"""
-    missing_2026 = [p for p in rendered_posts_desc if not already_indexed(arch2026, p["pid"])]
-    if missing_2026:
-        new_blocks = "".join(
-            archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
-            for p in missing_2026
-        )
-        arch2026 = arch2026.replace(arch2026_marker, new_blocks + arch2026_marker, 1)
-        arch2026 = re.sub(
-            r"(太棒了! 目前共计 )\d+( 篇日志)",
-            rf"\g<1>{TOTAL_POST_COUNT}\g<2>",
-            arch2026,
-            count=1,
-        )
+    arch2026 = prepend_archive_blocks(arch2026)
+    arch2026 = re.sub(
+        r"(太棒了! 目前共计 )\d+( 篇日志)",
+        rf"\g<1>{total_post_count}\g<2>",
+        arch2026,
+        count=1,
+    )
     (ROOT / "archives" / "2026" / "index.html").write_text(arch2026, encoding="utf-8")
 
     # categories/mechine/index.html
     cat = (ROOT / "categories" / "mechine" / "index.html").read_text(encoding="utf-8")
-    cat_marker = """  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta">
-        <time itemprop="dateCreated" datetime="2026-06-05T10:00:00+08:00" content="2026-06-05">06-05</time>
-      </div>
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/e601e6a8.html" itemprop="url">
-            <span itemprop="name">LLM Wiki 介绍：思想、意义、应用场景与优缺点</span>
-          </a>
-      </div>
-    </header>
-  </article>"""
-    cat = prepend_archive_blocks(cat, cat_marker, "")
+    cat = prepend_archive_blocks(cat)
+    mechine_count_match = re.search(r"mechine</a><span class=\"category-list-count\">(\d+)", cat)
+    mechine_category_count = (
+        int(mechine_count_match.group(1)) if mechine_count_match else MECHINE_CATEGORY_COUNT
+    )
     (ROOT / "categories" / "mechine" / "index.html").write_text(cat, encoding="utf-8")
 
     # search.xml (idempotent)
     search = (ROOT / "search.xml").read_text(encoding="utf-8")
     missing_search = [p for p in rendered_posts_desc if f"/posts/{p['pid']}.html" not in search]
     if missing_search:
-        insert_at = search.index("<entry>\n      <title>LLM Wiki")
+        insert_at = find_insert_point(
+            search,
+            ["<entry>\n      <title>LLM Wiki", "<entry>\n    <title>", "<entry>"],
+            default=search.find("<?xml"),
+        )
         search_entries = "".join(
             search_entry(pid=p["pid"], title=p["title"], excerpt_html=p["excerpt_html"])
             for p in missing_search
@@ -859,7 +879,19 @@ def main() -> None:
     sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
     missing_sitemap = [p for p in rendered_posts_desc if f"posts/{p['pid']}.html" not in sitemap]
     if missing_sitemap:
-        sitemap_insert = sitemap.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
+        sitemap_insert = find_insert_point(
+            sitemap,
+            [
+                "<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>",
+                "<url>\n    <loc>https://www.fastolf.com/posts/",
+                "<urlset",
+            ],
+            default=0,
+        )
+        if sitemap.startswith("<urlset"):
+            sitemap_insert = sitemap.find("<url>")
+            if sitemap_insert == -1:
+                sitemap_insert = len(sitemap)
         sitemap_urls = "".join(sitemap_url(p["pid"], p["published"]) for p in missing_sitemap)
         sitemap = sitemap[:sitemap_insert] + sitemap_urls + sitemap[sitemap_insert:]
     (ROOT / "sitemap.xml").write_text(sitemap, encoding="utf-8")
@@ -874,7 +906,15 @@ def main() -> None:
     baidu = (ROOT / "baidusitemap.xml").read_text(encoding="utf-8")
     missing_baidu = [p for p in rendered_posts_desc if f"posts/{p['pid']}.html" not in baidu]
     if missing_baidu:
-        baidu_insert = baidu.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
+        baidu_insert = find_insert_point(
+            baidu,
+            [
+                "<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>",
+                "<url>\n    <loc>https://www.fastolf.com/posts/",
+                "<urlset",
+            ],
+            default=baidu.find("<url>"),
+        )
         baidu_urls = "".join(
             f"  <url>\n    <loc>https://www.fastolf.com/posts/{p['pid']}.html</loc>\n"
             f"    <lastmod>{p['published'].strftime('%Y-%m-%d')}</lastmod>\n  </url>\n"
@@ -886,28 +926,37 @@ def main() -> None:
     # tags/index.html + per-tag archive pages
     tag_posts = collect_tag_posts(rendered_posts)
     total_tag_count = ORIGINAL_TAG_COUNT + len(tag_posts)
-    tag_template = (ROOT / "tags" / "hexo" / "index.html").read_text(encoding="utf-8")
+    tag_template_path = ROOT / "tags" / "hexo" / "index.html"
+    if not tag_template_path.exists():
+        tag_template_path = ROOT / "tags" / "MCP" / "index.html"
+    tag_template = tag_template_path.read_text(encoding="utf-8")
 
-    tags_index = (ROOT / "tags" / "index.html").read_text(encoding="utf-8")
-    tags_index = re.sub(
-        r"(目前共计 )\d+( 个标签)",
-        rf"\g<1>{total_tag_count}\g<2>",
-        tags_index,
-        count=1,
-    )
-    new_tag_links = [
-        tag_cloud_link(tag, len(posts))
-        for tag, posts in sorted(tag_posts.items())
-        if tag_href(tag) not in tags_index
-    ]
-    if new_tag_links:
-        tags_index = tags_index.replace(
-            '</div>\n          </div>\n        \n      </div>',
-            " " + " ".join(new_tag_links) + '</div>\n          </div>\n        \n      </div>',
-            1,
+    tags_index_path = ROOT / "tags" / "index.html"
+    if not tags_index_path.exists():
+        print("Skip tags/index.html updates (file not generated by Hexo).")
+        tags_index = ""
+    else:
+        tags_index = tags_index_path.read_text(encoding="utf-8")
+    if tags_index:
+        tags_index = re.sub(
+            r"(目前共计 )\d+( 个标签)",
+            rf"\g<1>{total_tag_count}\g<2>",
+            tags_index,
+            count=1,
         )
-    tags_index = patch_sidebar_site_state(tags_index, tag_count=total_tag_count)
-    (ROOT / "tags" / "index.html").write_text(tags_index, encoding="utf-8")
+        new_tag_links = [
+            tag_cloud_link(tag, len(posts))
+            for tag, posts in sorted(tag_posts.items())
+            if tag_href(tag) not in tags_index
+        ]
+        if new_tag_links:
+            tags_index = tags_index.replace(
+                '</div>\n          </div>\n        \n      </div>',
+                " " + " ".join(new_tag_links) + '</div>\n          </div>\n        \n      </div>',
+                1,
+            )
+        tags_index = patch_sidebar_site_state(tags_index, tag_count=total_tag_count)
+        tags_index_path.write_text(tags_index, encoding="utf-8")
 
     for tag, posts in tag_posts.items():
         tag_dir = ROOT / "tags" / tag_dir_name(tag)
@@ -920,7 +969,7 @@ def main() -> None:
     categories_index = (ROOT / "categories" / "index.html").read_text(encoding="utf-8")
     categories_index = re.sub(
         r'(href="/categories/mechine/">mechine</a><span class="category-list-count">)\d+(</span>)',
-        rf"\g<1>{MECHINE_CATEGORY_COUNT}\g<2>",
+        rf"\g<1>{mechine_category_count}\g<2>",
         categories_index,
         count=1,
     )
@@ -939,7 +988,7 @@ def main() -> None:
 
     print(
         f"Updated site indexes. New posts this run: {len(missing_desc)} on homepage. "
-        f"Tags: {total_tag_count}, mechine: {MECHINE_CATEGORY_COUNT}."
+        f"Tags: {total_tag_count}, mechine: {mechine_category_count}, total posts: {total_post_count}."
     )
 
 
