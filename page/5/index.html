@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">352</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,254 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/55387.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/55387.html" class="post-title-link" itemprop="url">状压DP</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>状压动态规划（Bitmask Dynamic Programming，状压DP）是一种优化技巧，通常用于解决组合优化问题，特别是集合的子集问题。以下是一个使用状压DP解决集合的最短路径问题的Java代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BitmaskDP</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">shortestPath</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span>[][] dist)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">totalStates</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; n;  <span class="comment">// Total possible subsets</span></span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n][totalStates];</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span>[] row : dp) {</span><br/><span class="line">            Arrays.fill(row, Integer.MAX_VALUE);</span><br/><span class="line">        }</span><br/><span class="line">        dp[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">0</span>;  <span class="comment">// Starting state: only the first city visited</span></span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">mask</span> <span class="operator">=</span> <span class="number">1</span>; mask &lt; totalStates; mask++) {</span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">0</span>; u &lt; n; u++) {</span><br/><span class="line">                <span class="keyword">if</span> ((mask &amp; (<span class="number">1</span> &lt;&lt; u)) != <span class="number">0</span>) {  <span class="comment">// Check if u is in the current subset</span></span><br/><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">v</span> <span class="operator">=</span> <span class="number">0</span>; v &lt; n; v++) {</span><br/><span class="line">                        <span class="keyword">if</span> (v != u &amp;&amp; (mask &amp; (<span class="number">1</span> &lt;&lt; v)) != <span class="number">0</span>) {  <span class="comment">// Check if v is in the current subset and not equal to u</span></span><br/><span class="line">                            dp[u][mask] = Math.min(dp[u][mask], dp[v][mask ^ (<span class="number">1</span> &lt;&lt; u)] + dist[v][u]);</span><br/><span class="line">                        }</span><br/><span class="line">                    }</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">minPath</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">1</span>; u &lt; n; u++) {</span><br/><span class="line">            minPath = Math.min(minPath, dp[u][totalStates - <span class="number">1</span>] + dist[u][<span class="number">0</span>]);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">return</span> minPath;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">4</span>;  <span class="comment">// Number of cities</span></span><br/><span class="line">        <span class="type">int</span>[][] dist = {</span><br/><span class="line">            {<span class="number">0</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>},</span><br/><span class="line">            {<span class="number">10</span>, <span class="number">0</span>, <span class="number">35</span>, <span class="number">25</span>},</span><br/><span class="line">            {<span class="number">15</span>, <span class="number">35</span>, <span class="number">0</span>, <span class="number">30</span>},</span><br/><span class="line">            {<span class="number">20</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">0</span>}</span><br/><span class="line">        };</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">shortest</span> <span class="operator">=</span> shortestPath(n, dist);</span><br/><span class="line">        System.out.println(<span class="string">"Shortest Path: "</span> + shortest);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在这个示例中，<code>shortestPath</code> 方法使用状压DP解决了集合的最短路径问题。算法通过构建一个二维数组 <code>dp</code> 来保存状态转移，从而计算最短路径。</p>
+<p>请注意，状压DP通常用于解决集合的子集问题，例如在TSP（Traveling Salesman Problem）中寻找最短路径。实际应用中，可能需要根据问题的需求进行适当的修改。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/24306.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/24306.html" class="post-title-link" itemprop="url">深度优先广度优先</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="深度优先"><a class="headerlink" href="#深度优先" title="深度优先"></a>深度优先</h2><p>深度优先遍历各个节点，需要使用到栈（Stack）这种数据结构。stack的特点是是先进后出。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点压入栈中，stack（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点C，B压入栈中，此时B在栈的顶部，stack(B,C)；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点E，D压入栈中，此时D在栈的顶部，stack（D,E,C）；</p>
+</li>
+<li><p>将D节点弹出，没有子节点压入,此时E在栈的顶部，stack（E，C）；</p>
+</li>
+<li><p>将E节点弹出，同时将E的子节点I压入，stack（I,C）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void depthFirst() {
+
+<pre><code>Stack&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; nodeStack = new Stack&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt;();
+
+Map&amp;lt;String, Object&amp;gt; node = new HashMap&amp;lt;String, Object&amp;gt;();
+
+nodeStack.add(node);
+
+while (!nodeStack.isEmpty()) {
+
+    node = nodeStack.pop();
+
+    System.out.println(node);
+
+    //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+    List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; children = getChildren(node);
+
+    if (children != null &amp;amp;&amp;amp; !children.isEmpty()) {
+
+        for (Map child : children) {
+
+            nodeStack.push(child);
+
+        }
+
+    }
+
+}
+</code></pre>
+<p>}<br></code></pre></p>
+<h2 id="广度优先"><a class="headerlink" href="#广度优先" title="广度优先"></a>广度优先</h2><p> 广度优先遍历各个节点，需要使用到队列（Queue）这种数据结构，queue的特点是先进先出，其实也可以使用双端队列，区别就是双端队列首尾都可以插入和弹出节点。整个遍历过程如下：</p>
+<ol>
+<li><p>首先将A节点插入队列中，queue（A）;</p>
+</li>
+<li><p>将A节点弹出，同时将A的子节点B，C插入队列中，此时B在队列首，C在队列尾部，queue（B，C）；</p>
+</li>
+<li><p>将B节点弹出，同时将B的子节点D，E插入队列中，此时C在队列首，E在队列尾部，queue（C，D，E）;</p>
+</li>
+<li><p>将C节点弹出，同时将C的子节点F，G，H插入队列中，此时D在队列首，H在队列尾部，queue（D，E，F，G，H）；</p>
+</li>
+<li><p>将D节点弹出，D没有子节点，此时E在队列首，H在队列尾部，queue（E，F，G，H）；</p>
+</li>
+</ol>
+<p>…依次往下，最终遍历完成</p>
+<pre><code>public void breadthFirst() {
+
+<pre><code>Deque&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; nodeDeque = new ArrayDeque&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt;();
+
+Map&amp;lt;String, Object&amp;gt; node = new HashMap&amp;lt;String, Object&amp;gt;();
+
+nodeDeque.add(node);
+
+while (!nodeDeque.isEmpty()) {
+
+    node = nodeDeque.peekFirst();
+
+    System.out.println(node);
+
+    //获得节点的子节点，对于二叉树就是获得节点的左子结点和右子节点
+
+    List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; children = getChildren(node);
+
+    if (children != null &amp;amp;&amp;amp; !children.isEmpty()) {
+
+        for (Map child : children) {
+
+            nodeDeque.add(child);
+
+        }
+
+    }
+
+}
+</code></pre>
+<p>}<br></code></pre></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1056,260 +1304,6 @@ public String toString() {
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/><span class="line">65</span><br/><span class="line">66</span><br/><span class="line">67</span><br/><span class="line">68</span><br/><span class="line">69</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">class</span> <span class="title class_">Task</span> {</span><br/><span class="line">    String name;</span><br/><span class="line">    <span class="type">int</span> duration;</span><br/><span class="line">    List&lt;Task&gt; dependencies;</span><br/><span class="line"></span><br/><span class="line">    Task(String name, <span class="type">int</span> duration) {</span><br/><span class="line">        <span class="built_in">this</span>.name = name;</span><br/><span class="line">        <span class="built_in">this</span>.duration = duration;</span><br/><span class="line">        <span class="built_in">this</span>.dependencies = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">void</span> <span class="title function_">addDependency</span><span class="params">(Task dependency)</span> {</span><br/><span class="line">        dependencies.add(dependency);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CriticalPathMethod</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">calculateCriticalPath</span><span class="params">(List&lt;Task&gt; tasks)</span> {</span><br/><span class="line">        Map&lt;Task, Integer&gt; earliestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br/><span class="line">        Map&lt;Task, Integer&gt; latestStartTimes = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 计算最早开始时间</span></span><br/><span class="line">        <span class="keyword">for</span> (Task task : tasks) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">earliestStartTime</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">            <span class="keyword">for</span> (Task dependency : task.dependencies) {</span><br/><span class="line">                earliestStartTime = Math.max(earliestStartTime, earliestStartTimes.get(dependency) + dependency.duration);</span><br/><span class="line">            }</span><br/><span class="line">            earliestStartTimes.put(task, earliestStartTime);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 计算最晚开始时间</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">projectDuration</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="keyword">for</span> (Task task : tasks) {</span><br/><span class="line">            projectDuration = Math.max(projectDuration, earliestStartTimes.get(task) + task.duration);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">for</span> (Task task : tasks) {</span><br/><span class="line">            latestStartTimes.put(task, projectDuration - task.duration);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 计算关键路径</span></span><br/><span class="line">        System.out.println(<span class="string">"Critical Path:"</span>);</span><br/><span class="line">        <span class="keyword">for</span> (Task task : tasks) {</span><br/><span class="line">            <span class="keyword">if</span> (earliestStartTimes.get(task).equals(latestStartTimes.get(task))) {</span><br/><span class="line">                System.out.println(task.name);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">Task</span> <span class="variable">A</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">"A"</span>, <span class="number">5</span>);</span><br/><span class="line">        <span class="type">Task</span> <span class="variable">B</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">"B"</span>, <span class="number">3</span>);</span><br/><span class="line">        <span class="type">Task</span> <span class="variable">C</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">"C"</span>, <span class="number">2</span>);</span><br/><span class="line">        <span class="type">Task</span> <span class="variable">D</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">"D"</span>, <span class="number">4</span>);</span><br/><span class="line">        <span class="type">Task</span> <span class="variable">E</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Task</span>(<span class="string">"E"</span>, <span class="number">6</span>);</span><br/><span class="line"></span><br/><span class="line">        B.addDependency(A);</span><br/><span class="line">        C.addDependency(A);</span><br/><span class="line">        D.addDependency(B);</span><br/><span class="line">        D.addDependency(C);</span><br/><span class="line">        E.addDependency(D);</span><br/><span class="line"></span><br/><span class="line">        List&lt;Task&gt; tasks = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(Arrays.asList(A, B, C, D, E));</span><br/><span class="line"></span><br/><span class="line">        calculateCriticalPath(tasks);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 <p>在这个示例中，我们使用关键路径算法来计算一个简单项目的关键路径。<code>Task</code> 类表示任务，其中包含任务名称、持续时间和依赖关系。<code>calculateCriticalPath</code> 方法计算每个任务的最早开始时间和最晚开始时间，并根据最早开始时间和最晚开始时间的差异来确定关键路径。</p>
 <p>这个示例是一个简化的关键路径算法实现，实际应用中可能需要考虑更多的细节和优化。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43734.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/43734.html" class="post-title-link" itemprop="url">兔子数列</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
-<ol>
-<li>初始状态：一对刚出生的兔子</li>
-<li>下一步：生长</li>
-<li><code>繁殖得到 一对刚出生的兔子-&gt; 第1步</code></li>
-</ol>
-<p>总结： 当月的兔子数=上月兔子数+当月新生兔子  数列的当前列=前两列之和</p>
-<h2 id="递归算法"><a class="headerlink" href="#递归算法" title="递归算法"></a>递归算法</h2><p>指数阶算法，效率较低，时间复杂度爆炸增量</p>
-<pre><code>    Fib1(int n)
-    
-<pre><code>{ if(n&amp;lt;1)
-
-       return -1;
-
-  if(n==1||n==2)
-
-        return 1;
-
-   return Fib1(n-1)+Fib1(n-2);
-
-}
-</code></pre>
-<p></code></pre></p>
-<h2 id="数组记录先两项值"><a class="headerlink" href="#数组记录先两项值" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
-<pre><code>Fib2(intn)
-{
-    if(n&lt;1)
-        return-1;
-    int[] a=new int[n];
-    a[1]=1;
-    a[2]=1;
-    for(int i=3;i&lt;=n;i++)
-        a[i]=a[i-1]+a[i-2];
-        return a[n];
-     }
-}
-         
-    
-<p></code></pre></p>
-<h2 id="迭代法"><a class="headerlink" href="#迭代法" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
-<pre><code>Fib3(intn)
-{
-    inti,s1,s2;
-    if(n&lt;1)
-        return-1;
-    if(n==1||n==2)
-        return1;
-    s1=1;s2=1;
-    for(i=3;i&lt;=n;i++)
-    {
-        s2=s1+s2;//辗转相加法
-        s1=s2-s1;//记录前一项
-    }
-    return s2;
- }
- 
-<p></code></pre></p>
-<h2 id="矩阵乘法"><a class="headerlink" href="#矩阵乘法" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与{{1,1},{1,0}}的n-2次幂的乘积, 可通过递推求证</code></p>
-<pre><code>   public static int ValueN(int n){
-         if(n&lt;1){
-             return 0;
-         }
-         if(n==1 || n==2){
-             return 1;
-         }
-          int [][] base={{1,1},{1,0}};
-          int [][] res=matrixPower(base,n-2);
-          return res[0][0]+res[1][0];
-       }
-       public static int[][] matrixPower(int[][] m,int p){
-           if(p==0)
-               return null;
-           if(p==1)
-               return m;
-           int[][] res=matrixPower(m,p&gt;&gt;1);
-           res=muliMatrix(res,res);
-           if((p&amp;1)==1){
-               res=muliMatrix(res,m);
-           }
-           return res;
-       }
-       //求两个矩阵相乘得到一个新的矩阵
-       public static int[][] muliMatrix(int[][] m1,int[][] m2){
-           int [][] res=new int[m1.length][m2[0].length];
-           for(int i=0;i&lt;m1.length;i++){
-               for(int j=0;j&lt;m2[0].length;j++){
-                   for(int k=0;k&lt;m2.length;k++){
-                       res[i][j]+=m1[i][k]*m2[k][j];
-                   }
-               }
-           }
-           return res;
-       }
-   }
-  
-<p></code></pre></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/47317.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/47317.html" class="post-title-link" itemprop="url">倍增</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>倍增算法（也称为指数跳跃算法）是一种高效的算法，用于解决一些特定的查找问题，例如在数组中查找某个区间内的最小值或最大值。以下是一个倍增算法的Java代码示例，用于解决查找最小值的问题：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SparseTable</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br/><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) {</span><br/><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) {</span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) {</span><br/><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryMin</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br/><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span>[] arr = {<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">6</span>};</span><br/><span class="line">        buildSparseTable(arr);</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">2</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">5</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryMin(left, right);</span><br/><span class="line"></span><br/><span class="line">        System.out.println(<span class="string">"Minimum element in range ["</span> + left + <span class="string">", "</span> + right + <span class="string">"]: "</span> + minInRange);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询指定范围内的最小值。<code>queryMin</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
-<p>倍增算法在一些特定的查找问题中非常有用，如查找最小值、最大值等。但请注意，它适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。</p>
 
       
     </div>

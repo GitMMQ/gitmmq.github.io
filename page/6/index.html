@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">352</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,260 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43734.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/43734.html" class="post-title-link" itemprop="url">兔子数列</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>自然界现象抽象化得到的数列模型——斐波那契数列</p>
+<ol>
+<li>初始状态：一对刚出生的兔子</li>
+<li>下一步：生长</li>
+<li><code>繁殖得到 一对刚出生的兔子-&gt; 第1步</code></li>
+</ol>
+<p>总结： 当月的兔子数=上月兔子数+当月新生兔子  数列的当前列=前两列之和</p>
+<h2 id="递归算法"><a class="headerlink" href="#递归算法" title="递归算法"></a>递归算法</h2><p>指数阶算法，效率较低，时间复杂度爆炸增量</p>
+<pre><code>    Fib1(int n)
+    
+<pre><code>{ if(n&amp;lt;1)
+
+       return -1;
+
+  if(n==1||n==2)
+
+        return 1;
+
+   return Fib1(n-1)+Fib1(n-2);
+
+}
+</code></pre>
+<p></code></pre></p>
+<h2 id="数组记录先两项值"><a class="headerlink" href="#数组记录先两项值" title="数组记录先两项值"></a>数组记录先两项值</h2><p>时间复杂度从指数阶降到了多项式阶O(n),空间复杂度O(n)</p>
+<pre><code>Fib2(intn)
+{
+    if(n&lt;1)
+        return-1;
+    int[] a=new int[n];
+    a[1]=1;
+    a[2]=1;
+    for(int i=3;i&lt;=n;i++)
+        a[i]=a[i-1]+a[i-2];
+        return a[n];
+     }
+}
+         
+    
+<p></code></pre></p>
+<h2 id="迭代法"><a class="headerlink" href="#迭代法" title="迭代法"></a>迭代法</h2><p>不记录中间结果，只记录中间项，空间复杂度降到O(1)</p>
+<pre><code>Fib3(intn)
+{
+    inti,s1,s2;
+    if(n&lt;1)
+        return-1;
+    if(n==1||n==2)
+        return1;
+    s1=1;s2=1;
+    for(i=3;i&lt;=n;i++)
+    {
+        s2=s1+s2;//辗转相加法
+        s1=s2-s1;//记录前一项
+    }
+    return s2;
+ }
+ 
+<p></code></pre></p>
+<h2 id="矩阵乘法"><a class="headerlink" href="#矩阵乘法" title="矩阵乘法"></a>矩阵乘法</h2><p><code>斐波那契数列(F(n),F(n-1))为(1,1)与{{1,1},{1,0}}的n-2次幂的乘积, 可通过递推求证</code></p>
+<pre><code>   public static int ValueN(int n){
+         if(n&lt;1){
+             return 0;
+         }
+         if(n==1 || n==2){
+             return 1;
+         }
+          int [][] base={{1,1},{1,0}};
+          int [][] res=matrixPower(base,n-2);
+          return res[0][0]+res[1][0];
+       }
+       public static int[][] matrixPower(int[][] m,int p){
+           if(p==0)
+               return null;
+           if(p==1)
+               return m;
+           int[][] res=matrixPower(m,p&gt;&gt;1);
+           res=muliMatrix(res,res);
+           if((p&amp;1)==1){
+               res=muliMatrix(res,m);
+           }
+           return res;
+       }
+       //求两个矩阵相乘得到一个新的矩阵
+       public static int[][] muliMatrix(int[][] m1,int[][] m2){
+           int [][] res=new int[m1.length][m2[0].length];
+           for(int i=0;i&lt;m1.length;i++){
+               for(int j=0;j&lt;m2[0].length;j++){
+                   for(int k=0;k&lt;m2.length;k++){
+                       res[i][j]+=m1[i][k]*m2[k][j];
+                   }
+               }
+           }
+           return res;
+       }
+   }
+  
+<p></code></pre></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/47317.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/47317.html" class="post-title-link" itemprop="url">倍增</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>倍增算法（也称为指数跳跃算法）是一种高效的算法，用于解决一些特定的查找问题，例如在数组中查找某个区间内的最小值或最大值。以下是一个倍增算法的Java代码示例，用于解决查找最小值的问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SparseTable</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">static</span> <span class="type">int</span>[][] sparseTable;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">buildSparseTable</span><span class="params">(<span class="type">int</span>[] arr)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">logN</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(n) / Math.log(<span class="number">2</span>)) + <span class="number">1</span>;</span><br/><span class="line">        sparseTable = <span class="keyword">new</span> <span class="title class_">int</span>[n][logN];</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) {</span><br/><span class="line">            sparseTable[i][<span class="number">0</span>] = arr[i];</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; (<span class="number">1</span> &lt;&lt; j) &lt;= n; j++) {</span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i + (<span class="number">1</span> &lt;&lt; j) - <span class="number">1</span> &lt; n; i++) {</span><br/><span class="line">                sparseTable[i][j] = Math.min(sparseTable[i][j - <span class="number">1</span>], sparseTable[i + (<span class="number">1</span> &lt;&lt; (j - <span class="number">1</span>))][j - <span class="number">1</span>]);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">queryMin</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.log(right - left + <span class="number">1</span>) / Math.log(<span class="number">2</span>));</span><br/><span class="line">        <span class="keyword">return</span> Math.min(sparseTable[left][j], sparseTable[right - (<span class="number">1</span> &lt;&lt; j) + <span class="number">1</span>][j]);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span>[] arr = {<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">6</span>};</span><br/><span class="line">        buildSparseTable(arr);</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">2</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">5</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">minInRange</span> <span class="operator">=</span> queryMin(left, right);</span><br/><span class="line"></span><br/><span class="line">        System.out.println(<span class="string">"Minimum element in range ["</span> + left + <span class="string">", "</span> + right + <span class="string">"]: "</span> + minInRange);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在这个示例中，<code>buildSparseTable</code> 方法构建了一个稀疏表，用于在数组中查询指定范围内的最小值。<code>queryMin</code> 方法用于查询指定范围内的最小元素。这种方法的时间复杂度为O(1)查询，但需要O(n log n)的预处理时间和O(n log n)的空间。</p>
+<p>倍增算法在一些特定的查找问题中非常有用，如查找最小值、最大值等。但请注意，它适用于不会频繁修改数组内容的情况，因为构建稀疏表的开销较大。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1011,175 +1265,6 @@ if (j == p.length) {
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, classification_report</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建随机森林分类器</span></span><br/><span class="line">model = RandomForestClassifier(n_estimators=<span class="number">100</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">model.fit(X_train, y_train)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = model.predict(X_test)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率和分类报告</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br/><span class="line">classification_rep = classification_report(y_test, y_pred, target_names=iris.target_names)</span><br/><span class="line"></span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Accuracy:"</span>, accuracy)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Classification Report:\n"</span>, classification_rep)</span><br/></pre></td></tr></table></figure>
 <p>在上述代码中，我们首先加载了鸢尾花数据集，然后使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，我们创建了一个随机森林分类器，并通过设置<code>n_estimators</code>参数来指定包含的决策树数量。使用<code>fit</code>方法训练模型，在测试集上进行预测，并计算了模型的准确率和分类报告。</p>
 <p>随机森林的优点之一是可以处理分类和回归问题，并且不容易过拟合。在实际应用中，您可以根据问题的需求调整超参数，如树的数量、最大深度等，以达到更好的性能。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/60504.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/60504.html" class="post-title-link" itemprop="url">逻辑回归</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="线性"><a class="headerlink" href="#线性" title="线性"></a>线性</h2><p>logistic回归又称logistic回归分析，是一种广义的线性回归分析模型</p>
-<p>逻辑回归是一种用于分类问题的机器学习算法，它可以预测一个二元分类目标变量的概率。以下是使用Python实现逻辑回归的示例代码，使用了<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br/></pre></td></tr></table></figure>
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LogisticRegression</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, confusion_matrix, classification_report</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建示例数据</span></span><br/><span class="line">np.random.seed(<span class="number">0</span>)</span><br/><span class="line">X = np.random.rand(<span class="number">100</span>, <span class="number">2</span>) * <span class="number">10</span></span><br/><span class="line">y = (X[:, <span class="number">0</span>] + X[:, <span class="number">1</span>] &gt; <span class="number">10</span>).astype(<span class="built_in">int</span>)  <span class="comment"># 根据线性关系生成二元分类标签</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建逻辑回归模型</span></span><br/><span class="line">model = LogisticRegression()</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">model.fit(X_train, y_train)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = model.predict(X_test)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率和混淆矩阵</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br/><span class="line">conf_matrix = confusion_matrix(y_test, y_pred)</span><br/><span class="line"></span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Accuracy:"</span>, accuracy)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Confusion Matrix:\n"</span>, conf_matrix)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Classification Report:\n"</span>, classification_report(y_test, y_pred))</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，我们首先创建了一个示例数据集，其中包含两个特征，根据一个线性关系生成了二元分类标签。然后，使用<code>train_test_split</code>函数将数据集划分为训练集和测试集。接着，我们创建了一个逻辑回归模型，并使用<code>fit</code>方法训练模型。在测试集上进行预测，并计算了模型的准确率、混淆矩阵和分类报告。</p>
-<p>请注意，这只是一个简单的逻辑回归示例。在实际应用中，您可能需要调整超参数、进行特征工程等，以达到更好的分类性能。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/23220.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/23220.html" class="post-title-link" itemprop="url">词袋模型</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>词袋模型（Bag-of-Words Model）是一种用于表示文本数据的方法，它将文本看作是一个包含单词的集合，忽略了单词的顺序和语法结构，只关注单词的频次或存在与否。以下是使用Python实现词袋模型的示例代码，使用了<code>CountVectorizer</code>类从<code>scikit-learn</code>库：</p>
-<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br/></pre></td></tr></table></figure>
-<p>接下来，使用下面的代码示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 示例文本数据</span></span><br/><span class="line">corpus = [</span><br/><span class="line">    <span class="string">"This is the first document."</span>,</span><br/><span class="line">    <span class="string">"This document is the second document."</span>,</span><br/><span class="line">    <span class="string">"And this is the third one."</span>,</span><br/><span class="line">    <span class="string">"Is this the first document?"</span></span><br/><span class="line">]</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建词袋模型</span></span><br/><span class="line">vectorizer = CountVectorizer()</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 将文本数据转换为词袋表示</span></span><br/><span class="line">X = vectorizer.fit_transform(corpus)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 获取词汇表和词频矩阵</span></span><br/><span class="line">vocabulary = vectorizer.get_feature_names_out()</span><br/><span class="line">word_frequency_matrix = X.toarray()</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 打印词汇表和词频矩阵</span></span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Vocabulary:"</span>, vocabulary)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Word Frequency Matrix:\n"</span>, word_frequency_matrix)</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，我们首先定义了一个包含多个文本文档的示例文本数据。然后，使用<code>CountVectorizer</code>类将文本数据转换为词袋表示，得到一个词频矩阵。词汇表是所有文本数据中出现的不同单词的集合，而词频矩阵记录了每个文档中每个单词的出现频次。</p>
-<p>请注意，词袋模型忽略了单词的顺序和语法结构，因此它可能无法捕捉到一些文本中的上下文信息。在实际应用中，您可能还需要考虑去除停用词、使用TF-IDF等进一步处理，以提高文本表示的效果。</p>
 
       
     </div>

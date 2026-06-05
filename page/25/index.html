@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">352</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,162 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a001c1e6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/a001c1e6.html" class="post-title-link" itemprop="url">leetcode 5 Solution</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-02-22 22:17:48" itemprop="dateCreated datePublished" datetime="2016-02-22T22:17:48+08:00">2016-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s5;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 最长回文子串</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">longestPalindrome</span><span class="params">(String s)</span> {</span><br/><span class="line">        <span class="comment">//定义回文子串的起始</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">start</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">end</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="comment">//遍历字符串字符</span></span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i&lt; s.length(); i++) {</span><br/><span class="line">            <span class="comment">//以当前字符为中心点扩展</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">len1</span> <span class="operator">=</span> expandAroundCenter(s, i, i);</span><br/><span class="line">            <span class="comment">//以当前字符和下一个字符为中心点扩展</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">len2</span> <span class="operator">=</span> expandAroundCenter(s, i, i + <span class="number">1</span>);</span><br/><span class="line">            <span class="comment">//取两种方式扩展最大长度</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> Math.max(len1, len2);</span><br/><span class="line">            <span class="keyword">if</span>(max &gt; end -start + <span class="number">1</span>) {</span><br/><span class="line">                <span class="comment">//-1防止 当前字符和下一个字符为中心点扩展 导致的问题</span></span><br/><span class="line">                start = i - (max-<span class="number">1</span>) / <span class="number">2</span>;</span><br/><span class="line">                end = i + max /<span class="number">2</span>;</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> s.substring(start,  end + <span class="number">1</span>);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">expandAroundCenter</span><span class="params">(String s, <span class="type">int</span> left, <span class="type">int</span> right)</span> {</span><br/><span class="line">        <span class="comment">//左右相等则扩展</span></span><br/><span class="line">        <span class="keyword">while</span>(left &gt;= <span class="number">0</span> &amp;&amp; right &lt; s.length() &amp;&amp; s.charAt(left) == s.charAt(right)) {</span><br/><span class="line">            left --;</span><br/><span class="line">            right ++;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//返回扩展的子串长度</span></span><br/><span class="line">        <span class="keyword">return</span> right - left -<span class="number">1</span>;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a70c8b51.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/a70c8b51.html" class="post-title-link" itemprop="url">leetcode 49 Solution</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-02-21 22:13:30" itemprop="dateCreated datePublished" datetime="2016-02-21T22:13:30+08:00">2016-02-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s49;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.*;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 字母异位词分组</span></span><br/><span class="line"><span class="comment"> * 给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 字母异位词 是由重新排列源单词的字母得到的一个新单词，所有源单词中的字母通常恰好只用一次。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/group-anagrams</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> List&lt;List&lt;String&gt;&gt; <span class="title function_">groupAnagrams</span><span class="params">(String[] strs)</span> {</span><br/><span class="line">        Map&lt;String, List&lt;String&gt;&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, List&lt;String&gt;&gt;();</span><br/><span class="line">        <span class="keyword">for</span> (String str : strs) {</span><br/><span class="line">            <span class="type">char</span>[] array = str.toCharArray();</span><br/><span class="line">            Arrays.sort(array);</span><br/><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(array);</span><br/><span class="line">            List&lt;String&gt; list = map.getOrDefault(key, <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;());</span><br/><span class="line">            list.add(str);</span><br/><span class="line">            map.put(key, list);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;List&lt;String&gt;&gt;(map.values());</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -813,162 +969,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s42;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 接雨水</span></span><br/><span class="line"><span class="comment"> * 给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">trap</span><span class="params">(<span class="type">int</span>[] height)</span> {</span><br/><span class="line">        <span class="keyword">if</span>(height.length == <span class="number">0</span>) {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//从左侧开始找最大值</span></span><br/><span class="line">        <span class="type">int</span>[] maxLeft = <span class="keyword">new</span> <span class="title class_">int</span>[height.length];</span><br/><span class="line">        maxLeft[<span class="number">0</span>] = height[<span class="number">0</span>];</span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; height.length; i++) {</span><br/><span class="line">            maxLeft[i] = Math.max(maxLeft[i-<span class="number">1</span>], height[i]);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//从右侧开始找最大值</span></span><br/><span class="line">        <span class="type">int</span>[] maxRight = <span class="keyword">new</span> <span class="title class_">int</span>[height.length];</span><br/><span class="line">        maxRight[height.length -<span class="number">1</span>] = height[height.length-<span class="number">1</span>];</span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> height.length-<span class="number">2</span>; i &gt;= <span class="number">0</span>; i--) {</span><br/><span class="line">            maxRight[i] = Math.max(maxRight[i + <span class="number">1</span>], height[i]);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="comment">//统计所有雨水小矩形的大小</span></span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; height.length; i++) {</span><br/><span class="line">            <span class="comment">//左右侧最大值的最小值累加</span></span><br/><span class="line">            sum += Math.min(maxLeft[i], maxRight[i]) - height[i];</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> sum;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/937f7e3f.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/937f7e3f.html" class="post-title-link" itemprop="url">leetcode 415 Solution</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2016-02-12 22:12:46" itemprop="dateCreated datePublished" datetime="2016-02-12T22:12:46+08:00">2016-02-12</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s415;</span><br/><span class="line"></span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> *给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *  </span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/add-strings</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">addStrings</span><span class="params">(String num1, String num2)</span> {</span><br/><span class="line">        <span class="comment">//字符串拼接 StringBuilder</span></span><br/><span class="line">        <span class="type">StringBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br/><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> num1.length();</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> num2.length();</span><br/><span class="line">        <span class="comment">//num1 遍历 下标</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span><span class="number">1</span>;</span><br/><span class="line">        <span class="comment">//num2 遍历 下标</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span><span class="number">1</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">carray</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">while</span>(i + j &lt;= m + n + <span class="number">1</span>) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">numa</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">            <span class="comment">//补0对齐位数</span></span><br/><span class="line">            <span class="keyword">if</span>(i &gt; m) {</span><br/><span class="line">                numa = <span class="number">0</span>;</span><br/><span class="line">            } <span class="keyword">else</span> {</span><br/><span class="line">                <span class="comment">//字符转数字 从右向左 取值</span></span><br/><span class="line">                numa = num1.charAt(m - i++) - <span class="string">'0'</span>;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="type">int</span> <span class="variable">numb</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">            <span class="comment">//补0对齐位数</span></span><br/><span class="line">            <span class="keyword">if</span>(j &gt; n) {</span><br/><span class="line">                numb = <span class="number">0</span>;</span><br/><span class="line">            } <span class="keyword">else</span> {</span><br/><span class="line">                <span class="comment">//字符转数字 从右向左 取值</span></span><br/><span class="line">                numb = num2.charAt(n - j++) - <span class="string">'0'</span>;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="comment">//从右向左 逐位数字相加</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> numa + numb + carray;</span><br/><span class="line">            <span class="comment">//满10 进一位</span></span><br/><span class="line">            carray = sum / <span class="number">10</span>;</span><br/><span class="line">            builder.append(sum % <span class="number">10</span>);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//最后一次相加后 如果有进位 则拼接到字符串</span></span><br/><span class="line">        <span class="keyword">if</span>(carray != <span class="number">0</span>) {</span><br/><span class="line">            builder.append(carray);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//翻转字符串</span></span><br/><span class="line">        <span class="keyword">return</span> builder.reverse().toString();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/b4dbcba5.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/b4dbcba5.html" class="post-title-link" itemprop="url">leetcode 41 Solution</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2016-02-11 22:07:46" itemprop="dateCreated datePublished" datetime="2016-02-11T22:07:46+08:00">2016-02-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s41;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 缺失的第一个正数</span></span><br/><span class="line"><span class="comment"> * 给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">firstMissingPositive</span><span class="params">(<span class="type">int</span>[] nums)</span> {</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br/><span class="line">        <span class="comment">//处理下负的值，把对应的值改成一个大于n的数字，因为找第一个正数，所以n+1 后面遍历会被忽略掉</span></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; ++i) {</span><br/><span class="line">            <span class="keyword">if</span> (nums[i] &lt;= <span class="number">0</span>) {</span><br/><span class="line">                nums[i] = n + <span class="number">1</span>;</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">// 把存在于 0 -n 之间的值 填到对应的下标处 也变成负值（表示未缺失），后面统计正的数就可以了</span></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; ++i) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">num</span> <span class="operator">=</span> Math.abs(nums[i]);</span><br/><span class="line">            <span class="keyword">if</span> (num &lt;= n) {</span><br/><span class="line">                nums[num - <span class="number">1</span>] = -Math.abs(nums[num - <span class="number">1</span>]);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//找到第一个&gt;0 数字的下标就是 第一个缺失的正数了，因为上一步已经把存在的值标记到对应下标的位置了（负的值表示存在）</span></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; ++i) {</span><br/><span class="line">            <span class="keyword">if</span> (nums[i] &gt; <span class="number">0</span>) {</span><br/><span class="line">                <span class="keyword">return</span> i + <span class="number">1</span>;</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> n + <span class="number">1</span>;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
       
     </div>
