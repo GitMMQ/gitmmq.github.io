@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Cron 调度、HEARTBEAT 主动巡检、no-agent 模式与 wakeAgent 门控、context_from 流水线，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析">
+<meta property="og:url" content="https://www.fastolf.com/posts/65977e9c.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="Cron 调度、HEARTBEAT 主动巡检、no-agent 模式与 wakeAgent 门控、context_from 流水线，中英文对照。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-06-06T05:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T05:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Agent;Cron;Hermes;OpenClaw">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/65977e9c.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/65977e9c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-06-06 13:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T13:00:00+08:00">2026-06-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10792</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>24 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+      
+        <blockquote>
+<p>最后更新 | Last updated: 2026-06-06</p>
+</blockquote>
+<hr />
+<h2>一、自动化能力概览 | Automation Capability Overview</h2>
+<p><strong>中文</strong></p>
+<p>个人 Agent 的「主动性」取决于能否在无人值守时执行任务。两个框架提供互补机制：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>OpenClaw（龙虾）</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定时调度</td>
+<td><code>cron</code> 工具（Gateway 内）</td>
+<td><code>cronjob</code> 工具 + Gateway 调度器</td>
+</tr>
+<tr>
+<td>主动巡检</td>
+<td><code>HEARTBEAT.md</code> + heartbeat 周期</td>
+<td>Cron + wakeAgent 门控</td>
+</tr>
+<tr>
+<td>调度粒度</td>
+<td>默认 30m heartbeat</td>
+<td>60s scheduler tick</td>
+</tr>
+<tr>
+<td>零成本巡检</td>
+<td>HEARTBEAT_OK 静默</td>
+<td><code>no_agent</code> + <code>wakeAgent: false</code></td>
+</tr>
+<tr>
+<td>流水线串联</td>
+<td>单 Agent 内多任务</td>
+<td><code>context_from</code> 跨任务链</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>deny cron 给不可信面</td>
+<td>Prompt 扫描 + cron 工具禁用</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Proactivity depends on unattended execution. Both frameworks offer complementary automation:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>OpenClaw (Lobster)</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scheduling</td>
+<td><code>cron</code> tool (in Gateway)</td>
+<td><code>cronjob</code> tool + Gateway scheduler</td>
+</tr>
+<tr>
+<td>Proactive checks</td>
+<td><code>HEARTBEAT.md</code> + heartbeat cadence</td>
+<td>Cron + wakeAgent gate</td>
+</tr>
+<tr>
+<td>Scheduler tick</td>
+<td>Default 30m heartbeat</td>
+<td>60s scheduler tick</td>
+</tr>
+<tr>
+<td>Zero-cost checks</td>
+<td>HEARTBEAT_OK silent ack</td>
+<td><code>no_agent</code> + <code>wakeAgent: false</code></td>
+</tr>
+<tr>
+<td>Pipelines</td>
+<td>Multi-task within one agent</td>
+<td><code>context_from</code> cross-job chains</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>deny cron on untrusted surfaces</td>
+<td>Prompt scan + cron toolset disabled in cron runs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、Hermes cronjob 工具全解析 | Hermes cronjob Tool Deep Dive</h2>
+<p><strong>中文</strong></p>
+<p>Hermes 将定时任务管理收敛为单一 <strong><code>cronjob</code> 工具</strong>（action 风格），CLI、Gateway、自然语言对话共用同一 API。</p>
+<h3>2.1 支持的操作</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create</code></td>
+<td>创建一次性或周期性任务</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>列出所有任务</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>修改 schedule、prompt、skills 等</td>
+</tr>
+<tr>
+<td><code>pause</code></td>
+<td>暂停调度</td>
+</tr>
+<tr>
+<td><code>resume</code></td>
+<td>恢复并计算下次运行时间</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>下次 tick 立即触发</td>
+</tr>
+<tr>
+<td><code>remove</code></td>
+<td>删除任务</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">cronjob(
+    action=&quot;create&quot;,
+    name=&quot;morning-digest&quot;,
+    schedule=&quot;0 9 * * *&quot;,
+    skills=[&quot;blogwatcher&quot;],
+    prompt=&quot;Check configured feeds and summarize anything new.&quot;,
+    deliver=&quot;telegram&quot;,
+)
+</code></pre>
+<h3>2.2 调度格式</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>格式</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>相对延迟（一次性）</td>
+<td><code>30m</code>, <code>2h</code>, <code>1d</code></td>
+<td>30 分钟后执行一次</td>
+</tr>
+<tr>
+<td>间隔（周期性）</td>
+<td><code>every 30m</code>, <code>every 2h</code></td>
+<td>每 2 小时</td>
+</tr>
+<tr>
+<td>Cron 表达式</td>
+<td>标准 5 段</td>
+<td><code>0 9 * * 1-5</code> 工作日 9:00</td>
+</tr>
+<tr>
+<td>自然语言</td>
+<td><code>every day 7am</code></td>
+<td>解析为等效 cron</td>
+</tr>
+<tr>
+<td>ISO 时间戳</td>
+<td><code>2026-03-15T09:00:00</code></td>
+<td>指定时刻一次性</td>
+</tr>
+</tbody>
+</table>
+<p><strong>重复行为</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>调度类型</th>
+<th>默认 repeat</th>
+<th>覆盖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一次性</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>间隔 / cron</td>
+<td>forever</td>
+<td><code>repeat=5</code> 限制次数</td>
+</tr>
+</tbody>
+</table>
+<h3>2.3 Skill-Backed Cron</h3>
+<p>任务可附加零个、一个或多个技能，执行时按顺序注入：</p>
+<pre><code class="language-python">cronjob(
+    action=&quot;create&quot;,
+    skills=[&quot;blogwatcher&quot;, &quot;maps&quot;],
+    prompt=&quot;Combine new feed items with nearby events into one brief.&quot;,
+    schedule=&quot;every 6h&quot;,
+    name=&quot;local-brief&quot;,
+)
+</code></pre>
+<p>技能内容作为上下文注入，prompt 仅承载任务指令——避免在 cron prompt 中粘贴完整技能正文。</p>
+<p><strong>English</strong></p>
+<p>Hermes unifies scheduling in the <code>cronjob</code> tool with actions: create, list, update, pause, resume, run, remove. Schedule formats: relative delays, intervals (<code>every N</code>), cron expressions, natural language, ISO timestamps. Attach zero or more skills loaded in order at execution. Prompt carries task instruction only.</p>
+<hr />
+<h2>三、workdir 与 profile 钉扎 | workdir &amp; profile Pinning</h2>
+<p><strong>中文</strong></p>
+<p>Cron 任务默认<strong>脱离任何代码库</strong>运行——不加载 <code>AGENTS.md</code>、<code>.cursorrules</code>，终端/文件工具使用 Gateway 启动目录。</p>
+<h3>3.1 workdir 钉扎</h3>
+<pre><code class="language-python">cronjob(
+    action=&quot;create&quot;,
+    schedule=&quot;every 1d at 09:00&quot;,
+    workdir=&quot;/home/me/projects/acme&quot;,
+    prompt=&quot;Audit open PRs, summarize CI health, and post to #eng&quot;,
+)
+</code></pre>
+<p>当 <code>workdir</code> 设置时：</p>
+<ul>
+<li>注入该目录的 <code>AGENTS.md</code>、<code>.cursorrules</code>（与交互式 CLI 相同发现顺序）</li>
+<li><code>terminal</code>、<code>read_file</code>、<code>patch</code>、<code>execute_code</code> 使用该目录为 cwd</li>
+<li>路径必须是存在的绝对路径</li>
+<li><code>workdir=""</code> 可清除钉扎</li>
+</ul>
+<p><strong>序列化约束</strong>：带 <code>workdir</code> 的任务在 scheduler tick 上<strong>串行执行</strong>（进程全局 cwd 状态）。</p>
+<h3>3.2 profile 钉扎</h3>
+<pre><code class="language-python">cronjob(
+    action=&quot;create&quot;,
+    schedule=&quot;every 1d at 03:00&quot;,
+    profile=&quot;night-ops&quot;,
+    prompt=&quot;Tail the security log and flag anomalies&quot;,
+)
+</code></pre>
+<p>调度器临时切换 <code>HERMES_HOME</code> 到目标 profile，加载其 <code>.env</code> + <code>config.yaml</code>。带 <code>profile</code> 的任务同样<strong>串行执行</strong>（<code>HERMES_HOME</code> 是进程全局状态）。</p>
+<p><strong>English</strong></p>
+<p>Cron jobs default to detached execution without project context. <code>workdir</code> pins AGENTS.md/.cursorrules injection and tool cwd to an absolute project path — serial execution due to global cwd. <code>profile</code> pins HERMES_HOME/config for the run — also serial due to global profile switch.</p>
+<hr />
+<h2>四、投递选项与静默模式 | Delivery Options &amp; Silent Mode</h2>
+<p><strong>中文</strong></p>
+<h3>4.1 deliver 参数</h3>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>origin</code> / <code>local</code></td>
+<td>回到来源聊天 / 仅本地 <code>cron/output/</code></td>
+</tr>
+<tr>
+<td><code>telegram</code> / <code>telegram:ID</code> / <code>telegram:chat:thread</code></td>
+<td>Telegram 目标</td>
+</tr>
+<tr>
+<td><code>discord:#channel</code> / <code>slack</code> / <code>whatsapp</code> 等</td>
+<td>各平台 home 或具名频道</td>
+</tr>
+<tr>
+<td><code>all</code> / <code>origin,all</code></td>
+<td>扇出全部 home channel（去重）</td>
+</tr>
+<tr>
+<td><code>telegram,discord</code></td>
+<td>逗号分隔多目标</td>
+</tr>
+</tbody>
+</table>
+<p>最终响应<strong>自动投递</strong>，无需 prompt 内 <code>send_message</code>。</p>
+<h3>4.2 响应包装</h3>
+<p>默认包装 header/footer 标明来源为定时任务。设 <code>cron.wrap_response: false</code> 可输出原始内容。</p>
+<h3>4.3 [SILENT] 静默抑制</h3>
+<p>若 Agent 最终响应以 <code>[SILENT]</code> 开头，<strong>抑制外发投递</strong>，输出仍保存到 <code>~/.hermes/cron/output/</code> 供审计。</p>
+<pre><code class="language-text">Check if nginx is running. If healthy, respond with only [SILENT].
+Otherwise, report the issue.
+</code></pre>
+<p><strong>仅成功运行可静默</strong>；失败任务始终投递。</p>
+<p><strong>English</strong></p>
+<p><code>deliver</code> routes output to origin, local files, specific platforms, or <code>all</code> fan-out. Final agent response auto-delivers without <code>send_message</code>. <code>[SILENT]</code> prefix suppresses outbound delivery on success while saving locally. Failed jobs always deliver. <code>cron.wrap_response: false</code> removes the wrapper header/footer.</p>
+<hr />
+<h2>五、no-agent 模式与 wakeAgent 门控 | no-agent Mode &amp; wakeAgent Gate</h2>
+<p><strong>中文</strong></p>
+<h3>5.1 no-agent 模式（零 Token 看门狗）</h3>
+<pre><code class="language-bash">hermes cron create &quot;every 5m&quot; \
+  --no-agent \
+  --script memory-watchdog.sh \
+  --deliver telegram \
+  --name &quot;memory-watchdog&quot;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>语义</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行</td>
+<td>仅运行脚本，<strong>不调用 LLM</strong></td>
+</tr>
+<tr>
+<td>输出</td>
+<td>stdout 原文投递</td>
+</tr>
+<tr>
+<td>空 stdout</td>
+<td>静默 tick，不投递</td>
+</tr>
+<tr>
+<td>非零退出/超时</td>
+<td>投递错误告警</td>
+</tr>
+<tr>
+<td>脚本位置</td>
+<td>必须在 <code>~/.hermes/scripts/</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>.sh</code>/<code>.bash</code> 用 <code>/bin/bash</code>；其他用当前 Python 解释器。</p>
+<h3>5.2 wakeAgent 门控（LLM 任务的 $0 预检）</h3>
+<p>带 <code>script=</code> 的 LLM 任务，预检脚本末行可输出 JSON 决定是否唤醒 Agent：</p>
+<pre><code class="language-json">{&quot;wakeAgent&quot;: false}
+</code></pre>
+<pre><code class="language-json">{&quot;wakeAgent&quot;: true, &quot;context&quot;: {&quot;new_issues&quot;: 3}}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>行为</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wakeAgent: false</code></td>
+<td>跳过本次 Agent 调用，零 Token</td>
+</tr>
+<tr>
+<td>省略或 <code>true</code></td>
+<td>正常唤醒 Agent（默认）</td>
+</tr>
+<tr>
+<td><code>context</code> 字段</td>
+<td>注入 Agent 上下文的结构化数据</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型配方</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>门控类型</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文件变更门控</td>
+<td>仅当 feed.json mtime &gt; last_run 时唤醒</td>
+</tr>
+<tr>
+<td>外部标志门控</td>
+<td>CI 部署后 drop <code>/tmp/ready</code> 文件</td>
+</tr>
+<tr>
+<td>SQL 计数门控</td>
+<td>仅当新行数 &gt; 0 时唤醒，并传递 count</td>
+</tr>
+</tbody>
+</table>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TD
+    T[Scheduler Tick] --&gt; S{有 script?}
+    S --&gt;|否| A[直接运行 Agent]
+    S --&gt;|是| R[运行预检脚本]
+    R --&gt; W{末行 wakeAgent?}
+    W --&gt;|false| Z[静默跳过 — $0]
+    W --&gt;|true/省略| A
+    A --&gt; D[投递结果]</code></pre></div>
+
+<p><strong>English</strong></p>
+<p><code>no_agent=True</code>: script-only, zero LLM tokens, stdout delivered verbatim, empty stdout = silent tick. <code>wakeAgent</code> gate: pre-check script emits <code>{"wakeAgent": false}</code> on last stdout line to skip the agent call for that tick — useful for 1-5 min polls that only need the LLM when state changed. Optional <code>context</code> object passes structured data to the agent.</p>
+<hr />
+<h2>六、context_from 流水线 | context_from Pipelines</h2>
+<p><strong>中文</strong></p>
+<p>Cron 任务在<strong>隔离会话</strong>中运行，无上次执行记忆。<code>context_from</code> 自动将上游任务最近输出前置到当前 prompt：</p>
+<pre><code class="language-python"># 阶段 1：采集
+cronjob(action=&quot;create&quot;, name=&quot;ai-news-fetch&quot;,
+        schedule=&quot;0 7 * * *&quot;,
+        prompt=&quot;Fetch top 10 AI stories from HN, save to raw.md&quot;)
+
+# 阶段 2：筛选（读取阶段 1 最近输出）
+cronjob(action=&quot;create&quot;, name=&quot;ai-news-triage&quot;,
+        schedule=&quot;30 7 * * *&quot;,
+        context_from=&quot;ai-news-fetch&quot;,
+        prompt=&quot;Score each story 1-10, output top 5 to ranked.md&quot;)
+
+# 阶段 3：发布
+cronjob(action=&quot;create&quot;, name=&quot;ai-news-brief&quot;,
+        schedule=&quot;0 8 * * *&quot;,
+        context_from=&quot;ai-news-triage&quot;,
+        prompt=&quot;Write 3 tweet drafts and deliver to telegram:7976161601&quot;)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单任务 ID/名称</td>
+<td><code>context_from="ai-news-fetch"</code></td>
+</tr>
+<tr>
+<td>多任务列表</td>
+<td><code>context_from=["job_a", "job_b"]</code></td>
+</tr>
+</tbody>
+</table>
+<p>输出从 <code>~/.hermes/cron/output/{job_id}/*.md</code> 读取，按列表顺序拼接。读取<strong>最近已完成</strong>输出——不等待同 tick 仍在运行的上游任务。</p>
+<p><strong>English</strong></p>
+<p><code>context_from</code> prepends upstream jobs' most recent completed output from <code>~/.hermes/cron/output/{job_id}/</code> to the current prompt. Accepts single job ID/name or list for fan-in. Enables collect → filter → deliver pipelines without glue code or databases.</p>
+<hr />
+<h2>七、Gateway 调度器 internals | Gateway Scheduler Internals</h2>
+<p><strong>中文</strong></p>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>sequenceDiagram
+    participant T as 60s Ticker
+    participant L as .tick.lock
+    participant J as jobs.json
+    participant A as AIAgent
+    participant D as Delivery
+
+    T-&gt;&gt;L: 获取文件锁
+    T-&gt;&gt;J: 加载任务
+    T-&gt;&gt;T: 筛选 due jobs (next_run &lt;= now)
+    loop 每个 due job
+        T-&gt;&gt;A: 创建全新会话（无历史）
+        opt 附加 skills
+        T-&gt;&gt;A: 注入 skills + prompt + context_from
+        opt script 预检
+        T-&gt;&gt;A: wakeAgent 门控
+        A-&gt;&gt;D: 完成 → 投递
+        T-&gt;&gt;J: 更新 run_count, next_run
+    end
+    T-&gt;&gt;L: 释放锁</code></pre></div>
+
+<p>存储：<code>jobs.json</code>（原子写）、<code>cron/output/{job_id}/</code>。Gateway 每 <strong>60s</strong> tick，<code>.tick.lock</code> 防重叠；Cron 会话禁用 <code>cronjob</code> toolset。<code>enabled_toolsets</code> 可 per-job 收紧工具 schema。</p>
+<p><strong>English</strong></p>
+<p>60s tick, file lock, fresh sessions, cron toolset disabled in cron runs, <code>enabled_toolsets</code> for cost control, fallback provider inheritance.</p>
+<hr />
+<h2>八、OpenClaw HEARTBEAT 主动巡检 | OpenClaw HEARTBEAT Proactive Monitoring</h2>
+<p><strong>中文</strong></p>
+<p>OpenClaw 的主动性主要通过 <strong>Gateway heartbeat</strong> 实现——周期性 Agent turn，默认 <strong>30 分钟</strong>（Anthropic OAuth 检测时为 1 小时）。</p>
+<h3>8.1 配置</h3>
+<pre><code class="language-json5">{
+  heartbeat: {
+    every: &quot;30m&quot;,           // &quot;0m&quot; 禁用
+    target: &quot;last&quot;,         // &quot;none&quot; | &quot;last&quot; | &quot;slack&quot; | &quot;telegram&quot; ...
+    activeHours: {
+      start: &quot;09:00&quot;,
+      end: &quot;22:00&quot;,
+      timezone: &quot;America/New_York&quot;,
+    },
+    schedule: [             // 可选：时段差异化间隔
+      { start: &quot;08:00&quot;, end: &quot;18:00&quot;, every: &quot;15m&quot; },
+      { start: &quot;23:00&quot;, end: &quot;08:00&quot;, every: &quot;2h&quot; },
+    ],
+  },
+}
+</code></pre>
+<h3>8.2 HEARTBEAT.md 清单</h3>
+<p>工作区中的 <code>HEARTBEAT.md</code> 是巡检 checklist——短小、稳定、适合每 30 分钟考虑：</p>
+<pre><code class="language-markdown"># Heartbeat Checklist
+
+- Scan inbox for urgent emails (last 30 min)
+- Check calendar for meetings in next 2 hours
+- Verify production health endpoint returns 200
+</code></pre>
+<p><strong>tasks: 结构化块</strong>（任务级独立间隔）：</p>
+<pre><code class="language-yaml">tasks:
+  - name: inbox-triage
+    interval: 30m
+    prompt: Check for urgent emails.
+  - name: calendar-scan
+    interval: 2h
+    prompt: Check for upcoming meetings.
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>行为</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仅 due tasks 进入 prompt</td>
+<td>节省 Token</td>
+</tr>
+<tr>
+<td>无 due tasks</td>
+<td>跳过整个 heartbeat（<code>reason=no-tasks-due</code>）</td>
+</tr>
+<tr>
+<td>非 task 正文</td>
+<td>追加为额外上下文</td>
+</tr>
+<tr>
+<td>状态持久化</td>
+<td><code>heartbeatTaskState</code> 存 session state</td>
+</tr>
+</tbody>
+</table>
+<h3>8.3 HEARTBEAT_OK 静默</h3>
+<p>一切正常时回复 <code>HEARTBEAT_OK</code> — 静默确认，不外发；有异常才 alert 到 <code>target</code>。</p>
+<p><strong>English</strong></p>
+<p>OpenClaw heartbeat: 30m cadence (1h for Anthropic OAuth), <code>HEARTBEAT.md</code> checklist, optional <code>tasks:</code> per-interval checks, <code>HEARTBEAT_OK</code> silent ack.</p>
+<hr />
+<h2>九、OpenClaw cron 工具与风险 | OpenClaw cron Tool &amp; Risks</h2>
+<p><strong>中文</strong></p>
+<p>OpenClaw 提供 <code>cron</code> 工具让 Agent 创建<strong>持久定时任务</strong>——属于<strong>高风险控制面工具</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>持久性</td>
+<td>任务存于 Gateway，重启后仍执行</td>
+</tr>
+<tr>
+<td>权限扩散</td>
+<td>可调度 exec/browser 等危险操作</td>
+</tr>
+<tr>
+<td>Prompt 注入</td>
+<td>恶意消息诱导创建有害 cron</td>
+</tr>
+<tr>
+<td>跨会话</td>
+<td>与当前聊天上下文解耦</td>
+</tr>
+</tbody>
+</table>
+<p>硬化：<code>tools.deny: ["cron", "gateway", "sessions_spawn"]</code>；不可信面必须 deny；<code>openclaw security audit</code> 定期审查。Hermes 对等：Cron 内禁用 <code>cronjob</code> + Prompt 扫描。</p>
+<p><strong>English</strong></p>
+<p>OpenClaw <code>cron</code> is high-risk persistent scheduling — deny on untrusted surfaces, minimal profiles, security audit. Hermes: cron toolset disabled in cron runs + prompt scanning.</p>
+<hr />
+<h2>十、安全：Cron Prompt 扫描 | Security: Cron Prompt Scanning</h2>
+<p><strong>中文</strong></p>
+<p>Hermes 在创建/更新时扫描 prompt：注入、凭证外泄、不可见 Unicode、SSH 后门等——阻断则拒绝创建并返回明确错误。运行时：<code>cron_mode: deny</code>（无人值守推荐）、<code>enabled_toolsets</code> 限制、脚本限于 <code>~/.hermes/scripts/</code>、<code>script_timeout_seconds</code> 默认 120s。</p>
+<p><strong>English</strong></p>
+<p>Create/update prompt scanning blocks injection and exfiltration. Runtime: <code>cron_mode: deny</code>, limited toolsets, script sandbox, configurable timeout.</p>
+<hr />
+<h2>十一、选型速查 | Selection Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>OpenClaw</th>
+<th>Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30m 收件箱/日历巡检</td>
+<td>HEARTBEAT.md</td>
+<td>cron + wakeAgent</td>
+</tr>
+<tr>
+<td>每日定时简报</td>
+<td>cron 工具</td>
+<td>cronjob + deliver</td>
+</tr>
+<tr>
+<td>多阶段流水线</td>
+<td>单 Agent 内编排</td>
+<td>context_from 链</td>
+</tr>
+<tr>
+<td>零 Token 看门狗</td>
+<td>—</td>
+<td>no_agent</td>
+</tr>
+<tr>
+<td>不可信面</td>
+<td>deny cron</td>
+<td>deny cronjob + Prompt 扫描</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>十二、最佳实践与命令速查 | Best Practices &amp; Quick Commands</h2>
+<p><strong>中文</strong></p>
+<h3>Hermes Cron</h3>
+<ol>
+<li><strong>自包含 prompt</strong>：Cron 会话无历史，须写清一切必要细节</li>
+<li><strong>技能而非长 prompt</strong>：复用工作流用 <code>skills=[...]</code> 附加</li>
+<li><strong>收敛 toolsets</strong>：<code>enabled_toolsets=["web","file"]</code> 控制成本</li>
+<li><strong>健康检查用 [SILENT]</strong>：正常时静默，异常才打扰</li>
+<li><strong>流水线用 context_from</strong>：避免硬编码文件路径在 prompt 中</li>
+<li><strong>生产用 Nous Portal OAuth</strong>：无人值守避免 API key 过期</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>添加</td>
+<td><code>/cron add 30m "..."</code> 或自然语言描述</td>
+</tr>
+<tr>
+<td>列表</td>
+<td><code>/cron list</code> / <code>hermes cron list</code></td>
+</tr>
+<tr>
+<td>暂停/恢复</td>
+<td><code>/cron pause\|resume &lt;id&gt;</code></td>
+</tr>
+<tr>
+<td>手动触发</td>
+<td><code>/cron run &lt;id&gt;</code> / <code>hermes cron tick</code></td>
+</tr>
+<tr>
+<td>安装调度</td>
+<td><code>hermes gateway install</code></td>
+</tr>
+</tbody>
+</table>
+<h3>OpenClaw Heartbeat</h3>
+<ol>
+<li><strong>保持 HEARTBEAT.md 短小</strong>：&lt;20 行 checklist</li>
+<li><strong>tasks: 分间隔</strong>：不同检查项用不同 interval</li>
+<li><strong>activeHours 限制</strong>：避免深夜无意义 Token 消耗</li>
+<li><strong>target: "last"</strong>：有异常时发到最近活跃渠道</li>
+<li><strong>deny cron 给聊天 Agent</strong>：heartbeat 与 cron 职责分离</li>
+</ol>
+<p><strong>English</strong></p>
+<p><strong>Hermes</strong>: self-contained prompts, skills attachment, limited toolsets, <code>[SILENT]</code> health checks, <code>context_from</code> pipelines, Nous Portal OAuth. Commands: <code>/cron add|list|pause|resume|run</code>, <code>hermes gateway install</code>.</p>
+<p><strong>OpenClaw</strong>: short HEARTBEAT.md, per-task intervals, activeHours, target last channel, deny cron on chat agents.</p>
+<hr />
+<h2>十三、延伸阅读 | Further Reading</h2>
+<ul>
+<li><a href="./tools-execution-environments.md">工具链与执行环境</a></li>
+<li><a href="./workspace-context-prompt.md">工作区文件与 Prompt 组装</a></li>
+<li><a href="./security-model.md">安全模型深度解析</a></li>
+<li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron">Hermes Cron 文档</a></li>
+<li><a href="https://docs.openclaw.ai/gateway/heartbeat">OpenClaw Heartbeat 文档</a></li>
+</ul>
+<hr />
+<h2>十四、结语 | Conclusion</h2>
+<p><strong>中文</strong></p>
+<p>自动化调度与主动巡检让个人 Agent 从「被动应答」进化为「持续值守」。OpenClaw 以 <strong>HEARTBEAT.md + 30 分钟 heartbeat + HEARTBEAT_OK 静默</strong> 提供轻量、内置的主动性，适合多渠道助理的日常巡检。Hermes 以 <strong>60 秒调度器、cronjob 统一 API、context_from 流水线、no-agent 零 Token 看门狗和 wakeAgent 门控</strong> 提供工业级无人值守能力，适合复杂流水线和成本敏感的高频轮询。安全配置的核心原则一致：<strong>不可信面 deny 调度工具，自包含 prompt，最小 toolset，失败必告警</strong>。</p>
+<p><strong>English</strong></p>
+<p>Automation and proactive monitoring evolve personal agents from reactive to always-on. OpenClaw offers lightweight proactivity via <strong>HEARTBEAT.md, 30m heartbeat, and HEARTBEAT_OK silent ack</strong> — ideal for multi-channel daily checks. Hermes offers industrial unattended capability via <strong>60s scheduler, unified cronjob API, context_from pipelines, no-agent zero-token watchdogs, and wakeAgent gates</strong> — ideal for complex pipelines and cost-sensitive frequent polling. Shared security principle: deny scheduling tools on untrusted surfaces, self-contained prompts, minimal toolsets, and fail-loud on errors.</p>
+
+      
+    
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    
+          <div class="post-tags">
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/Cron/" rel="tag"># Cron</a>
+              <a href="/tags/Hermes/" rel="tag"># Hermes</a>
+              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+          </div>
+        <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/17b36b1c.html" rel="prev" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
+      <i class="fa fa-chevron-left"></i> Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/7df1e50a.html" rel="next" title="Agent Hermes 与 OpenClaw 模型 Provider 与 Token 成本优化全解析">
+      Agent Hermes 与 OpenClaw 模型 Provider 与 Token 成本优化全解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">372</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">324k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">19:37</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

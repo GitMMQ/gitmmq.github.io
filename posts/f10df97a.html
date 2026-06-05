@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="安装初始化、hermes claw migrate、openclaw onboard、渠道配置、doctor/audit 运维清单，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南">
+<meta property="og:url" content="https://www.fastolf.com/posts/f10df97a.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="安装初始化、hermes claw migrate、openclaw onboard、渠道配置、doctor/audit 运维清单，中英文对照。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-06-06T09:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T09:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Agent;Deploy;Hermes;OpenClaw">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/f10df97a.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Agent Hermes 与 OpenClaw 部署迁移与运维实战指南 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/f10df97a.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent Hermes 与 OpenClaw 部署迁移与运维实战指南
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-06-06 17:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T17:00:00+08:00">2026-06-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>9493</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>21 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+      
+        <blockquote>
+<p>最后更新 | Last updated: 2026-06-06</p>
+</blockquote>
+<hr />
+<h2>一、部署模式总览 | Deployment Patterns Overview</h2>
+<p><strong>中文</strong></p>
+<p>个人 Agent 常见四种部署拓扑：</p>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+    subgraph A[&quot;模式 A：本地 Loopback&quot;]
+        LAP[笔记本 localhost]
+        LAP --&gt; GW1[Gateway 仅本机]
+    end
+
+    subgraph B[&quot;模式 B：VPS + 消息平台&quot;]
+        VPS[$5 VPS 长驻]
+        PHONE[手机 Telegram/WhatsApp]
+        PHONE --&gt; VPS
+    end
+
+    subgraph C[&quot;模式 C：分离式 Gateway/执行&quot;]
+        GWM[Gateway 机 — 仅消息]
+        EXE[执行机 — Docker/SSH]
+        GWM --&gt;|SSH| EXE
+    end
+
+    subgraph D[&quot;模式 D：Serverless（Hermes）&quot;]
+        GWH[Hermes Gateway]
+        MOD[Modal / Daytona]
+        GWH --&gt; MOD
+    end</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>OpenClaw</th>
+<th>Hermes</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 本地</td>
+<td><code>gateway.bind: loopback</code></td>
+<td>Gateway 默认不暴露 HTTP</td>
+<td>最安全开发</td>
+</tr>
+<tr>
+<td>B VPS</td>
+<td><code>openclaw onboard --install-daemon</code></td>
+<td><code>hermes gateway install</code></td>
+<td><strong>最常见生产</strong></td>
+</tr>
+<tr>
+<td>C 分离</td>
+<td>sandbox + remote node</td>
+<td><code>terminal.backend: ssh</code></td>
+<td>高安全</td>
+</tr>
+<tr>
+<td>D Serverless</td>
+<td>—</td>
+<td>Modal/Daytona 后端</td>
+<td>低闲置成本</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Four deployment patterns: local loopback (safest dev), VPS + messaging (most common prod), split gateway/execution (high security), serverless backends (Hermes Modal/Daytona for near-zero idle cost).</p>
+<hr />
+<h2>二、Hermes 安装 | Hermes Installation</h2>
+<p><strong>中文</strong></p>
+<h3>2.1 一键安装</h3>
+<p><strong>Linux / macOS / WSL2 / Android (Termux)：</strong></p>
+<pre><code class="language-bash">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+source ~/.bashrc   # 或 source ~/.zshrc
+</code></pre>
+<p><strong>Windows 原生（PowerShell）：</strong></p>
+<pre><code class="language-powershell">iex (irm https://hermes-agent.nousresearch.com/install.ps1)
+</code></pre>
+<p><strong>Windows 推荐路径</strong>：WSL2 内运行 bash 安装脚本 — 与 Linux 生产环境一致。</p>
+<p><strong>Termux（Android）</strong>：直接在手机上运行 Agent，适合轻量 Gateway + Telegram Bot。注意电量与后台进程限制。</p>
+<h3>2.2 安装器做了什么</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uv</td>
+<td>Python 包管理</td>
+</tr>
+<tr>
+<td>Python 3.11</td>
+<td>经 uv 安装，无需 sudo</td>
+</tr>
+<tr>
+<td>Node.js v22</td>
+<td>浏览器自动化、WhatsApp bridge</td>
+</tr>
+<tr>
+<td>ripgrep</td>
+<td>快速文件搜索</td>
+</tr>
+<tr>
+<td>ffmpeg</td>
+<td>TTS 音频转换</td>
+</tr>
+<tr>
+<td>仓库克隆</td>
+<td><code>~/.hermes/hermes-agent/</code></td>
+</tr>
+<tr>
+<td>全局命令</td>
+<td><code>~/.local/bin/hermes</code></td>
+</tr>
+</tbody>
+</table>
+<h3>2.3 安装布局</h3>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>代码位置</th>
+<th>数据目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Git 安装器（用户）</td>
+<td><code>~/.hermes/hermes-agent/</code></td>
+<td><code>~/.hermes/</code></td>
+</tr>
+<tr>
+<td>pip install</td>
+<td>site-packages</td>
+<td><code>~/.hermes/</code></td>
+</tr>
+<tr>
+<td>sudo 系统安装</td>
+<td><code>/usr/local/lib/hermes-agent/</code></td>
+<td>每用户 <code>~/.hermes/</code> 或 <code>$HERMES_HOME</code></td>
+</tr>
+</tbody>
+</table>
+<h3>2.4 初始化</h3>
+<pre><code class="language-bash">hermes setup              # 完整配置向导
+hermes setup --portal     # 推荐：OAuth + Tool Gateway 一步完成
+hermes model              # 选择 Provider 与模型
+hermes tools              # 配置 toolsets
+hermes gateway setup      # 配置消息平台
+</code></pre>
+<p><code>hermes setup --portal</code> 覆盖：模型 Provider + web search + image gen + TTS + cloud browser — <strong>最低摩擦无人值守路径</strong>。</p>
+<p><strong>English</strong></p>
+<p>Install via curl script (Linux/macOS/WSL2/Termux) or PowerShell (native Windows; WSL2 preferred). Installer bundles Python, Node, ripgrep, ffmpeg. Run <code>hermes setup --portal</code> for fastest OAuth + Tool Gateway setup.</p>
+<h3>2.5 非 root / systemd 服务用户</h3>
+<pre><code class="language-bash"># 管理员一次性（Debian/Ubuntu）
+sudo npx playwright install-deps chromium
+
+# 服务用户
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+# 或跳过浏览器：bash -s -- --skip-browser
+
+# 确保 PATH 含 ~/.local/bin/hermes
+hermes doctor
+</code></pre>
+<p><strong>English</strong></p>
+<p>For systemd service accounts: admin installs Playwright system deps; service user runs installer with <code>--skip-browser</code> if headless only. Verify with <code>hermes doctor</code>.</p>
+<hr />
+<h2>三、OpenClaw 安装 | OpenClaw Installation</h2>
+<p><strong>中文</strong></p>
+<pre><code class="language-bash">npm install -g openclaw@latest
+openclaw onboard --install-daemon
+openclaw dashboard
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm install -g</code></td>
+<td>全局 CLI + Gateway</td>
+</tr>
+<tr>
+<td><code>onboard --install-daemon</code></td>
+<td>引导式配置 + 系统服务（launchd/systemd）</td>
+</tr>
+<tr>
+<td><code>dashboard</code></td>
+<td>浏览器控制台 <code>http://127.0.0.1:18789/</code></td>
+</tr>
+</tbody>
+</table>
+<p>工作区默认：<code>~/.openclaw/workspace/</code>（SOUL.md、AGENTS.md 等）</p>
+<p>主配置：<code>~/.openclaw/openclaw.json</code></p>
+<p><strong>English</strong></p>
+<p><code>npm install -g openclaw@latest</code>, then <code>openclaw onboard --install-daemon</code> for guided setup and daemon install. Control UI at <code>http://127.0.0.1:18789/</code>. Workspace at <code>~/.openclaw/workspace/</code>.</p>
+<hr />
+<h2>四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path</h2>
+<p><strong>中文</strong></p>
+<p>Telegram 是两框架 <strong>上手最快</strong> 的渠道之一：Bot Token 申请简单、无需企业资质、长轮询即可运行。</p>
+<h3>4.1 Hermes Telegram</h3>
+<pre><code class="language-bash">hermes gateway setup
+# 或编辑 ~/.hermes/.env：
+# TELEGRAM_BOT_TOKEN=...
+# TELEGRAM_ALLOWED_USERS=123456789
+hermes gateway start
+</code></pre>
+<p>生产建议：</p>
+<ul>
+<li>配置 <code>TELEGRAM_ALLOWED_USERS</code> 或启用 DM pairing</li>
+<li><code>terminal.backend: docker</code></li>
+<li>可选 <code>TELEGRAM_HOME_CHANNEL</code> 用于 Cron 投递</li>
+</ul>
+<h3>4.2 OpenClaw Telegram</h3>
+<pre><code class="language-json5">{
+  channels: {
+    telegram: {
+      botToken: &quot;...&quot;,
+      dmPolicy: &quot;pairing&quot;,
+      groups: { &quot;*&quot;: { requireMention: true } },
+    },
+  },
+}
+</code></pre>
+<p>通过 <code>openclaw dashboard</code> 或 onboard 向导配置。</p>
+<h3>4.3 渠道对比速查</h3>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>上手难度</th>
+<th>Hermes</th>
+<th>OpenClaw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Telegram</td>
+<td>★☆☆</td>
+<td>内置 Adapter</td>
+<td>内置</td>
+</tr>
+<tr>
+<td>Discord</td>
+<td>★★☆</td>
+<td>内置</td>
+<td>内置</td>
+</tr>
+<tr>
+<td>WhatsApp</td>
+<td>★★★</td>
+<td>Cloud API / Baileys</td>
+<td>内置 bridge</td>
+</tr>
+<tr>
+<td>iMessage</td>
+<td>★★★★</td>
+<td>BlueBubbles</td>
+<td>内置 + Nodes</td>
+</tr>
+<tr>
+<td>企业微信/飞书</td>
+<td>★★★</td>
+<td>内置</td>
+<td>插件</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Telegram is the fastest channel for both frameworks. Hermes: <code>hermes gateway setup</code> + allowlist/pairing. OpenClaw: <code>channels.telegram</code> in <code>openclaw.json</code> with <code>dmPolicy: pairing</code>.</p>
+<hr />
+<h2>五、Gateway 系统服务 | Gateway as System Service</h2>
+<p><strong>中文</strong></p>
+<h3>5.1 Hermes</h3>
+<pre><code class="language-bash">hermes gateway install              # 用户级 systemd/launchd
+sudo hermes gateway install --system  # Linux 开机系统服务
+hermes gateway start
+hermes gateway stop
+hermes gateway stop --all           # 更新前停止所有 Profile
+</code></pre>
+<p>PID 文件：<code>~/.hermes/gateway.pid</code>（Profile 作用域）</p>
+<p>后台任务并行运行：Cron 调度（60s tick）、会话过期、记忆 flush、Provider 缓存刷新。</p>
+<h3>5.2 OpenClaw</h3>
+<p><code>openclaw onboard --install-daemon</code> 安装 launchd/systemd 服务。</p>
+<pre><code class="language-json5">{
+  gateway: {
+    mode: &quot;local&quot;,
+    bind: &quot;loopback&quot;,           // 生产：loopback 或 auth
+    auth: { mode: &quot;token&quot;, token: &quot;long-random-token&quot; },
+  },
+}
+</code></pre>
+<p>远程访问：Tailscale 或 SSH 隧道 — <strong>避免直接公网暴露 18789</strong>。</p>
+<p><strong>English</strong></p>
+<p>Hermes: <code>hermes gateway install</code> (user or <code>--system</code> service). OpenClaw: daemon via onboard. Bind loopback or enable auth; use Tailscale/SSH for remote access.</p>
+<hr />
+<h2>六、hermes claw migrate 迁移 | Migrating from OpenClaw</h2>
+<p><strong>中文</strong></p>
+<pre><code class="language-bash">hermes claw migrate
+</code></pre>
+<p>一键从 <code>~/.openclaw/</code> 导入：</p>
+<table>
+<thead>
+<tr>
+<th>导入项</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOUL.md</td>
+<td>Hermes 人格 / global SOUL</td>
+</tr>
+<tr>
+<td>MEMORY.md / USER.md</td>
+<td>持久记忆条目</td>
+</tr>
+<tr>
+<td>skills/</td>
+<td><code>~/.hermes/skills/</code></td>
+</tr>
+<tr>
+<td>API Keys</td>
+<td><code>.env</code> 映射</td>
+</tr>
+<tr>
+<td>消息/Gateway 设置</td>
+<td>Hermes 平台配置</td>
+</tr>
+</tbody>
+</table>
+<p><strong>迁移后仍需</strong>：</p>
+<pre><code class="language-bash">hermes model              # 确认 Provider
+hermes gateway setup      # 验证渠道 Token
+hermes doctor             # 健康检查
+</code></pre>
+<p>适用场景：已有龙虾部署、想叠加 Hermes 学习闭环，或社区 <strong>HermesClaw</strong> 双栈实验。</p>
+<p><strong>English</strong></p>
+<p><code>hermes claw migrate</code> imports SOUL, memory, skills, API keys, and messaging config from <code>~/.openclaw/</code>. Follow with <code>hermes model</code>, <code>hermes gateway setup</code>, and <code>hermes doctor</code>.</p>
+<hr />
+<h2>七、诊断与审计 | Diagnostics &amp; Auditing</h2>
+<p><strong>中文</strong></p>
+<h3>7.1 hermes doctor</h3>
+<pre><code class="language-bash">hermes doctor
+hermes doctor --ack &lt;id&gt;    # 确认处置供应链告警
+</code></pre>
+<p>检查项包括：</p>
+<ul>
+<li>Python venv 完整性</li>
+<li>已知妥协包版本（供应链蠕虫等）</li>
+<li>配置迁移状态</li>
+<li>安装方式检测（pip/git/Homebrew/Nix）</li>
+<li>缺失依赖与修复建议</li>
+</ul>
+<h3>7.2 openclaw security audit</h3>
+<pre><code class="language-bash">openclaw security audit
+openclaw security audit --deep    # 含实时 Gateway 探测
+openclaw security audit --fix     # 自动修复常见问题
+</code></pre>
+<p>覆盖：入站访问、工具爆炸半径、网络暴露、文件权限、插件策略漂移。</p>
+<h3>7.3 对照表</h3>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>OpenClaw</th>
+<th>Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>健康诊断</td>
+<td>Gateway 日志 + security audit</td>
+<td><code>hermes doctor</code></td>
+</tr>
+<tr>
+<td>安全审计</td>
+<td><code>openclaw security audit --deep</code></td>
+<td>doctor + Tirith + 审批配置</td>
+</tr>
+<tr>
+<td>更新</td>
+<td><code>npm update -g openclaw</code></td>
+<td><code>hermes update</code>（自动检测安装方式）</td>
+</tr>
+<tr>
+<td>配置检查</td>
+<td>手动编辑 openclaw.json</td>
+<td><code>hermes config check</code> / <code>migrate</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p><code>hermes doctor</code> for health and supply-chain advisories. <code>openclaw security audit [--deep] [--fix]</code> for OpenClaw hardening. <code>hermes update</code> auto-detects install method.</p>
+<hr />
+<h2>八、ACP IDE 集成 | ACP IDE Integration</h2>
+<p><strong>中文</strong></p>
+<pre><code class="language-bash">pip install -e '.[acp]'    # 或在标准安装后
+hermes acp
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>编辑器</th>
+<th>配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VS Code</td>
+<td>ACP Client 扩展 → <code>acp.agents.Hermes Agent</code></td>
+</tr>
+<tr>
+<td>Zed</td>
+<td>ACP Registry → <code>uvx --from 'hermes-agent[acp]' hermes-acp</code></td>
+</tr>
+<tr>
+<td>JetBrains</td>
+<td>指向 <code>acp_registry/</code></td>
+</tr>
+</tbody>
+</table>
+<p>ACP 使用 <code>hermes-acp</code> 精选 toolset：文件、终端、web、memory、skills、<code>delegate_task</code> — <strong>不含</strong> cronjob、messaging delivery。</p>
+<p>审批选项：<code>allow_once</code> / <code>allow_session</code> / <code>allow_always</code> / <code>deny</code></p>
+<pre><code class="language-bash">hermes acp --setup-browser --yes   # 可选浏览器工具
+</code></pre>
+<p><strong>English</strong></p>
+<p><code>hermes acp</code> for VS Code, Zed (via ACP Registry + uv), JetBrains. Curated toolset for editor workflows. Configure credentials first with <code>hermes model</code>.</p>
+<hr />
+<h2>九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research</h2>
+<p><strong>中文</strong></p>
+<p>Hermes 提供 Batch Runner、ShareGPT 轨迹导出、Atropos RL 集成与断点续跑，面向工具调用模型微调。OpenClaw 会话存于 <code>sessions/*.jsonl</code>，可手动提取但无内置 RL 管线。</p>
+<p><strong>English</strong></p>
+<p>Hermes: batch runner, ShareGPT export, Atropos RL. OpenClaw: jsonl transcripts only — no built-in RL pipeline.</p>
+<hr />
+<h2>十、移动端 Nodes（OpenClaw）| iOS/Android Nodes</h2>
+<p><strong>中文</strong></p>
+<p>OpenClaw 通过 Web Control UI 配对 iOS/Android <strong>Nodes</strong>（Canvas、相机、语音）。Hermes <strong>无原生 Node</strong>，以 Telegram/WhatsApp 等消息平台作「口袋助理」；Android 可用 Termux 自托管。需手机硬件深度集成选 OpenClaw Nodes；纯消息 + Cron 选 Hermes Gateway。</p>
+<p><strong>English</strong></p>
+<p>OpenClaw nodes: canvas, camera, voice via Control UI pairing. Hermes: messaging platforms or Termux on Android — no native mobile SDK.</p>
+<hr />
+<h2>十一、分离式 Gateway/执行（SSH 模式）| Split Gateway / Execution</h2>
+<p><strong>中文</strong></p>
+<p>高安全生产拓扑：</p>
+<pre><code class="language-text">┌─────────────────────┐         SSH          ┌─────────────────────┐
+│  Gateway VPS        │ ──────────────────► │  执行 VPS           │
+│  - 仅消息 + 配对     │    terminal.backend  │  - Docker 沙箱      │
+│  - 无敏感代码仓库    │         : ssh          │  - GPU / 大磁盘     │
+└─────────────────────┘                      └─────────────────────┘
+</code></pre>
+<p><strong>Hermes 配置：</strong></p>
+<pre><code class="language-yaml">terminal:
+  backend: ssh
+  ssh:
+    host: execution.internal
+    user: hermes
+    key_path: ~/.ssh/hermes_exec
+</code></pre>
+<p><strong>OpenClaw</strong>：sandbox 配置 + remote node 模式。</p>
+<p><strong>English</strong></p>
+<p>Split trust: Gateway host for messaging only; execution host via SSH/Docker sandbox. Hermes: <code>terminal.backend: ssh</code>. OpenClaw: sandbox + remote nodes.</p>
+<hr />
+<h2>十二、运维清单 | Operations Checklist</h2>
+<p><strong>中文</strong></p>
+<table>
+<thead>
+<tr>
+<th>频率 / 硬化项</th>
+<th>Hermes</th>
+<th>OpenClaw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每日</td>
+<td>Gateway 日志 / Cron 输出</td>
+<td>Dashboard 会话</td>
+</tr>
+<tr>
+<td>每周</td>
+<td><code>hermes doctor</code>、command_allowlist</td>
+<td><code>security audit</code></td>
+</tr>
+<tr>
+<td>每月</td>
+<td><code>hermes update</code>、轮换 Key</td>
+<td>npm 更新、审计 Skills</td>
+</tr>
+<tr>
+<td>Allowlist / 配对</td>
+<td>平台 allowlist + DM pairing</td>
+<td><code>dmPolicy: pairing</code> + <code>dmScope</code></td>
+</tr>
+<tr>
+<td>执行隔离</td>
+<td><code>terminal.backend: docker/ssh</code></td>
+<td>sandbox + <code>tools.profile</code></td>
+</tr>
+<tr>
+<td>服务化</td>
+<td><code>hermes gateway install</code></td>
+<td><code>onboard --install-daemon</code></td>
+</tr>
+<tr>
+<td>审计</td>
+<td><code>hermes doctor</code></td>
+<td><code>security audit --deep --fix</code></td>
+</tr>
+<tr>
+<td>插件/供应链</td>
+<td>Cron <code>enabled_toolsets</code></td>
+<td><code>plugins.allow</code> + shrinkwrap</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Routine ops: logs, weekly doctor/audit, monthly updates and key rotation. Production: allowlists, pairing, sandboxed execution, gateway services, and supply-chain checks for both frameworks.</p>
+<hr />
+<h2>十三、故障排查 | Troubleshooting</h2>
+<p><strong>中文</strong></p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>Hermes 解决</th>
+<th>OpenClaw 解决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hermes: command not found</code></td>
+<td><code>source ~/.bashrc</code>；检查 <code>~/.local/bin</code></td>
+<td>检查 npm global bin PATH</td>
+</tr>
+<tr>
+<td>API key 未设置</td>
+<td><code>hermes model</code> 或 <code>hermes setup --portal</code></td>
+<td>onboard 向导</td>
+</tr>
+<tr>
+<td>Gateway 不响应</td>
+<td><code>hermes gateway stop &amp;&amp; start</code>；查 PID</td>
+<td>重启 daemon；查 18789</td>
+</tr>
+<tr>
+<td>Telegram 无回复</td>
+<td>检查 allowlist / pairing</td>
+<td><code>dmPolicy</code>、bot token</td>
+</tr>
+<tr>
+<td>配置迁移失败</td>
+<td><code>hermes config check</code> → <code>migrate</code></td>
+<td>手动合并 openclaw.json</td>
+</tr>
+<tr>
+<td>模块导入错误</td>
+<td>用 venv 的 <code>hermes</code>，非系统 Python</td>
+<td>重装 npm 包</td>
+</tr>
+<tr>
+<td>Cron 不触发</td>
+<td><code>hermes gateway</code> 必须运行；<code>cron status</code></td>
+<td>Gateway cron 配置</td>
+</tr>
+<tr>
+<td>浏览器工具失败</td>
+<td><code>hermes acp --setup-browser</code></td>
+<td>Playwright 依赖</td>
+</tr>
+<tr>
+<td>供应链告警</td>
+<td><code>hermes doctor --ack</code></td>
+<td><code>security audit</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Common fixes: PATH for <code>hermes</code>, credentials via <code>hermes model</code>/<code>setup --portal</code>, gateway restart, pairing/allowlists for Telegram, <code>config migrate</code> for Hermes, <code>security audit</code> for OpenClaw. Run <code>hermes doctor</code> / <code>hermes status</code> or <code>openclaw security audit --deep</code> for guided diagnosis.</p>
+<hr />
+<h2>十四、快速命令对照 | Quick Command Reference</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>OpenClaw（龙虾）</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安装</td>
+<td><code>npm install -g openclaw@latest</code></td>
+<td><code>curl -fsSL .../install.sh \| bash</code></td>
+</tr>
+<tr>
+<td>初始化</td>
+<td><code>openclaw onboard --install-daemon</code></td>
+<td><code>hermes setup</code> / <code>setup --portal</code></td>
+</tr>
+<tr>
+<td>控制 UI</td>
+<td><code>openclaw dashboard</code></td>
+<td>CLI TUI + 各平台聊天</td>
+</tr>
+<tr>
+<td>启动 Gateway</td>
+<td>daemon 自动</td>
+<td><code>hermes gateway start</code></td>
+</tr>
+<tr>
+<td>系统服务</td>
+<td>onboard <code>--install-daemon</code></td>
+<td><code>hermes gateway install</code></td>
+</tr>
+<tr>
+<td>换模型</td>
+<td>Runtime 配置</td>
+<td><code>hermes model</code> / <code>/model</code></td>
+</tr>
+<tr>
+<td>安全审计</td>
+<td><code>openclaw security audit</code></td>
+<td><code>hermes doctor</code></td>
+</tr>
+<tr>
+<td>从对方迁移</td>
+<td>—</td>
+<td><code>hermes claw migrate</code></td>
+</tr>
+<tr>
+<td>IDE 集成</td>
+<td>外部 Runtime</td>
+<td><code>hermes acp</code></td>
+</tr>
+<tr>
+<td>MCP 桥接</td>
+<td>—</td>
+<td><code>hermes mcp serve</code></td>
+</tr>
+<tr>
+<td>更新</td>
+<td><code>npm update -g openclaw</code></td>
+<td><code>hermes update</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>十五、延伸阅读 | Further Reading</h2>
+<ul>
+<li><a href="./gateway.md">Gateway 架构深度解析</a> — 部署模式与生产清单</li>
+<li><a href="./security-model.md">安全模型深度解析</a> — audit 与硬化基线</li>
+<li><a href="./model-provider-cost.md">模型 Provider 与成本</a> — Portal 与 Cron 成本</li>
+<li><a href="./plugins-mcp-ecosystem.md">插件体系与 MCP</a> — 扩展安装</li>
+<li>Hermes：<a href="https://hermes-agent.nousresearch.com/docs/getting-started/installation">Installation</a>、<a href="https://hermes-agent.nousresearch.com/docs/getting-started/termux">Termux</a>、<a href="https://hermes-agent.nousresearch.com/docs/reference/faq">FAQ</a></li>
+<li>OpenClaw：https://docs.openclaw.ai/</li>
+</ul>
+<hr />
+<h2>十六、结语 | Conclusion</h2>
+<p><strong>中文</strong></p>
+<p>部署个人 Agent 的「最快路径」是：<strong>Hermes 用 <code>curl</code> + <code>setup --portal</code> + Telegram；OpenClaw 用 <code>npm</code> + <code>onboard</code> + Dashboard</strong>。生产环境无论选型，都应完成 <strong>配对/allowlist、执行沙箱、诊断审计、Gateway 系统服务</strong> 四件事。已有龙虾用户可通过 <code>hermes claw migrate</code> 平滑叠加学习闭环；高安全场景采用 <strong>SSH 分离 Gateway/执行</strong>。运维不是一次性安装 — <code>hermes doctor</code> 与 <code>openclaw security audit</code> 应纳入日常节奏。</p>
+<p><strong>English</strong></p>
+<p>Fastest paths: Hermes <code>curl</code> + <code>setup --portal</code> + Telegram; OpenClaw <code>npm</code> + <code>onboard</code> + Dashboard. Production requires pairing/allowlists, execution sandboxing, diagnostics, and gateway services. Migrate from OpenClaw with <code>hermes claw migrate</code>. Split gateway/execution via SSH for high security. Treat <code>hermes doctor</code> and <code>security audit</code> as routine ops, not one-time setup.</p>
+
+      
+    
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    
+          <div class="post-tags">
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/Deploy/" rel="tag"># Deploy</a>
+              <a href="/tags/Hermes/" rel="tag"># Hermes</a>
+              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+          </div>
+        <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/44679524.html" rel="prev" title="Agent Hermes 与 OpenClaw 插件体系与 MCP 生态全解析">
+      <i class="fa fa-chevron-left"></i> Agent Hermes 与 OpenClaw 插件体系与 MCP 生态全解析
+    </a></div>
+      <div class="post-nav-item">
+</div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">372</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">324k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">19:37</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

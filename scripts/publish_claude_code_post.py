@@ -11,6 +11,11 @@ from markdown.extensions.tables import TableExtension
 ROOT = Path("/workspace")
 MD_SOURCE = ROOT / "docs/claude-code-intro-bilingual.md"
 TEMPLATE = ROOT / "posts/e601e6a8.html"
+INDEX_MARKER_POST = "26215170.html"
+INDEX_MARKER_TITLE = "Agent Hermes 与 OpenClaw 安全模型深度解析"
+SEARCH_MARKER_TITLE = INDEX_MARKER_TITLE
+PREV_POST_URL = "/posts/26215170.html"
+PREV_POST_TITLE = INDEX_MARKER_TITLE
 
 TITLE = "Claude Code 全面介绍：架构设计、应用与优缺点"
 CATEGORY = "mechine"
@@ -138,10 +143,10 @@ def build_post_html(template: str, body_html: str) -> str:
 
     nav_pattern = re.compile(r'<div class="post-nav">.*?</div>\s*</div>', re.DOTALL)
     html = nav_pattern.sub(
-        """<div class="post-nav">
+        f"""<div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/e601e6a8.html" rel="prev" title="LLM Wiki 介绍：思想、意义、应用场景与优缺点">
-      <i class="fa fa-chevron-left"></i> LLM Wiki 介绍：思想、意义、应用场景与优缺点
+    <a href="{PREV_POST_URL}" rel="prev" title="{PREV_POST_TITLE}">
+      <i class="fa fa-chevron-left"></i> {PREV_POST_TITLE}
     </a></div>
       <div class="post-nav-item">
     </div>
@@ -298,13 +303,45 @@ def increment_post_count(text: str, delta: int = 1) -> str:
     def repl(match: re.Match[str]) -> str:
         return f'<span class="site-state-item-count">{int(match.group(1)) + delta}</span>'
 
-    return re.sub(r'<span class="site-state-item-count">(\d+)</span>', repl, text, count=1)
+    text = re.sub(
+        r'(<div class="site-state-item site-state-posts">.*?<span class="site-state-item-count">)(\d+)(</span>)',
+        lambda m: f"{m.group(1)}{int(m.group(2)) + delta}{m.group(3)}",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"共计 (\d+) 篇日志",
+        lambda m: f"共计 {int(m.group(1)) + delta} 篇日志",
+        text,
+    )
+    return text
 
 
 def insert_archive_entry(html: str, entry: str) -> str:
-    marker = '    <div class="collection-year">\n      <span class="collection-header">2026</span>\n    </div>\n\n  <article itemscope itemtype="http://schema.org/Article">\n    <header class="post-header">\n\n      <div class="post-meta">\n        <time itemprop="dateCreated"\n              datetime="2026-06-05T10:00:00+08:00"'
+    marker = (
+        '    <div class="collection-year">\n'
+        '      <span class="collection-header">2026</span>\n'
+        '    </div>\n\n\n'
+        '  <article itemscope itemtype="http://schema.org/Article">\n'
+        '    <header class="post-header">\n\n'
+        '      <div class="post-meta">\n'
+        '        <time itemprop="dateCreated"\n'
+        '              datetime="2026-06-05T14:00:00+08:00"'
+    )
+    compact_marker = (
+        '    <div class="collection-year">\n'
+        '      <span class="collection-header">2026</span>\n'
+        '    </div>\n\n'
+        '  <article itemscope itemtype="http://schema.org/Article">\n'
+        '    <header class="post-header">\n'
+        '      <div class="post-meta">\n'
+        '        <time itemprop="dateCreated" datetime="2026-06-05T14:00:00+08:00"'
+    )
     if marker in html:
         return html.replace(marker, entry.strip() + "\n\n" + marker, 1)
+    if compact_marker in html:
+        return html.replace(compact_marker, entry.strip() + "\n\n" + compact_marker, 1)
     year_marker = '    <div class="collection-year">\n      <span class="collection-header">2026</span>\n    </div>'
     if year_marker in html:
         return html.replace(year_marker, year_marker + "\n" + entry, 1)
@@ -353,7 +390,7 @@ def main() -> None:
     index_html = index_path.read_text(encoding="utf-8")
     marker = (
         '  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">\n'
-        '    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e601e6a8.html">'
+        f'    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/{INDEX_MARKER_POST}">'
     )
     if marker not in index_html:
         raise RuntimeError("index.html marker not found")
@@ -382,7 +419,7 @@ def main() -> None:
         search_xml,
         flags=re.DOTALL,
     )
-    search_marker = "    <entry>\n      <title>LLM Wiki 介绍：思想、意义、应用场景与优缺点</title>"
+    search_marker = f"    <entry>\n      <title>{SEARCH_MARKER_TITLE}</title>"
     if POST_URL not in search_xml:
         search_xml = search_xml.replace(search_marker, search_entry + "\n" + search_marker, 1)
     search_path.write_text(search_xml, encoding="utf-8")
@@ -390,15 +427,16 @@ def main() -> None:
     for sitemap_name in ("sitemap.txt", "sitemap.xml", "baidusitemap.xml"):
         update_sitemap(ROOT / sitemap_name)
 
-    llm_post = ROOT / "posts/e601e6a8.html"
-    llm_html = llm_post.read_text(encoding="utf-8")
-    next_nav = f"""<div class="post-nav-item">
+    prev_post = ROOT / f"posts/{INDEX_MARKER_POST}"
+    if prev_post.exists():
+        prev_html = prev_post.read_text(encoding="utf-8")
+        next_nav = f"""<div class="post-nav-item">
     <a href="{POST_URL}" rel="next" title="{TITLE}">
       {TITLE} <i class="fa fa-chevron-right"></i>
     </a></div>"""
-    if POST_URL not in llm_html:
-        llm_html = llm_html.replace('<div class="post-nav-item"></div>', next_nav, 1)
-    llm_post.write_text(llm_html, encoding="utf-8")
+        if POST_URL not in prev_html and '<div class="post-nav-item"></div>' in prev_html:
+            prev_html = prev_html.replace('<div class="post-nav-item"></div>', next_nav, 1)
+            prev_post.write_text(prev_html, encoding="utf-8")
 
     print(f"Published: {POST_URL}")
 
