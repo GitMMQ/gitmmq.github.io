@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="系列第 07 篇：当 LangGraph 的图状态机显得过重时，OpenAI Agents SDK 用「Agent + Runner + Handoff + Guardrails」四条原语，把 2026 年多 Agent 编排压到可读的 Python 表面。  2025 年 OpenAI 将实验性的 Swarm 演进为 OpenAI Agents SDK（pip install openai-a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails">
+<meta property="og:url" content="https://www.fastolf.com/posts/agent-dev-openai-agents-sdk.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="系列第 07 篇：当 LangGraph 的图状态机显得过重时，OpenAI Agents SDK 用「Agent + Runner + Handoff + Guardrails」四条原语，把 2026 年多 Agent 编排压到可读的 Python 表面。  2025 年 OpenAI 将实验性的 Swarm 演进为 OpenAI Agents SDK（pip install openai-a">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-05T09:30:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T09:30:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="Guardrails">
+<meta property="article:tag" content="Handoff">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="OpenAI">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/agent-dev-openai-agents-sdk.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/agent-dev-openai-agents-sdk.html","path":"posts/agent-dev-openai-agents-sdk.html","title":"OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%9A%E4%BD%8D%EF%BC%9AOpenAI-Agents-SDK-vs-LangGraph"><span class="nav-number">1.</span> <span class="nav-text">1. 定位：OpenAI Agents SDK vs LangGraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Agent-%E5%AE%9A%E4%B9%89%EF%BC%9Ainstructions%E3%80%81tools%E3%80%81model"><span class="nav-number">2.</span> <span class="nav-text">2. Agent 定义：instructions、tools、model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Handoff%EF%BC%9A%E5%A4%9A-Agent-%E5%A7%94%E6%89%98"><span class="nav-number">3.</span> <span class="nav-text">3. Handoff：多 Agent 委托</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Guardrails%EF%BC%9A%E8%BE%93%E5%85%A5-%E8%BE%93%E5%87%BA%E6%A0%A1%E9%AA%8C%E4%B8%8E%E5%AE%89%E5%85%A8"><span class="nav-number">4.</span> <span class="nav-text">4. Guardrails：输入&#x2F;输出校验与安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Tracing-%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">5. Tracing 与调试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E7%BB%BC%E5%90%88%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%88%86%E6%B5%81-%E5%B7%A5%E5%85%B7-Guardrail"><span class="nav-number">6.</span> <span class="nav-text">6. 综合示例：分流 + 工具 + Guardrail</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%94%9F%E4%BA%A7%E8%80%83%E9%87%8F"><span class="nav-number">7.</span> <span class="nav-text">7. 生产考量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%B0%8F%E7%BB%93%E4%B8%8E%E7%B3%BB%E5%88%97%E5%AF%BC%E8%88%AA"><span class="nav-number">8.</span> <span class="nav-text">8. 小结与系列导航</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-openai-agents-sdk.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 17:30:00" itemprop="dateCreated datePublished" datetime="2026-06-05T17:30:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>系列第 07 篇：当 LangGraph 的图状态机显得过重时，OpenAI Agents SDK 用「Agent + Runner + Handoff + Guardrails」四条原语，把 2026 年多 Agent 编排压到可读的 Python 表面。</p>
+</blockquote>
+<p>2025 年 OpenAI 将实验性的 Swarm 演进为 <strong>OpenAI Agents SDK</strong>（<code>pip install openai-agents</code>），定位为 <strong>轻量、生产就绪</strong> 的多 Agent 运行时：内置 Tracing、与 Responses API 深度集成，并支持 100+ 第三方 LLM。若你刚学完 <a href="/posts/agent-dev-langchain-langgraph.html">LangChain &#x2F; LangGraph 核心</a>，本篇帮你建立第二套心智模型——何时用图，何时用 Handoff。</p>
+<hr>
+<h2 id="1-定位：OpenAI-Agents-SDK-vs-LangGraph"><a href="#1-定位：OpenAI-Agents-SDK-vs-LangGraph" class="headerlink" title="1. 定位：OpenAI Agents SDK vs LangGraph"></a>1. 定位：OpenAI Agents SDK vs LangGraph</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>OpenAI Agents SDK</th>
+<th>LangGraph</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>核心抽象</td>
+<td><code>Agent</code> + <code>Runner</code> + <code>handoffs</code></td>
+<td><code>StateGraph</code> + <code>Checkpoint</code></td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>Session &#x2F; <code>to_input_list()</code> &#x2F; 服务端 <code>conversation_id</code></td>
+<td>显式 <code>TypedDict</code> 状态与 reducer</td>
+</tr>
+<tr>
+<td>编排风格</td>
+<td>LLM 驱动路由（Handoff）或 Manager（<code>as_tool</code>）</td>
+<td>代码 + 条件边，确定性更强</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>内置 Trace，对接 OpenAI Dashboard</td>
+<td>LangSmith &#x2F; 自建 OTel</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>OpenAI 栈、快速多 Agent、Guardrails 一等公民</td>
+<td>长流程、人工审批、复杂分支与回滚</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">用户输入 → Runner.run(triage_agent, query)</span><br><span class="line">              ↓</span><br><span class="line">         Input Guardrail（可选，首 Agent）</span><br><span class="line">              ↓</span><br><span class="line">         LLM + Tools / Handoff</span><br><span class="line">              ↓</span><br><span class="line">         Output Guardrail（可选，末 Agent）</span><br><span class="line">              ↓</span><br><span class="line">         final_output + Trace</span><br></pre></td></tr></table></figure>
+
+<p><strong>选型建议（2026 主流实践）：</strong> 以 OpenAI 模型为主、团队希望 <strong>少写图、多写 Prompt</strong> 时，优先 Agents SDK；需要 <strong>强确定性状态机、HITL 中断、跨厂商图复用</strong> 时，LangGraph 仍是生产首选。二者可共存：LangGraph 节点内嵌 <code>Runner.run</code> 调用 OpenAI Agent 作为子任务。</p>
+<p>从 Swarm 迁移的团队会明显感到 API 更「收口」：不再有零散 demo 级 helper，而是 <strong>Runner 统一调度 turn、tool、handoff</strong>。若你已在用 Assistants API，Agents SDK 可视为 <strong>Responses + 多 Agent 编排</strong> 的上层封装，减少自己拼 thread&#x2F;run 状态的样板代码。</p>
+<hr>
+<h2 id="2-Agent-定义：instructions、tools、model"><a href="#2-Agent-定义：instructions、tools、model" class="headerlink" title="2. Agent 定义：instructions、tools、model"></a>2. Agent 定义：instructions、tools、model</h2><p><code>Agent</code> 是可配置的 LLM 单元，最小集合为 <strong>name + instructions</strong>；生产环境通常再挂 <strong>tools</strong>、<strong>handoffs</strong>、<strong>guardrails</strong> 与 <strong>output_type</strong>（Pydantic 结构化输出）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> agents <span class="keyword">import</span> Agent, Runner, function_tool</span><br><span class="line"></span><br><span class="line"><span class="meta">@function_tool</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">search_kb</span>(<span class="params">query: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;在内部知识库检索。&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;[mock] hits for: <span class="subst">&#123;query&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">support_agent = Agent(</span><br><span class="line">    name=<span class="string">&quot;Support&quot;</span>,</span><br><span class="line">    instructions=(</span><br><span class="line">        <span class="string">&quot;你是客服 Agent。仅依据工具返回作答；&quot;</span></span><br><span class="line">        <span class="string">&quot;无法确认时说明需要人工升级。&quot;</span></span><br><span class="line">    ),</span><br><span class="line">    tools=[search_kb],</span><br><span class="line">    model=<span class="string">&quot;gpt-4.1&quot;</span>,  <span class="comment"># 可省略，使用默认</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><strong>与 LangChain 的差异：</strong> 工具用 <code>@function_tool</code> 装饰，docstring 即 schema 描述；无需单独 bind <code>StructuredTool</code>。<code>output_type=MyModel</code> 时，Runner 会驱动模型按 Pydantic 形状输出，适合工单分类、槽位抽取等 <strong>程序可读</strong> 场景。instructions 应写清 <strong>工具边界</strong> 与 <strong>拒绝策略</strong>，与系列 <a href="/posts/agent-dev-prompt-engineering.html">Prompt Engineering</a> 中的 Constraints 段对齐。</p>
+<p>执行入口统一为异步 <code>Runner.run</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    result = <span class="keyword">await</span> Runner.run(support_agent, <span class="string">&quot;如何重置 SSO？&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(result.final_output)</span><br><span class="line"></span><br><span class="line"><span class="comment"># asyncio.run(main())</span></span><br></pre></td></tr></table></figure>
+
+<p>多轮对话可传 <code>result.to_input_list()</code>、SDK <strong>Session</strong>，或 OpenAI 托管的 <code>conversation_id</code>——按「自控 vs 托管」选型，详见官方 Running agents 文档。</p>
+<p><strong>常见陷阱：</strong> instructions 过长却未拆 Handoff，导致单 Agent 上下文臃肿；工具 docstring 含糊，模型误选工具；<code>output_type</code> 与下游解析器字段不一致，引发静默截断。上线前用 10～20 条黄金用例跑 <code>Runner.run</code>，对照 Trace 检查 tool 选择与 handoff 目标是否符合预期。</p>
+<hr>
+<h2 id="3-Handoff：多-Agent-委托"><a href="#3-Handoff：多-Agent-委托" class="headerlink" title="3. Handoff：多 Agent 委托"></a>3. Handoff：多 Agent 委托</h2><p><strong>Handoff（交接）</strong> 让当前 Agent 将对话 <strong>移交给专家 Agent</strong>，专家继承历史并继续应答；路由由 LLM 根据 <code>handoff_description</code> 与 instructions 决定。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> agents <span class="keyword">import</span> Agent, Runner</span><br><span class="line"></span><br><span class="line">billing = Agent(</span><br><span class="line">    name=<span class="string">&quot;Billing&quot;</span>,</span><br><span class="line">    handoff_description=<span class="string">&quot;账单、退款、发票问题&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;处理账单与支付相关问题。&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">tech = Agent(</span><br><span class="line">    name=<span class="string">&quot;Tech&quot;</span>,</span><br><span class="line">    handoff_description=<span class="string">&quot;登录、API、集成与故障排查&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;处理技术支持与集成问题。&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">triage = Agent(</span><br><span class="line">    name=<span class="string">&quot;Triage&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;将用户问题路由到最合适的专家，不要自己长篇解答。&quot;</span>,</span><br><span class="line">    handoffs=[billing, tech],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">route</span>(<span class="params">user_msg: <span class="built_in">str</span></span>):</span><br><span class="line">    result = <span class="keyword">await</span> Runner.run(triage, user_msg)</span><br><span class="line">    <span class="built_in">print</span>(result.final_output)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;末位 Agent: <span class="subst">&#123;result.last_agent.name&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>Handoff vs <code>Agent.as_tool()</code>：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>谁对用户「说话」</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Handoff</td>
+<td>专家 Agent</td>
+<td>前台分流、专家直连用户</td>
+</tr>
+<tr>
+<td>Agents as tools</td>
+<td>Manager 汇总多专家</td>
+<td>需要统一口吻、合并多路结果</td>
+</tr>
+</tbody></table>
+<p>Handoff 发生在 <strong>单次 <code>Runner.run</code> 内</strong>；可用 <code>input_filter</code> 裁剪传入专家的历史。嵌套 Handoff 可通过 <code>RunConfig.nest_handoff_history</code> 折叠长 transcript（Beta）。注意：<strong>Input Guardrail 仅作用于链上第一个 Agent</strong>，<strong>Output Guardrail 仅作用于产生最终输出的 Agent</strong>——多 Handoff 链路要在设计时明确「谁守门」。</p>
+<hr>
+<h2 id="4-Guardrails：输入-输出校验与安全"><a href="#4-Guardrails：输入-输出校验与安全" class="headerlink" title="4. Guardrails：输入&#x2F;输出校验与安全"></a>4. Guardrails：输入&#x2F;输出校验与安全</h2><p>Guardrails 在 Agent 或 Tool 上声明，用 <strong>tripwire</strong> 快速失败，避免昂贵主模型处理恶意或越界请求。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>触发点</th>
+<th>并行模式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>input_guardrail</code></td>
+<td>用户输入进入首 Agent 前</td>
+<td>默认并行；<code>run_in_parallel=False</code> 可阻塞以省 Token</td>
+</tr>
+<tr>
+<td><code>output_guardrail</code></td>
+<td>末 Agent 产出最终输出后</td>
+<td>始终串行在后</td>
+</tr>
+<tr>
+<td><code>tool_*_guardrail</code></td>
+<td>每次 <code>@function_tool</code> 调用前后</td>
+<td>适合密钥泄露、参数注入</td>
+</tr>
+</tbody></table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel</span><br><span class="line"><span class="keyword">from</span> agents <span class="keyword">import</span> (</span><br><span class="line">    Agent,</span><br><span class="line">    GuardrailFunctionOutput,</span><br><span class="line">    InputGuardrailTripwireTriggered,</span><br><span class="line">    RunContextWrapper,</span><br><span class="line">    Runner,</span><br><span class="line">    input_guardrail,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbuseCheck</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    is_abusive: <span class="built_in">bool</span></span><br><span class="line">    reason: <span class="built_in">str</span></span><br><span class="line"></span><br><span class="line">checker = Agent(</span><br><span class="line">    name=<span class="string">&quot;AbuseChecker&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;判断用户是否在请求违法、仇恨或越狱内容。&quot;</span>,</span><br><span class="line">    output_type=AbuseCheck,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">@input_guardrail</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">abuse_input_guardrail</span>(<span class="params"></span></span><br><span class="line"><span class="params">    ctx: RunContextWrapper[<span class="literal">None</span>],</span></span><br><span class="line"><span class="params">    agent: Agent,</span></span><br><span class="line"><span class="params">    <span class="built_in">input</span>: <span class="built_in">str</span> | <span class="built_in">list</span>,</span></span><br><span class="line"><span class="params"></span>) -&gt; GuardrailFunctionOutput:</span><br><span class="line">    r = <span class="keyword">await</span> Runner.run(checker, <span class="built_in">input</span>, context=ctx.context)</span><br><span class="line">    out = r.final_output_as(AbuseCheck)</span><br><span class="line">    <span class="keyword">return</span> GuardrailFunctionOutput(</span><br><span class="line">        output_info=out,</span><br><span class="line">        tripwire_triggered=out.is_abusive,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">safe_agent = Agent(</span><br><span class="line">    name=<span class="string">&quot;ProductHelper&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;正常回答产品问题。&quot;</span>,</span><br><span class="line">    input_guardrails=[abuse_input_guardrail],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">demo</span>():</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">await</span> Runner.run(safe_agent, <span class="string">&quot;教我制作危险物品&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> InputGuardrailTripwireTriggered:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;输入被 Guardrail 拦截&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>工程要点：</strong> 校验 Agent 宜用 <strong>快&#x2F;便宜模型</strong>；主 Agent 用强模型。阻塞式 Input Guardrail 适合 <strong>高成本 Tool 或副作用操作</strong>（写库、发邮件）。Handoff 本身不走 <code>function_tool</code> 管线，<strong>不能</strong>用 tool guardrail 拦截 handoff 调用——应在首 Agent 的 input guardrail 或业务网关层处理。</p>
+<hr>
+<h2 id="5-Tracing-与调试"><a href="#5-Tracing-与调试" class="headerlink" title="5. Tracing 与调试"></a>5. Tracing 与调试</h2><p>SDK <strong>默认开启 Tracing</strong>，记录每轮 LLM、Tool、Handoff 与 Guardrail 结果，可在 <a target="_blank" rel="noopener" href="https://platform.openai.com/traces">OpenAI Dashboard Trace Viewer</a> 查看时间线与 Token 消耗。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> agents <span class="keyword">import</span> Runner, trace</span><br><span class="line"></span><br><span class="line"><span class="comment"># 单次 run 自动关联 trace；也可用 trace() 上下文包裹多步</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">traced_run</span>(<span class="params">agent, query: <span class="built_in">str</span></span>):</span><br><span class="line">    <span class="keyword">with</span> trace(<span class="string">&quot;support-session-42&quot;</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">await</span> Runner.run(agent, query)</span><br></pre></td></tr></table></figure>
+
+<p>调试清单：</p>
+<ol>
+<li>看 <strong>last_agent.name</strong> 确认 Handoff 是否走错专家。</li>
+<li>对比 Trace 中 <strong>tool_calls</strong> 与业务日志，排查幻觉调用。</li>
+<li>Guardrail tripwire 时检查 <code>output_info</code> 中的结构化理由，回灌 Prompt 或升级人工。</li>
+<li>本地开发可设环境变量关闭 Trace（见官方 Tracing 文档），CI 中保持开启以便回归对比。</li>
+</ol>
+<p>与 LangSmith 相比，OpenAI Trace 与 <strong>评测 &#x2F; 微调</strong> 工具链更近；混合栈可将 Trace ID 写入自有 OTel span，实现跨系统关联。</p>
+<p>在联调阶段建议固定 <code>trace(&quot;env-dev-pr-123&quot;)</code> 命名规范，便于在 Dashboard 按 PR 过滤。Guardrail tripwire 的异常栈应映射为 <strong>用户可读错误码</strong>（如 <code>GUARDRAIL_INPUT_BLOCKED</code>），避免把内部 checker 的 reasoning 原样暴露给终端用户。</p>
+<hr>
+<h2 id="6-综合示例：分流-工具-Guardrail"><a href="#6-综合示例：分流-工具-Guardrail" class="headerlink" title="6. 综合示例：分流 + 工具 + Guardrail"></a>6. 综合示例：分流 + 工具 + Guardrail</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel</span><br><span class="line"><span class="keyword">from</span> agents <span class="keyword">import</span> (</span><br><span class="line">    Agent,</span><br><span class="line">    GuardrailFunctionOutput,</span><br><span class="line">    Runner,</span><br><span class="line">    function_tool,</span><br><span class="line">    input_guardrail,</span><br><span class="line">    RunContextWrapper,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Intent</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    off_topic: <span class="built_in">bool</span></span><br><span class="line"></span><br><span class="line">intent_agent = Agent(</span><br><span class="line">    name=<span class="string">&quot;Intent&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;判断是否与公司产品支持无关（闲聊、作业、政治）。&quot;</span>,</span><br><span class="line">    output_type=Intent,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">@input_guardrail(<span class="params">run_in_parallel=<span class="literal">False</span></span>)</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">topic_guardrail</span>(<span class="params">ctx, agent, <span class="built_in">input</span></span>):</span><br><span class="line">    r = <span class="keyword">await</span> Runner.run(intent_agent, <span class="built_in">input</span>, context=ctx.context)</span><br><span class="line">    intent = r.final_output_as(Intent)</span><br><span class="line">    <span class="keyword">return</span> GuardrailFunctionOutput(</span><br><span class="line">        output_info=intent,</span><br><span class="line">        tripwire_triggered=intent.off_topic,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="meta">@function_tool</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ticket_status</span>(<span class="params">ticket_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;Ticket <span class="subst">&#123;ticket_id&#125;</span>: in_progress&quot;</span></span><br><span class="line"></span><br><span class="line">resolver = Agent(</span><br><span class="line">    name=<span class="string">&quot;Resolver&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;根据 ticket_status 回答进度，勿编造状态。&quot;</span>,</span><br><span class="line">    tools=[ticket_status],</span><br><span class="line">    input_guardrails=[topic_guardrail],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">triage = Agent(</span><br><span class="line">    name=<span class="string">&quot;SupportTriage&quot;</span>,</span><br><span class="line">    instructions=<span class="string">&quot;支持类问题 handoff 给 Resolver。&quot;</span>,</span><br><span class="line">    handoffs=[resolver],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    result = <span class="keyword">await</span> Runner.run(triage, <span class="string">&quot;工单 T-10086 现在什么状态？&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(result.final_output)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    asyncio.run(main())</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-生产考量"><a href="#7-生产考量" class="headerlink" title="7. 生产考量"></a>7. 生产考量</h2><table>
+<thead>
+<tr>
+<th>主题</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>密钥与配额</td>
+<td><code>OPENAI_API_KEY</code> 走密钥管理；按环境分项目与 Rate Limit</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>Input Guardrail 并行可降延迟，阻塞可降成本；按 SLA 选型</td>
+</tr>
+<tr>
+<td>幂等与副作用</td>
+<td>Tool 内写操作带 idempotency key；Guardrail 失败勿部分提交</td>
+</tr>
+<tr>
+<td>多租户</td>
+<td><code>RunContextWrapper</code> 注入 <code>tenant_id</code>，Guardrail 与 Tool 共用</td>
+</tr>
+<tr>
+<td>可测试性</td>
+<td>对 Guardrail 与 <code>@function_tool</code> 单测；E2E 用 recorded Trace 回放</td>
+</tr>
+<tr>
+<td>供应商锁定</td>
+<td>SDK 支持多 LLM Provider，核心逻辑避免硬编码 OpenAI 专有参数</td>
+</tr>
+</tbody></table>
+<p>部署形态上，Agents SDK 适合 <strong>FastAPI &#x2F; Celery Worker</strong> 内 <code>asyncio</code> 调用；高 QPS 场景在网关做鉴权与限流，Runner 层保持 <strong>无全局可变会话状态</strong>，Session 按 <code>thread_id</code> 隔离。与 Docker、Redis 队列的衔接见系列后续工程化篇章。</p>
+<p>版本升级时关注 <a target="_blank" rel="noopener" href="https://github.com/openai/openai-agents-python">openai-agents-python</a> Release Note：Handoff 嵌套、Sandbox Agent、MCP 托管工具等能力迭代较快，Pin 次要版本并在 staging 回放 Trace 回归，可降低生产行为漂移风险。</p>
+<hr>
+<h2 id="8-小结与系列导航"><a href="#8-小结与系列导航" class="headerlink" title="8. 小结与系列导航"></a>8. 小结与系列导航</h2><p>OpenAI Agents SDK 用 <strong>Agent 定义能力边界</strong>、<strong>Handoff 实现专家路由</strong>、<strong>Guardrails 把安全与成本守门前移</strong>、<strong>Tracing 闭合调试闭环</strong>——在 2026 年与 LangGraph 并列为主流 Agent 框架之一。掌握「Handoff vs as_tool」「Guardrail 作用域」「Runner 会话模式」三条主线，即可在数天内搭起可观测的多 Agent 服务。</p>
+<p><strong>系列上一篇：</strong> <a href="/posts/agent-dev-langchain-langgraph.html">LangChain &#x2F; LangGraph 核心</a> —— 图状态机、Checkpoint 与确定性编排。</p>
+<p><strong>系列下一篇：</strong> <a href="/posts/agent-dev-crewai-autogen.html">CrewAI &#x2F; AutoGen 多 Agent 协作</a> —— 角色化团队与对话式协作的另一条路径。</p>
+<hr>
+<p>相关阅读：<a href="/posts/agent-dev-python-foundation.html">Agent 开发基础：Python 3.10+ 必备技能</a> · <a href="/posts/agent-dev-prompt-engineering.html">Prompt Engineering 系统性设计</a> · <a target="_blank" rel="noopener" href="https://openai.github.io/openai-agents-python/">OpenAI Agents SDK 官方文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Agent/" rel="tag"># Agent</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/OpenAI/" rel="tag"># OpenAI</a>
+              <a href="/tags/Guardrails/" rel="tag"># Guardrails</a>
+              <a href="/tags/Handoff/" rel="tag"># Handoff</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-langchain-langgraph.html" rel="prev" title="Agent 框架核心：LangChain 与 LangGraph 面试必考知识点">
+                  <i class="fa fa-angle-left"></i> Agent 框架核心：LangChain 与 LangGraph 面试必考知识点
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-crewai-autogen.html" rel="next" title="多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动">
+                  多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

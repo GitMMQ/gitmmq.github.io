@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="English Title: Deploying Agent Apps — Docker Containerization &amp; Essential DevOps  完成 API 集成（REST&#x2F;OAuth&#x2F;Webhook） 后，你的 Agent 往往已经能调用外部系统、接收 Webhook、对接企业 SSO。但在笔记本上 uvicorn 或 node index.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent 应用部署：Docker 容器化与基础 DevOps 实践">
+<meta property="og:url" content="https://www.fastolf.com/posts/agent-dev-docker-devops.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="English Title: Deploying Agent Apps — Docker Containerization &amp; Essential DevOps  完成 API 集成（REST&#x2F;OAuth&#x2F;Webhook） 后，你的 Agent 往往已经能调用外部系统、接收 Webhook、对接企业 SSO。但在笔记本上 uvicorn 或 node index.js">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-05T09:55:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T09:55:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="部署">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/agent-dev-docker-devops.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/agent-dev-docker-devops.html","path":"posts/agent-dev-docker-devops.html","title":"Agent 应用部署：Docker 容器化与基础 DevOps 实践"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Agent 应用部署：Docker 容器化与基础 DevOps 实践 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88-Agent-%E5%BA%94%E7%94%A8%E9%9C%80%E8%A6%81%E5%AE%B9%E5%99%A8%E5%8C%96%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">1. 为什么 Agent 应用需要容器化？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Dockerfile-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%EF%BC%88Python-Node-Agent-%E6%9C%8D%E5%8A%A1%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">2. Dockerfile 最佳实践（Python &#x2F; Node Agent 服务）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-docker-compose-%E6%9C%AC%E5%9C%B0%E5%85%A8%E6%A0%88%EF%BC%88Agent-Redis-%E5%90%91%E9%87%8F%E5%BA%93%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">3. docker-compose 本地全栈（Agent + Redis + 向量库）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%9F%BA%E7%A1%80-CI-CD%EF%BC%9AGitHub-Actions-%E6%9E%84%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2"><span class="nav-number">4.</span> <span class="nav-text">4. 基础 CI&#x2F;CD：GitHub Actions 构建与部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%97%A5%E5%BF%97%E4%B8%8E%E7%9B%91%E6%8E%A7%E5%9F%BA%E7%A1%80"><span class="nav-number">5.</span> <span class="nav-text">5. 日志与监控基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E5%AF%86%E9%92%A5%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">6. 环境变量与密钥管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%A4%BA%E4%BE%8B%EF%BC%9ADockerfile-%E4%B8%8E-docker-compose-yml"><span class="nav-number">7.</span> <span class="nav-text">7. 示例：Dockerfile 与 docker-compose.yml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">8. 小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-docker-devops.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Agent 应用部署：Docker 容器化与基础 DevOps 实践 | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent 应用部署：Docker 容器化与基础 DevOps 实践
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 17:55:00" itemprop="dateCreated datePublished" datetime="2026-06-05T17:55:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p><strong>English Title:</strong> Deploying Agent Apps — Docker Containerization &amp; Essential DevOps</p>
+</blockquote>
+<p>完成 <a href="/posts/agent-dev-api-integration.html">API 集成（REST&#x2F;OAuth&#x2F;Webhook）</a> 后，你的 Agent 往往已经能调用外部系统、接收 Webhook、对接企业 SSO。但在笔记本上 <code>uvicorn</code> 或 <code>node index.js</code> 跑通的代码，并不等于能在团队里稳定交付。依赖版本漂移、环境变量散落、向量库与 Redis 地址写死在代码里——这些都会在第一次「给别人部署」时集中爆发。容器化把 <strong>运行时、依赖与配置</strong> 打成可复现单元；再配合基础 CI&#x2F;CD 与可观测性，Agent 服务才能从 Demo 走向可运维的生产形态。本文聚焦 Agent 场景下最实用的 Docker 与 DevOps 实践，不展开 K8s 全家桶，却足以支撑多数中小团队的上线路径。</p>
+<hr>
+<h2 id="1-为什么-Agent-应用需要容器化？"><a href="#1-为什么-Agent-应用需要容器化？" class="headerlink" title="1. 为什么 Agent 应用需要容器化？"></a>1. 为什么 Agent 应用需要容器化？</h2><p>Agent 服务与普通 Web API 相比，有几个额外的「环境敏感点」：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>典型痛点</th>
+<th>容器化带来的收益</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>依赖栈</strong></td>
+<td>Python + Node 混部、CUDA&#x2F;CPU 推理库版本不一</td>
+<td>镜像锁定依赖，开发&#x2F;测试&#x2F;生产一致</td>
+</tr>
+<tr>
+<td><strong>伴生组件</strong></td>
+<td>Redis（会话）、Qdrant&#x2F;Chroma（向量）、Postgres（状态）</td>
+<td>compose 一键拉起完整拓扑</td>
+</tr>
+<tr>
+<td><strong>长连接与 Worker</strong></td>
+<td>SSE、WebSocket、Celery&#x2F;ARQ 后台任务</td>
+<td>同一镜像多角色，用命令区分进程</td>
+</tr>
+<tr>
+<td><strong>密钥与配额</strong></td>
+<td><code>OPENAI_API_KEY</code>、OAuth Client Secret 易泄露进镜像</td>
+<td>运行时注入，镜像内不含明文</td>
+</tr>
+</tbody></table>
+<p>容器不是银弹：它解决的是 <strong>「在我机器上能跑」</strong> 与 <strong>交付可重复性</strong>；并发扩缩、多租户隔离仍要配合编排平台或 PaaS。但对 Agent 团队而言，先做到「任何人 <code>docker compose up</code> 能复现全栈」，再谈 K8s，性价比最高。许多团队在 PoC 阶段就把 Celery Worker、向量索引任务与 API 塞进同一进程，上线前才拆分——容器化恰好强迫你在早期厘清 <strong>进程边界</strong>，为后续水平扩展留出接口。</p>
+<hr>
+<h2 id="2-Dockerfile-最佳实践（Python-Node-Agent-服务）"><a href="#2-Dockerfile-最佳实践（Python-Node-Agent-服务）" class="headerlink" title="2. Dockerfile 最佳实践（Python &#x2F; Node Agent 服务）"></a>2. Dockerfile 最佳实践（Python &#x2F; Node Agent 服务）</h2><p>无论 Python（FastAPI + LangGraph）还是 Node（Express + OpenAI Agents SDK），原则相通：</p>
+<ol>
+<li><strong>多阶段构建（multi-stage）</strong>：构建阶段装编译工具与 dev 依赖；运行阶段只保留产物，缩小攻击面与镜像体积。</li>
+<li><strong>非 root 用户</strong>：<code>USER app</code>，避免容器内进程以 root 运行。</li>
+<li><strong>固定基础镜像标签</strong>：用 <code>python:3.12-slim-bookworm</code> 而非 <code>latest</code>，便于安全补丁回溯。</li>
+<li><strong>层缓存友好</strong>：先 <code>COPY requirements.txt</code> &#x2F; <code>package-lock.json</code> 再 <code>install</code>，代码变更不触发全量重装。</li>
+<li><strong>健康检查</strong>：<code>HEALTHCHECK</code> 探测 <code>/health</code>，编排器可自动重启僵死实例。</li>
+<li><strong>单进程前台</strong>：容器主进程应是 API 或 Worker，不要用 shell 脚本后台 <code>&amp;</code> 多个服务——一个容器一个职责。</li>
+</ol>
+<p><strong>Python 示例要点：</strong> 用 <code>uv</code> 或 <code>pip install --no-cache-dir</code>；若依赖 <code>sentence-transformers</code> 等大包，考虑单独基础镜像层。启动命令显式指定 worker 数：<code>uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2</code>。</p>
+<p><strong>Node 示例要点：</strong> <code>npm ci --omit=dev</code> 保证 lockfile 一致；生产用 <code>node dist/index.js</code> 而非 <code>ts-node</code>。Agent 若大量调用外部 API，注意容器内 DNS 与 HTTP 代理环境变量（<code>HTTP_PROXY</code>）需在运行时配置，不要 bake 进镜像。</p>
+<p>若镜像体积仍是瓶颈，可进一步用 <strong>distroless</strong> 或 <strong>Alpine</strong> 基础镜像，但需验证 glibc 与部分 Python 轮子（如 <code>numpy</code>）的兼容性。构建时加上 <code>.dockerignore</code> 排除 <code>__pycache__</code>、<code>.git</code>、<code>tests/</code>，能显著减少构建上下文上传时间——这在 monorepo 里尤其明显。</p>
+<hr>
+<h2 id="3-docker-compose-本地全栈（Agent-Redis-向量库）"><a href="#3-docker-compose-本地全栈（Agent-Redis-向量库）" class="headerlink" title="3. docker-compose 本地全栈（Agent + Redis + 向量库）"></a>3. docker-compose 本地全栈（Agent + Redis + 向量库）</h2><p>本地开发的目标是：<strong>一条命令</strong> 启动 Agent API、会话缓存与向量检索，且端口与生产拓扑接近。</p>
+<p>典型服务划分：</p>
+<table>
+<thead>
+<tr>
+<th>服务</th>
+<th>角色</th>
+<th>常用镜像</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>agent-api</code></td>
+<td>HTTP&#x2F;SSE 入口，编排 LLM 与 Tool</td>
+<td>自建 Dockerfile</td>
+</tr>
+<tr>
+<td><code>redis</code></td>
+<td>会话、限流、Celery broker</td>
+<td><code>redis:7-alpine</code></td>
+</tr>
+<tr>
+<td><code>qdrant</code> &#x2F; <code>chroma</code></td>
+<td>向量记忆、RAG 检索</td>
+<td><code>qdrant/qdrant</code> 或 Chroma 服务</td>
+</tr>
+<tr>
+<td><code>worker</code>（可选）</td>
+<td>异步嵌入、批量索引</td>
+<td>与 agent-api 同镜像，不同 command</td>
+</tr>
+</tbody></table>
+<p>compose 中通过 <strong>服务名</strong> 互联：<code>REDIS_URL=redis://redis:6379/0</code>、<code>QDRANT_URL=http://qdrant:6333</code>。切勿在代码里写 <code>localhost</code>——在容器网络内应指向服务名。开发时可将源码目录 <strong>volume 挂载</strong> 进容器实现热重载，但生产镜像不应依赖挂载。</p>
+<p>数据持久化：为 Redis、Qdrant 配置 named volume，避免 <code>docker compose down -v</code> 误删后丢失索引。向量库首次启动较慢，compose 可用 <code>depends_on</code> + 应用内重试连接，而非假设「启动顺序即就绪」。</p>
+<p>开发阶段可在 <code>docker-compose.override.yml</code>（不提交 Git）里挂载源码、开启 debug 端口；生产 compose 则去掉 volume 挂载，仅保留数据卷。这样同一套文件服务两条路径，减少「开发能跑、上线配置不一致」的割裂感。</p>
+<hr>
+<h2 id="4-基础-CI-CD：GitHub-Actions-构建与部署"><a href="#4-基础-CI-CD：GitHub-Actions-构建与部署" class="headerlink" title="4. 基础 CI&#x2F;CD：GitHub Actions 构建与部署"></a>4. 基础 CI&#x2F;CD：GitHub Actions 构建与部署</h2><p>最小可用流水线分三段：<strong>测试 → 构建镜像 → 部署</strong>。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># .github/workflows/deploy-agent.yml（示意）</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Agent</span> <span class="string">API</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span> [<span class="string">main</span>]</span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">test:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/setup-python@v5</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">python-version:</span> <span class="string">&quot;3.12&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">run:</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-r</span> <span class="string">requirements.txt</span> <span class="string">&amp;&amp;</span> <span class="string">pytest</span> <span class="string">-q</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">needs:</span> <span class="string">test</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">docker/build-push-action@v6</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">push:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">tags:</span> <span class="string">ghcr.io/$&#123;&#123;</span> <span class="string">github.repository</span> <span class="string">&#125;&#125;/agent-api:$&#123;&#123;</span> <span class="string">github.sha</span> <span class="string">&#125;&#125;</span></span><br><span class="line">  <span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">needs:</span> <span class="string">build</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          # SSH 到 VM 或触发平台 API：拉取新 tag 并 rolling restart</span></span><br><span class="line"><span class="string">          ssh deploy@host &quot;docker pull ghcr.io/org/agent-api:$&#123;&#123; github.sha &#125;&#125; &amp;&amp; docker compose up -d agent-api&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Agent 特有注意点：</strong> CI 中 mock LLM 与外部 API，避免每次 push 消耗真实 token；集成测试用 recorded fixtures。镜像 tag 用 <strong>Git SHA</strong> 而非 <code>latest</code>，便于回滚。若部署到云托管（Fly.io、Railway、ECS），将 deploy 步骤换成对应 CLI 即可，构建层不变。</p>
+<p>建议在 <code>main</code> 分支保护规则中要求 PR 通过 test job 才能合并；对 Agent 项目，可额外加一步 <strong>Dockerfile lint</strong>（如 hadolint）与 <strong>镜像漏洞扫描</strong>（Trivy），把安全问题左移到合并前。部署策略上，单 VM 用 <code>docker compose pull &amp;&amp; up -d</code> 足够；多实例时引入负载均衡与健康检查，再考虑蓝绿或滚动更新。</p>
+<hr>
+<h2 id="5-日志与监控基础"><a href="#5-日志与监控基础" class="headerlink" title="5. 日志与监控基础"></a>5. 日志与监控基础</h2><p>Agent 排障常问三类问题：<strong>请求是否到达？LLM 调用是否超时？检索是否命中？</strong> 日志应结构化（JSON），字段建议包含：<code>trace_id</code>、<code>user_id</code>、<code>model</code>、<code>latency_ms</code>、<code>prompt_tokens</code>、<code>completion_tokens</code>、<code>tool_name</code>、<code>retrieval_hit_count</code>。</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>应用日志</strong></td>
+<td>Python <code>structlog</code> &#x2F; Node <code>pino</code>，输出到 stdout，由容器运行时采集</td>
+</tr>
+<tr>
+<td><strong>指标</strong></td>
+<td>Prometheus：<code>http_request_duration_seconds</code>、LLM 错误率、队列深度</td>
+</tr>
+<tr>
+<td><strong>追踪</strong></td>
+<td>OpenTelemetry 串联 API → Redis → 向量库 → OpenAI，定位慢在哪个 span</td>
+</tr>
+<tr>
+<td><strong>告警</strong></td>
+<td>5xx 比例、P99 延迟、embedding 队列积压</td>
+</tr>
+</tbody></table>
+<p>避免在日志中打印完整 Prompt 或 API Key；必要时对 PII 脱敏。本地开发可用 <code>docker compose logs -f agent-api</code>；生产将日志导向 Loki &#x2F; CloudWatch &#x2F; ELK 之一即可，不必一开始上全套 APM。</p>
+<p>对 Agent 而言，建议在日志或指标中区分 <strong>用户可见延迟</strong>（首 token 时间 TTFT）与 <strong>端到端任务完成时间</strong>（含多轮 Tool 调用）。前者关系体验，后者关系计费与 SLA。当 P99 飙升时，先看是 LLM 供应商慢、向量检索慢，还是 Redis 连接池耗尽——结构化字段让这类归因不必靠猜。</p>
+<hr>
+<h2 id="6-环境变量与密钥管理"><a href="#6-环境变量与密钥管理" class="headerlink" title="6. 环境变量与密钥管理"></a>6. 环境变量与密钥管理</h2><p>Agent 服务典型环境变量：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>OPENAI_API_KEY</code> &#x2F; <code>ANTHROPIC_API_KEY</code></td>
+<td>模型调用</td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>会话与任务队列</td>
+</tr>
+<tr>
+<td><code>QDRANT_URL</code> &#x2F; <code>CHROMA_HOST</code></td>
+<td>向量检索</td>
+</tr>
+<tr>
+<td><code>OAUTH_CLIENT_ID</code> &#x2F; <code>CLIENT_SECRET</code></td>
+<td>与 <a href="/posts/agent-dev-api-integration.html">API 集成</a> 衔接的第三方认证</td>
+</tr>
+<tr>
+<td><code>LOG_LEVEL</code></td>
+<td><code>info</code> &#x2F; <code>debug</code></td>
+</tr>
+</tbody></table>
+<p><strong>原则：</strong> 密钥只通过环境注入或 Secret 挂载（Docker secret、K8s Secret、GitHub Encrypted Secrets），<strong>绝不</strong>写入 Dockerfile、<code>docker-compose.yml</code> 默认值或 Git 仓库。<code>.env</code> 仅用于本地，且应列入 <code>.gitignore</code>。生产与开发使用不同 key 与不同 Redis DB index，防止测试流量污染生产记忆。</p>
+<p>轮换密钥时：先在新 Secret 中写入新 key → 滚动重启实例 → 吊销旧 key。compose 本地可用 <code>env_file: .env</code>；CI 用 <code>secrets: OPENAI_API_KEY</code> 映射为环境变量。</p>
+<hr>
+<h2 id="7-示例：Dockerfile-与-docker-compose-yml"><a href="#7-示例：Dockerfile-与-docker-compose-yml" class="headerlink" title="7. 示例：Dockerfile 与 docker-compose.yml"></a>7. 示例：Dockerfile 与 docker-compose.yml</h2><p><strong>Dockerfile（Python Agent API）：</strong></p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.12</span>-slim-bookworm AS builder</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> requirements.txt .</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip install --no-cache-dir -r requirements.txt -t /deps</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.12</span>-slim-bookworm</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> useradd --create-home app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /deps /usr/local/lib/python3.12/site-packages</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> app ./app</span></span><br><span class="line"><span class="keyword">USER</span> app</span><br><span class="line"><span class="keyword">ENV</span> PYTHONUNBUFFERED=<span class="number">1</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8000</span></span><br><span class="line"><span class="keyword">HEALTHCHECK</span><span class="language-bash"> --interval=30s --<span class="built_in">timeout</span>=5s --start-period=10s \</span></span><br><span class="line"><span class="language-bash">  CMD python -c <span class="string">&quot;import urllib.request; urllib.request.urlopen(&#x27;http://127.0.0.1:8000/health&#x27;)&quot;</span></span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;uvicorn&quot;</span>, <span class="string">&quot;app.main:app&quot;</span>, <span class="string">&quot;--host&quot;</span>, <span class="string">&quot;0.0.0.0&quot;</span>, <span class="string">&quot;--port&quot;</span>, <span class="string">&quot;8000&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>docker-compose.yml：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">agent-api:</span></span><br><span class="line">    <span class="attr">build:</span> <span class="string">.</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8000:8000&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">REDIS_URL:</span> <span class="string">redis://redis:6379/0</span></span><br><span class="line">      <span class="attr">QDRANT_URL:</span> <span class="string">http://qdrant:6333</span></span><br><span class="line">      <span class="attr">OPENAI_API_KEY:</span> <span class="string">$&#123;OPENAI_API_KEY&#125;</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">qdrant</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:7-alpine</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis_data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">qdrant:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">qdrant/qdrant:v1.12.0</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">qdrant_data:/qdrant/storage</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;6333:6333&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">redis_data:</span></span><br><span class="line">  <span class="attr">qdrant_data:</span></span><br></pre></td></tr></table></figure>
+
+<p>Node 版可将 <code>builder</code> 阶段改为 <code>npm ci &amp;&amp; npm run build</code>，运行阶段使用 <code>node:20-alpine</code>，其余拓扑相同。需要后台嵌入任务时，增加 <code>worker</code> 服务：<code>command: [&quot;python&quot;, &quot;-m&quot;, &quot;app.worker&quot;]</code>，与 API 共享环境变量与网络。</p>
+<hr>
+<h2 id="8-小结"><a href="#8-小结" class="headerlink" title="8. 小结"></a>8. 小结</h2><p>容器化解决的是 Agent 交付的 <strong>一致性</strong>；compose 解决的是 <strong>本地全栈复现</strong>；CI&#x2F;CD 解决的是 <strong>可重复发布与回滚</strong>；日志与密钥规范解决的是 <strong>出事能查、密钥不泄</strong>。建议路径：先用 compose 跑通 Agent + Redis + Qdrant → 写好 Dockerfile 与健康检查 → 接上 GitHub Actions 构建镜像 → 再按需迁移到托管 K8s 或 PaaS。下一篇将深入 <strong>Redis 与消息队列</strong>，把会话缓存、任务分发与限流从「能连上」做到「扛得住并发」。</p>
+<hr>
+<p><strong>系列导航 Series Navigation：</strong></p>
+<ul>
+<li>上一篇：<a href="/posts/agent-dev-api-integration.html">API 集成（REST&#x2F;OAuth&#x2F;Webhook）</a></li>
+<li>下一篇：<a href="/posts/agent-dev-redis-message-queue.html">Redis 与消息队列</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Agent/" rel="tag"># Agent</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/DevOps/" rel="tag"># DevOps</a>
+              <a href="/tags/CI-CD/" rel="tag"># CI/CD</a>
+              <a href="/tags/%E9%83%A8%E7%BD%B2/" rel="tag"># 部署</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-api-integration.html" rel="prev" title="Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理">
+                  <i class="fa fa-angle-left"></i> Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-redis-message-queue.html" rel="next" title="Agent 状态与任务队列：Redis 缓存与消息队列实战">
+                  Agent 状态与任务队列：Redis 缓存与消息队列实战 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

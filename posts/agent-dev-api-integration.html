@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="English Title: Agent External Integration — RESTful APIs, OAuth 2.0 &amp; Webhook Handling  Function Calling 让模型「知道该调什么工具」，但真正把 Agent 接到企业系统里，靠的是 HTTP API 集成：用 REST 拉取业务数据、用 OAuth 代表用户访问 SaaS、用 Webho">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理">
+<meta property="og:url" content="https://www.fastolf.com/posts/agent-dev-api-integration.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="English Title: Agent External Integration — RESTful APIs, OAuth 2.0 &amp; Webhook Handling  Function Calling 让模型「知道该调什么工具」，但真正把 Agent 接到企业系统里，靠的是 HTTP API 集成：用 REST 拉取业务数据、用 OAuth 代表用户访问 SaaS、用 Webho">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-05T09:50:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T09:50:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="OAuth">
+<meta property="article:tag" content="Webhook">
+<meta property="article:tag" content="集成">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/agent-dev-api-integration.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/agent-dev-api-integration.html","path":"posts/agent-dev-api-integration.html","title":"Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-30-%E7%A7%92%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">0. 30 秒心智模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88-Agent-%E5%BF%85%E9%A1%BB%E5%81%9A-API-%E9%9B%86%E6%88%90"><span class="nav-number">2.</span> <span class="nav-text">1. 为什么 Agent 必须做 API 集成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-RESTful-API-%E8%B0%83%E7%94%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">2. RESTful API 调用模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%80%89%E5%9E%8B%EF%BC%9Ahttpx-%E5%BC%82%E6%AD%A5%E4%BC%98%E5%85%88"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 客户端选型：httpx 异步优先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%87%8D%E8%AF%95%E4%B8%8E%E9%80%80%E9%81%BF"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 重试与退避</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E9%99%90%E6%B5%81%EF%BC%88Rate-Limit%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 限流（Rate Limit）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-OAuth-2-0%EF%BC%9AAgent-%E5%B7%A5%E5%85%B7%E5%A6%82%E4%BD%95%E6%8B%BF%E4%BB%A4%E7%89%8C"><span class="nav-number">4.</span> <span class="nav-text">3. OAuth 2.0：Agent 工具如何拿令牌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%8E%88%E6%9D%83%E7%A0%81%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%E6%AC%A1%E6%80%A7%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 授权码流程（一次性）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E8%BF%90%E8%A1%8C%E6%97%B6%E5%88%B7%E6%96%B0"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 运行时刷新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Webhook%EF%BC%9A%E5%BC%82%E6%AD%A5%E4%BA%8B%E4%BB%B6%E4%B8%8E%E9%AA%8C%E7%AD%BE"><span class="nav-number">5.</span> <span class="nav-text">4. Webhook：异步事件与验签</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%A4%84%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 处理流水线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E7%AD%BE%E5%90%8D%E9%AA%8C%E8%AF%81%EF%BC%88GitHub-%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 签名验证（GitHub 示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%B9%82%E7%AD%89%E4%B8%8E%E5%8E%BB%E9%87%8D"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 幂等与去重</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%AE%BE%E8%AE%A1-Agent-%E5%8F%8B%E5%A5%BD%E7%9A%84-API-Wrapper%EF%BC%88%E4%BD%9C%E4%B8%BA-Tool%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">5. 设计 Agent 友好的 API Wrapper（作为 Tool）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AE%89%E5%85%A8%EF%BC%9A%E5%AF%86%E9%92%A5%E4%B8%8E-Scope"><span class="nav-number">7.</span> <span class="nav-text">6. 安全：密钥与 Scope</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%BB%BC%E5%90%88%E7%A4%BA%E4%BE%8B%EF%BC%9AFastAPI-Tool-Webhook"><span class="nav-number">8.</span> <span class="nav-text">7. 综合示例：FastAPI + Tool + Webhook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%B8%B8%E8%A7%81%E9%99%B7%E9%98%B1%E4%B8%8E%E9%9D%A2%E8%AF%95%E9%80%9F%E8%AE%B0"><span class="nav-number">9.</span> <span class="nav-text">8. 常见陷阱与面试速记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E5%B0%8F%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">9. 小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E5%88%97%E5%AF%BC%E8%88%AA"><span class="nav-number">11.</span> <span class="nav-text">系列导航</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-api-integration.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理 | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent 外部世界集成：RESTful API、OAuth 认证与 Webhook 处理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 17:50:00" itemprop="dateCreated datePublished" datetime="2026-06-05T17:50:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p><strong>English Title:</strong> Agent External Integration — RESTful APIs, OAuth 2.0 &amp; Webhook Handling</p>
+</blockquote>
+<p>Function Calling 让模型「知道该调什么工具」，但真正把 Agent 接到企业系统里，靠的是 <strong>HTTP API 集成</strong>：用 REST 拉取业务数据、用 OAuth 代表用户访问 SaaS、用 Webhook 接收异步事件。本文是系列第 11 篇，承接 <a href="/posts/agent-dev-function-calling.html">Function Calling &#x2F; Tool Use</a> 的工具契约，向下衔接 <a href="/posts/agent-dev-docker-devops.html">Docker 与基础 DevOps</a> 的部署与密钥注入。</p>
+<hr>
+<h2 id="0-30-秒心智模型"><a href="#0-30-秒心智模型" class="headerlink" title="0. 30 秒心智模型"></a>0. 30 秒心智模型</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户意图 → LLM 选 Tool → API Wrapper（REST / OAuth）</span><br><span class="line">                              ↓</span><br><span class="line">                    外部系统（CRM / 工单 / 日历）</span><br><span class="line">                              ↓</span><br><span class="line">              Webhook 推送事件 → 验签 → 入队 → Agent 续跑</span><br></pre></td></tr></table></figure>
+
+<p>面试官与架构师常问的三条线：<strong>同步调用怎么稳、授权怎么续期、被动事件怎么可信</strong>。下面按此展开。</p>
+<hr>
+<h2 id="1-为什么-Agent-必须做-API-集成"><a href="#1-为什么-Agent-必须做-API-集成" class="headerlink" title="1. 为什么 Agent 必须做 API 集成"></a>1. 为什么 Agent 必须做 API 集成</h2><p>大模型本身没有你的客户名单、库存或审批流。Agent 的价值在于 <strong>在推理环中读写真实世界</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>典型 API</th>
+<th>Agent 行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>查单</td>
+<td><code>GET /orders/{id}</code></td>
+<td>用户问「我的订单到哪了」→ 调 REST → 总结 Observation</td>
+</tr>
+<tr>
+<td>写操作</td>
+<td><code>POST /tickets</code></td>
+<td>用户说「帮我开工单」→ 校验参数 → 创建 → 返回单号</td>
+</tr>
+<tr>
+<td>代表用户</td>
+<td>OAuth 访问 Gmail &#x2F; Slack</td>
+<td>用 refresh_token 换 access_token，代发消息</td>
+</tr>
+<tr>
+<td>被动响应</td>
+<td>Webhook <code>issue.closed</code></td>
+<td>事件入队，触发「跟进客户」子任务</td>
+</tr>
+</tbody></table>
+<p>与 <a href="/posts/agent-dev-mcp-protocol.html">MCP 协议</a> 的关系：MCP 标准化「发现工具 + 调用工具」的传输层；底层仍常是 REST。你可以把 <strong>Agent-friendly API Wrapper</strong> 同时暴露为 MCP Tool 与 LangChain <code>@tool</code>，业务 HTTP 逻辑只写一份。</p>
+<p><strong>工程原则：</strong> 模型只接触 <strong>窄接口、强类型、可审计</strong> 的 Wrapper，而不是把原始 OpenAPI 全文塞进 Prompt。</p>
+<p>从 <a href="/posts/agent-dev-llm-api-guide.html">主流模型 API 调用实战</a> 到本篇，差别在于：前者是 <strong>你主动请求 LLM</strong>，后者是 <strong>Agent 主动请求你的业务系统</strong>。两者都要管 timeout、重试与用量，但业务 API 往往还有 <strong>租户隔离、合规审计、写操作幂等</strong> 等额外约束——这些不应交给模型「临场发挥」，而应在 Wrapper 层写死策略。</p>
+<hr>
+<h2 id="2-RESTful-API-调用模式"><a href="#2-RESTful-API-调用模式" class="headerlink" title="2. RESTful API 调用模式"></a>2. RESTful API 调用模式</h2><h3 id="2-1-客户端选型：httpx-异步优先"><a href="#2-1-客户端选型：httpx-异步优先" class="headerlink" title="2.1 客户端选型：httpx 异步优先"></a>2.1 客户端选型：httpx 异步优先</h3><p>Agent 服务多为 FastAPI &#x2F; asyncio；<strong>httpx</strong> 同时支持 sync &#x2F; async，连接池可复用，比逐请求 <code>requests</code> 更省延迟。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> httpx</span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">Any</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CRMClient</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, base_url: <span class="built_in">str</span>, api_key: <span class="built_in">str</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>._client = httpx.AsyncClient(</span><br><span class="line">            base_url=base_url,</span><br><span class="line">            headers=&#123;<span class="string">&quot;Authorization&quot;</span>: <span class="string">f&quot;Bearer <span class="subst">&#123;api_key&#125;</span>&quot;</span>&#125;,</span><br><span class="line">            timeout=httpx.Timeout(<span class="number">10.0</span>, connect=<span class="number">5.0</span>),</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">get_contact</span>(<span class="params">self, contact_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">dict</span>[<span class="built_in">str</span>, <span class="type">Any</span>]:</span><br><span class="line">        r = <span class="keyword">await</span> <span class="variable language_">self</span>._client.get(<span class="string">f&quot;/v1/contacts/<span class="subst">&#123;contact_id&#125;</span>&quot;</span>)</span><br><span class="line">        r.raise_for_status()</span><br><span class="line">        <span class="keyword">return</span> r.json()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">aclose</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">await</span> <span class="variable language_">self</span>._client.aclose()</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-重试与退避"><a href="#2-2-重试与退避" class="headerlink" title="2.2 重试与退避"></a>2.2 重试与退避</h3><p>对 <strong>429 &#x2F; 502 &#x2F; 503</strong> 与网络抖动应重试；对 <strong>4xx（除 429）</strong> 一般不重试，把错误转成 Tool Observation 让模型改参。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> httpx</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">request_with_retry</span>(<span class="params"></span></span><br><span class="line"><span class="params">    client: httpx.AsyncClient,</span></span><br><span class="line"><span class="params">    method: <span class="built_in">str</span>,</span></span><br><span class="line"><span class="params">    url: <span class="built_in">str</span>,</span></span><br><span class="line"><span class="params">    *,</span></span><br><span class="line"><span class="params">    max_attempts: <span class="built_in">int</span> = <span class="number">4</span>,</span></span><br><span class="line"><span class="params">    **kwargs,</span></span><br><span class="line"><span class="params"></span>) -&gt; httpx.Response:</span><br><span class="line">    delay = <span class="number">0.5</span></span><br><span class="line">    <span class="keyword">for</span> attempt <span class="keyword">in</span> <span class="built_in">range</span>(max_attempts):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            resp = <span class="keyword">await</span> client.request(method, url, **kwargs)</span><br><span class="line">            <span class="keyword">if</span> resp.status_code <span class="keyword">in</span> (<span class="number">429</span>, <span class="number">502</span>, <span class="number">503</span>):</span><br><span class="line">                retry_after = <span class="built_in">float</span>(resp.headers.get(<span class="string">&quot;Retry-After&quot;</span>, delay))</span><br><span class="line">                <span class="keyword">await</span> asyncio.sleep(retry_after)</span><br><span class="line">                delay = <span class="built_in">min</span>(delay * <span class="number">2</span>, <span class="number">8.0</span>)</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">return</span> resp</span><br><span class="line">        <span class="keyword">except</span> (httpx.TimeoutException, httpx.NetworkError):</span><br><span class="line">            <span class="keyword">if</span> attempt == max_attempts - <span class="number">1</span>:</span><br><span class="line">                <span class="keyword">raise</span></span><br><span class="line">            <span class="keyword">await</span> asyncio.sleep(delay)</span><br><span class="line">            delay *= <span class="number">2</span></span><br><span class="line">    <span class="keyword">raise</span> RuntimeError(<span class="string">&quot;unreachable&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-限流（Rate-Limit）"><a href="#2-3-限流（Rate-Limit）" class="headerlink" title="2.3 限流（Rate Limit）"></a>2.3 限流（Rate Limit）</h3><p>Agent 可能在单轮对话中 <strong>连续多次</strong> 调同一 API。需在 Wrapper 层做令牌桶或分布式限流（Redis），避免打满厂商配额导致全站 429。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TokenBucket</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, rate: <span class="built_in">float</span>, capacity: <span class="built_in">int</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.rate, <span class="variable language_">self</span>.capacity = rate, capacity</span><br><span class="line">        <span class="variable language_">self</span>.tokens = <span class="built_in">float</span>(capacity)</span><br><span class="line">        <span class="variable language_">self</span>.updated = time.monotonic()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">acquire</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        now = time.monotonic()</span><br><span class="line">        <span class="variable language_">self</span>.tokens = <span class="built_in">min</span>(<span class="variable language_">self</span>.capacity, <span class="variable language_">self</span>.tokens + (now - <span class="variable language_">self</span>.updated) * <span class="variable language_">self</span>.rate)</span><br><span class="line">        <span class="variable language_">self</span>.updated = now</span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.tokens &lt; <span class="number">1</span>:</span><br><span class="line">            time.sleep((<span class="number">1</span> - <span class="variable language_">self</span>.tokens) / <span class="variable language_">self</span>.rate)</span><br><span class="line">            <span class="variable language_">self</span>.tokens = <span class="number">0</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="variable language_">self</span>.tokens -= <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>面试要点：</strong> 区分 <strong>客户端重试</strong> 与 <strong>服务端幂等</strong>——<code>POST</code> 创建资源应带 <code>Idempotency-Key</code> 头，防止重试产生重复工单。</p>
+<hr>
+<h2 id="3-OAuth-2-0：Agent-工具如何拿令牌"><a href="#3-OAuth-2-0：Agent-工具如何拿令牌" class="headerlink" title="3. OAuth 2.0：Agent 工具如何拿令牌"></a>3. OAuth 2.0：Agent 工具如何拿令牌</h2><p>SaaS（Google、GitHub、Salesforce）普遍要求 <strong>用户授权</strong> 后，后台用 <strong>refresh_token</strong> 换 <strong>access_token</strong>。Agent 不应把长期 refresh_token 放进 LLM 上下文，而应存在密钥库，由 Tool 运行时读取。</p>
+<h3 id="3-1-授权码流程（一次性）"><a href="#3-1-授权码流程（一次性）" class="headerlink" title="3.1 授权码流程（一次性）"></a>3.1 授权码流程（一次性）</h3><ol>
+<li>引导用户打开 <code>authorize_url</code>（scope 最小化）。</li>
+<li>回调接收 <code>code</code>，服务端 <code>POST /token</code> 换 <code>access_token</code> + <code>refresh_token</code>。</li>
+<li>将 refresh_token 加密存入 DB &#x2F; Vault，绑定 <code>user_id</code>。</li>
+</ol>
+<h3 id="3-2-运行时刷新"><a href="#3-2-运行时刷新" class="headerlink" title="3.2 运行时刷新"></a>3.2 运行时刷新</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> httpx</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OAuthTokenStore</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="variable language_">self</span>._cache: <span class="built_in">dict</span>[<span class="built_in">str</span>, <span class="built_in">tuple</span>[<span class="built_in">str</span>, <span class="built_in">float</span>]] = &#123;&#125;  <span class="comment"># user_id -&gt; (access, exp)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">get_access_token</span>(<span class="params">self, user_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        access, exp = <span class="variable language_">self</span>._cache.get(user_id, (<span class="string">&quot;&quot;</span>, <span class="number">0</span>))</span><br><span class="line">        <span class="keyword">if</span> time.time() &lt; exp - <span class="number">60</span>:</span><br><span class="line">            <span class="keyword">return</span> access</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">await</span> <span class="variable language_">self</span>._refresh(user_id)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">_refresh</span>(<span class="params">self, user_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="comment"># 从 DB 读取 refresh_token（示例略）</span></span><br><span class="line">        refresh_token = os.environ[<span class="string">f&quot;REFRESH_<span class="subst">&#123;user_id&#125;</span>&quot;</span>]</span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">with</span> httpx.AsyncClient() <span class="keyword">as</span> client:</span><br><span class="line">            r = <span class="keyword">await</span> client.post(</span><br><span class="line">                <span class="string">&quot;https://oauth2.googleapis.com/token&quot;</span>,</span><br><span class="line">                data=&#123;</span><br><span class="line">                    <span class="string">&quot;grant_type&quot;</span>: <span class="string">&quot;refresh_token&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;refresh_token&quot;</span>: refresh_token,</span><br><span class="line">                    <span class="string">&quot;client_id&quot;</span>: os.environ[<span class="string">&quot;OAUTH_CLIENT_ID&quot;</span>],</span><br><span class="line">                    <span class="string">&quot;client_secret&quot;</span>: os.environ[<span class="string">&quot;OAUTH_CLIENT_SECRET&quot;</span>],</span><br><span class="line">                &#125;,</span><br><span class="line">            )</span><br><span class="line">            r.raise_for_status()</span><br><span class="line">            data = r.json()</span><br><span class="line">        access = data[<span class="string">&quot;access_token&quot;</span>]</span><br><span class="line">        <span class="variable language_">self</span>._cache[user_id] = (access, time.time() + data[<span class="string">&quot;expires_in&quot;</span>])</span><br><span class="line">        <span class="keyword">return</span> access</span><br></pre></td></tr></table></figure>
+
+<p><strong>Agent 设计建议：</strong></p>
+<ul>
+<li>Tool 参数只接受 <strong>业务 ID</strong>（如 <code>calendar_id</code>），令牌由 <code>user_id</code> 从 Session 解析。</li>
+<li>scope 按工具拆分：读日历只需 <code>calendar.readonly</code>，禁止默认申请 <code>drive.full</code>。</li>
+<li>令牌刷新失败时返回明确 Observation：「授权已过期，请重新连接 Google 账号」。</li>
+</ul>
+<hr>
+<h2 id="4-Webhook：异步事件与验签"><a href="#4-Webhook：异步事件与验签" class="headerlink" title="4. Webhook：异步事件与验签"></a>4. Webhook：异步事件与验签</h2><p>Webhook 是 <strong>服务器推、Agent 拉</strong> 的反面：外部系统在事件发生时 <code>POST</code> 你的 URL。典型用于：支付成功、PR 合并、工单状态变更。</p>
+<h3 id="4-1-处理流水线"><a href="#4-1-处理流水线" class="headerlink" title="4.1 处理流水线"></a>4.1 处理流水线</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST /webhooks/github → 验签 → 解析 payload → 写入队列</span><br><span class="line">        → Worker 消费 → 触发 Agent（新 thread 或续跑 checkpoint）</span><br></pre></td></tr></table></figure>
+
+<p><strong>务必快速返回 2xx</strong>（如 202），重逻辑放队列；否则对方会重试，造成重复执行。</p>
+<h3 id="4-2-签名验证（GitHub-示例）"><a href="#4-2-签名验证（GitHub-示例）" class="headerlink" title="4.2 签名验证（GitHub 示例）"></a>4.2 签名验证（GitHub 示例）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> hmac</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI, Request, HTTPException</span><br><span class="line"></span><br><span class="line">app = FastAPI()</span><br><span class="line">WEBHOOK_SECRET = <span class="string">b&quot;your-webhook-secret&quot;</span>  <span class="comment"># 来自环境变量 / Secret Manager</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.post(<span class="params"><span class="string">&quot;/webhooks/github&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">github_webhook</span>(<span class="params">request: Request</span>):</span><br><span class="line">    body = <span class="keyword">await</span> request.body()</span><br><span class="line">    sig = request.headers.get(<span class="string">&quot;X-Hub-Signature-256&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">    expected = <span class="string">&quot;sha256=&quot;</span> + hmac.new(WEBHOOK_SECRET, body, hashlib.sha256).hexdigest()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> hmac.compare_digest(sig, expected):</span><br><span class="line">        <span class="keyword">raise</span> HTTPException(status_code=<span class="number">401</span>, detail=<span class="string">&quot;invalid signature&quot;</span>)</span><br><span class="line"></span><br><span class="line">    event = request.headers.get(<span class="string">&quot;X-GitHub-Event&quot;</span>)</span><br><span class="line">    payload = <span class="keyword">await</span> request.json()</span><br><span class="line">    <span class="comment"># await queue.publish(&#123;&quot;event&quot;: event, &quot;payload&quot;: payload&#125;)</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&quot;ok&quot;</span>: <span class="literal">True</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-幂等与去重"><a href="#4-3-幂等与去重" class="headerlink" title="4.3 幂等与去重"></a>4.3 幂等与去重</h3><p>用 <code>X-GitHub-Delivery</code> 或业务 <code>event_id</code> 在 Redis 做 <strong>SET NX + TTL</strong>，防止重放。Agent 侧把「同一 PR 关闭」只处理一次，避免重复 @客户。</p>
+<hr>
+<h2 id="5-设计-Agent-友好的-API-Wrapper（作为-Tool）"><a href="#5-设计-Agent-友好的-API-Wrapper（作为-Tool）" class="headerlink" title="5. 设计 Agent 友好的 API Wrapper（作为 Tool）"></a>5. 设计 Agent 友好的 API Wrapper（作为 Tool）</h2><p>好的 Tool 是 <strong>意图级 API</strong>，不是 OpenAPI 的机械映射。</p>
+<table>
+<thead>
+<tr>
+<th>反模式</th>
+<th>推荐做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>raw_http(method, url, body)</code></td>
+<td><code>create_ticket(title, priority)</code></td>
+</tr>
+<tr>
+<td>返回 5MB JSON</td>
+<td>返回摘要 + <code>resource_id</code> 供后续 <code>get_detail</code></td>
+</tr>
+<tr>
+<td>异常堆栈给模型</td>
+<td><code>{&quot;error&quot;: &quot;contact_not_found&quot;, &quot;hint&quot;: &quot;请确认邮箱&quot;}</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field</span><br><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CreateTicketInput</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    title: <span class="built_in">str</span> = Field(..., description=<span class="string">&quot;工单标题，50 字以内&quot;</span>)</span><br><span class="line">    priority: <span class="built_in">str</span> = Field(<span class="string">&quot;normal&quot;</span>, description=<span class="string">&quot;low | normal | high&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool(<span class="params">args_schema=CreateTicketInput</span>)</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">create_support_ticket</span>(<span class="params">title: <span class="built_in">str</span>, priority: <span class="built_in">str</span> = <span class="string">&quot;normal&quot;</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;当用户明确要求创建工单或投诉未解决时调用。成功返回单号。&quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># client = get_crm_client_from_context()</span></span><br><span class="line">    <span class="comment"># ticket = await client.create_ticket(title=title, priority=priority)</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;TICKET-2026-8842&quot;</span>  <span class="comment"># 示例</span></span><br></pre></td></tr></table></figure>
+
+<p>与 <a href="/posts/agent-dev-function-calling.html">Function Calling</a> 衔接：描述写清 <strong>何时调用、必填字段、失败语义</strong>；参数用 Pydantic 约束，减少幻觉参数。</p>
+<hr>
+<h2 id="6-安全：密钥与-Scope"><a href="#6-安全：密钥与-Scope" class="headerlink" title="6. 安全：密钥与 Scope"></a>6. 安全：密钥与 Scope</h2><ol>
+<li><strong>密钥不进 Prompt、不进 Git</strong>：本地用 <code>.env</code>，生产用 K8s Secret &#x2F; Vault；CI 用 OIDC 而非长期 API Key。</li>
+<li><strong>最小权限</strong>：REST 用只读 Key 做查询 Tool；写操作单独 Tool + 人工审批（HITL）。</li>
+<li><strong>出站 SSRF 防护</strong>：禁止模型通过 Tool 指定任意 URL；Wrapper 白名单 <code>base_url</code>。</li>
+<li><strong>审计</strong>：记录 <code>user_id</code>、<code>tool_name</code>、请求 ID、响应码；敏感字段脱敏后再写入 LangSmith Trace。</li>
+<li><strong>多租户隔离</strong>：OAuth token、Webhook 路由按 tenant 分表，防止 A 客户事件触发 B 的 Agent。</li>
+</ol>
+<p>部署层密钥注入、网络策略与镜像扫描见下一篇 <a href="/posts/agent-dev-docker-devops.html">Docker 与基础 DevOps</a>。</p>
+<hr>
+<h2 id="7-综合示例：FastAPI-Tool-Webhook"><a href="#7-综合示例：FastAPI-Tool-Webhook" class="headerlink" title="7. 综合示例：FastAPI + Tool + Webhook"></a>7. 综合示例：FastAPI + Tool + Webhook</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># app/main.py — 最小骨架（示意）</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> asynccontextmanager</span><br><span class="line"><span class="keyword">import</span> httpx</span><br><span class="line"><span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI</span><br><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"></span><br><span class="line">crm: httpx.AsyncClient | <span class="literal">None</span> = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@asynccontextmanager</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">lifespan</span>(<span class="params">app: FastAPI</span>):</span><br><span class="line">    <span class="keyword">global</span> crm</span><br><span class="line">    crm = httpx.AsyncClient(</span><br><span class="line">        base_url=<span class="string">&quot;https://api.example.com&quot;</span>,</span><br><span class="line">        headers=&#123;<span class="string">&quot;Authorization&quot;</span>: <span class="string">f&quot;Bearer <span class="subst">&#123;os.getenv(<span class="string">&#x27;CRM_API_KEY&#x27;</span>)&#125;</span>&quot;</span>&#125;,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">yield</span></span><br><span class="line">    <span class="keyword">await</span> crm.aclose()</span><br><span class="line"></span><br><span class="line">app = FastAPI(lifespan=lifespan)</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">lookup_order</span>(<span class="params">order_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;查询物流状态。order_id 为订单号。&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">assert</span> crm <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span></span><br><span class="line">    r = <span class="keyword">await</span> crm.get(<span class="string">f&quot;/orders/<span class="subst">&#123;order_id&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> r.status_code == <span class="number">404</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;未找到订单，请核对单号。&quot;</span></span><br><span class="line">    r.raise_for_status()</span><br><span class="line">    data = r.json()</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;订单 <span class="subst">&#123;order_id&#125;</span>：<span class="subst">&#123;data[<span class="string">&#x27;status&#x27;</span>]&#125;</span>，预计 <span class="subst">&#123;data.get(<span class="string">&#x27;eta&#x27;</span>, <span class="string">&#x27;未知&#x27;</span>)&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Agent 路由：POST /chat → Runner → lookup_order</span></span><br><span class="line"><span class="comment"># Webhook 路由：POST /webhooks/payment → 验签 → 若 paid 则 enqueue 续聊</span></span><br></pre></td></tr></table></figure>
+
+<p>生产环境应拆分为：<strong>API Gateway（鉴权、限流）</strong>、<strong>Agent Worker</strong>、<strong>Webhook Ingest</strong> 三个进程，避免 Webhook 流量拖垮对话接口。</p>
+<p>若团队已采用 <a href="/posts/agent-dev-crewai-autogen.html">CrewAI &#x2F; AutoGen 多 Agent</a> 做角色分工，建议把 <strong>所有 HTTP 调用收敛到「工具专家」Agent 的 Tool 集</strong>，其它角色只通过消息传递业务结论，避免多个 Agent 各自持有一份 API Key，难以轮换与审计。</p>
+<hr>
+<h2 id="8-常见陷阱与面试速记"><a href="#8-常见陷阱与面试速记" class="headerlink" title="8. 常见陷阱与面试速记"></a>8. 常见陷阱与面试速记</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tool 偶发超时</td>
+<td>无连接池 &#x2F; 同步阻塞</td>
+<td><code>httpx.AsyncClient</code> + 合理 timeout</td>
+</tr>
+<tr>
+<td>重复工单</td>
+<td>POST 重试无幂等键</td>
+<td><code>Idempotency-Key</code> + 服务端去重</td>
+</tr>
+<tr>
+<td>OAuth 突然全挂</td>
+<td>refresh_token 撤销未处理</td>
+<td>捕获 400，引导用户重新授权</td>
+</tr>
+<tr>
+<td>Webhook 风暴</td>
+<td>未快速 ACK</td>
+<td>202 + 队列异步消费</td>
+</tr>
+<tr>
+<td>Token 账单爆炸</td>
+<td>把整段 API JSON 塞回模型</td>
+<td>Wrapper 做摘要，详情按需二次 Tool</td>
+</tr>
+</tbody></table>
+<p><strong>Q：Agent 直接调 REST 和走 MCP 怎么选？</strong><br>对外部生态、多客户端复用选 MCP；对单一后端、强定制逻辑，REST Wrapper + <code>@tool</code> 更简单。二者可共存。</p>
+<p><strong>Q：Webhook 如何驱动「长时 Agent」？</strong><br>事件只负责 <strong>入队 + 唤醒</strong>；状态用 <code>thread_id</code> 与 Checkpoint 恢复，不在 Webhook 进程里跑完整 ReAct 循环。</p>
+<p><strong>Q：同步 REST 与 Streaming 混用？</strong><br>对 LLM 用 SSE；对业务 API 仍是一次性 JSON。不要在 Tool 里对 REST 做 token 级 stream 解析——除非厂商明确支持 NDJSON 且你有背压控制，否则 Observation 难以在 ReAct 一轮内闭合。</p>
+<hr>
+<h2 id="9-小结"><a href="#9-小结" class="headerlink" title="9. 小结"></a>9. 小结</h2><p>API 集成是 Agent 的「手脚」：<strong>REST + httpx</strong> 负责同步读写，<strong>重试与限流</strong> 保证稳定性；<strong>OAuth</strong> 负责代表用户访问 SaaS，<strong>refresh 逻辑</strong> 必须远离模型上下文；<strong>Webhook + 验签 + 幂等</strong> 负责可信的异步触发。把 HTTP 细节封进 <strong>窄 Tool</strong>，模型只处理业务语义，才能同时满足安全、成本与可维护性。</p>
+<p>完成本篇后，建议继续 <a href="/posts/agent-dev-docker-devops.html">Docker 与基础 DevOps</a>，把 API Key、OAuth Client Secret 与 Webhook Secret 纳入镜像与编排的最佳实践。</p>
+<hr>
+<h2 id="系列导航"><a href="#系列导航" class="headerlink" title="系列导航"></a>系列导航</h2><ul>
+<li>上一篇：<a href="/posts/agent-dev-function-calling.html">Function Calling &#x2F; Tool Use</a></li>
+<li>下一篇：<a href="/posts/agent-dev-docker-devops.html">Docker 与基础 DevOps</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+              <a href="/tags/Webhook/" rel="tag"># Webhook</a>
+              <a href="/tags/Agent/" rel="tag"># Agent</a>
+              <a href="/tags/%E9%9B%86%E6%88%90/" rel="tag"># 集成</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-function-calling.html" rel="prev" title="Function Calling 深度解析：Tool Use 参数设计、并行调用与错误处理">
+                  <i class="fa fa-angle-left"></i> Function Calling 深度解析：Tool Use 参数设计、并行调用与错误处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-docker-devops.html" rel="next" title="Agent 应用部署：Docker 容器化与基础 DevOps 实践">
+                  Agent 应用部署：Docker 容器化与基础 DevOps 实践 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

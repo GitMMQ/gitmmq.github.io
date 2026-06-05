@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="English Title: Multi-Agent Frameworks — CrewAI Role-Playing vs AutoGen Conversation-Driven  当你已经会用单 Agent 完成「读文档 → 调工具 → 写答案」的闭环，下一步往往是把任务拆给多个专长不同的智能体。CrewAI 用角色与流程组织协作，AutoGen（现 AG2）用对话与消息传递驱动协作。二者都">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动">
+<meta property="og:url" content="https://www.fastolf.com/posts/agent-dev-crewai-autogen.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="English Title: Multi-Agent Frameworks — CrewAI Role-Playing vs AutoGen Conversation-Driven  当你已经会用单 Agent 完成「读文档 → 调工具 → 写答案」的闭环，下一步往往是把任务拆给多个专长不同的智能体。CrewAI 用角色与流程组织协作，AutoGen（现 AG2）用对话与消息传递驱动协作。二者都">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-05T09:35:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T09:35:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="AutoGen">
+<meta property="article:tag" content="CrewAI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="多Agent">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/agent-dev-crewai-autogen.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/agent-dev-crewai-autogen.html","path":"posts/agent-dev-crewai-autogen.html","title":"多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BD%95%E6%97%B6%E9%9C%80%E8%A6%81%E5%A4%9A-Agent%EF%BC%8C%E4%BD%95%E6%97%B6%E5%8D%95-Agent-%E8%B6%B3%E5%A4%9F"><span class="nav-number">1.</span> <span class="nav-text">1. 何时需要多 Agent，何时单 Agent 足够</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-CrewAI%EF%BC%9A%E8%A7%92%E8%89%B2%E3%80%81%E7%9B%AE%E6%A0%87%E4%B8%8E%E6%B5%81%E7%A8%8B%E7%BC%96%E6%8E%92"><span class="nav-number">2.</span> <span class="nav-text">2. CrewAI：角色、目标与流程编排</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-AutoGen-AG2%EF%BC%9A%E5%AF%B9%E8%AF%9D%E9%A9%B1%E5%8A%A8%E7%9A%84-GroupChat"><span class="nav-number">3.</span> <span class="nav-text">3. AutoGen &#x2F; AG2：对话驱动的 GroupChat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%AF%B9%E6%AF%94%E4%B8%80%E8%A7%88"><span class="nav-number">4.</span> <span class="nav-text">4. 对比一览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">5. 代码示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-CrewAI%EF%BC%9A%E8%B0%83%E7%A0%94-%E2%86%92-%E6%92%B0%E7%A8%BF-%E9%A1%BA%E5%BA%8F%E6%B5%81%E7%A8%8B"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 CrewAI：调研 → 撰稿 顺序流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-AutoGen%EF%BC%9A%E5%8F%8C-Agent-%E7%BE%A4%E8%81%8A%E7%9B%B4%E8%87%B3%E7%BB%88%E6%AD%A2"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 AutoGen：双 Agent 群聊直至终止</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Token-%E6%88%90%E6%9C%AC%E4%B8%8E%E7%BB%88%E6%AD%A2%E7%AD%96%E7%95%A5"><span class="nav-number">6.</span> <span class="nav-text">6. Token 成本与终止策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%A6%82%E4%BD%95%E9%80%89%E5%9E%8B"><span class="nav-number">7.</span> <span class="nav-text">7. 如何选型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">8. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-crewai-autogen.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动 | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          多 Agent 协作框架：CrewAI 角色扮演 vs AutoGen 对话驱动
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 17:35:00" itemprop="dateCreated datePublished" datetime="2026-06-05T17:35:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p><strong>English Title:</strong> Multi-Agent Frameworks — CrewAI Role-Playing vs AutoGen Conversation-Driven</p>
+</blockquote>
+<p>当你已经会用单 Agent 完成「读文档 → 调工具 → 写答案」的闭环，下一步往往是把任务拆给多个专长不同的智能体。CrewAI 用<strong>角色与流程</strong>组织协作，AutoGen（现 AG2）用<strong>对话与消息传递</strong>驱动协作。二者都能做多 Agent，但心智模型、成本曲线和工程落点截然不同。本文帮你建立选型依据，并给出可运行的最小示例。</p>
+<hr>
+<h2 id="1-何时需要多-Agent，何时单-Agent-足够"><a href="#1-何时需要多-Agent，何时单-Agent-足够" class="headerlink" title="1. 何时需要多 Agent，何时单 Agent 足够"></a>1. 何时需要多 Agent，何时单 Agent 足够</h2><p><strong>单 Agent 更合适的场景：</strong></p>
+<ul>
+<li>任务边界清晰，工具链固定（例如：查库 + 生成 SQL + 执行）</li>
+<li>对话轮次可控，上下文在一两次工具调用内能收敛</li>
+<li>团队希望最小依赖、最短上线路径</li>
+</ul>
+<p><strong>多 Agent 更值得投入的场景：</strong></p>
+<ul>
+<li>流程天然分阶段，且每阶段需要<strong>不同的系统提示与约束</strong>（调研 &#x2F; 写作 &#x2F; 审校）</li>
+<li>需要<strong>对抗式或交叉验证</strong>（一个生成、一个挑错）</li>
+<li>人类要在环中审批中间产物，再交给下一角色继续</li>
+<li>单 Agent 的 prompt 已经臃肿，出现角色混淆、越权调用工具等问题</li>
+</ul>
+<p>经验法则：若你只是把同一段 system prompt 复制三份并改名，多半还没赚到多 Agent 的收益；若各阶段的可观测输出、失败重试、人工卡点已经定义清楚，多 Agent 框架能显著降低编排代码的复杂度。</p>
+<hr>
+<h2 id="2-CrewAI：角色、目标与流程编排"><a href="#2-CrewAI：角色、目标与流程编排" class="headerlink" title="2. CrewAI：角色、目标与流程编排"></a>2. CrewAI：角色、目标与流程编排</h2><p>CrewAI 的核心抽象是<strong>剧组（Crew）</strong>：每个 <code>Agent</code> 有明确的 <code>role</code>（职责）、<code>goal</code>（要达成的结果）、<code>backstory</code>（行为风格与专业背景）。<code>Task</code> 描述具体交付物，并绑定到执行者。<code>Crew</code> 把多个 Task 按 <strong>Process</strong> 串起来执行。</p>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>role</code></td>
+<td>对外身份，影响模型如何组织语言与优先级</td>
+</tr>
+<tr>
+<td><code>goal</code></td>
+<td>可验收的目标，宜写清输出形态</td>
+</tr>
+<tr>
+<td><code>backstory</code></td>
+<td>约束语气、方法论、禁忌（相当于软性 system）</td>
+</tr>
+<tr>
+<td><code>Task</code></td>
+<td>单次工作单元，可指定 <code>agent</code>、<code>context</code>（上游任务输出）</td>
+</tr>
+<tr>
+<td><code>Process.sequential</code></td>
+<td>严格按任务顺序执行，上一任务输出注入下一任务</td>
+</tr>
+<tr>
+<td><code>Process.hierarchical</code></td>
+<td>由 Manager Agent 分配子任务并汇总（适合动态分工）</td>
+</tr>
+</tbody></table>
+<p>CrewAI 更贴近「<strong>岗位说明书 + 流水线</strong>」：你事先定义谁做什么、顺序如何，运行时较少出现「自由闲聊」。这对内容生产、竞品分析、报告生成等<strong>流程稳定</strong>的业务非常友好。</p>
+<hr>
+<h2 id="3-AutoGen-AG2：对话驱动的-GroupChat"><a href="#3-AutoGen-AG2：对话驱动的-GroupChat" class="headerlink" title="3. AutoGen &#x2F; AG2：对话驱动的 GroupChat"></a>3. AutoGen &#x2F; AG2：对话驱动的 GroupChat</h2><p>AutoGen 将每个参与者建模为 <strong>ConversableAgent</strong>：既能调用 LLM，也能执行代码、调用函数。多 Agent 协作的典型模式是 <strong>GroupChat</strong>：所有消息进入共享频道，由 <code>GroupChatManager</code>（或新版中的 group chat 运行器）决定下一位发言者。</p>
+<p>协作机制可以概括为：</p>
+<ol>
+<li><strong>Message passing</strong> — Agent A 的回复作为消息对象传给 B，可附带 <code>tool_calls</code> 与执行结果</li>
+<li><strong>Speaker selection</strong> — 轮询、<code>auto</code>（由 LLM 根据上下文选下一位）、或自定义函数</li>
+<li><strong>Nested chat</strong> — 子对话解决子问题，再把摘要回传主频道（控制上下文膨胀）</li>
+</ol>
+<p>AG2（AutoGen 0.4+）在 API 上有所演进，但思想不变：<strong>用对话历史作为共享状态机</strong>，适合探索性任务、辩论式推理、需要多轮协商才能收敛的方案设计。代价是消息链更长，Token 与终止条件必须显式治理。</p>
+<hr>
+<h2 id="4-对比一览"><a href="#4-对比一览" class="headerlink" title="4. 对比一览"></a>4. 对比一览</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>CrewAI</th>
+<th>AutoGen &#x2F; AG2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>协作隐喻</td>
+<td>岗位 + 流水线</td>
+<td>会议室群聊</td>
+</tr>
+<tr>
+<td>状态载体</td>
+<td>Task 输出、<code>context</code> 链</td>
+<td>共享 message 列表</td>
+</tr>
+<tr>
+<td>流程可控性</td>
+<td>高（sequential &#x2F; hierarchical）</td>
+<td>中（依赖发言策略）</td>
+</tr>
+<tr>
+<td>动态分工</td>
+<td>hierarchical + Manager</td>
+<td>GroupChat speaker 策略</td>
+</tr>
+<tr>
+<td>人类在环</td>
+<td>可在 Task 间插入审批</td>
+<td><code>UserProxyAgent</code> 随时介入</td>
+</tr>
+<tr>
+<td>学习曲线</td>
+<td>低，YAML 感强</td>
+<td>中，需理解消息与 Manager</td>
+</tr>
+<tr>
+<td>典型风险</td>
+<td>角色模板化、任务拆太碎</td>
+<td>对话发散、轮次失控</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-代码示例"><a href="#5-代码示例" class="headerlink" title="5. 代码示例"></a>5. 代码示例</h2><h3 id="5-1-CrewAI：调研-→-撰稿-顺序流程"><a href="#5-1-CrewAI：调研-→-撰稿-顺序流程" class="headerlink" title="5.1 CrewAI：调研 → 撰稿 顺序流程"></a>5.1 CrewAI：调研 → 撰稿 顺序流程</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> crewai <span class="keyword">import</span> Agent, Task, Crew, Process</span><br><span class="line"></span><br><span class="line">researcher = Agent(</span><br><span class="line">    role=<span class="string">&quot;行业研究员&quot;</span>,</span><br><span class="line">    goal=<span class="string">&quot;收集 AI Agent 框架的 3 个对比维度与代表产品&quot;</span>,</span><br><span class="line">    backstory=<span class="string">&quot;你擅长结构化调研，只输出要点列表，不编造来源。&quot;</span>,</span><br><span class="line">    verbose=<span class="literal">True</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">writer = Agent(</span><br><span class="line">    role=<span class="string">&quot;技术作者&quot;</span>,</span><br><span class="line">    goal=<span class="string">&quot;根据调研要点写一篇 800 字中文博客大纲&quot;</span>,</span><br><span class="line">    backstory=<span class="string">&quot;你面向开发者读者，语言简洁，小节清晰。&quot;</span>,</span><br><span class="line">    verbose=<span class="literal">True</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">research_task = Task(</span><br><span class="line">    description=<span class="string">&quot;列出 CrewAI、AutoGen、OpenAI Agents SDK 的定位差异（各 3 条）&quot;</span>,</span><br><span class="line">    expected_output=<span class="string">&quot;Markdown 要点列表&quot;</span>,</span><br><span class="line">    agent=researcher,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">write_task = Task(</span><br><span class="line">    description=<span class="string">&quot;基于调研要点生成博客大纲（含 H2 标题）&quot;</span>,</span><br><span class="line">    expected_output=<span class="string">&quot;Markdown 大纲&quot;</span>,</span><br><span class="line">    agent=writer,</span><br><span class="line">    context=[research_task],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">crew = Crew(</span><br><span class="line">    agents=[researcher, writer],</span><br><span class="line">    tasks=[research_task, write_task],</span><br><span class="line">    process=Process.sequential,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">result = crew.kickoff()</span><br><span class="line"><span class="built_in">print</span>(result)</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-AutoGen：双-Agent-群聊直至终止"><a href="#5-2-AutoGen：双-Agent-群聊直至终止" class="headerlink" title="5.2 AutoGen：双 Agent 群聊直至终止"></a>5.2 AutoGen：双 Agent 群聊直至终止</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> autogen <span class="keyword">import</span> ConversableAgent, GroupChat, GroupChatManager</span><br><span class="line"></span><br><span class="line">llm_config = &#123;<span class="string">&quot;config_list&quot;</span>: [&#123;<span class="string">&quot;model&quot;</span>: <span class="string">&quot;gpt-4o-mini&quot;</span>, <span class="string">&quot;api_key&quot;</span>: os.environ[<span class="string">&quot;OPENAI_API_KEY&quot;</span>]&#125;]&#125;</span><br><span class="line"></span><br><span class="line">planner = ConversableAgent(</span><br><span class="line">    name=<span class="string">&quot;planner&quot;</span>,</span><br><span class="line">    system_message=<span class="string">&quot;你负责拆解任务，每次只提出下一步，不直接写长文。&quot;</span>,</span><br><span class="line">    llm_config=llm_config,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">coder = ConversableAgent(</span><br><span class="line">    name=<span class="string">&quot;coder&quot;</span>,</span><br><span class="line">    system_message=<span class="string">&quot;你根据 planner 的步骤写 Python 示例，代码需可运行。&quot;</span>,</span><br><span class="line">    llm_config=llm_config,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">user = ConversableAgent(name=<span class="string">&quot;user&quot;</span>, human_input_mode=<span class="string">&quot;NEVER&quot;</span>)</span><br><span class="line"></span><br><span class="line">group = GroupChat(agents=[user, planner, coder], messages=[], max_round=<span class="number">6</span>)</span><br><span class="line">manager = GroupChatManager(groupchat=group, llm_config=llm_config)</span><br><span class="line"></span><br><span class="line">user.initiate_chat(</span><br><span class="line">    manager,</span><br><span class="line">    message=<span class="string">&quot;为「多 Agent 选型」写一段对比结论，并附一个最小 CrewAI 示例。&quot;</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>生产环境请将 <code>api_key</code> 置于环境变量，并为 <code>coder</code> 配置沙箱执行；示例仅展示协作形态。</p>
+</blockquote>
+<hr>
+<h2 id="6-Token-成本与终止策略"><a href="#6-Token-成本与终止策略" class="headerlink" title="6. Token 成本与终止策略"></a>6. Token 成本与终止策略</h2><p>多 Agent 的账单通常<strong>高于</strong>单 Agent，因为同一上下文会在多个角色间重复传递。</p>
+<p><strong>控费手段：</strong></p>
+<ol>
+<li><strong>限制轮次</strong> — CrewAI 控制 Task 数量；AutoGen 设置 <code>max_round</code> &#x2F; <code>max_consecutive_auto_reply</code></li>
+<li><strong>摘要中间态</strong> — 长调研结果先压缩再交给 Writer，避免全文在多 Agent 间复制</li>
+<li><strong>模型分级</strong> — 调研&#x2F;分类用 mini，终稿&#x2F;审校用 flagship</li>
+<li><strong>早停条件</strong> — 检测 <code>TERMINATE</code>、<code>任务完成</code> 等关键词，或工具返回成功即结束</li>
+<li><strong>可观测性</strong> — 对每次 <code>kickoff</code> &#x2F; 每轮 GroupChat 记录 <code>prompt_tokens</code>、<code>completion_tokens</code></li>
+</ol>
+<p><strong>终止策略对照：</strong></p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>常见终止方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CrewAI</td>
+<td>所有 Task <code>completed</code>；<code>kickoff</code> 返回最终输出</td>
+</tr>
+<tr>
+<td>AutoGen</td>
+<td><code>max_round</code>、关键词、<code>is_termination_msg</code> 回调、<code>UserProxyAgent</code> 输入 <code>exit</code></td>
+</tr>
+</tbody></table>
+<p>没有显式终止的 GroupChat，很容易在「互相客气」中烧掉数倍 Token——这是 AutoGen 新手最常踩的坑。</p>
+<hr>
+<h2 id="7-如何选型"><a href="#7-如何选型" class="headerlink" title="7. 如何选型"></a>7. 如何选型</h2><p><strong>优先 CrewAI，若你：</strong></p>
+<ul>
+<li>已有清晰的 SOP（市场调研 → 大纲 → 正文 → 审校）</li>
+<li>需要给非技术同事展示「岗位分工」图</li>
+<li>希望默认顺序执行、减少对话跑偏</li>
+</ul>
+<p><strong>优先 AutoGen &#x2F; AG2，若你：</strong></p>
+<ul>
+<li>问题本身需要多轮协商或辩论才能收敛</li>
+<li>需要灵活的 <code>UserProxy</code> 人类审批</li>
+<li>已有代码执行、函数调用密集的 Agent 生态，希望统一在消息层集成</li>
+</ul>
+<p><strong>仍可考虑单 Agent + 工作流引擎（如 LangGraph）</strong>，当你要精细控制状态图、分支与持久化，而不想被「剧组」或「群聊」隐喻束缚时——系列前一篇 <a href="/posts/agent-dev-openai-agents-sdk.html">OpenAI Agents SDK</a> 提供了另一种轻量编排路径。</p>
+<hr>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a>8. 总结</h2><p>CrewAI 用<strong>角色扮演 + 任务流水线</strong>降低「分工明确」类业务的编排成本；AutoGen 用<strong>共享对话</strong>释放「协商、迭代、人机共创」类场景的灵活性。二者不是替代关系，而是对不同协作形态的建模。落地时请先画清阶段交付物与终止条件，再选框架；否则多 Agent 只会把单 Agent 的混乱复制多份。</p>
+<hr>
+<p><strong>系列导航 Series Navigation：</strong></p>
+<ul>
+<li>上一篇：<a href="/posts/agent-dev-openai-agents-sdk.html">OpenAI Agents SDK</a></li>
+<li>下一篇：<a href="/posts/agent-dev-mcp-protocol.html">MCP 协议与 Server 开发</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Agent/" rel="tag"># Agent</a>
+              <a href="/tags/CrewAI/" rel="tag"># CrewAI</a>
+              <a href="/tags/AutoGen/" rel="tag"># AutoGen</a>
+              <a href="/tags/%E5%A4%9AAgent/" rel="tag"># 多Agent</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-openai-agents-sdk.html" rel="prev" title="OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails">
+                  <i class="fa fa-angle-left"></i> OpenAI Agents SDK 实战：Agent 定义、Handoff 与 Guardrails
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/agent-dev-mcp-protocol.html" rel="next" title="MCP 协议实战：让 Agent 连接一切外部工具（Model Context Protocol）">
+                  MCP 协议实战：让 Agent 连接一切外部工具（Model Context Protocol） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>
