@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">384</span>
+          <span class="site-state-item-count">385</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,100 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22038.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/22038.html" class="post-title-link" itemprop="url">svm</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在特征空间上找到最佳的分离超平面使得训练集上正负样本间隔最大</p>
+<p>用来解决二分类问题的有监督学习算法</p>
+<p>引入了核方法之后SVM也可以用来解决非线性问题</p>
+<h2 id="类型"><a class="headerlink" href="#类型" title="类型"></a>类型</h2><ul>
+<li>硬间隔支持向量机（线性可分支持向量机）：当训练数据线性可分时，可通过硬间隔最大化学得一个线性可分支持向量机。</li>
+<li>软间隔支持向量机：当训练数据近似线性可分时，可通过软间隔最大化学得一个线性支持向量机。</li>
+<li>非线性支持向量机：当训练数据线性不可分时，可通过核方法以及软间隔最大化学得一个非线性支持向量机。</li>
+</ul>
+<p>支持向量机（Support Vector Machine，SVM）是一种常用的机器学习算法，主要用于分类和回归问题。SVM的核心思想是通过找到一个超平面（或者更一般地说，一个线性决策边界），将不同类别的数据点尽可能分开，同时最大化支持向量与超平面的距离（即间隔）。在分类问题中，SVM的目标是找到一个最优的超平面，使得不同类别的数据点都尽可能远离这个超平面。</p>
+<p>以下是一个使用Python和<code>scikit-learn</code>库实现SVM的示例代码：</p>
+<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> datasets</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = datasets.load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建SVM分类器</span></span><br/><span class="line">svm_model = SVC(kernel=<span class="string">'linear'</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">svm_model.fit(X_train, y_train)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = svm_model.predict(X_test)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"SVM Accuracy:"</span>, accuracy)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用了<code>datasets.load_iris</code>函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个线性SVM分类器（<code>SVC</code>），使用<code>fit</code>方法训练模型。接着，我们在测试集上进行预测并计算准确率。</p>
+<p>您可以通过调整参数（例如核函数、惩罚参数C等）来进一步优化SVM模型的性能。注意，SVM算法不仅适用于二元分类问题，还可以扩展到多类别分类和回归问题。</p>
+<p>参考: <a href="https://blog.csdn.net/liugan528/article/details/79448379" rel="noopener" target="_blank" title="svm">svm</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2111,172 +2205,6 @@ node = null;
 </li>
 </ul>
 <p>}<br/></p></code></pre>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/44076.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/44076.html" class="post-title-link" itemprop="url">数据结构-矩阵压缩</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/data/" itemprop="url" rel="index"><span itemprop="name">data</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="对称矩阵的压缩"><a class="headerlink" href="#对称矩阵的压缩" title="对称矩阵的压缩"></a>对称矩阵的压缩</h2><p><code>n阶对称矩阵：只存储上三角或者下三角矩阵中的元素，把原来需要存储n*n个元素压缩至n*(n-1)/2个元素</code></p>
-<pre><code>//对称矩阵的压缩算法
-public class SymeMatric {
-
-<pre><code>double[] a;// 矩阵元素
-int n; // 矩阵的阶数
-int m;// 一维数组的元素的个数--长度
-
-public SymeMatric(int n) {
-    // 对称矩阵中不重复元素，保存到一维数组中所需要的一维数组的长度
-    // 2阶对称矩阵对应(1+2=3)维数组，3阶对称矩阵对应1+2+3=6维数组，
-    // 4阶对称矩阵对应1+2+3+4维数组，n阶对称矩阵对应前n项和，
-    // 所以一维数组的长度m的值为1,2,3...n的前n项和
-    m = n * (n + 1) / 2; 
-    a = new double[m];
-    this.n = n;
-}
-
-// 通过一个二维数组来初始化
-public void evalute(double[][] b) {
-    int k = 0;
-    for (int i = 0; i &amp;lt; n; i++) {
-        for (int j = 0; j &amp;lt; n; j++) {
-            // i &amp;gt;= j表示只保存下三角元素
-            if (i &amp;gt;= j) {
-                a[k++] = b[i][j];
-            }
-        }
-    }
-}
-
-// 通过一个一维数组来初始化,那么这个一维数组就是对称矩阵元素的一个副本
-public void evalute(double[] b) {
-    for (int k = 0; k &amp;lt; m; k++) {
-        a[k] = b[k];
-    }
-}
-
-// 对称矩阵相加
-public SymeMatric add(SymeMatric b) {
-    SymeMatric t = new SymeMatric(n);
-    int k;
-    for (int i = 1; i &amp;lt;= n; i++) {
-        for (int j = 1; j &amp;lt;= n; j++) {
-            if (i &amp;gt;= j) {
-                k = i * (i - 1) / 2 + j - 1;
-            } else {
-                k = j * (j - 1) / 2 + i - 1;
-            }
-            // 求和
-            t.a[k] = a[k] + b.a[k];
-        }
-    }
-    return t;
-}
-
-// 打印对称矩阵，这个才是关键！！
-public void print() {
-    int k;
-    for (int i = 1; i &amp;lt;= n; i++) {
-        for (int j = 1; j &amp;lt;= n; j++) {
-            if (i &amp;gt;= j) {
-                k = i * (i - 1) / 2 + j - 1;
-            } else {
-                k = j * (j - 1) / 2 + i - 1;
-            }
-            System.out.print(" " + a[k]);
-        }
-        System.out.println();
-    }
-}
-</code></pre>
-<p>}<br/></p></code></pre>
-<h2 id="三角矩阵的压缩"><a class="headerlink" href="#三角矩阵的压缩" title="三角矩阵的压缩"></a>三角矩阵的压缩</h2><p><code>m对角矩阵：非零元素在每行中有m个，一维数组s[k]和A[i][j]的对应关系为：k = m*i+j</code></p>
-<h2 id="稀疏矩阵的压缩"><a class="headerlink" href="#稀疏矩阵的压缩" title="稀疏矩阵的压缩"></a>稀疏矩阵的压缩</h2><p><code>矩阵m*n如果有t个非零元素，那么s = t/m*n称为矩阵的稀疏因子，如果s&lt;=0.05那么矩阵为稀疏矩阵</code></p>
-<p>注：三元组顺序表表示，其中三元组格式为(i,j,e)记录了非零元素的行号、列号以及非零元素</p>
-<pre><code>inal int _ROWS=5;		//定义行数
-final int _COLS=5;		//定义列数
-final int _NOTZERO=6;	//定义稀疏矩阵中不为零的个数
-int i,j,tmpRW,tmpCL,tmpNZ;
-int temp=1;
-int Sparse[][]=new int[_ROWS][_COLS];	//声明稀疏矩阵
-int Compress[][]=new int[_NOTZERO+1][3];//声明压缩矩阵
-    
-<p>for(i=0;i&lt;_ROWS;i++) 		//将矩阵初始值都设为0<br/>    for(j=0;j&lt;_COLS;j++)<br/>        Sparse[i][j]=0;</p>
-<p>tmpNZ=_NOTZERO;			//产生随机稀疏矩阵<br/>for(i=1;i&lt;tmpNZ+1;i++) {<br/>    tmpRW=(int)(Math.random()*100);<br/>    tmpRW=(tmpRW%_ROWS);<br/>    tmpCL=(int)(Math.random()*100);<br/>    tmpCL=(tmpCL%_COLS);<br/>    if(Sparse[tmpRW][tmpCL]!=0)<br/>        tmpNZ++;<br/>    Sparse[tmpRW][tmpCL]=i;<br/>}</p>
-<p>/<em>开始压缩稀疏矩阵</em>/<br/>Compress[0][0]=_ROWS;<br/>Compress[0][1]=_COLS;<br/>Compress[0][2]=_NOTZERO;<br/>for(i=0;i&lt;_ROWS;i++) {<br/>    for(j=0;j&lt;_COLS;j++) {<br/>        if(Sparse[i][j]!=0){<br/>            Compress[temp][0]=i;<br/>            Compress[temp][1]=j;<br/>            Compress[temp][2]=Sparse[i][j];<br/>            temp++;<br/>        }<br/>    }<br/>}</p>
-<p></p></code></pre>
-<p>链接：<a href="https://www.cnblogs.com/gaosheng-221/p/6133443.html" rel="noopener" target="_blank">https://www.cnblogs.com/gaosheng-221/p/6133443.html</a></p>
 
       
     </div>

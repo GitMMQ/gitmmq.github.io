@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">384</span>
+          <span class="site-state-item-count">385</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,223 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/67a42e4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/67a42e4.html" class="post-title-link" itemprop="url">mysql-答疑文章（三）：说一说这些好问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-18 14:16:32" itemprop="dateCreated datePublished" datetime="2019-12-18T14:16:32+08:00">2019-12-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>答疑文章（三）：说一说这些好问题<br/>这是我们专栏的最后一篇答疑文章，今天我们来说说一些好问题。</p>
+<p>在我看来，能够帮我们扩展一个逻辑的边界的问题，就是好问题。</p>
+<p>因为通过解决这样的问题，能够加深我们对这个逻辑的理解，或者帮我们关联到另外一个知识点，进而可以帮助我们建立起自己的知识网络。</p>
+<p>在工作中会问好问题，是一个很重要的能力。</p>
+<p>经过这段时间的学习，从评论区的问题我可以感觉出来，紧跟课程学习的同学，对SQL语句执行性能的感觉越来越好了，提出的问题也越来越细致和精准了。</p>
+<p>接下来，我们就一起看看同学们在评论区提到的这些好问题。</p>
+<p>在和你一起分析这些问题的时候，我会指出它们具体是在哪篇文章出现的。</p>
+<p>同时，在回答这些问题的过程中，我会假设你已经掌握了这篇文章涉及的知识。</p>
+<p>当然，如果你印象模糊了，也可以跳回文章再复习一次。</p>
+<p>join的写法在第35篇文章《join语句怎么优化？》中，我在介绍join执行顺序的时候，用的都是straight_join。</p>
+<p>@郭健 同学在文后提出了两个问题：</p>
+<ol>
+<li>如果用left join的话，左边的表一定是驱动表吗？2. 如果两个表的join包含多个条件的等值匹配，是都要写到on里面呢，还是只把一个条件写到on里面，其他条件写到where部分？为了同时回答这两个问题，我来构造两个表a和b：</li>
+</ol>
+<p>表a和b都有两个字段f1和f2，不同的是表a的字段f1上有索引。</p>
+<p>然后，我往两个表中都插入了6条记录，其中在表a和b中同时存在的数据有4行。</p>
+<p>@郭健 同学提到的第二个问题，其实就是下面这两种写法的区别：</p>
+<p>我把这两条语句分别记为Q1和Q2。</p>
+<p>首先，需要说明的是，这两个left join语句的语义逻辑并不相同。</p>
+<p>我们先来看一下它们的执行结果。</p>
+<p>create table a(f1 int, f2 int, index(f1))engine=innodb;create table b(f1 int, f2 int)engine=innodb;insert into a values(1,1),(2,2),(3,3),(4,4),(5,5),(6,6);insert into b values(3,3),(4,4),(5,5),(6,6),(7,7),(8,8);select * from a left join b on(a.f1=b.f1) and (a.f2=b.f2); /<em>Q1</em>/select * from a left join b on(a.f1=b.f1) where (a.f2=b.f2);/<em>Q2</em>/图1 两个join的查询结果可以看到：</p>
+<p>语句Q1返回的数据集是6行，表a中即使没有满足匹配条件的记录，查询结果中也会返回一行，并将表b的各个字段值填成NULL。</p>
+<p>语句Q2返回的是4行。</p>
+<p>从逻辑上可以这么理解，最后的两行，由于表b中没有匹配的字段，结果集里面b.f2的值是空，不满足where 部分的条件判断，因此不能作为结果集的一部分。</p>
+<p>接下来，我们看看实际执行这两条语句时，MySQL是怎么做的。</p>
+<p>我们先一起看看语句Q1的explain结果：</p>
+<p>图2 Q1的explain结果可以看到，这个结果符合我们的预期：</p>
+<p>驱动表是表a，被驱动表是表b；</p>
+<p>由于表b的f1字段上没有索引，所以使用的是Block Nexted Loop Join（简称BNL） 算法。</p>
+<p>看到BNL算法，你就应该知道这条语句的执行流程其实是这样的：</p>
+<ol>
+<li>把表a的内容读入join_buffer 中。</li>
+</ol>
+<p>因为是select * ，所以字段f1和f2都被放入join_buffer了。</p>
+<ol start="2">
+<li>顺序扫描表b，对于每一行数据，判断join条件（也就是a.f1=b.f1 and a.f2=b.f2)是否满足，满足条件的记录, 作为结果集的一行返回。</li>
+</ol>
+<p>如果语句中有where子句，需要先判断where部分满足条件后，再返回。</p>
+<ol start="3">
+<li>表b扫描完成后，对于没有被匹配的表a的行（在这个例子中就是(1,1)、(2,2)这两行），把剩余字段补上NULL，再放入结果集中。</li>
+</ol>
+<p>对应的流程图如下：</p>
+<p>图3 left join -BNL算法可以看到，这条语句确实是以表a为驱动表，而且从执行效果看，也和使用straight_join是一样的。</p>
+<p>你可能会想，语句Q2的查询结果里面少了最后两行数据，是不是就是把上面流程中的步骤3去掉呢？我们还是先看一下语句Q2的expain结果吧。</p>
+<p>图4 Q2的explain结果这里先和你说一句题外话，专栏马上就结束了，我也和你一起根据explain结果“脑补”了很多次一条语句的执行流程了，所以我希望你已经具备了这个能力。</p>
+<p>今天，我们再一起分析一次SQL语句的explain结果。</p>
+<p>可以看到，这条语句是以表b为驱动表的。</p>
+<p>而如果一条join语句的Extra字段什么都没写的话，就表示使用的是Index Nested-Loop Join（简称NLJ）算法。</p>
+<p>因此，语句Q2的执行流程是这样的：顺序扫描表b，每一行用b.f1到表a中去查，匹配到记录后判断a.f2=b.f2是否满足，满足条件的话就作为结果集的一部分返回。</p>
+<p>那么，为什么语句Q1和Q2这两个查询的执行流程会差距这么大呢？其实，这是因为优化器基于Q2这个查询的语义做了优化。</p>
+<p>为了理解这个问题，我需要再和你交代一个背景知识点：在MySQL里，NULL跟任何值执行等值判断和不等值判断的结果，都是NULL。</p>
+<p>这里包括， select NULL = NULL 的结果，也是返回NULL。</p>
+<p>因此，语句Q2里面where a.f2=b.f2就表示，查询结果里面不会包含b.f2是NULL的行，这样这个left join的语义就是“找到这两个表里面，f1、f2对应相同的行。</p>
+<p>对于表a中存在，而表b中匹配不到的行，就放弃”。</p>
+<p>这样，这条语句虽然用的是left join，但是语义跟join是一致的。</p>
+<p>因此，优化器就把这条语句的left join改写成了join，然后因为表a的f1上有索引，就把表b作为驱动表，这样就可以用上NLJ 算法。</p>
+<p>在执行explain之后，你再执行show warnings，就能看到这个改写的结果，如图5所示。</p>
+<p>图5 Q2的改写结果这个例子说明，即使我们在SQL语句中写成left join，执行过程还是有可能不是从左到右连接的。</p>
+<p>也就是说，使用left join时，左边的表不一定是驱动表。</p>
+<p>这样看来，如果需要left join的语义，就不能把被驱动表的字段放在where条件里面做等值判断或不等值判断，必须都写在on里面。</p>
+<p>那如果是join语句呢？这时候，我们再看看这两条语句：</p>
+<p>我们再使用一次看explain 和 show warnings的方法，看看优化器是怎么做的。</p>
+<p>select * from a join b on(a.f1=b.f1) and (a.f2=b.f2); /<em>Q3</em>/select * from a join b on(a.f1=b.f1) where (a.f2=b.f2);/<em>Q4</em>/图6 join语句改写可以看到，这两条语句都被改写成：</p>
+<p>执行计划自然也是一模一样的。</p>
+<p>也就是说，在这种情况下，join将判断条件是否全部放在on部分就没有区别了。</p>
+<p>Simple Nested Loop Join 的性能问题我们知道，join语句使用不同的算法，对语句的性能影响会很大。</p>
+<p>在第34篇文章《到底可不可以使用join？》的评论区中，@书策稠浊 和 @朝夕心 两位同学提了一个很不错的问题。</p>
+<p>我们在文中说到，虽然BNL算法和Simple Nested Loop Join 算法都是要判断M*N次（M和N分别是join的两个表的行数），但是Simple Nested Loop Join 算法的每轮判断都要走全表扫描，因此性能上BNL算法执行起来会快很多。</p>
+<p>为了便于说明，我还是先为你简单描述一下这两个算法。</p>
+<p>BNL算法的执行逻辑是：</p>
+<ol>
+<li><p>首先，将驱动表的数据全部读入内存join_buffer中，这里join_buffer是无序数组；</p>
+</li>
+<li><p>然后，顺序遍历被驱动表的所有行，每一行数据都跟join_buffer中的数据进行匹配，匹配成功则作为结果集的一部分返回。</p>
+</li>
+</ol>
+<p>select * from a join b where (a.f1=b.f1) and (a.f2=b.f2);Simple Nested Loop Join算法的执行逻辑是：顺序取出驱动表中的每一行数据，到被驱动表去做全表扫描匹配，匹配成功则作为结果集的一部分返回。</p>
+<p>这两位同学的疑问是，Simple Nested Loop Join算法，其实也是把数据读到内存里，然后按照匹配条件进行判断，为什么性能差距会这么大呢？解释这个问题，需要用到MySQL中索引结构和Buffer Pool的相关知识点：</p>
+<ol>
+<li>在对被驱动表做全表扫描的时候，如果数据没有在Buffer Pool中，就需要等待这部分数据从磁盘读入；</li>
+</ol>
+<p>从磁盘读入数据到内存中，会影响正常业务的Buffer Pool命中率，而且这个算法天然会对被驱动表的数据做多次访问，更容易将这些数据页放到Buffer Pool的头部（请参考第35篇文章中的相关内容)；</p>
+<ol start="2">
+<li>即使被驱动表数据都在内存中，每次查找“下一个记录的操作”，都是类似指针操作。</li>
+</ol>
+<p>而join_buffer中是数组，遍历的成本更低。</p>
+<p>所以说，BNL算法的性能会更好。</p>
+<p>distinct 和 group by的性能在第37篇文章《什么时候会使用内部临时表？》中，@老杨同志 提了一个好问题：如果只需要去重，不需要执行聚合函数，distinct 和group by哪种效率高一些呢？我来展开一下他的问题：如果表t的字段a上没有索引，那么下面这两条语句：</p>
+<p>的性能是不是相同的?首先需要说明的是，这种group by的写法，并不是SQL标准的写法。</p>
+<p>标准的group by语句，是需要在select部分加一个聚合函数，比如：</p>
+<p>这条语句的逻辑是：按照字段a分组，计算每组的a出现的次数。</p>
+<p>在这个结果里，由于做的是聚合计算，相同的a只出现一次。</p>
+<p>select a from t group by a order by null;select distinct a from t;select a,count(*) from t group by a order by null;备注：这里你可以顺便复习一下第37篇文章中关于group by的相关内容。</p>
+<p>没有了count(*)以后，也就是不再需要执行“计算总数”的逻辑时，第一条语句的逻辑就变成是：</p>
+<p>按照字段a做分组，相同的a的值只返回一行。</p>
+<p>而这就是distinct的语义，所以不需要执行聚合函数时，distinct 和group by这两条语句的语义和执行流程是相同的，因此执行性能也相同。</p>
+<p>这两条语句的执行流程是下面这样的。</p>
+<ol>
+<li><p>创建一个临时表，临时表有一个字段a，并且在这个字段a上创建一个唯一索引；</p>
+</li>
+<li><p>遍历表t，依次取数据插入临时表中：</p>
+</li>
+</ol>
+<p>如果发现唯一键冲突，就跳过；</p>
+<p>否则插入成功；</p>
+<ol start="3">
+<li>遍历完成后，将临时表作为结果集返回给客户端。</li>
+</ol>
+<p>备库自增主键问题除了性能问题，大家对细节的追问也很到位。</p>
+<p>在第39篇文章《自增主键为什么不是连续的？》评论区，@帽子掉了 同学问到：在binlog_format=statement时，语句A先获取id=1，然后语句B获取id=2；接着语句B提交，写binlog，然后语句A再写binlog。</p>
+<p>这时候，如果binlog重放，是不是会发生语句B的id为1，而语句A的id为2的不一致情况呢？首先，这个问题默认了“自增id的生成顺序，和binlog的写入顺序可能是不同的”，这个理解是正确的。</p>
+<p>其次，这个问题限定在statement格式下，也是对的。</p>
+<p>因为row格式的binlog就没有这个问题了，Write row event里面直接写了每一行的所有字段的值。</p>
+<p>而至于为什么不会发生不一致的情况，我们来看一下下面的这个例子。</p>
+<p>图7 insert 语句的binlog可以看到，在insert语句之前，还有一句SET INSERT_ID=1。</p>
+<p>这条命令的意思是，这个线程里下一次需要用到自增值的时候，不论当前表的自增值是多少，固定用1这个值。</p>
+<p>create table t(id int auto_increment primary key);insert into t values(null);这个SET INSERT_ID语句是固定跟在insert语句之前的，比如@帽子掉了同学提到的场景，主库上语句A的id是1，语句B的id是2，但是写入binlog的顺序先B后A，那么binlog就变成：</p>
+<p>你看，在备库上语句B用到的INSERT_ID依然是2，跟主库相同。</p>
+<p>因此，即使两个INSERT语句在主备库的执行顺序不同，自增主键字段的值也不会不一致。</p>
+<p>小结今天这篇答疑文章，我选了4个好问题和你分享，并做了分析。</p>
+<p>在我看来，能够提出好问题，首先表示这些同学理解了我们文章的内容，进而又做了深入思考。</p>
+<p>有你们在认真的阅读和思考，对我来说是鼓励，也是动力。</p>
+<p>说实话，短短的三篇答疑文章无法全部展开同学们在评论区留下的高质量问题，之后有的同学还会二刷，也会有新的同学加入，大家想到新的问题就请给我留言吧，我会继续关注评论区，和你在评论区交流。</p>
+<p>老规矩，答疑文章也是要有课后思考题的。</p>
+<p>在第8篇文章的评论区， @XD同学提到一个问题：他查看了一下innodb_trx，发现这个事务的trx_id是一个很大的数（281479535353408），而且似乎在同一个session中启动的会话得到的trx_id是保持不变的。</p>
+<p>当执行任何加写锁的语句后，trx_id都会变成一个很小的数字（118378）。</p>
+<p>你可以通过实验验证一下，然后分析看看，事务id的分配规则是什么，以及MySQL为什么要这么设计呢？你可以把你的结论和分析写在留言区，我会在下一篇文章和你讨论这个问题。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期的问题是，怎么给分区表t创建自增主键。</p>
+<p>由于MySQL要求主键包含所有的分区字段，所以肯定是要创建联合主键的。</p>
+<p>这时候就有两种可选：一种是(ftime, id)，另一种是(id, ftime)。</p>
+<p>如果从利用率上来看，应该使用(ftime, id)这种模式。</p>
+<p>因为用ftime做分区key，说明大多数语句都SET INSERT_ID=2;语句B；</p>
+<p>SET INSERT_ID=1;语句A；</p>
+<p>是包含ftime的，使用这种模式，可以利用前缀索引的规则，减少一个索引。</p>
+<p>这时的建表语句是：</p>
+<p>当然，我的建议是你要尽量使用InnoDB引擎。</p>
+<p>InnoDB表要求至少有一个索引，以自增字段作为第一个字段，所以需要加一个id的单独索引。</p>
+<p>当然把字段反过来，创建成：</p>
+<p>CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,  f̀time  ̀datetime NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ ftime ,̀ ìd )̀) ENGINE=MyISAM DEFAULT CHARSET=latin1PARTITION BY RANGE (YEAR(ftime))(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE = MyISAM, PARTITION p_2018 VALUES LESS THAN (2018) ENGINE = MyISAM, PARTITION p_2019 VALUES LESS THAN (2019) ENGINE = MyISAM, PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE = MyISAM);CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL AUTO_INCREMENT,  f̀time  ̀datetime NOT NULL,  </code>c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ ftime ,̀ ìd )̀,  KEY ìd  ̀(̀ id )̀) ENGINE=InnoDB DEFAULT CHARSET=latin1PARTITION BY RANGE (YEAR(ftime))(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE = InnoDB, PARTITION p_2018 VALUES LESS THAN (2018) ENGINE = InnoDB, PARTITION p_2019 VALUES LESS THAN (2019) ENGINE = InnoDB, PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE = InnoDB);  PRIMARY KEY (̀ id ,̀ f̀time )̀,  KEY ìd  ̀(̀ ftime )̀也是可以的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2078,267 +2295,6 @@
 <p>最后，我给你留下一道思考题吧。</p>
 <p>我们在讲join语句的这两篇文章中，都只涉及到了两个表的join。</p>
 <p>那么，现在有一个三个表join的需求，假设这三个表的表结构如下：<br/>语句的需求实现如下的join逻辑：<br/>现在为了得到最快的执行速度，如果让你来设计表t1、t2、t3上的索引，来支持这个join语句，你会加哪些索引呢？同时，如果我希望你用straight_join来重写这个语句，配合你创建的索引，你就需要安排连接顺序，你主要考虑的因素是什么呢？</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/db4372f3.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/db4372f3.html" class="post-title-link" itemprop="url">mysql-使用join</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-12-08 14:12:07" itemprop="dateCreated datePublished" datetime="2019-12-08T14:12:07+08:00">2019-12-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>到底可不可以使用join？在实际生产中，关于join语句使用的问题，一般会集中在以下两类：</p>
-<ol>
-<li>我们DBA不让使用join，使用join有什么问题呢？2. 如果有两个大小不同的表做join，应该用哪个表做驱动表呢？今天这篇文章，我就先跟你说说join语句到底是怎么执行的，然后再来回答这两个问题。</li>
-</ol>
-<p>为了便于量化分析，我还是创建两个表t1和t2来和你说明。</p>
-<p>可以看到，这两个表都有一个主键索引id和一个索引a，字段b上无索引。</p>
-<p>存储过程idata()往表t2里插入了1000行数据，在表t1里插入的是100行数据。</p>
-<p>Index Nested-Loop Join我们来看一下这个语句：</p>
-<p>如果直接使用join语句，MySQL优化器可能会选择表t1或t2作为驱动表，这样会影响我们分析SQL语句的执行过程。</p>
-<p>所以，为了便于分析执行过程中的性能问题，我改用straight_join让MySQL使用固定的连接方式执行查询，这样优化器只会按照我们指定的方式去join。</p>
-<p>在这个语句CREATE TABLE t̀2  ̀(  ìd  ̀int(11) NOT NULL,  <code>a  ̀int(11) DEFAULT NULL,  </code>b  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY `a  ̀(̀ a )̀) ENGINE=InnoDB;drop procedure idata;delimiter ;;create procedure idata()begin  declare i int;  set i=1;  while(i&lt;=1000)do    insert into t2 values(i, i, i);    set i=i+1;  end while;end;;delimiter ;call idata();create table t1 like t2;insert into t1 (select * from t2 where id&lt;=100)select * from t1 straight_join t2 on (t1.a=t2.a);里，t1 是驱动表，t2是被驱动表。</p>
-<p>现在，我们来看一下这条语句的explain结果。</p>
-<p>图1 使用索引字段join的 explain结果可以看到，在这条语句里，被驱动表t2的字段a上有索引，join过程用上了这个索引，因此这个语句的执行流程是这样的：</p>
-<ol>
-<li><p>从表t1中读入一行数据 R；</p>
-</li>
-<li><p>从数据行R中，取出a字段到表t2里去查找；</p>
-</li>
-<li><p>取出表t2中满足条件的行，跟R组成一行，作为结果集的一部分；</p>
-</li>
-<li><p>重复执行步骤1到3，直到表t1的末尾循环结束。</p>
-</li>
-</ol>
-<p>这个过程是先遍历表t1，然后根据从表t1中取出的每行数据中的a值，去表t2中查找满足条件的记录。</p>
-<p>在形式上，这个过程就跟我们写程序时的嵌套查询类似，并且可以用上被驱动表的索引，所以我们称之为“Index Nested-Loop Join”，简称NLJ。</p>
-<p>它对应的流程图如下所示：</p>
-<p>图2 Index Nested-Loop Join算法的执行流程在这个流程里：</p>
-<ol>
-<li><p>对驱动表t1做了全表扫描，这个过程需要扫描100行；</p>
-</li>
-<li><p>而对于每一行R，根据a字段去表t2查找，走的是树搜索过程。</p>
-</li>
-</ol>
-<p>由于我们构造的数据都是一一对应的，因此每次的搜索过程都只扫描一行，也是总共扫描100行；</p>
-<ol start="3">
-<li>所以，整个执行流程，总扫描行数是200。</li>
-</ol>
-<p>现在我们知道了这个过程，再试着回答一下文章开头的两个问题。</p>
-<p>先看第一个问题：能不能使用join?假设不使用join，那我们就只能用单表查询。</p>
-<p>我们看看上面这条语句的需求，用单表查询怎么实现。</p>
-<ol>
-<li><p>执行select * from t1，查出表t1的所有数据，这里有100行；</p>
-</li>
-<li><p>循环遍历这100行数据：</p>
-</li>
-</ol>
-<p>从每一行R取出字段a的值$R.a；</p>
-<p>执行select * from t2 where a=$R.a；</p>
-<p>把返回的结果和R构成结果集的一行。</p>
-<p>可以看到，在这个查询过程，也是扫描了200行，但是总共执行了101条语句，比直接join多了100次交互。</p>
-<p>除此之外，客户端还要自己拼接SQL语句和结果。</p>
-<p>显然，这么做还不如直接join好。</p>
-<p>我们再来看看第二个问题：怎么选择驱动表？在这个join语句执行过程中，驱动表是走全表扫描，而被驱动表是走树搜索。</p>
-<p>假设被驱动表的行数是M。</p>
-<p>每次在被驱动表查一行数据，要先搜索索引a，再搜索主键索引。</p>
-<p>每次搜索一棵树近似复杂度是以2为底的M的对数，记为log M，所以在被驱动表上查一行的时间复杂度是 2*log M。</p>
-<p>假设驱动表的行数是N，执行过程就要扫描驱动表N行，然后对于每一行，到被驱动表上匹配一次。</p>
-<p>因此整个执行过程，近似复杂度是 N + N<em>2</em>log M。</p>
-<p>显然，N对扫描行数的影响更大，因此应该让小表来做驱动表。</p>
-<p>到这里小结一下，通过上面的分析我们得到了两个结论：</p>
-<ol>
-<li><p>使用join语句，性能比强行拆成多个单表执行SQL语句的性能要好；</p>
-</li>
-<li><p>如果使用join语句的话，需要让小表做驱动表。</p>
-</li>
-</ol>
-<p>但是，你需要注意，这个结论的前提是“可以使用被驱动表的索引”。</p>
-<p>接下来，我们再看看被驱动表用不上索引的情况。</p>
-<p>Simple Nested-Loop Join现在，我们把SQL语句改成这样：</p>
-<p>由于表t2的字段b上没有索引，因此再用图2的执行流程时，每次到t2去匹配的时候，就要做一次222如果你没觉得这个影响有那么“显然”， 可以这么理解：N扩大1000倍的话，扫描行数就会扩大1000倍；而M扩大1000倍，扫描行数扩大不到10倍。</p>
-<p>select * from t1 straight_join t2 on (t1.a=t2.b);全表扫描。</p>
-<p>你可以先设想一下这个问题，继续使用图2的算法，是不是可以得到正确的结果呢？如果只看结果的话，这个算法是正确的，而且这个算法也有一个名字，叫做“Simple Nested-Loop Join”。</p>
-<p>但是，这样算来，这个SQL请求就要扫描表t2多达100次，总共扫描100*1000=10万行。</p>
-<p>这还只是两个小表，如果t1和t2都是10万行的表（当然了，这也还是属于小表的范围），就要扫描100亿行，这个算法看上去太“笨重”了。</p>
-<p>当然，MySQL也没有使用这个Simple Nested-Loop Join算法，而是使用了另一个叫作“BlockNested-Loop Join”的算法，简称BNL。</p>
-<p>Block Nested-Loop Join这时候，被驱动表上没有可用的索引，算法的流程是这样的：</p>
-<ol>
-<li><p>把表t1的数据读入线程内存join_buffer中，由于我们这个语句中写的是select *，因此是把整个表t1放入了内存；</p>
-</li>
-<li><p>扫描表t2，把表t2中的每一行取出来，跟join_buffer中的数据做对比，满足join条件的，作为结果集的一部分返回。</p>
-</li>
-</ol>
-<p>这个过程的流程图如下：</p>
-<p>图3 Block Nested-Loop Join 算法的执行流程对应地，这条SQL语句的explain结果如下所示：</p>
-<p>图4 不使用索引字段join的 explain结果可以看到，在这个过程中，对表t1和t2都做了一次全表扫描，因此总的扫描行数是1100。</p>
-<p>由于join_buffer是以无序数组的方式组织的，因此对表t2中的每一行，都要做100次判断，总共需要在内存中做的判断次数是：100*1000=10万次。</p>
-<p>前面我们说过，如果使用Simple Nested-Loop Join算法进行查询，扫描行数也是10万行。</p>
-<p>因此，从时间复杂度上来说，这两个算法是一样的。</p>
-<p>但是，Block Nested-Loop Join算法的这10万次判断是内存操作，速度上会快很多，性能也更好。</p>
-<p>接下来，我们来看一下，在这种情况下，应该选择哪个表做驱动表。</p>
-<p>假设小表的行数是N，大表的行数是M，那么在这个算法里：</p>
-<ol>
-<li><p>两个表都做一次全表扫描，所以总的扫描行数是M+N；</p>
-</li>
-<li><p>内存中的判断次数是M*N。</p>
-</li>
-</ol>
-<p>可以看到，调换这两个算式中的M和N没差别，因此这时候选择大表还是小表做驱动表，执行耗时是一样的。</p>
-<p>然后，你可能马上就会问了，这个例子里表t1才100行，要是表t1是一个大表，join_buffer放不下怎么办呢？join_buffer的大小是由参数join_buffer_size设定的，默认值是256k。</p>
-<p>如果放不下表t1的所有数据话，策略很简单，就是分段放。</p>
-<p>我把join_buffer_size改成1200，再执行：</p>
-<p>执行过程就变成了：</p>
-<ol>
-<li><p>扫描表t1，顺序读取数据行放入join_buffer中，放完第88行join_buffer满了，继续第2步；</p>
-</li>
-<li><p>扫描表t2，把t2中的每一行取出来，跟join_buffer中的数据做对比，满足join条件的，作为结果集的一部分返回；</p>
-</li>
-<li><p>清空join_buffer；</p>
-</li>
-<li><p>继续扫描表t1，顺序读取最后的12行数据放入join_buffer中，继续执行第2步。</p>
-</li>
-</ol>
-<p>执行流程图也就变成这样：</p>
-<p>select * from t1 straight_join t2 on (t1.a=t2.b);图5 Block Nested-Loop Join – 两段图中的步骤4和5，表示清空join_buffer再复用。</p>
-<p>这个流程才体现出了这个算法名字中“Block”的由来，表示“分块去join”。</p>
-<p>可以看到，这时候由于表t1被分成了两次放入join_buffer中，导致表t2会被扫描两次。</p>
-<p>虽然分成两次放入join_buffer，但是判断等值条件的次数还是不变的，依然是(88+12)*1000=10万次。</p>
-<p>我们再来看下，在这种情况下驱动表的选择问题。</p>
-<p>假设，驱动表的数据行数是N，需要分K段才能完成算法流程，被驱动表的数据行数是M。</p>
-<p>注意，这里的K不是常数，N越大K就会越大，因此把K表示为λ*N，显然λ的取值范围是(0,1)。</p>
-<p>所以，在这个算法的执行过程中：</p>
-<ol>
-<li><p>扫描行数是 N+λ<em>N</em>M；</p>
-</li>
-<li><p>内存判断 N*M次。</p>
-</li>
-</ol>
-<p>显然，内存判断次数是不受选择哪个表作为驱动表影响的。</p>
-<p>而考虑到扫描行数，在M和N大小确定的情况下，N小一些，整个算式的结果会更小。</p>
-<p>所以结论是，应该让小表当驱动表。</p>
-<p>当然，你会发现，在N+λ<em>N</em>M这个式子里，λ才是影响扫描行数的关键因素，这个值越小越好。</p>
-<p>刚刚我们说了N越大，分段数K越大。</p>
-<p>那么，N固定的时候，什么参数会影响K的大小呢？（也就是λ的大小）答案是join_buffer_size。</p>
-<p>join_buffer_size越大，一次可以放入的行越多，分成的段数也就越少，对被驱动表的全表扫描次数就越少。</p>
-<p>这就是为什么，你可能会看到一些建议告诉你，如果你的join语句很慢，就把join_buffer_size改大。</p>
-<p>理解了MySQL执行join的两种算法，现在我们再来试着回答文章开头的两个问题。</p>
-<p>第一个问题：能不能使用join语句？1. 如果可以使用Index Nested-Loop Join算法，也就是说可以用上被驱动表上的索引，其实是没问题的；</p>
-<ol start="2">
-<li>如果使用Block Nested-Loop Join算法，扫描行数就会过多。</li>
-</ol>
-<p>尤其是在大表上的join操作，这样可能要扫描被驱动表很多次，会占用大量的系统资源。</p>
-<p>所以这种join尽量不要用。</p>
-<p>所以你在判断要不要使用join语句时，就是看explain结果里面，Extra字段里面有没有出现“BlockNested Loop”字样。</p>
-<p>第二个问题是：如果要使用join，应该选择大表做驱动表还是选择小表做驱动表？1. 如果是Index Nested-Loop Join算法，应该选择小表做驱动表；</p>
-<ol start="2">
-<li>如果是Block Nested-Loop Join算法：</li>
-</ol>
-<p>在join_buffer_size足够大的时候，是一样的；</p>
-<p>在join_buffer_size不够大的时候（这种情况更常见），应该选择小表做驱动表。</p>
-<p>所以，这个问题的结论就是，总是应该使用小表做驱动表。</p>
-<p>当然了，这里我需要说明下，什么叫作“小表”。</p>
-<p>我们前面的例子是没有加条件的。</p>
-<p>如果我在语句的where条件加上 t2.id&lt;=50这个限定条件，再来看下这两条语句：</p>
-<p>select * from t1 straight_join t2 on (t1.b=t2.b) where t2.id&lt;=50;select * from t2 straight_join t1 on (t1.b=t2.b) where t2.id&lt;=50;注意，为了让两条语句的被驱动表都用不上索引，所以join字段都使用了没有索引的字段b。</p>
-<p>但如果是用第二个语句的话，join_buffer只需要放入t2的前50行，显然是更好的。</p>
-<p>所以这里，“t2的前50行”是那个相对小的表，也就是“小表”。</p>
-<p>我们再来看另外一组例子：</p>
-<p>这个例子里，表t1 和 t2都是只有100行参加join。</p>
-<p>但是，这两条语句每次查询放入join_buffer中的数据是不一样的：</p>
-<p>表t1只查字段b，因此如果把t1放到join_buffer中，则join_buffer中只需要放入b的值；</p>
-<p>表t2需要查所有的字段，因此如果把表t2放到join_buffer中的话，就需要放入三个字段id、a和b。</p>
-<p>这里，我们应该选择表t1作为驱动表。</p>
-<p>也就是说在这个例子里，“只需要一列参与join的表t1”是那个相对小的表。</p>
-<p>所以，更准确地说，在决定哪个表做驱动表的时候，应该是两个表按照各自的条件过滤，过滤完成之后，计算参与join的各个字段的总数据量，数据量小的那个表，就是“小表”，应该作为驱动表。</p>
-<p>小结今天，我和你介绍了MySQL执行join语句的两种可能算法，这两种算法是由能否使用被驱动表的索引决定的。</p>
-<p>而能否用上被驱动表的索引，对join语句的性能影响很大。</p>
-<p>通过对Index Nested-Loop Join和Block Nested-Loop Join两个算法执行过程的分析，我们也得到了文章开头两个问题的答案：</p>
-<ol>
-<li><p>如果可以使用被驱动表的索引，join语句还是有其优势的；</p>
-</li>
-<li><p>不能使用被驱动表的索引，只能使用Block Nested-Loop Join算法，这样的语句就尽量不要使用；</p>
-</li>
-<li><p>在使用join的时候，应该让小表做驱动表。</p>
-</li>
-</ol>
-<p>最后，又到了今天的问题时间。</p>
-<p>我们在上文说到，使用Block Nested-Loop Join算法，可能会因为join_buffer不够大，需要对被select t1.b,t2.* from  t1  straight_join t2 on (t1.b=t2.b) where t2.id&lt;=100;select t1.b,t2.* from  t2  straight_join t1 on (t1.b=t2.b) where t2.id&lt;=100;驱动表做多次全表扫描。</p>
-<p>我的问题是，如果被驱动表是一个大表，并且是一个冷数据表，除了查询过程中可能会导致IO压力大以外，你觉得对这个MySQL服务还有什么更严重的影响吗？（这个问题需要结合上一篇文章的知识点）你可以把你的结论和分析写在留言区，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我在上一篇文章最后留下的问题是，如果客户端由于压力过大，迟迟不能接收数据，会对服务端造成什么严重的影响。</p>
-<p>这个问题的核心是，造成了“长事务”。</p>
-<p>至于长事务的影响，就要结合我们前面文章中提到的锁、MVCC的知识点了。</p>
-<p>如果前面的语句有更新，意味着它们在占用着行锁，会导致别的语句更新被锁住；</p>
-<p>当然读的事务也有问题，就是会导致undo log不能被回收，导致回滚段空间膨胀。</p>
 
       
     </div>

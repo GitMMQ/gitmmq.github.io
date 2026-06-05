@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">384</span>
+          <span class="site-state-item-count">385</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,245 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/agent-dev-embedding-vector-search.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/agent-dev-embedding-vector-search.html" class="post-title-link" itemprop="url">Agent 记忆系统：Embedding 与向量检索实战（Chroma / Milvus / Qdrant）</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-06-05 17:20:00" itemprop="dateCreated datePublished" datetime="2026-06-05T17:20:00+08:00">2026-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p><strong>English Title:</strong> Agent Memory with Embeddings &amp; Vector Search — Chroma, Milvus &amp; Qdrant</p>
+</blockquote>
+<p>掌握<a href="/posts/agent-dev-llm-api-guide.html">大模型 API 调用</a>之后，Agent 仍面临一个硬约束：<strong>上下文窗口有限，而业务记忆无限</strong>。对话历史、用户偏好、文档知识库、工具执行日志——若全部塞进 Prompt，成本与延迟会迅速失控。Embedding 将文本映射为稠密向量，再配合向量数据库做相似度检索，是构建 Agent <strong>长期记忆</strong> 与 <strong>RAG 知识注入</strong> 的标准解法。它与 Prompt、Tool 调用并列，构成现代 Agent 栈的「数据面」。本文从原理到选型，再到可运行的 Python 流水线，帮你把「能对话」升级为「能记住、能查证」。</p>
+<hr>
+<h2 id="1-为什么-Agent-需要向量记忆？"><a href="#1-为什么-Agent-需要向量记忆？" class="headerlink" title="1. 为什么 Agent 需要向量记忆？"></a>1. 为什么 Agent 需要向量记忆？</h2><p>传统 Agent 只依赖滑动窗口内的 messages，会带来三类问题：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>表现</th>
+<th>向量记忆如何解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>遗忘</strong></td>
+<td>多轮后早期决策丢失</td>
+<td>将关键片段写入向量库，按语义召回</td>
+</tr>
+<tr>
+<td><strong>幻觉</strong></td>
+<td>模型编造未见过的事实</td>
+<td>RAG 注入检索到的原文作为 grounding</td>
+</tr>
+<tr>
+<td><strong>成本</strong></td>
+<td>全量历史 token 线性增长</td>
+<td>只检索 Top-K 相关块，压缩有效上下文</td>
+</tr>
+</tbody></table>
+<p>Agent 记忆可粗分为：<strong>短期</strong>（当前 thread 的 messages）、<strong>长期</strong>（跨会话的用户画像与摘要）、<strong>外部知识</strong>（PDF、Wiki、工单）。Embedding + 向量检索主要服务后两者；短期记忆仍建议配合 Redis 或数据库存原文，向量层负责「按意思找片段」。例如用户说「还是按上次那样配环境」，系统无需扫描全部历史，只需用当前意图检索「上次环境配置」相关块即可。这种<strong>语义索引</strong>比关键词匹配更抗表述变化，是 Agent 体验从「健忘」到「贴心」的关键跃迁。</p>
+<hr>
+<h2 id="2-文本-Embedding-模型选型"><a href="#2-文本-Embedding-模型选型" class="headerlink" title="2. 文本 Embedding 模型选型"></a>2. 文本 Embedding 模型选型</h2><p>Embedding 模型的任务是把语义相近的句子映射到向量空间中彼此靠近的位置。主流选择：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>特点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>OpenAI <code>text-embedding-3-small/large</code></strong></td>
+<td>质量稳定、维度可调、与生态集成好</td>
+<td>英文为主、愿付 API 费用</td>
+</tr>
+<tr>
+<td><strong>BGE（<code>BAAI/bge-m3</code> 等）</strong></td>
+<td>开源可私有化、中文表现优秀</td>
+<td>内网部署、成本敏感</td>
+</tr>
+<tr>
+<td><strong>多语言（<code>multilingual-e5</code>、<code>bge-m3</code>）</strong></td>
+<td>中英混合、跨语言检索</td>
+<td>全球化产品、混合语料</td>
+</tr>
+</tbody></table>
+<p><strong>选型原则：</strong> 同一索引内<strong>必须使用同一模型</strong>；换模型需全量重嵌入。维度越高不一定越好——在召回率与存储&#x2F;延迟之间权衡。中文 Agent 若走 API，可优先 <code>text-embedding-3-small</code>；若自建，BGE-M3 是常见默认。本地推理可用 <code>sentence-transformers</code> 加载 BGE，避免每次检索都走外网；注意 GPU 批处理能显著降低入库阶段的耗时。无论哪种模型，都应在离线集上做一次 <strong>MTEB 或自建问答对</strong> 的抽检，确认你的领域语料（工单、代码注释、产品手册）召回达标后再上线。</p>
+<hr>
+<h2 id="3-相似度检索原理"><a href="#3-相似度检索原理" class="headerlink" title="3. 相似度检索原理"></a>3. 相似度检索原理</h2><p>向量检索的核心是比较查询向量 <strong>q</strong> 与库中向量 <strong>d</strong> 的相似度：</p>
+<ul>
+<li><strong>余弦相似度（Cosine）</strong>：衡量方向一致性，对向量长度不敏感，文本场景最常用</li>
+<li><strong>点积（Dot Product）</strong>：若向量已 L2 归一化，等价于余弦；未归一化时大范数向量会占优</li>
+<li><strong>欧氏距离（L2）</strong>：几何距离，部分库默认支持</li>
+</ul>
+<p>百万级以上规模时，全量暴力扫描不可行，需 <strong>近似最近邻（ANN）</strong> 索引。<strong>HNSW</strong>（分层可导航小世界图）是工业界主流：构建时建多层图，查询时从顶层贪心下降，在 <strong>召回率 vs 延迟</strong> 间通过 <code>ef_search</code>、<code>M</code> 等参数调节。理解这一点有助于调参：召回偏低时先增大 <code>ef</code>，而非盲目加 chunk。另有 IVF、PQ 等索引适合超大规模与内存受限场景，但 Agent 记忆库往往在百万条以内，HNSW 通常足够。检索返回的是「相似」而非「相同」——务必在 Prompt 中要求模型<strong>仅依据检索片段回答</strong>，并在无相关结果时明确说「知识库中未找到」，降低胡编风险。</p>
+<hr>
+<h2 id="4-向量数据库对比：Chroma-vs-Milvus-vs-Qdrant"><a href="#4-向量数据库对比：Chroma-vs-Milvus-vs-Qdrant" class="headerlink" title="4. 向量数据库对比：Chroma vs Milvus vs Qdrant"></a>4. 向量数据库对比：Chroma vs Milvus vs Qdrant</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th><strong>Chroma</strong></th>
+<th><strong>Milvus</strong></th>
+<th><strong>Qdrant</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>嵌入式 &#x2F; 轻量原型</td>
+<td>分布式、超大规模</td>
+<td>生产级、过滤能力强</td>
+</tr>
+<tr>
+<td>部署</td>
+<td><code>pip install</code> 即可本地跑</td>
+<td>需 K8s &#x2F; 集群组件</td>
+<td>Docker 单节点即可起步</td>
+</tr>
+<tr>
+<td>元数据过滤</td>
+<td>基础</td>
+<td>丰富</td>
+<td><strong>Payload 过滤</strong> 体验好</td>
+</tr>
+<tr>
+<td>规模</td>
+<td>百万级内舒适</td>
+<td>十亿级向量</td>
+<td>千万～亿级</td>
+</tr>
+<tr>
+<td>Agent 场景</td>
+<td>本地开发、MVP</td>
+<td>企业知识库、多租户</td>
+<td>带权限的多用户记忆</td>
+</tr>
+</tbody></table>
+<p><strong>务实建议：</strong> 学习与 PoC 用 <strong>Chroma</strong>；需要复杂 <code>where</code> 过滤（<code>user_id</code>、<code>session_id</code>）且要上生产，看 <strong>Qdrant</strong>；数据量与 SLA 要求极高、已有运维体系，选 <strong>Milvus</strong>。三者 Python SDK 心智模型相近：<code>collection</code> → <code>upsert</code> → <code>query</code>。</p>
+<hr>
+<h2 id="5-Agent-场景的-RAG-流水线"><a href="#5-Agent-场景的-RAG-流水线" class="headerlink" title="5. Agent 场景的 RAG 流水线"></a>5. Agent 场景的 RAG 流水线</h2><p>典型 RAG（Retrieval-Augmented Generation）在 Agent 中的位置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">文档/对话 → 分块(Chunk) → Embedding → 写入向量库</span><br><span class="line">用户提问 → Query Embedding → Top-K 检索 → 拼入 Prompt → LLM 生成</span><br></pre></td></tr></table></figure>
+
+<p>与纯问答 RAG 不同，Agent 还需：<strong>写入时机</strong>（工具结果、用户确认的事实何时入库）、<strong>检索时机</strong>（Planner 决策前 vs 回答前）、<strong>引用格式</strong>（要求模型标注 <code>[1][2]</code> 便于审计）。记忆写入建议附带 <code>metadata</code>：<code>user_id</code>、<code>source</code>、<code>timestamp</code>、<code>importance</code>，便于过滤与过期清理。进阶做法是把检索封装为独立 <strong>Tool</strong>（如 <code>search_memory(query)</code>），由 LLM 决定何时查记忆，而不是每轮固定注入 Top-K——这在多跳任务中更省 token，也更接近人类「想起来再查」的行为。下一篇 <a href="/posts/agent-dev-langchain-langgraph.html">LangChain &#x2F; LangGraph</a> 将把此类节点编排进状态图。</p>
+<hr>
+<h2 id="6-Python-示例：嵌入、存储、检索"><a href="#6-Python-示例：嵌入、存储、检索" class="headerlink" title="6. Python 示例：嵌入、存储、检索"></a>6. Python 示例：嵌入、存储、检索</h2><p>以下用 <strong>Chroma</strong> 演示最小闭环（需 <code>pip install chromadb openai</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> chromadb</span><br><span class="line"><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI</span><br><span class="line"></span><br><span class="line">client = OpenAI()</span><br><span class="line">chroma = chromadb.PersistentClient(path=<span class="string">&quot;./agent_memory&quot;</span>)</span><br><span class="line">collection = chroma.get_or_create_collection(<span class="string">&quot;memories&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">embed</span>(<span class="params">texts: <span class="built_in">list</span>[<span class="built_in">str</span>]</span>) -&gt; <span class="built_in">list</span>[<span class="built_in">list</span>[<span class="built_in">float</span>]]:</span><br><span class="line">    resp = client.embeddings.create(</span><br><span class="line">        model=<span class="string">&quot;text-embedding-3-small&quot;</span>,</span><br><span class="line">        <span class="built_in">input</span>=texts,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> [d.embedding <span class="keyword">for</span> d <span class="keyword">in</span> resp.data]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写入记忆</span></span><br><span class="line">docs = [</span><br><span class="line">    <span class="string">&quot;用户偏好：接口文档用 OpenAPI 3.1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;上次部署失败原因：Redis 连接超时&quot;</span>,</span><br><span class="line">]</span><br><span class="line">ids = [<span class="string">&quot;mem-1&quot;</span>, <span class="string">&quot;mem-2&quot;</span>]</span><br><span class="line">collection.add(</span><br><span class="line">    ids=ids,</span><br><span class="line">    documents=docs,</span><br><span class="line">    embeddings=embed(docs),</span><br><span class="line">    metadatas=[&#123;<span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;u42&quot;</span>&#125;, &#123;<span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;u42&quot;</span>&#125;],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检索</span></span><br><span class="line">query = <span class="string">&quot;部署出过什么问题？&quot;</span></span><br><span class="line">q_emb = embed([query])[<span class="number">0</span>]</span><br><span class="line">hits = collection.query(</span><br><span class="line">    query_embeddings=[q_emb],</span><br><span class="line">    n_results=<span class="number">2</span>,</span><br><span class="line">    where=&#123;<span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;u42&quot;</span>&#125;,</span><br><span class="line">)</span><br><span class="line"><span class="keyword">for</span> doc, dist <span class="keyword">in</span> <span class="built_in">zip</span>(hits[<span class="string">&quot;documents&quot;</span>][<span class="number">0</span>], hits[<span class="string">&quot;distances&quot;</span>][<span class="number">0</span>]):</span><br><span class="line">    <span class="built_in">print</span>(doc, dist)</span><br></pre></td></tr></table></figure>
+
+<p>将 <code>hits[&quot;documents&quot;]</code> 拼入 system 或 user message 即可驱动 Agent 回答。生产环境把 <code>PersistentClient</code> 换成 Qdrant&#x2F;Milvus 对应客户端，<strong>接口模式不变</strong>。</p>
+<hr>
+<h2 id="7-常见陷阱"><a href="#7-常见陷阱" class="headerlink" title="7. 常见陷阱"></a>7. 常见陷阱</h2><table>
+<thead>
+<tr>
+<th>陷阱</th>
+<th>后果</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Chunk 过大&#x2F;过小</strong></td>
+<td>过大噪声多；过小语义碎裂</td>
+<td>512～1024 token，按段落或标题切分，适当 overlap</td>
+</tr>
+<tr>
+<td><strong>无元数据过滤</strong></td>
+<td>召回他人记忆，严重越权</td>
+<td>强制 <code>user_id</code> &#x2F; <code>tenant_id</code> 过滤</td>
+</tr>
+<tr>
+<td><strong>混用 Embedding 模型</strong></td>
+<td>相似度失真</td>
+<td>版本化索引，迁移时全量重嵌</td>
+</tr>
+<tr>
+<td><strong>只检索不校验</strong></td>
+<td>陈旧记忆误导模型</td>
+<td>结合时间戳衰减 + LLM 判断「是否与问题相关」</td>
+</tr>
+<tr>
+<td><strong>忽略重排序</strong></td>
+<td>Top-K 含噪声</td>
+<td>可用 Cross-Encoder 或 LLM rerank 二次精选</td>
+</tr>
+</tbody></table>
+<p>另外：<strong>不要把密钥写进向量库</strong>；敏感内容入库前脱敏。评测时用固定「黄金问题集」测 Recall@K，而非凭感觉调 chunk。</p>
+<hr>
+<h2 id="8-小结"><a href="#8-小结" class="headerlink" title="8. 小结"></a>8. 小结</h2><p>Embedding 与向量检索是 Agent <strong>记忆层</strong> 的基建：它不负责推理，却决定 Agent 能否在有限上下文中「想起」正确信息。建议路径：Chroma 本地跑通 RAG → 加上 metadata 过滤 → 按规模迁移 Qdrant&#x2F;Milvus → 与 LangGraph 的 checkpointer 分工（状态机管流程，向量库管语义记忆）。监控指标建议关注：<strong>检索延迟 P99</strong>、<strong>Recall@5</strong>、<strong>注入 token 占比</strong> 与 <strong>「未找到仍作答」率</strong>，四者联动才能判断记忆系统是否真的在帮 Agent，而不是增加噪声。掌握本文后，即可进入框架层，把检索节点编排进多步 Agent。</p>
+<hr>
+<p><strong>系列导航 Series Navigation：</strong></p>
+<ul>
+<li>上一篇：<a href="/posts/agent-dev-llm-api-guide.html">主流模型 API 调用实战</a></li>
+<li>下一篇：<a href="/posts/agent-dev-langchain-langgraph.html">LangChain &#x2F; LangGraph 核心</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -3061,806 +3300,6 @@ openclaw security audit --fix    # 自动修复常见问题
 <p>OpenClaw 的安全模型是 <strong>「身份先行、范围次之、模型最后」</strong> — 用 Gateway 认证、DM 策略、工具 Profile 和 Exec 审批控制爆炸半径，默认信任单操作者，适合快速搭建个人助理并通过 <code>security audit</code> 渐进加固。Hermes 的安全模型是 <strong>「七层纵深、默认审慎」</strong> — 危险命令人工审批、硬线黑名单、Tirith 扫描、容器隔离、凭证过滤环环相扣，适合对命令执行安全有更高要求的长期运行场景。两者都不是敌对多租户沙箱；若需此类隔离，唯一可靠方案是 <strong>拆分信任边界</strong>，而非在单一 Gateway 上叠加更多审批规则。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw's security model is <strong>identity first, scope second, model last</strong> — Gateway auth, DM policies, tool profiles, and exec approvals control blast radius, defaulting to trusted single-operator UX, hardened progressively via <code>security audit</code>. Hermes's model is <strong>seven-layer defense-in-depth with cautious defaults</strong> — manual approval, hardline blocklist, Tirith scanning, container isolation, and credential filtering for higher-assurance long-running deployments. Neither is a hostile multi-tenant sandbox; for that, the only reliable approach is <strong>splitting trust boundaries</strong>, not piling more approval rules onto one Gateway.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/65592aa7.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/65592aa7.html" class="post-title-link" itemprop="url">Agent Hermes 与 OpenClaw Gateway 架构深度解析</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2026-06-05 05:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T05:00:00+08:00">2026-06-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>最后更新 | Last updated: 2026-06-05</p>
-</blockquote>
-<hr/>
-<h2>一、Gateway 的角色定位 | Gateway Role &amp; Positioning</h2>
-<p><strong>中文</strong></p>
-<p>在两个框架中，Gateway 都是<strong>连接外部世界与 Agent 引擎的枢纽</strong>，但职责权重不同：</p>
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>OpenClaw Gateway</th>
-<th>Hermes Gateway</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>架构地位</td>
-<td><strong>Gateway 即产品</strong> — 唯一控制平面</td>
-<td>Gateway 是入口之一，核心在 AIAgent 引擎</td>
-</tr>
-<tr>
-<td>实现语言</td>
-<td>TypeScript（Node.js）</td>
-<td>Python</td>
-</tr>
-<tr>
-<td>默认端口</td>
-<td><code>18789</code></td>
-<td>无固定公开端口（各平台 Adapter 独立连接）</td>
-</tr>
-<tr>
-<td>进程模型</td>
-<td>单进程 WebSocket 服务</td>
-<td>长驻 <code>GatewayRunner</code> 进程</td>
-</tr>
-<tr>
-<td>Agent 运行时</td>
-<td>Gateway 内嵌或路由到外部 Runtime</td>
-<td>每消息创建 <code>AIAgent</code> 实例</td>
-</tr>
-<tr>
-<td>渠道数量</td>
-<td>50+（含插件）</td>
-<td>20 个内置 Adapter</td>
-</tr>
-<tr>
-<td>控制 UI</td>
-<td>浏览器 Dashboard</td>
-<td>CLI TUI + 各平台原生聊天界面</td>
-</tr>
-</tbody>
-</table>
-<p><strong>English</strong></p>
-<p>In both frameworks, the Gateway is the <strong>hub connecting the external world to the agent engine</strong>, but with different weight:</p>
-<table>
-<thead>
-<tr>
-<th>Dimension</th>
-<th>OpenClaw Gateway</th>
-<th>Hermes Gateway</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Architectural role</td>
-<td><strong>Gateway is the product</strong> — sole control plane</td>
-<td>Gateway is one entry point; core is AIAgent engine</td>
-</tr>
-<tr>
-<td>Language</td>
-<td>TypeScript (Node.js)</td>
-<td>Python</td>
-</tr>
-<tr>
-<td>Default port</td>
-<td><code>18789</code></td>
-<td>No fixed public port (per-platform adapters)</td>
-</tr>
-<tr>
-<td>Process model</td>
-<td>Single WebSocket server</td>
-<td>Long-running <code>GatewayRunner</code></td>
-</tr>
-<tr>
-<td>Agent runtime</td>
-<td>Embedded or routed to external runtime</td>
-<td><code>AIAgent</code> instance per message</td>
-</tr>
-<tr>
-<td>Channels</td>
-<td>50+ (with plugins)</td>
-<td>20 built-in adapters</td>
-</tr>
-<tr>
-<td>Control UI</td>
-<td>Browser dashboard</td>
-<td>CLI TUI + native chat on each platform</td>
-</tr>
-</tbody>
-</table>
-<hr/>
-<h2>二、OpenClaw Gateway 架构 | OpenClaw Gateway Architecture</h2>
-<p><strong>中文</strong></p>
-<h3>2.1 整体架构</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
-    subgraph Clients["客户端"]
-        PHONE[手机聊天 App]
-        WEB[Web Control UI]
-        MAC[macOS App]
-        IOS[iOS/Android Nodes]
-    end
-
-<pre><code>subgraph GW[&quot;OpenClaw Gateway :18789&quot;]
-    WS[WebSocket Server]
-    ROUTE[会话路由 sessionKey]
-    AUTH[认证 gateway.auth]
-    TOOLS[工具执行]
-    MEM[记忆读写]
-end
-
-subgraph Agent[&quot;Agent Runtime&quot;]
-    WP[Workspace 文件注入]
-    SK[Skills 加载]
-    LLM[LLM 调用]
-end
-
-PHONE --&amp;gt; WS
-WEB --&amp;gt; WS
-MAC --&amp;gt; WS
-IOS --&amp;gt; WS
-WS --&amp;gt; ROUTE
-ROUTE --&amp;gt; Agent
-Agent --&amp;gt; TOOLS
-Agent --&amp;gt; MEM
-Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-</code></pre>
-<p>OpenClaw 没有独立的「编排微服务层」——Gateway 接收消息、路由会话、调用 LLM、执行工具、写回响应，全部在一个进程中完成。</p>
-<h3>2.2 消息处理流程</h3>
-<pre><code class="language-text">1. 聊天 App 发来消息
-2. Gateway 接收（WebSocket / 渠道 Webhook）
-3. 解析 sessionKey（路由键，非授权令牌）
-4. 加载对应 Agent 的 Workspace 文件 + Skills
-5. 组装系统提示词，调用 LLM
-6. 若有工具调用 → 执行 shell/文件/浏览器/API
-7. 响应经 Gateway 发回原渠道
-</code></pre>
-<h3>2.3 会话路由（sessionKey）</h3>
-<p><code>sessionKey</code> 是<strong>路由选择器</strong>，决定使用哪个会话上下文，<strong>不是</strong>用户认证令牌。</p>
-<p>常见隔离策略（<code>session.dmScope</code>）：</p>
-<table>
-<thead>
-<tr>
-<th>值</th>
-<th>行为</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>per-channel-peer</code></td>
-<td>每个发送者独立会话（推荐多用户 DM）</td>
-</tr>
-<tr>
-<td><code>per-account-channel-peer</code></td>
-<td>多账号渠道下按账号+发送者隔离</td>
-</tr>
-</tbody>
-</table>
-<h3>2.4 多 Agent 路由</h3>
-<p>OpenClaw 支持在同一 Gateway 上运行多个 Agent，按工作区、发送者或规则路由：</p>
-<pre><code class="language-text">Gateway
-├── Agent A（工作区 ~/.openclaw/workspace-personal）
-├── Agent B（工作区 ~/.openclaw/workspace-work）
-└── 路由规则 → 按 channel / sender / mention 分发
-</code></pre>
-<h3>2.5 渠道接入</h3>
-<p><strong>内置渠道</strong>：WhatsApp、Telegram、Discord、Slack、Signal、iMessage、Google Chat、Microsoft Teams、WebChat 等。</p>
-<p><strong>插件渠道</strong>：Matrix、Nostr、Twitch、Zalo、Feishu 等通过 bundled 或 external channel plugins 扩展。</p>
-<p><strong>Nodes（移动端）</strong>：iOS/Android 设备配对后提供 Canvas、相机、语音等工作流。</p>
-<h3>2.6 配置中心</h3>
-<p>主配置文件：<code>~/.openclaw/openclaw.json</code></p>
-<pre><code class="language-json5">{
-  gateway: {
-    mode: "local",
-    bind: "loopback",
-    auth: { mode: "token", token: "long-random-token" },
-  },
-  channels: {
-    whatsapp: {
-      dmPolicy: "pairing",
-      groups: { "*": { requireMention: true } },
-    },
-  },
-  tools: {
-    profile: "messaging",
-    exec: { security: "deny", ask: "always" },
-  },
-}
-</code></pre>
-<h3>2.7 Web Control UI</h3>
-<p>本地默认：<code>http://127.0.0.1:18789/</code></p>
-<p>提供聊天、配置、会话管理、节点配对的浏览器控制台。远程访问需 Tailscale 或 SSH 隧道。</p>
-<p><strong>English</strong></p>
-<h3>2.1 Overall Architecture</h3>
-<p>Single TypeScript process on port 18789: WebSocket server handles all channels, session routing, tool execution, and memory I/O. No separate orchestration microservice — the Gateway <em>is</em> the product.</p>
-<h3>2.2 Message Flow</h3>
-<p>Chat app → Gateway (WebSocket/webhook) → sessionKey routing → load workspace + skills → LLM → tools → response back to channel.</p>
-<h3>2.3 Session Routing (sessionKey)</h3>
-<p><code>sessionKey</code> is a <strong>routing selector</strong>, not an auth token. <code>session.dmScope</code> controls DM isolation (e.g., <code>per-channel-peer</code> for multi-user inboxes).</p>
-<h3>2.4 Multi-Agent Routing</h3>
-<p>Multiple agents on one Gateway, routed by workspace, sender, or rules.</p>
-<h3>2.5 Channel Integration</h3>
-<p>Built-in channels (WhatsApp, Telegram, Discord, etc.) plus plugin channels (Matrix, Zalo, etc.) and iOS/Android nodes.</p>
-<h3>2.6 Configuration</h3>
-<p>Central config at <code>~/.openclaw/openclaw.json</code> — gateway mode, auth, channel policies, tool profiles.</p>
-<h3>2.7 Web Control UI</h3>
-<p>Browser dashboard at <code>http://127.0.0.1:18789/</code> for chat, config, sessions, and node pairing.</p>
-<hr/>
-<h2>三、Hermes Gateway 架构 | Hermes Gateway Architecture</h2>
-<p><strong>中文</strong></p>
-<h3>3.1 整体架构</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
-    subgraph Platforms["20+ 平台 Adapter"]
-        TG[telegram.py]
-        DC[discord.py]
-        SL[slack.py]
-        WA[whatsapp.py]
-        CN[dingtalk / feishu / wecom / qqbot]
-    end
-
-<pre><code>subgraph GR[&quot;GatewayRunner (gateway/run.py)&quot;]
-    HANDLE[_handle_message]
-    AUTHZ[用户授权]
-    SLASH[斜杠命令分发]
-    AGENT[AIAgent 创建]
-    GUARD[双层消息守卫]
-end
-
-subgraph Core[&quot;共享核心&quot;]
-    AI[AIAgent run_agent.py]
-    SS[SessionStore SQLite]
-    DEL[delivery.py 出站投递]
-end
-
-Platforms --&amp;gt; HANDLE
-HANDLE --&amp;gt; AUTHZ
-AUTHZ --&amp;gt; SLASH
-SLASH --&amp;gt; AGENT
-AGENT --&amp;gt; AI
-AI --&amp;gt; SS
-AI --&amp;gt; DEL
-DEL --&amp;gt; Platforms&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-</code></pre>
-<p>Hermes Gateway 是 <strong>AIAgent 引擎的消息前端</strong>，本身不包含独立的 LLM 编排逻辑。</p>
-<h3>3.2 关键源文件</h3>
-<table>
-<thead>
-<tr>
-<th>文件</th>
-<th>职责</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>gateway/run.py</code></td>
-<td><code>GatewayRunner</code> — 主循环、消息分发、斜杠命令</td>
-</tr>
-<tr>
-<td><code>gateway/session.py</code></td>
-<td><code>SessionStore</code> — 会话持久化、session key 构建</td>
-</tr>
-<tr>
-<td><code>gateway/delivery.py</code></td>
-<td>出站消息投递（回复、跨平台、Cron 投递）</td>
-</tr>
-<tr>
-<td><code>gateway/pairing.py</code></td>
-<td>DM 配对授权流程</td>
-</tr>
-<tr>
-<td><code>gateway/hooks.py</code></td>
-<td>生命周期 Hook 发现与分发</td>
-</tr>
-<tr>
-<td><code>gateway/platforms/*.py</code></td>
-<td>各平台 Adapter</td>
-</tr>
-</tbody>
-</table>
-<h3>3.3 消息处理流程</h3>
-<pre><code class="language-text">平台事件 → Adapter.on_message() → MessageEvent
-        → GatewayRunner._handle_message()
-            1. 解析 session key
-            2. 用户授权检查
-            3. 斜杠命令？→ 命令处理器
-            4. Agent 正在运行？→ 双层守卫（排队/中断/审批）
-            5. 创建 AIAgent → run_conversation()
-            6. 响应经 Adapter 发回
-</code></pre>
-<h3>3.4 Session Key 格式</h3>
-<pre><code class="language-text">agent:main:{platform}:{chat_type}:{chat_id}
-</code></pre>
-<p>示例：<code>agent:main:telegram:private:123456789</code></p>
-<p>线程型平台（Telegram 论坛话题、Discord/Slack 线程）在 <code>chat_id</code> 中包含线程 ID。<strong>禁止手动拼接</strong>，应使用 <code>build_session_key()</code>。</p>
-<h3>3.5 双层消息守卫</h3>
-<p>Agent 正在处理消息时，新消息经过两级拦截：</p>
-<p><strong>Level 1 — Base Adapter</strong>（<code>gateway/platforms/base.py</code>）：<br/>
-- 检查 <code>_active_sessions</code><br/>
-- 活跃会话 → 消息入 <code>_pending_messages</code> 队列，设置中断事件</p>
-<p><strong>Level 2 — GatewayRunner</strong>（<code>gateway/run.py</code>）：<br/>
-- 检查 <code>_running_agents</code><br/>
-- <code>/stop</code>、<code>/approve</code>、<code>/deny</code> 等命令绕过守卫，内联分发<br/>
-- 其他消息触发 <code>running_agent.interrupt()</code></p>
-<h3>3.6 用户授权</h3>
-<p>授权检查顺序（<code>_is_user_authorized()</code>）：</p>
-<ol>
-<li>平台级 allow-all（如 <code>DISCORD_ALLOW_ALL_USERS=true</code>）</li>
-<li>DM 配对已批准列表</li>
-<li>平台 allowlist（如 <code>TELEGRAM_ALLOWED_USERS=12345,67890</code>）</li>
-<li>全局 allowlist（<code>GATEWAY_ALLOWED_USERS</code>）</li>
-<li>全局 allow-all（<code>GATEWAY_ALLOW_ALL_USERS=true</code>）</li>
-<li><strong>默认：拒绝</strong></li>
-</ol>
-<p>未配置任何 allowlist 时，启动日志会警告所有未授权用户将被拒绝。</p>
-<h3>3.7 DM 配对流程</h3>
-<pre><code class="language-text">未知用户发 DM → Bot 回复 8 位配对码
-管理员 CLI：hermes pairing approve telegram ABC12DEF
-用户永久授权（存储于 ~/.hermes/pairing/）
-</code></pre>
-<p>安全特性：密码学随机、1 小时 TTL、10 分钟速率限制、5 次失败锁定 1 小时。</p>
-<h3>3.8 斜杠命令统一分发</h3>
-<p>CLI 与 Gateway 共享命令注册表（<code>hermes_cli/commands.py</code>）：</p>
-<table>
-<thead>
-<tr>
-<th>操作</th>
-<th>命令</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>新对话</td>
-<td><code>/new</code> 或 <code>/reset</code></td>
-</tr>
-<tr>
-<td>换模型</td>
-<td><code>/model [provider:model]</code></td>
-</tr>
-<tr>
-<td>浏览技能</td>
-<td><code>/skills</code> 或 <code>/skill-name</code></td>
-</tr>
-<tr>
-<td>中断</td>
-<td><code>/stop</code>（Gateway）/ <code>Ctrl+C</code>（CLI）</td>
-</tr>
-<tr>
-<td>危险命令审批</td>
-<td><code>/approve</code> / <code>/deny</code></td>
-</tr>
-<tr>
-<td>压缩上下文</td>
-<td><code>/compress</code></td>
-</tr>
-</tbody>
-</table>
-<p>Agent 运行中，部分命令（如 <code>/model</code>）会被拒绝，需先 <code>/stop</code>。</p>
-<h3>3.9 出站投递（Delivery）</h3>
-<p><code>gateway/delivery.py</code> 支持四种投递模式：</p>
-<table>
-<thead>
-<tr>
-<th>模式</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>直接回复</td>
-<td>响应发回 originating chat</td>
-</tr>
-<tr>
-<td>Home Channel</td>
-<td>Cron/后台结果路由到配置的「主频道」</td>
-</tr>
-<tr>
-<td>显式目标</td>
-<td><code>send_message</code> 工具指定 <code>telegram:-1001234567890</code></td>
-</tr>
-<tr>
-<td>跨平台投递</td>
-<td>从 Telegram 收到消息，结果发到 Discord</td>
-</tr>
-</tbody>
-</table>
-<p><strong>设计决策</strong>：Cron 投递<strong>不镜像</strong>进 Gateway 会话历史，避免消息交替违规。</p>
-<h3>3.10 平台 Adapter 列表</h3>
-<table>
-<thead>
-<tr>
-<th>Adapter</th>
-<th>协议/依赖</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>telegram.py</td>
-<td>Telegram Bot API（长轮询或 Webhook）</td>
-</tr>
-<tr>
-<td>discord.py</td>
-<td>discord.py</td>
-</tr>
-<tr>
-<td>slack.py</td>
-<td>Slack Socket Mode</td>
-</tr>
-<tr>
-<td>whatsapp.py</td>
-<td>WhatsApp Business Cloud API</td>
-</tr>
-<tr>
-<td>signal.py</td>
-<td>signal-cli REST</td>
-</tr>
-<tr>
-<td>matrix.py</td>
-<td>mautrix（可选 E2EE）</td>
-</tr>
-<tr>
-<td>dingtalk.py / feishu.py</td>
-<td>钉钉/飞书 WebSocket 或 Webhook</td>
-</tr>
-<tr>
-<td>wecom.py / weixin.py</td>
-<td>企业微信 / 个人微信 iLink</td>
-</tr>
-<tr>
-<td>qqbot/</td>
-<td>腾讯 QQ 官方 API v2</td>
-</tr>
-<tr>
-<td>email.py</td>
-<td>IMAP/SMTP</td>
-</tr>
-<tr>
-<td>sms.py</td>
-<td>Twilio</td>
-</tr>
-<tr>
-<td>homeassistant.py</td>
-<td>Home Assistant 对话集成</td>
-</tr>
-<tr>
-<td>api_server.py</td>
-<td>REST API 适配器</td>
-</tr>
-<tr>
-<td>webhook.py</td>
-<td>通用入站/出站 Webhook</td>
-</tr>
-</tbody>
-</table>
-<h3>3.11 Token 锁（Profile 隔离）</h3>
-<p>使用相同 Bot Token 的 Adapter 在 <code>connect()</code> 时调用 <code>acquire_scoped_lock()</code>，防止多 Profile 同时占用同一 Token。</p>
-<p>每个 Profile（<code>hermes -p &lt;name&gt;</code>）拥有独立的 <code>HERMES_HOME</code>、配置、会话和 Gateway PID。</p>
-<h3>3.12 生命周期 Hooks</h3>
-<table>
-<thead>
-<tr>
-<th>事件</th>
-<th>触发时机</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>gateway:startup</code></td>
-<td>Gateway 进程启动</td>
-</tr>
-<tr>
-<td><code>session:start</code> / <code>session:end</code> / <code>session:reset</code></td>
-<td>会话生命周期</td>
-</tr>
-<tr>
-<td><code>agent:start</code> / <code>agent:step</code> / <code>agent:end</code></td>
-<td>Agent 处理周期</td>
-</tr>
-<tr>
-<td><code>command:*</code></td>
-<td>任意斜杠命令执行</td>
-</tr>
-</tbody>
-</table>
-<p>Hook 目录：<code>~/.hermes/hooks/</code>（用户自定义）</p>
-<h3>3.13 后台维护任务</h3>
-<p>Gateway 并行运行：</p>
-<ul>
-<li><strong>Cron 调度</strong> — 检查到期任务并触发</li>
-<li><strong>会话过期</strong> — 清理超时废弃会话</li>
-<li><strong>记忆刷新</strong> — 会话过期前主动 flush 记忆</li>
-<li><strong>缓存刷新</strong> — 模型列表与 Provider 状态</li>
-</ul>
-<h3>3.14 进程管理</h3>
-<pre><code class="language-bash">hermes gateway start    # 启动
-hermes gateway stop     # 停止当前 Profile
-hermes gateway stop --all  # 停止所有 Profile（更新时用）
-</code></pre>
-<p>PID 文件：<code>~/.hermes/gateway.pid</code>（Profile 作用域）</p>
-<p><strong>English</strong></p>
-<h3>3.1 Overall Architecture</h3>
-<p><code>GatewayRunner</code> is the messaging frontend for the shared <code>AIAgent</code> engine. 20+ platform adapters normalize inbound events; the runner handles auth, slash commands, agent creation, and delivery.</p>
-<h3>3.2 Key Source Files</h3>
-<p><code>gateway/run.py</code> (runner), <code>session.py</code> (persistence), <code>delivery.py</code> (outbound), <code>pairing.py</code> (DM auth), <code>platforms/*.py</code> (adapters).</p>
-<h3>3.3 Message Flow</h3>
-<p>Platform event → adapter → <code>_handle_message()</code> → auth → slash command or AIAgent → response via adapter.</p>
-<h3>3.4 Session Key</h3>
-<p><code>agent:main:{platform}:{chat_type}:{chat_id}</code> — use <code>build_session_key()</code>, never construct manually.</p>
-<h3>3.5 Two-Level Message Guard</h3>
-<p>Adapter-level queuing + runner-level interrupt/approval routing while agent is active.</p>
-<h3>3.6 User Authorization</h3>
-<p>Layered allowlists + DM pairing; default deny if no allowlist configured.</p>
-<h3>3.7 DM Pairing</h3>
-<p>8-char cryptographic codes, TTL, rate limits, lockout. Approved via <code>hermes pairing approve</code>.</p>
-<h3>3.8 Shared Slash Commands</h3>
-<p>CLI and Gateway share <code>COMMAND_REGISTRY</code> — <code>/model</code>, <code>/skills</code>, <code>/stop</code>, <code>/approve</code>, etc.</p>
-<h3>3.9 Delivery Modes</h3>
-<p>Direct reply, home channel, explicit target, cross-platform. Cron deliveries excluded from gateway session history.</p>
-<h3>3.10 Platform Adapters</h3>
-<p>20 built-in adapters covering Telegram, Discord, Slack, WhatsApp, Signal, Matrix, DingTalk, Feishu, WeCom, QQ, email, SMS, Home Assistant, REST API, webhooks, and more.</p>
-<h3>3.11 Profile Isolation</h3>
-<p>Per-profile <code>HERMES_HOME</code>, config, sessions, gateway PID, and token locks.</p>
-<h3>3.12 Hooks &amp; Background Tasks</h3>
-<p>Lifecycle hooks for startup, sessions, agent steps, commands. Background cron ticking, session expiry, memory flush, cache refresh.</p>
-<hr/>
-<h2>四、Gateway 对比矩阵 | Gateway Comparison Matrix</h2>
-<p><strong>中文</strong></p>
-<table>
-<thead>
-<tr>
-<th>能力</th>
-<th>OpenClaw</th>
-<th>Hermes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>核心哲学</td>
-<td>Gateway = 产品</td>
-<td>Gateway = AIAgent 入口</td>
-</tr>
-<tr>
-<td>协议栈</td>
-<td>WebSocket 统一</td>
-<td>每平台原生协议</td>
-</tr>
-<tr>
-<td>控制 UI</td>
-<td>浏览器 Dashboard</td>
-<td>CLI TUI + 各平台聊天</td>
-</tr>
-<tr>
-<td>会话存储</td>
-<td>jsonl 文件</td>
-<td>SQLite state.db</td>
-</tr>
-<tr>
-<td>斜杠命令</td>
-<td>渠道内 + Control UI</td>
-<td>CLI/Gateway 统一注册表</td>
-</tr>
-<tr>
-<td>多 Profile</td>
-<td>Profile 机制</td>
-<td><code>hermes -p &lt;name&gt;</code> 完整隔离</td>
-</tr>
-<tr>
-<td>Cron 投递</td>
-<td>支持</td>
-<td>一等公民，可附 Skills</td>
-</tr>
-<tr>
-<td>跨平台投递</td>
-<td>支持</td>
-<td><code>delivery.py</code> 显式路由</td>
-</tr>
-<tr>
-<td>移动端 Nodes</td>
-<td>iOS/Android 配对</td>
-<td>无原生 Node（靠消息平台）</td>
-</tr>
-<tr>
-<td>从对方迁移</td>
-<td>—</td>
-<td><code>hermes claw migrate</code> 导入消息设置</td>
-</tr>
-</tbody>
-</table>
-<p><strong>English</strong></p>
-<table>
-<thead>
-<tr>
-<th>Capability</th>
-<th>OpenClaw</th>
-<th>Hermes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Core philosophy</td>
-<td>Gateway = product</td>
-<td>Gateway = AIAgent entry</td>
-</tr>
-<tr>
-<td>Protocol</td>
-<td>Unified WebSocket</td>
-<td>Per-platform native protocols</td>
-</tr>
-<tr>
-<td>Control UI</td>
-<td>Browser dashboard</td>
-<td>CLI TUI + platform chats</td>
-</tr>
-<tr>
-<td>Session storage</td>
-<td>jsonl files</td>
-<td>SQLite state.db</td>
-</tr>
-<tr>
-<td>Slash commands</td>
-<td>In-channel + Control UI</td>
-<td>Unified CLI/Gateway registry</td>
-</tr>
-<tr>
-<td>Multi-profile</td>
-<td>Profile mechanism</td>
-<td><code>hermes -p &lt;name&gt;</code> full isolation</td>
-</tr>
-<tr>
-<td>Cron delivery</td>
-<td>Supported</td>
-<td>First-class with skill attachment</td>
-</tr>
-<tr>
-<td>Cross-platform delivery</td>
-<td>Supported</td>
-<td>Explicit <code>delivery.py</code> routing</td>
-</tr>
-<tr>
-<td>Mobile nodes</td>
-<td>iOS/Android pairing</td>
-<td>Via messaging platforms only</td>
-</tr>
-<tr>
-<td>Migration</td>
-<td>—</td>
-<td><code>hermes claw migrate</code> imports messaging config</td>
-</tr>
-</tbody>
-</table>
-<hr/>
-<h2>五、部署模式 | Deployment Patterns</h2>
-<p><strong>中文</strong></p>
-<h3>模式 A：本地 Loopback（最安全）</h3>
-<pre><code class="language-text">笔记本 localhost → Gateway → 仅本机 Control UI / 本地渠道
-</code></pre>
-<ul>
-<li>OpenClaw：<code>gateway.bind: "loopback"</code></li>
-<li>Hermes：Gateway 默认不暴露 HTTP 端口</li>
-</ul>
-<h3>模式 B：VPS + 消息平台（最常见）</h3>
-<pre><code class="language-text">$5 VPS → Gateway 长驻 → Telegram/WhatsApp Bot Token
-用户在手机上对话，Agent 在云端执行
-</code></pre>
-<ul>
-<li>Hermes 推荐 <code>terminal.backend: docker</code> 隔离命令执行</li>
-<li>OpenClaw 推荐 <code>openclaw security audit</code> 加固</li>
-</ul>
-<h3>模式 C：分离式（高安全）</h3>
-<pre><code class="language-text">Gateway 机器（仅消息）──SSH──→ 执行机器（Docker 沙箱）
-</code></pre>
-<ul>
-<li>Hermes 原生支持：<code>terminal.backend: ssh</code></li>
-<li>OpenClaw：通过 sandbox 配置 + 远程 node</li>
-</ul>
-<h3>模式 D：Serverless（Hermes 独有）</h3>
-<pre><code class="language-text">Gateway 在 VPS → Agent 命令发往 Modal/Daytona
-空闲休眠，按需唤醒，接近零闲置成本
-</code></pre>
-<p><strong>English</strong></p>
-<p><strong>Pattern A — Local loopback</strong> (safest): bind to localhost only.</p>
-<p><strong>Pattern B — VPS + messaging</strong> (most common): long-running Gateway on cheap VPS, chat from phone.</p>
-<p><strong>Pattern C — Split trust</strong> (high security): Gateway on one host, execution on another via SSH/Docker sandbox.</p>
-<p><strong>Pattern D — Serverless</strong> (Hermes-specific): Modal/Daytona backends with sleep-on-idle.</p>
-<hr/>
-<h2>六、生产部署清单 | Production Deployment Checklist</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw</h3>
-<ul>
-<li>[ ] <code>openclaw security audit --deep</code> 并修复发现项</li>
-<li>[ ] <code>gateway.bind: "loopback"</code> 或配置 <code>gateway.auth</code></li>
-<li>[ ] <code>dmPolicy: "pairing"</code> + <code>session.dmScope: "per-channel-peer"</code></li>
-<li>[ ] 收紧 <code>tools.profile</code>，禁用不必要的工具组</li>
-<li>[ ] <code>chmod</code> 锁定 <code>~/.openclaw</code> 权限</li>
-<li>[ ] 插件仅加载信任来源</li>
-</ul>
-<h3>Hermes Agent</h3>
-<ul>
-<li>[ ] 配置平台 allowlist，禁用 <code>GATEWAY_ALLOW_ALL_USERS</code></li>
-<li>[ ] <code>terminal.backend: docker</code>（生产 Gateway）</li>
-<li>[ ] 启用 DM pairing</li>
-<li>[ ] <code>chmod 600 ~/.hermes/.env</code></li>
-<li>[ ] 定期审查 <code>command_allowlist</code></li>
-<li>[ ] <code>hermes doctor</code> 检查供应链告警</li>
-</ul>
-<p><strong>English</strong></p>
-<p><strong>OpenClaw</strong>: run security audit, bind loopback or enable auth, pairing DM policy, tighten tool profile, lock filesystem permissions, trust-only plugins.</p>
-<p><strong>Hermes</strong>: configure allowlists, use Docker backend, enable DM pairing, secure <code>.env</code>, audit command allowlist, run <code>hermes doctor</code>.</p>
-<hr/>
-<h2>七、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
-<p>OpenClaw Gateway 是 <strong>「多渠道操作系统」</strong> — 用单一 WebSocket 控制平面统一 50+ 渠道，适合需要极致连接广度与浏览器控制台的场景。Hermes Gateway 是 <strong>「Agent 引擎的消息前端」</strong> — 20 个 Adapter 接入同一 AIAgent 核心，与 CLI、ACP、Cron 共享会话存储与斜杠命令，适合需要统一学习闭环与跨入口一致体验的场景。二者都能让你「在 Telegram 上发消息、Agent 在云端干活」，选型应优先考虑你对 <strong>连接广度</strong> 还是 <strong>引擎深度</strong> 的需求。</p>
-<p><strong>English</strong></p>
-<p>OpenClaw Gateway is a <strong>multi-channel operating system</strong> — one WebSocket control plane for 50+ channels, ideal for maximum connectivity and a browser dashboard. Hermes Gateway is the <strong>messaging frontend for the agent engine</strong> — 20 adapters into one AIAgent core, sharing session storage and slash commands with CLI, ACP, and Cron. Both let you "message from Telegram while the agent works in the cloud"; choose based on whether you need <strong>connectivity breadth</strong> or <strong>engine depth</strong>.</p>
 
       
     </div>
