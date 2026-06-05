@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">351</span>
+          <span class="site-state-item-count">352</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -206,6 +206,235 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e1607c99.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/e1607c99.html" class="post-title-link" itemprop="url">mysql-为什么我只改一行的语句锁这么多</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-25 22:13:30" itemprop="dateCreated datePublished" datetime="2019-11-25T22:13:30+08:00">2019-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>为什么我只改一行的语句，锁这么多在上一篇文章中，我和你介绍了间隙锁和next-key lock的概念，但是并没有说明加锁规则。</p>
+<p>间隙锁的概念理解起来确实有点儿难，尤其在配合上行锁以后，很容易在判断是否会出现锁等待的问题上犯错。</p>
+<p>所以今天，我们就先从这个加锁规则开始吧。</p>
+<p>首先说明一下，这些加锁规则我没在别的地方看到过有类似的总结，以前我自己判断的时候都是想着代码里面的实现来脑补的。</p>
+<p>这次为了总结成不看代码的同学也能理解的规则，是我又重新刷了代码临时总结出来的。</p>
+<p>所以，这个规则有以下两条前提说明：</p>
+<ol>
+<li><p>MySQL后面的版本可能会改变加锁策略，所以这个规则只限于截止到现在的最新版本，即5.x系列&lt;=5.7.24，8.0系列 &lt;=8.0.13。</p>
+</li>
+<li><p>如果大家在验证中有发现bad case的话，请提出来，我会再补充进这篇文章，使得一起学习本专栏的所有同学都能受益。</p>
+</li>
+</ol>
+<p>因为间隙锁在可重复读隔离级别下才有效，所以本篇文章接下来的描述，若没有特殊说明，默认是可重复读隔离级别。</p>
+<p>我总结的加锁规则里面，包含了两个“原则”、两个“优化”和一个“bug”。</p>
+<ol>
+<li>原则1：加锁的基本单位是next-key lock。</li>
+</ol>
+<p>希望你还记得，next-key lock是前开后闭区间。</p>
+<ol start="2">
+<li><p>原则2：查找过程中访问到的对象才会加锁。</p>
+</li>
+<li><p>优化1：索引上的等值查询，给唯一索引加锁的时候，next-key lock退化为行锁。</p>
+</li>
+<li><p>优化2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-keylock退化为间隙锁。</p>
+</li>
+<li><p>一个bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止。</p>
+</li>
+</ol>
+<p>我还是以上篇文章的表t为例，和你解释一下这些规则。</p>
+<p>表t的建表语句和初始化语句如下。</p>
+<p>接下来的例子基本都是配合着图片说明的，所以我建议你可以对照着文稿看，有些例子可能会“毁三观”，也建议你读完文章后亲手实践一下。</p>
+<p>案例一：等值查询间隙锁第一个例子是关于等值条件操作间隙：</p>
+<p>图1 等值查询的间隙锁由于表t中没有id=7的记录，所以用我们上面提到的加锁规则判断一下的话：</p>
+<p>CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY `c  ̀(̀ c )̀) ENGINE=InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);1. 根据原则1，加锁单位是next-key lock，session A加锁范围就是(5,10]；</p>
+<ol start="2">
+<li>同时根据优化2，这是一个等值查询(id=7)，而id=10不满足查询条件，next-key lock退化成间隙锁，因此最终加锁的范围是(5,10)。</li>
+</ol>
+<p>所以，session B要往这个间隙里面插入id=8的记录会被锁住，但是session C修改id=10这行是可以的。</p>
+<p>案例二：非唯一索引等值锁第二个例子是关于覆盖索引上的锁：</p>
+<p>图2 只加在非唯一索引上的锁看到这个例子，你是不是有一种“该锁的不锁，不该锁的乱锁”的感觉？我们来分析一下吧。</p>
+<p>这里session A要给索引c上c=5的这一行加上读锁。</p>
+<ol>
+<li><p>根据原则1，加锁单位是next-key lock，因此会给(0,5]加上next-key lock。</p>
+</li>
+<li><p>要注意c是普通索引，因此仅访问c=5这一条记录是不能马上停下来的，需要向右遍历，查到c=10才放弃。</p>
+</li>
+</ol>
+<p>根据原则2，访问到的都要加锁，因此要给(5,10]加next-key lock。</p>
+<ol start="3">
+<li><p>但是同时这个符合优化2：等值判断，向右遍历，最后一个值不满足c=5这个等值条件，因此退化成间隙锁(5,10)。</p>
+</li>
+<li><p>根据原则2 ，只有访问到的对象才会加锁，这个查询使用覆盖索引，并不需要访问主键索引，所以主键索引上没有加任何锁，这就是为什么session B的update语句可以执行完成。</p>
+</li>
+</ol>
+<p>但session C要插入一个(7,7,7)的记录，就会被session A的间隙锁(5,10)锁住。</p>
+<p>需要注意，在这个例子中，lock in share mode只锁覆盖索引，但是如果是for update就不一样了。</p>
+<p> 执行 for update时，系统会认为你接下来要更新数据，因此会顺便给主键索引上满足条件的行加上行锁。</p>
+<p>这个例子说明，锁是加在索引上的；同时，它给我们的指导是，如果你要用lock in share mode来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段。</p>
+<p>比如，将session A的查询语句改成select d from t where c=5 lock in share mode。</p>
+<p>你可以自己验证一下效果。</p>
+<p>案例三：主键索引范围锁第三个例子是关于范围查询的。</p>
+<p>举例之前，你可以先思考一下这个问题：对于我们这个表t，下面这两条查询语句，加锁范围相同吗？你可能会想，id定义为int类型，这两个语句就是等价的吧？其实，它们并不完全等价。</p>
+<p>在逻辑上，这两条查语句肯定是等价的，但是它们的加锁规则不太一样。</p>
+<p>现在，我们就让session A执行第二个查询语句，来看看加锁效果。</p>
+<p>图3 主键索引上范围查询的锁现在我们就用前面提到的加锁规则，来分析一下session A 会加什么锁呢？mysql&gt; select * from t where id=10 for update;mysql&gt; select * from t where id&gt;=10 and id&lt;11 for update;1. 开始执行的时候，要找到第一个id=10的行，因此本该是next-key lock(5,10]。</p>
+<p> 根据优化1，主键id上的等值条件，退化成行锁，只加了id=10这一行的行锁。</p>
+<ol start="2">
+<li>范围查找就往后继续找，找到id=15这一行停下来，因此需要加next-key lock(10,15]。</li>
+</ol>
+<p>所以，session A这时候锁的范围就是主键索引上，行锁id=10和next-key lock(10,15]。</p>
+<p>这样，session B和session C的结果你就能理解了。</p>
+<p>这里你需要注意一点，首次session A定位查找id=10的行的时候，是当做等值查询来判断的，而向右扫描到id=15的时候，用的是范围查询判断。</p>
+<p>案例四：非唯一索引范围锁接下来，我们再看两个范围查询加锁的例子，你可以对照着案例三来看。</p>
+<p>需要注意的是，与案例三不同的是，案例四中查询语句的where部分用的是字段c。</p>
+<p>图4 非唯一索引范围锁这次session A用字段c来判断，加锁规则跟案例三唯一的不同是：在第一次用c=10定位记录的时候，索引c上加了(5,10]这个next-key lock后，由于索引c是非唯一索引，没有优化规则，也就是说不会蜕变为行锁，因此最终sesion A加的锁是，索引c上的(5,10] 和(10,15] 这两个next-keylock。</p>
+<p>所以从结果上来看，sesson B要插入（8,8,8)的这个insert语句时就被堵住了。</p>
+<p>这里需要扫描到c=15才停止扫描，是合理的，因为InnoDB要扫到c=15，才知道不需要继续往后找了。</p>
+<p>案例五：唯一索引范围锁bug前面的四个案例，我们已经用到了加锁规则中的两个原则和两个优化，接下来再看一个关于加锁规则中bug的案例。</p>
+<p>图5 唯一索引范围锁的bugsession A是一个范围查询，按照原则1的话，应该是索引id上只加(10,15]这个next-key lock，并且因为id是唯一键，所以循环判断到id=15这一行就应该停止了。</p>
+<p>但是实现上，InnoDB会往前扫描到第一个不满足条件的行为止，也就是id=20。</p>
+<p>而且由于这是个范围扫描，因此索引id上的(15,20]这个next-key lock也会被锁上。</p>
+<p>所以你看到了，session B要更新id=20这一行，是会被锁住的。</p>
+<p>同样地，session C要插入id=16的一行，也会被锁住。</p>
+<p>照理说，这里锁住id=20这一行的行为，其实是没有必要的。</p>
+<p>因为扫描到id=15，就可以确定不用往后再找了。</p>
+<p>但实现上还是这么做了，因此我认为这是个bug。</p>
+<p>我也曾找社区的专家讨论过，官方bug系统上也有提到，但是并未被verified。</p>
+<p>所以，认为这是bug这个事儿，也只能算我的一家之言，如果你有其他见解的话，也欢迎你提出来。</p>
+<p>案例六：非唯一索引上存在”等值”的例子接下来的例子，是为了更好地说明“间隙”这个概念。</p>
+<p>这里，我给表t插入一条新记录。</p>
+<p>新插入的这一行c=10，也就是说现在表里有两个c=10的行。</p>
+<p>那么，这时候索引c上的间隙是什么状态了呢？你要知道，由于非唯一索引上包含主键的值，所以是不可能存在“相同”的两行的。</p>
+<p>mysql&gt; insert into t values(30,10,30);图6 非唯一索引等值的例子可以看到，虽然有两个c=10，但是它们的主键值id是不同的（分别是10和30），因此这两个c=10的记录之间，也是有间隙的。</p>
+<p>图中我画出了索引c上的主键id。</p>
+<p>为了跟间隙锁的开区间形式进行区别，我用(c=10,id=30)这样的形式，来表示索引上的一行。</p>
+<p>现在，我们来看一下案例六。</p>
+<p>这次我们用delete语句来验证。</p>
+<p>注意，delete语句加锁的逻辑，其实跟select … for update 是类似的，也就是我在文章开始总结的两个“原则”、两个“优化”和一个“bug”。</p>
+<p>图7 delete 示例这时，session A在遍历的时候，先访问第一个c=10的记录。</p>
+<p>同样地，根据原则1，这里加的是(c=5,id=5)到(c=10,id=10)这个next-key lock。</p>
+<p>然后，session A向右查找，直到碰到(c=15,id=15)这一行，循环才结束。</p>
+<p>根据优化2，这是一个等值查询，向右查找到了不满足条件的行，所以会退化成(c=10,id=10) 到 (c=15,id=15)的间隙锁。</p>
+<p>也就是说，这个delete语句在索引c上的加锁范围，就是下图中蓝色区域覆盖的部分。</p>
+<p>图8 delete加锁效果示例这个蓝色区域左右两边都是虚线，表示开区间，即(c=5,id=5)和(c=15,id=15)这两行上都没有锁。</p>
+<p>案例七：limit 语句加锁例子6也有一个对照案例，场景如下所示：</p>
+<p>图9 limit 语句加锁这个例子里，session A的delete语句加了 limit 2。</p>
+<p>你知道表t里c=10的记录其实只有两条，因此加不加limit 2，删除的效果都是一样的，但是加锁的效果却不同。</p>
+<p>可以看到，session B的insert语句执行通过了，跟案例六的结果不同。</p>
+<p>这是因为，案例七里的delete语句明确加了limit 2的限制，因此在遍历到(c=10, id=30)这一行之后，满足条件的语句已经有两条，循环就结束了。</p>
+<p>因此，索引c上的加锁范围就变成了从（c=5,id=5)到（c=10,id=30)这个前开后闭区间，如下图所示：</p>
+<p>图10 带limit 2的加锁效果可以看到，(c=10,id=30）之后的这个间隙并没有在加锁范围里，因此insert语句插入c=12是可以执行成功的。</p>
+<p>这个例子对我们实践的指导意义就是，在删除数据的时候尽量加limit。</p>
+<p>这样不仅可以控制删除数据的条数，让操作更安全，还可以减小加锁的范围。</p>
+<p>案例八：一个死锁的例子前面的例子中，我们在分析的时候，是按照next-key lock的逻辑来分析的，因为这样分析比较方便。</p>
+<p>最后我们再看一个案例，目的是说明：next-key lock实际上是间隙锁和行锁加起来的结果。</p>
+<p>你一定会疑惑，这个概念不是一开始就说了吗？不要着急，我们先来看下面这个例子：</p>
+<p>图11 案例八的操作序列现在，我们按时间顺序来分析一下为什么是这样的结果。</p>
+<ol>
+<li><p>session A 启动事务后执行查询语句加lock in share mode，在索引c上加了next-keylock(5,10] 和间隙锁(10,15)；</p>
+</li>
+<li><p>session B 的update语句也要在索引c上加next-key lock(5,10] ，进入锁等待；</p>
+</li>
+<li><p>然后session A要再插入(8,8,8)这一行，被session B的间隙锁锁住。</p>
+</li>
+</ol>
+<p>由于出现了死锁，InnoDB让session B回滚。</p>
+<p>你可能会问，session B的next-key lock不是还没申请成功吗？其实是这样的，session B的“加next-key lock(5,10] ”操作，实际上分成了两步，先是加(5,10)的间隙锁，加锁成功；然后加c=10的行锁，这时候才被锁住的。</p>
+<p>也就是说，我们在分析加锁规则的时候可以用next-key lock来分析。</p>
+<p>但是要知道，具体执行的时候，是要分成间隙锁和行锁两段来执行的。</p>
+<p>小结这里我再次说明一下，我们上面的所有案例都是在可重复读隔离级别(repeatable-read)下验证的。</p>
+<p>同时，可重复读隔离级别遵守两阶段锁协议，所有加锁的资源，都是在事务提交或者回滚的时候才释放的。</p>
+<p>在最后的案例中，你可以清楚地知道next-key lock实际上是由间隙锁加行锁实现的。</p>
+<p>如果切换到读提交隔离级别(read-committed)的话，就好理解了，过程中去掉间隙锁的部分，也就是只剩下行锁的部分。</p>
+<p>其实读提交隔离级别在外键场景下还是有间隙锁，相对比较复杂，我们今天先不展开。</p>
+<p>另外，在读提交隔离级别下还有一个优化，即：语句执行过程中加上的行锁，在语句执行完成后，就要把“不满足条件的行”上的行锁直接释放了，不需要等到事务提交。</p>
+<p>也就是说，读提交隔离级别下，锁的范围更小，锁的时间更短，这也是不少业务都默认使用读提交隔离级别的原因。</p>
+<p>不过，我希望你学过今天的课程以后，可以对next-key lock的概念有更清晰的认识，并且会用加锁规则去判断语句的加锁范围。</p>
+<p>在业务需要使用可重复读隔离级别的时候，能够更细致地设计操作数据库的语句，解决幻读问题的同时，最大限度地提升系统并行处理事务的能力。</p>
+<p>经过这篇文章的介绍，你再看一下上一篇文章最后的思考题，再来尝试分析一次。</p>
+<p>我把题目重新描述和简化一下：还是我们在文章开头初始化的表t，里面有6条记录，图12的语句序列中，为什么session B的insert操作，会被锁住呢？图12 锁分析思考题另外，如果你有兴趣多做一些实验的话，可以设计好语句序列，在执行之前先自己分析一下，然后实际地验证结果是否跟你的分析一致。</p>
+<p>对于那些你自己无法解释的结果，可以发到评论区里，后面我争取挑一些有趣的案例在文章中分析。</p>
+<p>你可以把你关于思考题的分析写在留言区，也可以分享你自己设计的锁验证方案，我会在下一篇文章的末尾选取有趣的评论跟大家分享。</p>
+<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+<p>上期问题时间上期的问题，我在本期继续作为了课后思考题，所以会在下篇文章再一起公布“答案”。</p>
+<p>这里，我展开回答一下评论区几位同学的问题。</p>
+<p>@令狐少侠 说，以前一直认为间隙锁只在二级索引上有。</p>
+<p>现在你知道了，有间隙的地方就可能有间隙锁。</p>
+<p>@浪里白条 同学问，如果是varchar类型，加锁规则是什么样的。</p>
+<p>回答：实际上在判断间隙的时候，varchar和int是一样的，排好序以后，相邻两个值之间就有间隙。</p>
+<p>有几位同学提到说，上一篇文章自己验证的结果跟案例一不同，就是在session A执行完这两个语句：</p>
+<p>以后，session B 的update 和session C的insert 都会被堵住。</p>
+<p>这是不是跟文章的结论矛盾？其实不是的，这个例子用的是反证假设，就是假设不堵住，会出现问题；然后，推导出sessionA需要锁整个表所有的行和所有间隙。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2160,198 +2389,6 @@
 <p>这个答复里面包含了“优化成本和收益”的思想，我觉得值得at出来。</p>
 <p>@小潘 同学提了另外一个极致的方向。</p>
 <p>如果碰到表数据量特别大的场景，通过这种方式的收益是很不错的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e1ece7cd.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/e1ece7cd.html" class="post-title-link" itemprop="url">mysql-怎么给字符串字段加索引</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-11-11 22:08:14" itemprop="dateCreated datePublished" datetime="2019-11-11T22:08:14+08:00">2019-11-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>怎么给字符串字段加索引？现在，几乎所有的系统都支持邮箱登录，如何在邮箱这样的字段上建立合理的索引，是我们今天要讨论的问题。</p>
-<p>假设，你现在维护一个支持邮箱登录的系统，用户表是这么定义的：</p>
-<p>由于要使用邮箱登录，所以业务代码中一定会出现类似于这样的语句：</p>
-<p>从第4和第5篇讲解索引的文章中，我们可以知道，如果email这个字段上没有索引，那么这个语句就只能做全表扫描。</p>
-<p>同时，MySQL是支持前缀索引的，也就是说，你可以定义字符串的一部分作为索引。</p>
-<p>默认地，mysql&gt; create table SUser(ID bigint unsigned primary key,email varchar(64), … )engine=innodb; mysql&gt; select f1, f2 from SUser where email=’xxx’;如果你创建索引的语句不指定前缀长度，那么索引就会包含整个字符串。</p>
-<p>比如，这两个在email字段上创建索引的语句：</p>
-<p>第一个语句创建的index1索引里面，包含了每个记录的整个字符串；而第二个语句创建的index2索引里面，对于每个记录都是只取前6个字节。</p>
-<p>那么，这两种不同的定义在数据结构和存储上有什么区别呢？如图2和3所示，就是这两个索引的示意图。</p>
-<p>图1 email 索引结构mysql&gt; alter table SUser add index index1(email);或mysql&gt; alter table SUser add index index2(email(6));图2 email(6) 索引结构从图中你可以看到，由于email(6)这个索引结构中每个邮箱字段都只取前6个字节（即：</p>
-<p>zhangs），所以占用的空间会更小，这就是使用前缀索引的优势。</p>
-<p>但，这同时带来的损失是，可能会增加额外的记录扫描次数。</p>
-<p>接下来，我们再看看下面这个语句，在这两个索引定义下分别是怎么执行的。</p>
-<p>如果使用的是index1（即email整个字符串的索引结构），执行顺序是这样的：</p>
-<ol>
-<li><p>从index1索引树找到满足索引值是’<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>’的这条记录，取得ID2的值；</p>
-</li>
-<li><p>到主键上查到主键值是ID2的行，判断email的值是正确的，将这行记录加入结果集；</p>
-</li>
-<li><p>取index1索引树上刚刚查到的位置的下一条记录，发现已经不满足email=‘<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>’的条件了，循环结束。</p>
-</li>
-</ol>
-<p>这个过程中，只需要回主键索引取一次数据，所以系统认为只扫描了一行。</p>
-<p>select id,name,email from SUser where email=‘<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>‘;如果使用的是index2（即email(6)索引结构），执行顺序是这样的：</p>
-<ol>
-<li><p>从index2索引树找到满足索引值是’zhangs’的记录，找到的第一个是ID1；</p>
-</li>
-<li><p>到主键上查到主键值是ID1的行，判断出email的值不是’<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>’，这行记录丢弃；</p>
-</li>
-<li><p>取index2上刚刚查到的位置的下一条记录，发现仍然是’zhangs’，取出ID2，再到ID索引上取整行然后判断，这次值对了，将这行记录加入结果集；</p>
-</li>
-<li><p>重复上一步，直到在idxe2上取到的值不是’zhangs’时，循环结束。</p>
-</li>
-</ol>
-<p>在这个过程中，要回主键索引取4次数据，也就是扫描了4行。</p>
-<p>通过这个对比，你很容易就可以发现，使用前缀索引后，可能会导致查询语句读数据的次数变多。</p>
-<p>但是，对于这个查询语句来说，如果你定义的index2不是email(6)而是email(7），也就是说取email字段的前7个字节来构建索引的话，即满足前缀’zhangss’的记录只有一个，也能够直接查到ID2，只扫描一行就结束了。</p>
-<p>也就是说使用前缀索引，定义好长度，就可以做到既节省空间，又不用额外增加太多的查询成本。</p>
-<p>于是，你就有个问题：当要给字符串创建前缀索引时，有什么方法能够确定我应该使用多长的前缀呢？实际上，我们在建立索引时关注的是区分度，区分度越高越好。</p>
-<p>因为区分度越高，意味着重复的键值越少。</p>
-<p>因此，我们可以通过统计索引上有多少个不同的值来判断要使用多长的前缀。</p>
-<p>首先，你可以使用下面这个语句，算出这个列上有多少个不同的值：</p>
-<p>然后，依次选取不同长度的前缀来看这个值，比如我们要看一下4~7个字节的前缀索引，可以用这个语句：</p>
-<p>mysql&gt; select count(distinct email) as L from SUser;当然，使用前缀索引很可能会损失区分度，所以你需要预先设定一个可以接受的损失比例，比如5%。</p>
-<p>然后，在返回的L4~L7中，找出不小于 L * 95%的值，假设这里L6、L7都满足，你就可以选择前缀长度为6。</p>
-<p>前缀索引对覆盖索引的影响前面我们说了使用前缀索引可能会增加扫描行数，这会影响到性能。</p>
-<p>其实，前缀索引的影响不止如此，我们再看一下另外一个场景。</p>
-<p>你先来看看这个SQL语句：</p>
-<p>与前面例子中的SQL语句相比，这个语句只要求返回id和email字段。</p>
-<p>所以，如果使用index1（即email整个字符串的索引结构）的话，可以利用覆盖索引，从index1查到结果后直接就返回了，不需要回到ID索引再去查一次。</p>
-<p>而如果使用index2（即email(6)索引结构）的话，就不得不回到ID索引再去判断email字段的值。</p>
-<p>即使你将index2的定义修改为email(18)的前缀索引，这时候虽然index2已经包含了所有的信息，但InnoDB还是要回到id索引再查一下，因为系统并不确定前缀索引的定义是否截断了完整信息。</p>
-<p>也就是说，使用前缀索引就用不上覆盖索引对查询性能的优化了，这也是你在选择是否使用前缀索引时需要考虑的一个因素。</p>
-<p>其他方式对于类似于邮箱这样的字段来说，使用前缀索引的效果可能还不错。</p>
-<p>但是，遇到前缀的区分度不mysql&gt; select   count(distinct left(email,4)）as L4,  count(distinct left(email,5)）as L5,  count(distinct left(email,6)）as L6,  count(distinct left(email,7)）as L7,from SUser;select id,email from SUser where email=‘<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>‘;select id,name,email from SUser where email=‘<a href="mailto:zhangssxyz@xxx.com">zhangssxyz@xxx.com</a>‘;够好的情况时，我们要怎么办呢？比如，我们国家的身份证号，一共18位，其中前6位是地址码，所以同一个县的人的身份证号前6位一般会是相同的。</p>
-<p>假设你维护的数据库是一个市的公民信息系统，这时候如果对身份证号做长度为6的前缀索引的话，这个索引的区分度就非常低了。</p>
-<p>按照我们前面说的方法，可能你需要创建长度为12以上的前缀索引，才能够满足区分度要求。</p>
-<p>但是，索引选取的越长，占用的磁盘空间就越大，相同的数据页能放下的索引值就越少，搜索的效率也就会越低。</p>
-<p>那么，如果我们能够确定业务需求里面只有按照身份证进行等值查询的需求，还有没有别的处理方法呢？这种方法，既可以占用更小的空间，也能达到相同的查询效率。</p>
-<p>答案是，有的。</p>
-<p>第一种方式是使用倒序存储。</p>
-<p>如果你存储身份证号的时候把它倒过来存，每次查询的时候，你可以这么写：</p>
-<p>由于身份证号的最后6位没有地址码这样的重复逻辑，所以最后这6位很可能就提供了足够的区分度。</p>
-<p>当然了，实践中你不要忘记使用count(distinct)方法去做个验证。</p>
-<p>第二种方式是使用hash字段。</p>
-<p>你可以在表上再创建一个整数字段，来保存身份证的校验码，同时在这个字段上创建索引。</p>
-<p>然后每次插入新记录的时候，都同时用crc32()这个函数得到校验码填到这个新字段。</p>
-<p>由于校验码可能存在冲突，也就是说两个不同的身份证号通过crc32()函数得到的结果可能是相同的，所以你的查询语句where部分要判断id_card的值是否精确相同。</p>
-<p>这样，索引的长度变成了4个字节，比原来小了很多。</p>
-<p>mysql&gt; select field_list from t where id_card = reverse(‘input_id_card_string’);mysql&gt; alter table t add id_card_crc int unsigned, add index(id_card_crc);mysql&gt; select field_list from t where id_card_crc=crc32(‘input_id_card_string’) and id_card=’input_id_card_string’接下来，我们再一起看看使用倒序存储和使用hash字段这两种方法的异同点。</p>
-<p>首先，它们的相同点是，都不支持范围查询。</p>
-<p>倒序存储的字段上创建的索引是按照倒序字符串的方式排序的，已经没有办法利用索引方式查出身份证号码在[ID_X, ID_Y]的所有市民了。</p>
-<p>同样地，hash字段的方式也只能支持等值查询。</p>
-<p>它们的区别，主要体现在以下三个方面：</p>
-<ol>
-<li>从占用的额外空间来看，倒序存储方式在主键索引上，不会消耗额外的存储空间，而hash字段方法需要增加一个字段。</li>
-</ol>
-<p>当然，倒序存储方式使用4个字节的前缀长度应该是不够的，如果再长一点，这个消耗跟额外这个hash字段也差不多抵消了。</p>
-<ol start="2">
-<li>在CPU消耗方面，倒序方式每次写和读的时候，都需要额外调用一次reverse函数，而hash字段的方式需要额外调用一次crc32()函数。</li>
-</ol>
-<p>如果只从这两个函数的计算复杂度来看的话，reverse函数额外消耗的CPU资源会更小些。</p>
-<ol start="3">
-<li>从查询效率上看，使用hash字段方式的查询性能相对更稳定一些。</li>
-</ol>
-<p>因为crc32算出来的值虽然有冲突的概率，但是概率非常小，可以认为每次查询的平均扫描行数接近1。</p>
-<p>而倒序存储方式毕竟还是用的前缀索引的方式，也就是说还是会增加扫描行数。</p>
-<p>小结在今天这篇文章中，我跟你聊了聊字符串字段创建索引的场景。</p>
-<p>我们来回顾一下，你可以使用的方式有：</p>
-<ol>
-<li><p>直接创建完整索引，这样可能比较占用空间；</p>
-</li>
-<li><p>创建前缀索引，节省空间，但会增加查询扫描次数，并且不能使用覆盖索引；</p>
-</li>
-<li><p>倒序存储，再创建前缀索引，用于绕过字符串本身前缀的区分度不够的问题；</p>
-</li>
-<li><p>创建hash字段索引，查询性能稳定，有额外的存储和计算消耗，跟第三种方式一样，都不支持范围扫描。</p>
-</li>
-</ol>
-<p>在实际应用中，你要根据业务字段的特点选择使用哪种方式。</p>
-<p>好了，又到了最后的问题时间。</p>
-<p>如果你在维护一个学校的学生信息数据库，学生登录名的统一格式是”学号@gmail.com”, 而学号的规则是：十五位的数字，其中前三位是所在城市编号、第四到第六位是学校编号、第七位到第十位是入学年份、最后五位是顺序编号。</p>
-<p>系统登录的时候都需要学生输入登录名和密码，验证正确后才能继续使用系统。</p>
-<p>就只考虑登录验证这个行为的话，你会怎么设计这个登录名的索引呢？你可以把你的分析思路和设计结果写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上篇文章中的第一个例子，评论区有几位同学说没有复现，大家要检查一下隔离级别是不是RR（Repeatable Read，可重复读），创建的表t是不是InnoDB引擎。</p>
-<p>我把复现过程做成了一个视频，供你参考。</p>
-<p>在上一篇文章最后，我给你留的问题是，为什么经过这个操作序列，explain的结果就不对了？这里，我来为你分析一下原因。</p>
-<p>delete 语句删掉了所有的数据，然后再通过call idata()插入了10万行数据，看上去是覆盖了原来的10万行。</p>
-<p>但是，session A开启了事务并没有提交，所以之前插入的10万行数据是不能删除的。</p>
-<p>这样，之前的数据每一行数据都有两个版本，旧版本是delete之前的数据，新版本是标记为deleted的数据。</p>
-<p>这样，索引a上的数据其实就有两份。</p>
-<p>然后你会说，不对啊，主键上的数据也不能删，那没有使用force index的语句，使用explain命令看到的扫描行数为什么还是100000左右？（潜台词，如果这个也翻倍，也许优化器还会认为选字段a作为索引更合适）是的，不过这个是主键，主键是直接按照表的行数来估计的。</p>
-<p>而表的行数，优化器直接用的是show table status的值。</p>
-<p>这个值的计算方法，我会在后面有文章为你详细讲解。</p>
 
       
     </div>
