@@ -1,8 +1,8 @@
 ---
 title: "leetcode 47 Solution"
 disableNunjucks: true
-date: 2016-02-18T22:13:05.000Z
-updated: 2023-01-06T08:17:38.310Z
+date: 2016-02-18T14:13:05.000Z
+updated: 2023-01-06T00:17:38.310Z
 categories:
   - "algrithom"
 tags:

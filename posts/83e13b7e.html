@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.4.2">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,40 +14,36 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
-  </script>
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-  <meta name="description" content="系统讲解 Hermes 70+ 工具与 6 种执行后端、OpenClaw tools.profile 与沙箱策略，中英文对照。">
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、工具体系概览 | Tool System Overview 中文 两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：    维度 OpenClaw（龙虾） Hermes Agent     工具数量 核心内置 + 插件扩展 70+ 工具，28 toolsets   组织方式 tools.profile">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 工具链与执行环境全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/83e13b7e.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="系统讲解 Hermes 70+ 工具与 6 种执行后端、OpenClaw tools.profile 与沙箱策略，中英文对照。">
-<meta property="og:locale">
-<meta property="article:published_time" content="2026-06-06T03:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-06T03:00:00.000Z">
+<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、工具体系概览 | Tool System Overview 中文 两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：    维度 OpenClaw（龙虾） Hermes Agent     工具数量 核心内置 + 插件扩展 70+ 工具，28 toolsets   组织方式 tools.profile">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-05T19:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T19:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
-<meta property="article:tag" content="AI Agent;Tools;Hermes;OpenClaw">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="Hermes">
+<meta property="article:tag" content="OpenClaw">
+<meta property="article:tag" content="Tools">
 <meta name="twitter:card" content="summary">
+
 
 <link rel="canonical" href="https://www.fastolf.com/posts/83e13b7e.html">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'zh-Hans'
-  };
-</script>
-<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>Agent Hermes 与 OpenClaw 工具链与执行环境全解析 | Qi</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/83e13b7e.html","path":"posts/83e13b7e.html","title":"Agent Hermes 与 OpenClaw 工具链与执行环境全解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Agent Hermes 与 OpenClaw 工具链与执行环境全解析 | Qi</title>
   
 
 
@@ -54,57 +51,62 @@
 
 
 
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
   </div>
 
   <div class="site-meta">
 
     <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Qi</h1>
-      <span class="logo-line-after"><i></i></span>
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
   </div>
 
   <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
@@ -112,34 +114,8 @@
 
 
 
-
 <nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -151,106 +127,151 @@
 
   <div class="search-pop-overlay">
     <div class="popup search-popup">
-        <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result">
-  <div id="no-result">
-    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
-  </div>
-</div>
-
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
     </div>
   </div>
 
-</div>
-    </header>
+</header>
+        
+  
+  <aside class="sidebar">
 
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、工具体系概览 | Tool System Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、Hermes 工具与 Toolsets | Hermes Tools &amp; Toolsets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">三、Hermes 六类终端后端 | Hermes Six Terminal Backends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">四、Docker 持久容器生命周期 | Docker Persistent Container Lifecycle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">五、后台进程、PTY 与 sudo | Background Processes, PTY &amp; Privileges</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 后台进程（Background）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 PTY 模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 sudo 与危险命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">六、OpenClaw 工具 Profile 与分组 | OpenClaw Tool Profiles &amp; Groups</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">7.</span> <span class="nav-text">七、OpenClaw Exec 安全模型 | OpenClaw Exec Security Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">8.</span> <span class="nav-text">八、文件安全与沙箱 | Filesystem Safety &amp; Sandboxing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">9.</span> <span class="nav-text">九、浏览器与代码执行 | Browser &amp; Code Execution</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">9.1.</span> <span class="nav-text">9.1 浏览器自动化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">9.2.</span> <span class="nav-text">9.2 代码执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">10.</span> <span class="nav-text">十、子 Agent 委派与工具隔离 | Sub-Agent Delegation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">11.</span> <span class="nav-text">十一、生产部署对照 | Production Deployment Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">12.</span> <span class="nav-text">十二、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">12.1.</span> <span class="nav-text">通用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">12.2.</span> <span class="nav-text">Hermes 专属</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">12.3.</span> <span class="nav-text">OpenClaw 专属</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">13.</span> <span class="nav-text">十三、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">14.</span> <span class="nav-text">十四、结语 | Conclusion</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">384</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
   </div>
 
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
+        </div>
+      </div>
+    </div>
 
     
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/83e13b7e.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Meng Qi">
-      <meta itemprop="description" content="recording">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Agent Hermes 与 OpenClaw 工具链与执行环境全解析 | Qi">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           Agent Hermes 与 OpenClaw 工具链与执行环境全解析
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2026-06-06 11:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T11:00:00+08:00">2026-06-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
-                </span>
-            </span>
+      <time title="创建时间：2026-06-06 03:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T03:00:00+08:00">2026-06-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>11278</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>25 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -258,15 +279,10 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-
-      
-        
-      
-        <blockquote>
+    <div class="post-body" itemprop="articleBody"><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr />
+<hr/>
 <h2>一、工具体系概览 | Tool System Overview</h2>
 <p><strong>中文</strong></p>
 <p>两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：</p>
@@ -354,7 +370,7 @@
 </tr>
 </tbody>
 </table>
-<hr />
+<hr/>
 <h2>二、Hermes 工具与 Toolsets | Hermes Tools &amp; Toolsets</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 工具按 <strong>toolset</strong> 分组，每个平台（CLI、Telegram、Cron 等）可独立启用/禁用 toolset 子集：</p>
@@ -443,7 +459,7 @@
 </tbody>
 </table>
 <pre><code class="language-bash">hermes tools                    # Curses UI 按平台配置 toolsets
-hermes chat --toolsets web,file -q &quot;List files in cwd&quot;
+hermes chat --toolsets web,file -q "List files in cwd"
 </code></pre>
 <p><strong>平台预设</strong>（<code>hermes tools</code> 中的 platform）：</p>
 <table>
@@ -470,26 +486,26 @@ hermes chat --toolsets web,file -q &quot;List files in cwd&quot;
 </table>
 <p><strong>English</strong></p>
 <p>Hermes groups 70+ tools into 28 toolsets. Each platform (CLI, Telegram, Cron, etc.) can enable/disable subsets via <code>hermes tools</code>. Categories: web, terminal/file, browser, media, memory, skills, delegation, cron, code execution, messaging, safe, RL. Presets like <code>hermes-cli</code> (full dev) and <code>hermes-telegram</code> (messaging-focused) tune the default tool surface.</p>
-<hr />
+<hr/>
 <h2>三、Hermes 六类终端后端 | Hermes Six Terminal Backends</h2>
 <p><strong>中文</strong></p>
 <p>所有 <code>terminal</code>、文件工具、<code>execute_code</code> 调用均路由到配置的<strong>执行后端</strong>：</p>
 <div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
-    subgraph Hermes[&quot;Hermes Tool Dispatch&quot;]
+    subgraph Hermes["Hermes Tool Dispatch"]
         TD[Tool Dispatch]
     end
 
-    subgraph Backends[&quot;6 终端后端&quot;]
-        L[local — 本机 Shell]
-        D[docker — 持久容器]
-        S[ssh — 远程服务器]
-        SI[singularity — HPC 容器]
-        MO[modal — Serverless 云]
-        DA[daytona — 云开发沙箱]
-    end
+<pre><code>subgraph Backends[&quot;6 终端后端&quot;]
+    L[local — 本机 Shell]
+    D[docker — 持久容器]
+    S[ssh — 远程服务器]
+    SI[singularity — HPC 容器]
+    MO[modal — Serverless 云]
+    DA[daytona — 云开发沙箱]
+end
 
-    TD --&gt; L &amp; D &amp; S &amp; SI &amp; MO &amp; DA</code></pre></div>
-
+TD --&amp;gt; L &amp;amp; D &amp;amp; S &amp;amp; SI &amp;amp; MO &amp;amp; DA&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
 <table>
 <thead>
 <tr>
@@ -534,18 +550,18 @@ hermes chat --toolsets web,file -q &quot;List files in cwd&quot;
 <pre><code class="language-yaml"># ~/.hermes/config.yaml
 terminal:
   backend: docker
-  docker_image: &quot;nikolaik/python-nodejs:python3.11-nodejs20&quot;
+  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
   container_cpu: 1
   container_memory: 5120      # MB
   container_disk: 51200     # MB
   container_persistent: true
   docker_volumes:
-    - &quot;/home/user/projects:/workspace/projects&quot;
+    - "/home/user/projects:/workspace/projects"
 </code></pre>
 <p><code>TERMINAL_ENV</code> 环境变量可覆盖 <code>config.yaml</code> 中的 <code>terminal.backend</code>，适合单次会话临时切换。</p>
 <p><strong>English</strong></p>
 <p>All <code>terminal</code>, file, and <code>execute_code</code> calls route through the configured backend: local (default), docker, ssh, singularity, modal, or daytona. Configure in <code>~/.hermes/config.yaml</code> or override with <code>TERMINAL_ENV</code>. Docker is recommended for production Gateway isolation; SSH splits control plane from execution.</p>
-<hr />
+<hr/>
 <h2>四、Docker 持久容器生命周期 | Docker Persistent Container Lifecycle</h2>
 <p><strong>中文</strong></p>
 <p>Hermes Docker 后端的核心理念：<strong>一个长驻容器，跨工具调用、跨会话、跨子 Agent 共享</strong>。</p>
@@ -594,21 +610,15 @@ terminal:
 <p><strong>与 OpenClaw 对比</strong>：OpenClaw 可选 <code>agents.defaults.sandbox.docker</code> 按会话沙箱；Hermes Docker 默认是<strong>进程级单容器共享模型</strong>，更适合长期开发工作流。</p>
 <p><strong>English</strong></p>
 <p>Hermes Docker backend uses one long-lived container shared across tool calls, sessions, and sub-agents. Lazy creation on first use; state (cwd, packages, <code>/workspace</code> files) persists between calls. Default: container survives Hermes process exit and reattaches via label on next start. Profile-scoped isolation via <code>hermes-profile=</code> labels. Cleanup after <code>terminal.lifetime_seconds</code> of inactivity when no background processes remain.</p>
-<hr />
+<hr/>
 <h2>五、后台进程、PTY 与 sudo | Background Processes, PTY &amp; Privileges</h2>
 <p><strong>中文</strong></p>
 <h3>5.1 后台进程（Background）</h3>
 <pre><code class="language-python"># Hermes terminal 工具
-terminal(command=&quot;pytest -v tests/&quot;, background=True)
-# → {&quot;session_id&quot;: &quot;proc_abc123&quot;, &quot;pid&quot;: 12345}
+terminal(command="pytest -v tests/", background=True)
+# → {"session_id": "proc_abc123", "pid": 12345}
 
-process(action=&quot;list&quot;)                              # 列出运行中进程
-process(action=&quot;poll&quot;, session_id=&quot;proc_abc123&quot;)  # 检查状态
-process(action=&quot;wait&quot;, session_id=&quot;proc_abc123&quot;)  # 阻塞至完成
-process(action=&quot;log&quot;, session_id=&quot;proc_abc123&quot;)   # 完整输出
-process(action=&quot;kill&quot;, session_id=&quot;proc_abc123&quot;)  # 终止
-process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot;y&quot;)  # 发送输入
-</code></pre>
+<p>process(action&#x3D;”list”)                              # 列出运行中进程<br>process(action&#x3D;”poll”, session_id&#x3D;”proc_abc123”)  # 检查状态<br>process(action&#x3D;”wait”, session_id&#x3D;”proc_abc123”)  # 阻塞至完成<br>process(action&#x3D;”log”, session_id&#x3D;”proc_abc123”)   # 完整输出<br>process(action&#x3D;”kill”, session_id&#x3D;”proc_abc123”)  # 终止<br>process(action&#x3D;”write”, session_id&#x3D;”proc_abc123”, data&#x3D;”y”)  # 发送输入<br></code></pre></p>
 <p><strong>两种后台模式</strong>：</p>
 <ol>
 <li><strong>长驻服务</strong>（dev server、watcher）— 永不退出</li>
@@ -644,21 +654,21 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p><strong>容器后端跳过审批</strong>：docker/singularity/modal/daytona 将容器视为信任边界，不重复主机级审批。</p>
 <p><strong>English</strong></p>
 <p>Hermes <code>terminal(background=true)</code> returns a <code>session_id</code> managed via <code>process</code> tool (list/poll/wait/log/kill/write). PTY mode (<code>pty=true</code>) enables interactive CLIs. Container backends skip host approval checks — the container is the boundary. OpenClaw mirrors this with <code>exec</code> + <code>process</code> and <code>pty</code> parameter.</p>
-<hr />
+<hr/>
 <h2>六、OpenClaw 工具 Profile 与分组 | OpenClaw Tool Profiles &amp; Groups</h2>
 <p><strong>中文</strong></p>
 <p>OpenClaw 通过 <code>tools</code> 配置控制 Agent 可见工具集：</p>
 <pre><code class="language-json5">{
   tools: {
-    profile: &quot;messaging&quot;,           // 预设 profile
-    deny: [&quot;group:automation&quot;, &quot;group:runtime&quot;, &quot;group:fs&quot;,
-           &quot;sessions_spawn&quot;, &quot;sessions_send&quot;],
-    allow: [&quot;read&quot;, &quot;web_search&quot;],
+    profile: "messaging",           // 预设 profile
+    deny: ["group:automation", "group:runtime", "group:fs",
+           "sessions_spawn", "sessions_send"],
+    allow: ["read", "web_search"],
     fs: { workspaceOnly: true },
     exec: {
-      security: &quot;deny&quot;,             // deny | allowlist | full
-      ask: &quot;always&quot;,                // always | on-miss | off
-      host: &quot;sandbox&quot;,              // auto | sandbox | gateway | node
+      security: "deny",             // deny | allowlist | full
+      ask: "always",                // always | on-miss | off
+      host: "sandbox",              // auto | sandbox | gateway | node
       timeoutSec: 1800,
     },
     elevated: { enabled: false },
@@ -711,7 +721,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 </ul>
 <p><strong>English</strong></p>
 <p>OpenClaw controls tool visibility via <code>tools.profile</code>, <code>deny</code>, <code>allow</code>, and groups (<code>group:automation</code>, <code>group:runtime</code>, <code>group:fs</code>). High-risk control-plane tools: <code>gateway</code>, <code>cron</code>, <code>sessions_spawn</code>. Hardened baseline: messaging profile, deny automation/runtime/fs groups, <code>workspaceOnly</code> fs, deny/limit exec with approvals.</p>
-<hr />
+<hr/>
 <h2>七、OpenClaw Exec 安全模型 | OpenClaw Exec Security Model</h2>
 <p><strong>中文</strong></p>
 <div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TD
@@ -729,7 +739,6 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
     J --&gt;|always| K[人工审批]
     J --&gt;|on-miss| L[未命中时询问]
     J --&gt;|off| M[YOLO 执行]</code></pre></div>
-
 <table>
 <thead>
 <tr>
@@ -767,7 +776,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p><strong>会话覆盖</strong>：<code>/exec host=auto security=allowlist ask=on-miss</code></p>
 <p><strong>English</strong></p>
 <p>OpenClaw <code>exec</code> routes by <code>host</code> (auto→sandbox or gateway, or node). Security modes: deny, allowlist, full. Ask modes gate human approval. Sandbox off by default; explicit <code>host=sandbox</code> fails closed without sandbox. PATH/loader overrides rejected on gateway/node. Use <code>process</code> for long work; use <code>cron</code> for scheduling, not sleep loops. Session overrides via <code>/exec</code>.</p>
-<hr />
+<hr/>
 <h2>八、文件安全与沙箱 | Filesystem Safety &amp; Sandboxing</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -804,7 +813,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p>OpenClaw <code>workspaceOnly: true</code> 限制 <code>read</code>/<code>write</code>/<code>edit</code> 仅在 workspace 目录内操作。Hermes cron 任务可通过 <code>workdir</code> 参数将文件/终端工具钉在特定项目目录。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw: <code>@openclaw/fs-safe</code>, <code>tools.fs.workspaceOnly</code>, <code>applyPatch.workspaceOnly</code> (default true). Hermes: cwd allowlist, context file scanning, env var stripping. Both constrain filesystem blast radius; Hermes cron <code>workdir</code> pins file/terminal tools to a project directory.</p>
-<hr />
+<hr/>
 <h2>九、浏览器与代码执行 | Browser &amp; Code Execution</h2>
 <p><strong>中文</strong></p>
 <h3>9.1 浏览器自动化</h3>
@@ -856,7 +865,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 </table>
 <p><strong>English</strong></p>
 <p>OpenClaw: browser plugin + SSRF policy + <code>apply_patch</code> for OpenAI models. Hermes: 5 browser backends, browse-sh skill catalog, bidirectional MCP, <code>execute_code</code> in terminal backend sandbox with credential filtering.</p>
-<hr />
+<hr/>
 <h2>十、子 Agent 委派与工具隔离 | Sub-Agent Delegation</h2>
 <p><strong>中文</strong></p>
 <p>Hermes <code>delegate_tool</code> 生成隔离子代理并行处理子任务：</p>
@@ -868,7 +877,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p>OpenClaw <code>sessions_spawn</code> / <code>sessions_send</code> 实现跨会话 Agent 操作，默认应对不可信面 deny。</p>
 <p><strong>English</strong></p>
 <p>Hermes <code>delegate_tool</code> spawns isolated sub-agents with reduced context, sharing the parent Docker container. Cron runs disable <code>cronjob</code> toolset to prevent recursive scheduling. OpenClaw uses <code>sessions_spawn</code>/<code>sessions_send</code> for cross-session agents — deny by default on untrusted surfaces.</p>
-<hr />
+<hr/>
 <h2>十一、生产部署对照 | Production Deployment Comparison</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -915,7 +924,7 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p><strong>English</strong></p>
 <p><strong>OpenClaw production</strong>: enable sandbox, tighten profile/deny, exec deny + ask always, audit with <code>security audit</code>.</p>
 <p><strong>Hermes production</strong>: <code>terminal.backend: docker</code> or ssh split, per-platform toolsets, manual approvals, <code>cron_mode: deny</code>, <code>hermes doctor</code>.</p>
-<hr />
+<hr/>
 <h2>十二、最佳实践 | Best Practices</h2>
 <p><strong>中文</strong></p>
 <h3>通用</h3>
@@ -941,209 +950,75 @@ process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot
 <p><strong>Universal</strong>: minimal tool surface, container as boundary, background via process not sleep loops, PTY only when needed.</p>
 <p><strong>Hermes</strong>: cron <code>enabled_toolsets</code>, modal/daytona for serverless, <code>notify_on_complete</code> for long builds.</p>
 <p><strong>OpenClaw</strong>: deny runtime/cron on shared DMs, safeBins for stdin filters only, <code>strictInlineEval</code> for inline eval.</p>
-<hr />
+<hr/>
 <h2>十三、延伸阅读 | Further Reading</h2>
 <ul>
 <li><a href="./gateway.md">Gateway 架构深度解析</a></li>
 <li><a href="./security-model.md">安全模型深度解析</a></li>
 <li><a href="./automation-cron-heartbeat.md">自动化调度与主动巡检</a></li>
-<li><a href="https://docs.openclaw.ai/tools/exec">OpenClaw Exec 文档</a></li>
-<li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/tools">Hermes Tools 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.openclaw.ai/tools/exec">OpenClaw Exec 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/tools">Hermes Tools 文档</a></li>
 </ul>
-<hr />
+<hr/>
 <h2>十四、结语 | Conclusion</h2>
 <p><strong>中文</strong></p>
 <p>工具链与执行环境决定了 Agent 能「做什么」以及「爆炸半径有多大」。OpenClaw 以 <strong>Profile + Exec 审批 + 可选沙箱</strong> 构建灵活的控制面，适合多渠道、多 Node 的广度连接场景。Hermes 以 <strong>70+ 工具、28 toolsets、6 后端、持久 Docker 容器</strong> 构建深度执行能力，适合长期开发、Serverless 和研究轨迹场景。理解两者的工具哲学——<strong>范围控制</strong> vs. <strong>执行深度</strong>——是安全配置与性能优化的前提。</p>
 <p><strong>English</strong></p>
 <p>Toolchains and execution environments define what an agent can do and its blast radius. OpenClaw uses <strong>profiles + exec approvals + optional sandbox</strong> for flexible control across channels and nodes. Hermes uses <strong>70+ tools, 28 toolsets, 6 backends, and persistent Docker containers</strong> for deep execution in long-running dev, serverless, and research scenarios. Understanding <strong>scope control</strong> vs. <strong>execution depth</strong> is prerequisite to security hardening and performance tuning.</p>
 
-      
-    
-
     </div>
 
     
     
     
 
-      <footer class="post-footer">
-
-        
-
-
-        
-    
+    <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
-              <a href="/tags/Tools/" rel="tag"># Tools</a>
               <a href="/tags/Hermes/" rel="tag"># Hermes</a>
               <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
           </div>
-        <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/posts/13d06324.html" rel="prev" title="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析">
-      <i class="fa fa-chevron-left"></i> Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/17b36b1c.html" rel="next" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
-      Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/13d06324.html" rel="prev" title="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析">
+                  <i class="fa fa-angle-left"></i> Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/17b36b1c.html" rel="next" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
+                  Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
   </article>
-  
-  
-  
-
-
-
-          </div>
-          
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Meng Qi</p>
-  <div class="site-description" itemprop="description">recording</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">372</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">15</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">18</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
 </div>
 
 
 
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
 
 
-      </div>
-    </main>
 
-    <footer class="footer">
-      <div class="footer-inner">
-        
+</div>
+  </main>
 
-        
+  <footer class="footer">
+    <div class="footer-inner">
 
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2026</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
     </span>
-    <span title="站点总字数">324k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">19:37</span>
-</div>
-
-<!--
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+    <span class="author" itemprop="copyrightHolder">true</span>
   </div>
--->
-
-<div>
-<span id="timeDate">loading...</span><span id="times">loading...</span>
-<script>
-    var now = new Date();
-    function createtime() {
-        var grt= new Date("1/1/2018 00:00:00");
-        now.setTime(now.getTime()+250);
-        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
-        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
-        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
-        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
-        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
-        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
-        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
-        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
-    }
-setInterval("createtime()",250);
-</script>
-</div>
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -1151,8 +1026,7 @@ setInterval("createtime()",250);
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -1161,68 +1035,37 @@ setInterval("createtime()",250);
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
-
-
-
+    </div>
+  </footer>
 
   
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
 
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 
-
-
-  
-<script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 <div class="moon-menu">
   <div class="moon-menu-items">
-    
     <div id="moon-menu-item-back2bottom" class="moon-menu-item">
-      <i class='fas fa-chevron-down'></i>    </div>
-    
+      <i class="fas fa-chevron-down"></i>
+    </div>
     <div id="moon-menu-item-back2top" class="moon-menu-item">
-      <i class='fas fa-chevron-up'></i>    </div>
-    
+      <i class="fas fa-chevron-up"></i>
+    </div>
   </div>
   <div class="moon-menu-button">
     <svg class="moon-menu-bg">
@@ -1230,10 +1073,12 @@ setInterval("createtime()",250);
       <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
     </svg>
     <div class="moon-menu-content">
-      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
       <div class="moon-menu-text"></div>
     </div>
   </div>
-</div><script src="/js/injector.js"></script>
+</div>
+<script src="/js/injector.js"></script>
+
 </body>
 </html>

@@ -1,8 +1,8 @@
 ---
 title: "leetcode 4 Solution"
 disableNunjucks: true
-date: 2016-02-09T22:17:30.000Z
-updated: 2023-01-06T08:17:38.286Z
+date: 2016-02-09T14:17:30.000Z
+updated: 2023-01-06T00:17:38.286Z
 categories:
   - "algrithom"
 tags:

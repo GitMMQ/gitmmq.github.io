@@ -1,8 +1,8 @@
 ---
 title: "leetcode 160 Solution"
 disableNunjucks: true
-date: 2015-12-31T22:07:08.000Z
-updated: 2023-01-06T08:17:38.085Z
+date: 2015-12-31T14:07:08.000Z
+updated: 2023-01-06T00:17:38.085Z
 categories:
   - "algrithom"
 tags:

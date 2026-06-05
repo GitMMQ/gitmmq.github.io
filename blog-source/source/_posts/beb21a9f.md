@@ -1,8 +1,8 @@
 ---
 title: "leetcode 26 Solution"
 disableNunjucks: true
-date: 2016-01-23T22:16:34.000Z
-updated: 2023-01-06T08:17:38.232Z
+date: 2016-01-23T14:16:34.000Z
+updated: 2023-01-06T00:17:38.232Z
 categories:
   - "algrithom"
 tags:

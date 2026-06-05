@@ -1,8 +1,8 @@
 ---
 title: "leetcode 70 Solution"
 disableNunjucks: true
-date: 2016-03-17T22:12:39.000Z
-updated: 2023-01-06T08:17:38.376Z
+date: 2016-03-17T14:12:39.000Z
+updated: 2023-01-06T00:17:38.376Z
 categories:
   - "algrithom"
 tags:

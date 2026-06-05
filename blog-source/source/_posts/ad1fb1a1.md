@@ -1,8 +1,8 @@
 ---
 title: "leetcode 3 Solution"
 disableNunjucks: true
-date: 2016-01-27T22:20:36.000Z
-updated: 2023-01-06T08:17:38.242Z
+date: 2016-01-27T14:20:36.000Z
+updated: 2023-01-06T00:17:38.242Z
 categories:
   - "algrithom"
 tags:

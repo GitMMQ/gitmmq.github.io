@@ -1,8 +1,8 @@
 ---
 title: "leetcode 215 Solution"
 disableNunjucks: true
-date: 2016-01-12T22:19:39.000Z
-updated: 2023-01-06T08:17:38.126Z
+date: 2016-01-12T14:19:39.000Z
+updated: 2023-01-06T00:17:38.126Z
 categories:
   - "algrithom"
 tags:

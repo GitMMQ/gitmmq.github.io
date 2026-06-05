@@ -27,8 +27,8 @@
 <meta property="og:site_name" content="Qi">
 <meta property="og:description" content="遗传算法（Genetic Algorithms ）是基于生物进化理论的原理发展起来的一种广为应用的、高效的随机搜索与优化的方法。其主要特点是群体搜索策略和群体中个体之间的信息交换，搜索不依赖于梯度信息。 步骤 初始化 t←0进化代数计数器；T是最大进化代数；随机生成M个个体作为初始群体P（t） 个体评价 计算P（t）中各个个体的适应度； 选择运算 将选择算子作用于群体； 交叉运算 将交叉算子作用于">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-12-27T01:31:27.593Z">
-<meta property="article:modified_time" content="2022-12-27T22:40:46.680Z">
+<meta property="article:published_time" content="2022-12-26T17:31:27.593Z">
+<meta property="article:modified_time" content="2022-12-27T14:40:46.680Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech, Data, Vision">
 <meta name="twitter:card" content="summary">
@@ -178,7 +178,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-count">384</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -187,7 +187,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-count">85</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -248,7 +248,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 09:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:27+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -305,7 +305,7 @@
 </ul>
 <h2 id="代码实现"><a class="headerlink" href="#代码实现" title="代码实现"></a>代码实现</h2><pre><code>package noah;  
   
-<p>import java.io.BufferedReader;<br>import java.io.FileInputStream;<br>import java.io.IOException;<br>import java.io.InputStreamReader;<br>import java.util.Random;  </p>
+<p>import java.io.BufferedReader;<br/>import java.io.FileInputStream;<br/>import java.io.IOException;<br/>import java.io.InputStreamReader;<br/>import java.util.Random;  </p>
 <p>public class GA {  </p>
 <pre><code>private int scale;// 种群规模  
 private int cityNum; // 城市数量，染色体长度  
@@ -315,552 +315,391 @@ private int bestT;// 最佳出现代数
 private int bestLength; // 最佳长度  
 private int[] bestTour; // 最佳路径  
 
-// 初始种群，父代种群，行数表示种群规模，一行代表一个个体，即染色体，列表示染色体基因片段  
-private int[][] oldPopulation;  
-private int[][] newPopulation;// 新的种群，子代种群  
-private int[] fitness;// 种群适应度，表示种群中各个个体的适应度  
-
-private float[] Pi;// 种群中各个个体的累计概率  
-private float Pc;// 交叉概率  
-private float Pm;// 变异概率  
-private int t;// 当前代数  
-
-private Random random;  
-
-public GA() {  
-
-}  
-
-/** 
- * constructor of GA 
- *  
- * @param s 
- *            种群规模 
- * @param n 
- *            城市数量 
- * @param g 
- *            运行代数 
- * @param c 
- *            交叉率 
- * @param m 
- *            变异率 
- *  
- **/  
-public GA(int s, int n, int g, float c, float m) {  
-    scale = s;  
-    cityNum = n;  
-    MAX_GEN = g;  
-    Pc = c;  
-    Pm = m;  
-}  
-
-// 给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默  
-@SuppressWarnings(&quot;resource&quot;)  
-/** 
- * 初始化GA算法类 
- * @param filename 数据文件名，该文件存储所有城市节点坐标数据 
- * @throws IOException 
+<p>&#x2F;&#x2F; 初始种群，父代种群，行数表示种群规模，一行代表一个个体，即染色体，列表示染色体基因片段<br>private int[][] oldPopulation;<br>private int[][] newPopulation;&#x2F;&#x2F; 新的种群，子代种群<br>private int[] fitness;&#x2F;&#x2F; 种群适应度，表示种群中各个个体的适应度  </p>
+<p>private float[] Pi;&#x2F;&#x2F; 种群中各个个体的累计概率<br>private float Pc;&#x2F;&#x2F; 交叉概率<br>private float Pm;&#x2F;&#x2F; 变异概率<br>private int t;&#x2F;&#x2F; 当前代数  </p>
+<p>private Random random;  </p>
+<p>public GA() {  </p>
+<p>}  </p>
+<p>&#x2F;** </p>
+<ul>
+<li>constructor of GA </li>
+<li></li>
+<li>@param s </li>
+<li><pre><code>       种群规模 
+</code></pre>
+</li>
+<li>@param n </li>
+<li><pre><code>       城市数量 
+</code></pre>
+</li>
+<li>@param g </li>
+<li><pre><code>       运行代数 
+</code></pre>
+</li>
+<li>@param c </li>
+<li><pre><code>       交叉率 
+</code></pre>
+</li>
+<li>@param m </li>
+<li><pre><code>       变异率 
+</code></pre>
+</li>
+<li></li>
+</ul>
+<p> **&#x2F;<br>public GA(int s, int n, int g, float c, float m) {<br>    scale &#x3D; s;<br>    cityNum &#x3D; n;<br>    MAX_GEN &#x3D; g;<br>    Pc &#x3D; c;<br>    Pm &#x3D; m;<br>}  </p>
+<p>&#x2F;&#x2F; 给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默<br>@SuppressWarnings(“resource”)<br>&#x2F;** </p>
+<ul>
+<li><p>初始化GA算法类 </p>
+</li>
+<li><p>@param filename 数据文件名，该文件存储所有城市节点坐标数据 </p>
+</li>
+<li><p>@throws IOException<br> *&#x2F;<br>private void init(String filename) throws IOException {<br> &#x2F;&#x2F; 读取数据<br> int[] x;<br> int[] y;<br> String strbuff;<br> BufferedReader data &#x3D; new BufferedReader(new InputStreamReader(<br>     new FileInputStream(filename)));<br> distance &#x3D; new int[cityNum][cityNum];<br> x &#x3D; new int[cityNum];<br> y &#x3D; new int[cityNum];<br> for (int i &#x3D; 0; i &amp;lt; cityNum; i++) {<br> &#x2F;&#x2F; 读取一行数据，数据格式1 6734 1453<br> strbuff &#x3D; data.readLine();<br> &#x2F;&#x2F; 字符分割<br> String[] strcol &#x3D; strbuff.split(“ “);<br> x[i] &#x3D; Integer.valueOf(strcol[1]);&#x2F;&#x2F; x坐标<br> y[i] &#x3D; Integer.valueOf(strcol[2]);&#x2F;&#x2F; y坐标<br> }<br> &#x2F;&#x2F; 计算距离矩阵<br> &#x2F;&#x2F; ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628<br> for (int i &#x3D; 0; i &amp;lt; cityNum - 1; i++) {<br> distance[i][i] &#x3D; 0; &#x2F;&#x2F; 对角线为0<br> for (int j &#x3D; i + 1; j &amp;lt; cityNum; j++) {<br>     double rij &#x3D; Math<br>             .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])<br>                     * (y[i] - y[j])) &#x2F; 10.0);<br>     &#x2F;&#x2F; 四舍五入，取整<br>     int tij &#x3D; (int) Math.round(rij);<br>     if (tij &amp;lt; rij) {<br>         distance[i][j] &#x3D; tij + 1;<br>         distance[j][i] &#x3D; distance[i][j];<br>     } else {<br>         distance[i][j] &#x3D; tij;<br>         distance[j][i] &#x3D; distance[i][j];<br>     }<br> }<br> }<br> distance[cityNum - 1][cityNum - 1] &#x3D; 0;  </p>
+<p> bestLength &#x3D; Integer.MAX_VALUE;<br> bestTour &#x3D; new int[cityNum + 1];<br> bestT &#x3D; 0;<br> t &#x3D; 0;  </p>
+<p> newPopulation &#x3D; new int[scale][cityNum];<br> oldPopulation &#x3D; new int[scale][cityNum];<br> fitness &#x3D; new int[scale];<br> Pi &#x3D; new float[scale];  </p>
+<p> random &#x3D; new Random(System.currentTimeMillis());<br> &#x2F;* </p>
+<ul>
+<li>for(int i&#x3D;0;i&amp;lt;cityNum;i++) { for(int j&#x3D;0;j&amp;lt;cityNum;j++) { </li>
+<li>System.out.print(distance[i][j]+”,”); } System.out.println(); }<br>  *&#x2F;<br> &#x2F;&#x2F; 初始化种群</li>
+</ul>
+</li>
+</ul>
+<p>}  </p>
+<p>&#x2F;&#x2F; 初始化种群<br>void initGroup() {<br>    int i, j, k;<br>    &#x2F;&#x2F; Random random &#x3D; new Random(System.currentTimeMillis());<br>    for (k &#x3D; 0; k &amp;lt; scale; k++)&#x2F;&#x2F; 种群数<br>    {<br>        oldPopulation[k][0] &#x3D; random.nextInt(65535) % cityNum;<br>        for (i &#x3D; 1; i &amp;lt; cityNum;)&#x2F;&#x2F; 染色体长度<br>        {<br>            oldPopulation[k][i] &#x3D; random.nextInt(65535) % cityNum;<br>            for (j &#x3D; 0; j &amp;lt; i; j++) {<br>                if (oldPopulation[k][i] &#x3D;&#x3D; oldPopulation[k][j]) {<br>                    break;<br>                }<br>            }<br>            if (j &#x3D;&#x3D; i) {<br>                i++;<br>            }<br>        }<br>    }  </p>
+<pre><code>/* 
+ * for(i=0;i&amp;amp;lt;scale;i++) { for(j=0;j&amp;amp;lt;cityNum;j++) { 
+ * System.out.print(oldPopulation[i][j]+&quot;,&quot;); } System.out.println(); } 
  */  
-private void init(String filename) throws IOException {  
-    // 读取数据  
-    int[] x;  
-    int[] y;  
-    String strbuff;  
-    BufferedReader data = new BufferedReader(new InputStreamReader(  
-            new FileInputStream(filename)));  
-    distance = new int[cityNum][cityNum];  
-    x = new int[cityNum];  
-    y = new int[cityNum];  
-    for (int i = 0; i &amp;lt; cityNum; i++) {  
-        // 读取一行数据，数据格式1 6734 1453  
-        strbuff = data.readLine();  
-        // 字符分割  
-        String[] strcol = strbuff.split(&quot; &quot;);  
-        x[i] = Integer.valueOf(strcol[1]);// x坐标  
-        y[i] = Integer.valueOf(strcol[2]);// y坐标  
-    }  
-    // 计算距离矩阵  
-    // ，针对具体问题，距离计算方法也不一样，此处用的是att48作为案例，它有48个城市，距离计算方法为伪欧氏距离，最优值为10628  
-    for (int i = 0; i &amp;lt; cityNum - 1; i++) {  
-        distance[i][i] = 0; // 对角线为0  
-        for (int j = i + 1; j &amp;lt; cityNum; j++) {  
-            double rij = Math  
-                    .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])  
-                            * (y[i] - y[j])) / 10.0);  
-            // 四舍五入，取整  
-            int tij = (int) Math.round(rij);  
-            if (tij &amp;lt; rij) {  
-                distance[i][j] = tij + 1;  
-                distance[j][i] = distance[i][j];  
-            } else {  
-                distance[i][j] = tij;  
-                distance[j][i] = distance[i][j];  
-            }  
-        }  
-    }  
-    distance[cityNum - 1][cityNum - 1] = 0;  
+</code></pre>
+<p>}  </p>
+<p>public int evaluate(int[] chromosome) {<br>    &#x2F;&#x2F; 0123<br>    int len &#x3D; 0;<br>    &#x2F;&#x2F; 染色体，起始城市,城市1,城市2…城市n<br>    for (int i &#x3D; 1; i &amp;lt; cityNum; i++) {<br>        len +&#x3D; distance[chromosome[i - 1]][chromosome[i]];<br>    }<br>    &#x2F;&#x2F; 城市n,起始城市<br>    len +&#x3D; distance[chromosome[cityNum - 1]][chromosome[0]];<br>    return len;<br>}  </p>
+<p>&#x2F;&#x2F; 计算种群中各个个体的累积概率，前提是已经计算出各个个体的适应度fitness[max]，作为赌轮选择策略一部分，Pi[max]<br>void countRate() {<br>    int k;<br>    double sumFitness &#x3D; 0;&#x2F;&#x2F; 适应度总和  </p>
+<pre><code>double[] tempf = new double[scale];  
 
-    bestLength = Integer.MAX_VALUE;  
-    bestTour = new int[cityNum + 1];  
-    bestT = 0;  
-    t = 0;  
-
-    newPopulation = new int[scale][cityNum];  
-    oldPopulation = new int[scale][cityNum];  
-    fitness = new int[scale];  
-    Pi = new float[scale];  
-
-    random = new Random(System.currentTimeMillis());  
-    /* 
-     * for(int i=0;i&amp;lt;cityNum;i++) { for(int j=0;j&amp;lt;cityNum;j++) { 
-     * System.out.print(distance[i][j]+&quot;,&quot;); } System.out.println(); } 
-     */  
-    // 初始化种群  
-
+for (k = 0; k &amp;amp;lt; scale; k++) {  
+    tempf[k] = 10.0 / fitness[k];  
+    sumFitness += tempf[k];  
 }  
 
-// 初始化种群  
-void initGroup() {  
-    int i, j, k;  
-    // Random random = new Random(System.currentTimeMillis());  
-    for (k = 0; k &amp;lt; scale; k++)// 种群数  
-    {  
-        oldPopulation[k][0] = random.nextInt(65535) % cityNum;  
-        for (i = 1; i &amp;lt; cityNum;)// 染色体长度  
-        {  
-            oldPopulation[k][i] = random.nextInt(65535) % cityNum;  
-            for (j = 0; j &amp;lt; i; j++) {  
-                if (oldPopulation[k][i] == oldPopulation[k][j]) {  
-                    break;  
-                }  
-            }  
-            if (j == i) {  
-                i++;  
-            }  
-        }  
-    }  
-
-    /* 
-     * for(i=0;i&amp;lt;scale;i++) { for(j=0;j&amp;lt;cityNum;j++) { 
-     * System.out.print(oldPopulation[i][j]+&quot;,&quot;); } System.out.println(); } 
-     */  
+Pi[0] = (float) (tempf[0] / sumFitness);  
+for (k = 1; k &amp;amp;lt; scale; k++) {  
+    Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);  
 }  
 
-public int evaluate(int[] chromosome) {  
-    // 0123  
-    int len = 0;  
-    // 染色体，起始城市,城市1,城市2...城市n  
-    for (int i = 1; i &amp;lt; cityNum; i++) {  
-        len += distance[chromosome[i - 1]][chromosome[i]];  
+/* 
+ * for(k=0;k&amp;amp;lt;scale;k++) { System.out.println(fitness[k]+&quot; &quot;+Pi[k]); } 
+ */  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;&#x2F; 挑选某代种群中适应度最高的个体，直接复制到子代中<br>&#x2F;&#x2F; 前提是已经计算出各个个体的适应度Fitness[max]<br>public void selectBestGh() {<br>    int k, i, maxid;<br>    int maxevaluation;  </p>
+<pre><code>maxid = 0;  
+maxevaluation = fitness[0];  
+for (k = 1; k &amp;amp;lt; scale; k++) {  
+    if (maxevaluation &amp;amp;gt; fitness[k]) {  
+        maxevaluation = fitness[k];  
+        maxid = k;  
     }  
-    // 城市n,起始城市  
-    len += distance[chromosome[cityNum - 1]][chromosome[0]];  
-    return len;  
 }  
 
-// 计算种群中各个个体的累积概率，前提是已经计算出各个个体的适应度fitness[max]，作为赌轮选择策略一部分，Pi[max]  
-void countRate() {  
-    int k;  
-    double sumFitness = 0;// 适应度总和  
-
-    double[] tempf = new double[scale];  
-
-    for (k = 0; k &amp;lt; scale; k++) {  
-        tempf[k] = 10.0 / fitness[k];  
-        sumFitness += tempf[k];  
+if (bestLength &amp;amp;gt; maxevaluation) {  
+    bestLength = maxevaluation;  
+    bestT = t;// 最好的染色体出现的代数;  
+    for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+        bestTour[i] = oldPopulation[maxid][i];  
     }  
-
-    Pi[0] = (float) (tempf[0] / sumFitness);  
-    for (k = 1; k &amp;lt; scale; k++) {  
-        Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);  
-    }  
-
-    /* 
-     * for(k=0;k&amp;lt;scale;k++) { System.out.println(fitness[k]+&quot; &quot;+Pi[k]); } 
-     */  
 }  
 
-// 挑选某代种群中适应度最高的个体，直接复制到子代中  
-// 前提是已经计算出各个个体的适应度Fitness[max]  
-public void selectBestGh() {  
-    int k, i, maxid;  
-    int maxevaluation;  
-
-    maxid = 0;  
-    maxevaluation = fitness[0];  
-    for (k = 1; k &amp;lt; scale; k++) {  
-        if (maxevaluation &amp;gt; fitness[k]) {  
-            maxevaluation = fitness[k];  
-            maxid = k;  
-        }  
-    }  
-
-    if (bestLength &amp;gt; maxevaluation) {  
-        bestLength = maxevaluation;  
-        bestT = t;// 最好的染色体出现的代数;  
-        for (i = 0; i &amp;lt; cityNum; i++) {  
-            bestTour[i] = oldPopulation[maxid][i];  
-        }  
-    }  
-
-    // System.out.println(&quot;代数 &quot; + t + &quot; &quot; + maxevaluation);  
-    // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
-    copyGh(0, maxid);// 将当代种群中适应度最高的染色体k复制到新种群中，排在第一位0  
-}  
-
+// System.out.println(&quot;代数 &quot; + t + &quot; &quot; + maxevaluation);  
 // 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置  
-public void copyGh(int k, int kk) {  
-    int i;  
-    for (i = 0; i &amp;lt; cityNum; i++) {  
-        newPopulation[k][i] = oldPopulation[kk][i];  
-    }  
-}  
+copyGh(0, maxid);// 将当代种群中适应度最高的染色体k复制到新种群中，排在第一位0  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;&#x2F; 复制染色体，k表示新染色体在种群中的位置，kk表示旧的染色体在种群中的位置<br>public void copyGh(int k, int kk) {<br>    int i;<br>    for (i &#x3D; 0; i &amp;lt; cityNum; i++) {<br>        newPopulation[k][i] &#x3D; oldPopulation[kk][i];<br>    }<br>}  </p>
+<p>&#x2F;&#x2F; 赌轮选择策略挑选<br>public void select() {<br>    int k, i, selectId;<br>    float ran1;<br>    &#x2F;&#x2F; Random random &#x3D; new Random(System.currentTimeMillis());<br>    for (k &#x3D; 1; k &amp;lt; scale; k++) {<br>        ran1 &#x3D; (float) (random.nextInt(65535) % 1000 &#x2F; 1000.0);<br>        &#x2F;&#x2F; System.out.println(“概率”+ran1);<br>        &#x2F;&#x2F; 产生方式<br>        for (i &#x3D; 0; i &amp;lt; scale; i++) {<br>            if (ran1 &amp;lt;&#x3D; Pi[i]) {<br>                break;<br>            }<br>        }<br>        selectId &#x3D; i;<br>        &#x2F;&#x2F; System.out.println(“选中” + selectId);<br>        copyGh(k, selectId);<br>    }<br>}  </p>
+<p>&#x2F;&#x2F;进化函数，正常交叉变异<br>public void evolution() {<br>    int k;<br>    &#x2F;&#x2F; 挑选某代种群中适应度最高的个体<br>    selectBestGh();  </p>
+<pre><code>// 赌轮选择策略挑选scale-1个下一代个体  
+select();  
 
-// 赌轮选择策略挑选  
-public void select() {  
-    int k, i, selectId;  
-    float ran1;  
-    // Random random = new Random(System.currentTimeMillis());  
-    for (k = 1; k &amp;lt; scale; k++) {  
-        ran1 = (float) (random.nextInt(65535) % 1000 / 1000.0);  
-        // System.out.println(&quot;概率&quot;+ran1);  
-        // 产生方式  
-        for (i = 0; i &amp;lt; scale; i++) {  
-            if (ran1 &amp;lt;= Pi[i]) {  
-                break;  
-            }  
-        }  
-        selectId = i;  
-        // System.out.println(&quot;选中&quot; + selectId);  
-        copyGh(k, selectId);  
-    }  
-}  
+// Random random = new Random(System.currentTimeMillis());  
+float r;  
 
-//进化函数，正常交叉变异  
-public void evolution() {  
-    int k;  
-    // 挑选某代种群中适应度最高的个体  
-    selectBestGh();  
-
-    // 赌轮选择策略挑选scale-1个下一代个体  
-    select();  
-
-    // Random random = new Random(System.currentTimeMillis());  
-    float r;  
-
-    // 交叉方法  
-    for (k = 0; k &amp;lt; scale; k = k + 2) {  
+// 交叉方法  
+for (k = 0; k &amp;amp;lt; scale; k = k + 2) {  
+    r = random.nextFloat();// /产生概率  
+    // System.out.println(&quot;交叉率...&quot; + r);  
+    if (r &amp;amp;lt; Pc) {  
+        // System.out.println(k + &quot;与&quot; + k + 1 + &quot;进行交叉...&quot;);  
+        //OXCross(k, k + 1);// 进行交叉  
+        OXCross1(k, k + 1);  
+    } else {  
         r = random.nextFloat();// /产生概率  
-        // System.out.println(&quot;交叉率...&quot; + r);  
-        if (r &amp;lt; Pc) {  
-            // System.out.println(k + &quot;与&quot; + k + 1 + &quot;进行交叉...&quot;);  
-            //OXCross(k, k + 1);// 进行交叉  
-            OXCross1(k, k + 1);  
-        } else {  
-            r = random.nextFloat();// /产生概率  
-            // System.out.println(&quot;变异率1...&quot; + r);  
-            // 变异  
-            if (r &amp;lt; Pm) {  
-                // System.out.println(k + &quot;变异...&quot;);  
-                OnCVariation(k);  
-            }  
-            r = random.nextFloat();// /产生概率  
-            // System.out.println(&quot;变异率2...&quot; + r);  
-            // 变异  
-            if (r &amp;lt; Pm) {  
-                // System.out.println(k + 1 + &quot;变异...&quot;);  
-                OnCVariation(k + 1);  
-            }  
-        }  
-
-    }  
-}  
-
-//进化函数，保留最好染色体不进行交叉变异  
-public void evolution1() {  
-    int k;  
-    // 挑选某代种群中适应度最高的个体  
-    selectBestGh();  
-
-    // 赌轮选择策略挑选scale-1个下一代个体  
-    select();  
-
-    // Random random = new Random(System.currentTimeMillis());  
-    float r;  
-
-    for (k = 1; k + 1 &amp;lt; scale / 2; k = k + 2) {  
-        r = random.nextFloat();// /产生概率  
-        if (r &amp;lt; Pc) {  
-            OXCross1(k, k + 1);// 进行交叉  
-            //OXCross(k,k+1);//进行交叉  
-        } else {  
-            r = random.nextFloat();// /产生概率  
-            // 变异  
-            if (r &amp;lt; Pm) {  
-                OnCVariation(k);  
-            }  
-            r = random.nextFloat();// /产生概率  
-            // 变异  
-            if (r &amp;lt; Pm) {  
-                OnCVariation(k + 1);  
-            }  
-        }  
-    }  
-    if (k == scale / 2 - 1)// 剩最后一个染色体没有交叉L-1  
-    {  
-        r = random.nextFloat();// /产生概率  
-        if (r &amp;lt; Pm) {  
+        // System.out.println(&quot;变异率1...&quot; + r);  
+        // 变异  
+        if (r &amp;amp;lt; Pm) {  
+            // System.out.println(k + &quot;变异...&quot;);  
             OnCVariation(k);  
         }  
-    }  
-
-}  
-
-// 类OX交叉算子  
-void OXCross(int k1, int k2) {  
-    int i, j, k, flag;  
-    int ran1, ran2, temp;  
-    int[] Gh1 = new int[cityNum];  
-    int[] Gh2 = new int[cityNum];  
-    // Random random = new Random(System.currentTimeMillis());  
-
-    ran1 = random.nextInt(65535) % cityNum;  
-    ran2 = random.nextInt(65535) % cityNum;  
-    // System.out.println();  
-    // System.out.println(&quot;-----------------------&quot;);  
-    // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
-
-    while (ran1 == ran2) {  
-        ran2 = random.nextInt(65535) % cityNum;  
-    }  
-
-    if (ran1 &amp;gt; ran2)// 确保ran1&amp;lt;ran2  
-    {  
-        temp = ran1;  
-        ran1 = ran2;  
-        ran2 = temp;  
-    }  
-    // System.out.println();  
-    // System.out.println(&quot;-----------------------&quot;);  
-    // System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
-    // System.out.println(&quot;-----------------------&quot;);  
-    // System.out.println();  
-    flag = ran2 - ran1 + 1;// 删除重复基因前染色体长度  
-    for (i = 0, j = ran1; i &amp;lt; flag; i++, j++) {  
-        Gh1[i] = newPopulation[k2][j];  
-        Gh2[i] = newPopulation[k1][j];  
-    }  
-    // 已近赋值i=ran2-ran1个基因  
-
-    for (k = 0, j = flag; j &amp;lt; cityNum;)// 染色体长度  
-    {  
-        Gh1[j] = newPopulation[k1][k++];  
-        for (i = 0; i &amp;lt; flag; i++) {  
-            if (Gh1[i] == Gh1[j]) {  
-                break;  
-            }  
-        }  
-        if (i == flag) {  
-            j++;  
+        r = random.nextFloat();// /产生概率  
+        // System.out.println(&quot;变异率2...&quot; + r);  
+        // 变异  
+        if (r &amp;amp;lt; Pm) {  
+            // System.out.println(k + 1 + &quot;变异...&quot;);  
+            OnCVariation(k + 1);  
         }  
     }  
 
-    for (k = 0, j = flag; j &amp;lt; cityNum;)// 染色体长度  
-    {  
-        Gh2[j] = newPopulation[k2][k++];  
-        for (i = 0; i &amp;lt; flag; i++) {  
-            if (Gh2[i] == Gh2[j]) {  
-                break;  
-            }  
-        }  
-        if (i == flag) {  
-            j++;  
-        }  
-    }  
-
-    for (i = 0; i &amp;lt; cityNum; i++) {  
-        newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
-        newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
-    }  
-
-    // System.out.println(&quot;进行交叉--------------------------&quot;);  
-    // System.out.println(k1+&quot;交叉后...&quot;);  
-    // for (i = 0; i &amp;lt; cityNum; i++) {  
-    // System.out.print(newPopulation[k1][i] + &quot;-&quot;);  
-    // }  
-    // System.out.println();  
-    // System.out.println(k2+&quot;交叉后...&quot;);  
-    // for (i = 0; i &amp;lt; cityNum; i++) {  
-    // System.out.print(newPopulation[k2][i] + &quot;-&quot;);  
-    // }  
-    // System.out.println();  
-    // System.out.println(&quot;交叉完毕--------------------------&quot;);  
-}  
-
-// 交叉算子,相同染色体交叉产生不同子代染色体  
-public void OXCross1(int k1, int k2) {  
-    int i, j, k, flag;  
-    int ran1, ran2, temp;  
-    int[] Gh1 = new int[cityNum];  
-    int[] Gh2 = new int[cityNum];  
-    // Random random = new Random(System.currentTimeMillis());  
-
-    ran1 = random.nextInt(65535) % cityNum;  
-    ran2 = random.nextInt(65535) % cityNum;  
-    while (ran1 == ran2) {  
-        ran2 = random.nextInt(65535) % cityNum;  
-    }  
-
-    if (ran1 &amp;gt; ran2)// 确保ran1&amp;lt;ran2  
-    {  
-        temp = ran1;  
-        ran1 = ran2;  
-        ran2 = temp;  
-    }  
-
-    // 将染色体1中的第三部分移到染色体2的首部  
-    for (i = 0, j = ran2; j &amp;lt; cityNum; i++, j++) {  
-        Gh2[i] = newPopulation[k1][j];  
-    }  
-
-    flag = i;// 染色体2原基因开始位置  
-
-    for (k = 0, j = flag; j &amp;lt; cityNum;)// 染色体长度  
-    {  
-        Gh2[j] = newPopulation[k2][k++];  
-        for (i = 0; i &amp;lt; flag; i++) {  
-            if (Gh2[i] == Gh2[j]) {  
-                break;  
-            }  
-        }  
-        if (i == flag) {  
-            j++;  
-        }  
-    }  
-
-    flag = ran1;  
-    for (k = 0, j = 0; k &amp;lt; cityNum;)// 染色体长度  
-    {  
-        Gh1[j] = newPopulation[k1][k++];  
-        for (i = 0; i &amp;lt; flag; i++) {  
-            if (newPopulation[k2][i] == Gh1[j]) {  
-                break;  
-            }  
-        }  
-        if (i == flag) {  
-            j++;  
-        }  
-    }  
-
-    flag = cityNum - ran1;  
-
-    for (i = 0, j = flag; j &amp;lt; cityNum; j++, i++) {  
-        Gh1[j] = newPopulation[k2][i];  
-    }  
-
-    for (i = 0; i &amp;lt; cityNum; i++) {  
-        newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
-        newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
-    }  
-}  
-
-// 多次对换变异算子  
-public void OnCVariation(int k) {  
-    int ran1, ran2, temp;  
-    int count;// 对换次数  
-
-    // Random random = new Random(System.currentTimeMillis());  
-    count = random.nextInt(65535) % cityNum;  
-
-    for (int i = 0; i &amp;lt; count; i++) {  
-
-        ran1 = random.nextInt(65535) % cityNum;  
-        ran2 = random.nextInt(65535) % cityNum;  
-        while (ran1 == ran2) {  
-            ran2 = random.nextInt(65535) % cityNum;  
-        }  
-        temp = newPopulation[k][ran1];  
-        newPopulation[k][ran1] = newPopulation[k][ran2];  
-        newPopulation[k][ran2] = temp;  
-    }  
-
-    /* 
-     * for(i=0;i&amp;lt;L;i++) { printf(&quot;%d &quot;,newGroup[k][i]); } printf(&quot;\n&quot;); 
-     */  
-}  
-
-public void solve() {  
-    int i;  
-    int k;  
-
-    // 初始化种群  
-    initGroup();  
-    // 计算初始化种群适应度，Fitness[max]  
-    for (k = 0; k &amp;lt; scale; k++) {  
-        fitness[k] = evaluate(oldPopulation[k]);  
-        // System.out.println(fitness[k]);  
-    }  
-    // 计算初始化种群中各个个体的累积概率，Pi[max]  
-    countRate();  
-    System.out.println(&quot;初始种群...&quot;);  
-    for (k = 0; k &amp;lt; scale; k++) {  
-        for (i = 0; i &amp;lt; cityNum; i++) {  
-            System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
-        }  
-        System.out.println();  
-        System.out.println(&quot;----&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
-    }  
-      
-    for (t = 0; t &amp;lt; MAX_GEN; t++) {  
-        //evolution1();  
-        evolution();  
-        // 将新种群newGroup复制到旧种群oldGroup中，准备下一代进化  
-        for (k = 0; k &amp;lt; scale; k++) {  
-            for (i = 0; i &amp;lt; cityNum; i++) {  
-                oldPopulation[k][i] = newPopulation[k][i];  
-            }  
-        }  
-        // 计算种群适应度  
-        for (k = 0; k &amp;lt; scale; k++) {  
-            fitness[k] = evaluate(oldPopulation[k]);  
-        }  
-        // 计算种群中各个个体的累积概率  
-        countRate();  
-    }  
-
-    System.out.println(&quot;最后种群...&quot;);  
-    for (k = 0; k &amp;lt; scale; k++) {  
-        for (i = 0; i &amp;lt; cityNum; i++) {  
-            System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
-        }  
-        System.out.println();  
-        System.out.println(&quot;---&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
-    }  
-
-    System.out.println(&quot;最佳长度出现代数：&quot;);  
-    System.out.println(bestT);  
-    System.out.println(&quot;最佳长度&quot;);  
-    System.out.println(bestLength);  
-    System.out.println(&quot;最佳路径：&quot;);  
-    for (i = 0; i &amp;lt; cityNum; i++) {  
-        System.out.print(bestTour[i] + &quot;,&quot;);  
-    }  
-
-}  
-
-  
-/** 
- * @param args 
- * @throws IOException 
- */  
-public static void main(String[] args) throws IOException {  
-    System.out.println(&quot;Start....&quot;);  
-    GA ga = new GA(30, 48, 1000, 0.8f, 0.9f);  
-    ga.init(&quot;c://data.txt&quot;);  
-    ga.solve();  
 }  
 </code></pre>
-<p>}<br></code></pre></p>
+<p>}  </p>
+<p>&#x2F;&#x2F;进化函数，保留最好染色体不进行交叉变异<br>public void evolution1() {<br>    int k;<br>    &#x2F;&#x2F; 挑选某代种群中适应度最高的个体<br>    selectBestGh();  </p>
+<pre><code>// 赌轮选择策略挑选scale-1个下一代个体  
+select();  
+
+// Random random = new Random(System.currentTimeMillis());  
+float r;  
+
+for (k = 1; k + 1 &amp;amp;lt; scale / 2; k = k + 2) {  
+    r = random.nextFloat();// /产生概率  
+    if (r &amp;amp;lt; Pc) {  
+        OXCross1(k, k + 1);// 进行交叉  
+        //OXCross(k,k+1);//进行交叉  
+    } else {  
+        r = random.nextFloat();// /产生概率  
+        // 变异  
+        if (r &amp;amp;lt; Pm) {  
+            OnCVariation(k);  
+        }  
+        r = random.nextFloat();// /产生概率  
+        // 变异  
+        if (r &amp;amp;lt; Pm) {  
+            OnCVariation(k + 1);  
+        }  
+    }  
+}  
+if (k == scale / 2 - 1)// 剩最后一个染色体没有交叉L-1  
+{  
+    r = random.nextFloat();// /产生概率  
+    if (r &amp;amp;lt; Pm) {  
+        OnCVariation(k);  
+    }  
+}  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;&#x2F; 类OX交叉算子<br>void OXCross(int k1, int k2) {<br>    int i, j, k, flag;<br>    int ran1, ran2, temp;<br>    int[] Gh1 &#x3D; new int[cityNum];<br>    int[] Gh2 &#x3D; new int[cityNum];<br>    &#x2F;&#x2F; Random random &#x3D; new Random(System.currentTimeMillis());  </p>
+<pre><code>ran1 = random.nextInt(65535) % cityNum;  
+ran2 = random.nextInt(65535) % cityNum;  
+// System.out.println();  
+// System.out.println(&quot;-----------------------&quot;);  
+// System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+
+while (ran1 == ran2) {  
+    ran2 = random.nextInt(65535) % cityNum;  
+}  
+
+if (ran1 &amp;amp;gt; ran2)// 确保ran1&amp;amp;lt;ran2  
+{  
+    temp = ran1;  
+    ran1 = ran2;  
+    ran2 = temp;  
+}  
+// System.out.println();  
+// System.out.println(&quot;-----------------------&quot;);  
+// System.out.println(&quot;----&quot;+ran1+&quot;----&quot;+ran2);  
+// System.out.println(&quot;-----------------------&quot;);  
+// System.out.println();  
+flag = ran2 - ran1 + 1;// 删除重复基因前染色体长度  
+for (i = 0, j = ran1; i &amp;amp;lt; flag; i++, j++) {  
+    Gh1[i] = newPopulation[k2][j];  
+    Gh2[i] = newPopulation[k1][j];  
+}  
+// 已近赋值i=ran2-ran1个基因  
+
+for (k = 0, j = flag; j &amp;amp;lt; cityNum;)// 染色体长度  
+{  
+    Gh1[j] = newPopulation[k1][k++];  
+    for (i = 0; i &amp;amp;lt; flag; i++) {  
+        if (Gh1[i] == Gh1[j]) {  
+            break;  
+        }  
+    }  
+    if (i == flag) {  
+        j++;  
+    }  
+}  
+
+for (k = 0, j = flag; j &amp;amp;lt; cityNum;)// 染色体长度  
+{  
+    Gh2[j] = newPopulation[k2][k++];  
+    for (i = 0; i &amp;amp;lt; flag; i++) {  
+        if (Gh2[i] == Gh2[j]) {  
+            break;  
+        }  
+    }  
+    if (i == flag) {  
+        j++;  
+    }  
+}  
+
+for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+    newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+    newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+}  
+
+// System.out.println(&quot;进行交叉--------------------------&quot;);  
+// System.out.println(k1+&quot;交叉后...&quot;);  
+// for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+// System.out.print(newPopulation[k1][i] + &quot;-&quot;);  
+// }  
+// System.out.println();  
+// System.out.println(k2+&quot;交叉后...&quot;);  
+// for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+// System.out.print(newPopulation[k2][i] + &quot;-&quot;);  
+// }  
+// System.out.println();  
+// System.out.println(&quot;交叉完毕--------------------------&quot;);  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;&#x2F; 交叉算子,相同染色体交叉产生不同子代染色体<br>public void OXCross1(int k1, int k2) {<br>    int i, j, k, flag;<br>    int ran1, ran2, temp;<br>    int[] Gh1 &#x3D; new int[cityNum];<br>    int[] Gh2 &#x3D; new int[cityNum];<br>    &#x2F;&#x2F; Random random &#x3D; new Random(System.currentTimeMillis());  </p>
+<pre><code>ran1 = random.nextInt(65535) % cityNum;  
+ran2 = random.nextInt(65535) % cityNum;  
+while (ran1 == ran2) {  
+    ran2 = random.nextInt(65535) % cityNum;  
+}  
+
+if (ran1 &amp;amp;gt; ran2)// 确保ran1&amp;amp;lt;ran2  
+{  
+    temp = ran1;  
+    ran1 = ran2;  
+    ran2 = temp;  
+}  
+
+// 将染色体1中的第三部分移到染色体2的首部  
+for (i = 0, j = ran2; j &amp;amp;lt; cityNum; i++, j++) {  
+    Gh2[i] = newPopulation[k1][j];  
+}  
+
+flag = i;// 染色体2原基因开始位置  
+
+for (k = 0, j = flag; j &amp;amp;lt; cityNum;)// 染色体长度  
+{  
+    Gh2[j] = newPopulation[k2][k++];  
+    for (i = 0; i &amp;amp;lt; flag; i++) {  
+        if (Gh2[i] == Gh2[j]) {  
+            break;  
+        }  
+    }  
+    if (i == flag) {  
+        j++;  
+    }  
+}  
+
+flag = ran1;  
+for (k = 0, j = 0; k &amp;amp;lt; cityNum;)// 染色体长度  
+{  
+    Gh1[j] = newPopulation[k1][k++];  
+    for (i = 0; i &amp;amp;lt; flag; i++) {  
+        if (newPopulation[k2][i] == Gh1[j]) {  
+            break;  
+        }  
+    }  
+    if (i == flag) {  
+        j++;  
+    }  
+}  
+
+flag = cityNum - ran1;  
+
+for (i = 0, j = flag; j &amp;amp;lt; cityNum; j++, i++) {  
+    Gh1[j] = newPopulation[k2][i];  
+}  
+
+for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+    newPopulation[k1][i] = Gh1[i];// 交叉完毕放回种群  
+    newPopulation[k2][i] = Gh2[i];// 交叉完毕放回种群  
+}  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;&#x2F; 多次对换变异算子<br>public void OnCVariation(int k) {<br>    int ran1, ran2, temp;<br>    int count;&#x2F;&#x2F; 对换次数  </p>
+<pre><code>// Random random = new Random(System.currentTimeMillis());  
+count = random.nextInt(65535) % cityNum;  
+
+for (int i = 0; i &amp;amp;lt; count; i++) {  
+
+    ran1 = random.nextInt(65535) % cityNum;  
+    ran2 = random.nextInt(65535) % cityNum;  
+    while (ran1 == ran2) {  
+        ran2 = random.nextInt(65535) % cityNum;  
+    }  
+    temp = newPopulation[k][ran1];  
+    newPopulation[k][ran1] = newPopulation[k][ran2];  
+    newPopulation[k][ran2] = temp;  
+}  
+
+/* 
+ * for(i=0;i&amp;amp;lt;L;i++) { printf(&quot;%d &quot;,newGroup[k][i]); } printf(&quot;\n&quot;); 
+ */  
+</code></pre>
+<p>}  </p>
+<p>public void solve() {<br>    int i;<br>    int k;  </p>
+<pre><code>// 初始化种群  
+initGroup();  
+// 计算初始化种群适应度，Fitness[max]  
+for (k = 0; k &amp;amp;lt; scale; k++) {  
+    fitness[k] = evaluate(oldPopulation[k]);  
+    // System.out.println(fitness[k]);  
+}  
+// 计算初始化种群中各个个体的累积概率，Pi[max]  
+countRate();  
+System.out.println(&quot;初始种群...&quot;);  
+for (k = 0; k &amp;amp;lt; scale; k++) {  
+    for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+        System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+    }  
+    System.out.println();  
+    System.out.println(&quot;----&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+}  
+  
+for (t = 0; t &amp;amp;lt; MAX_GEN; t++) {  
+    //evolution1();  
+    evolution();  
+    // 将新种群newGroup复制到旧种群oldGroup中，准备下一代进化  
+    for (k = 0; k &amp;amp;lt; scale; k++) {  
+        for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+            oldPopulation[k][i] = newPopulation[k][i];  
+        }  
+    }  
+    // 计算种群适应度  
+    for (k = 0; k &amp;amp;lt; scale; k++) {  
+        fitness[k] = evaluate(oldPopulation[k]);  
+    }  
+    // 计算种群中各个个体的累积概率  
+    countRate();  
+}  
+
+System.out.println(&quot;最后种群...&quot;);  
+for (k = 0; k &amp;amp;lt; scale; k++) {  
+    for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+        System.out.print(oldPopulation[k][i] + &quot;,&quot;);  
+    }  
+    System.out.println();  
+    System.out.println(&quot;---&quot; + fitness[k] + &quot; &quot; + Pi[k]);  
+}  
+
+System.out.println(&quot;最佳长度出现代数：&quot;);  
+System.out.println(bestT);  
+System.out.println(&quot;最佳长度&quot;);  
+System.out.println(bestLength);  
+System.out.println(&quot;最佳路径：&quot;);  
+for (i = 0; i &amp;amp;lt; cityNum; i++) {  
+    System.out.print(bestTour[i] + &quot;,&quot;);  
+}  
+</code></pre>
+<p>}  </p>
+<p>&#x2F;** </p>
+<ul>
+<li>@param args </li>
+<li>@throws IOException<br> *&#x2F;<br>public static void main(String[] args) throws IOException {<br> System.out.println(“Start….”);<br> GA ga &#x3D; new GA(30, 48, 1000, 0.8f, 0.9f);<br> ga.init(“c:&#x2F;&#x2F;data.txt”);<br> ga.solve();<br>}<br></code></pre></li>
+</ul>
+<p>}<br/></p></code></pre>
 <p>参考：<a href="https://blog.csdn.net/tyhj_sf/article/details/53321527" rel="noopener" target="_blank">https://blog.csdn.net/tyhj_sf/article/details/53321527</a></p>
 
     </div>

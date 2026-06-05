@@ -1,8 +1,8 @@
 ---
 title: "leetcode 41 Solution"
 disableNunjucks: true
-date: 2016-02-11T22:07:46.000Z
-updated: 2023-01-06T08:17:38.290Z
+date: 2016-02-11T14:07:46.000Z
+updated: 2023-01-06T00:17:38.290Z
 categories:
   - "algrithom"
 tags:

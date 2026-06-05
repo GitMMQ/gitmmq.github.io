@@ -1,8 +1,8 @@
 ---
 title: "leetcode 151 Solution"
 disableNunjucks: true
-date: 2015-12-28T22:15:01.000Z
-updated: 2023-01-06T08:17:38.117Z
+date: 2015-12-28T14:15:01.000Z
+updated: 2023-01-06T00:17:38.117Z
 categories:
   - "algrithom"
 tags:

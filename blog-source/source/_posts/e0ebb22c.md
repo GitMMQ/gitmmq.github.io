@@ -1,8 +1,8 @@
 ---
 title: "leetcode 116 Solution"
 disableNunjucks: true
-date: 2015-11-21T22:00:09.000Z
-updated: 2023-01-06T08:17:38.169Z
+date: 2015-11-21T14:00:09.000Z
+updated: 2023-01-06T00:17:38.169Z
 categories:
   - "algrithom"
 tags:

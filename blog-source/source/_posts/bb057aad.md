@@ -1,8 +1,8 @@
 ---
 title: "leetcode 155 Solution"
 disableNunjucks: true
-date: 2015-12-29T22:13:40.000Z
-updated: 2023-01-06T08:17:38.087Z
+date: 2015-12-29T14:13:40.000Z
+updated: 2023-01-06T00:17:38.087Z
 categories:
   - "algrithom"
 tags:

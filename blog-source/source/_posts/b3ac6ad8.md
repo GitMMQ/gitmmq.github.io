@@ -1,8 +1,8 @@
 ---
 title: "leetcode 20 Solution"
 disableNunjucks: true
-date: 2016-01-08T22:02:06.000Z
-updated: 2023-01-06T08:17:38.114Z
+date: 2016-01-08T14:02:06.000Z
+updated: 2023-01-06T00:17:38.114Z
 categories:
   - "algrithom"
 tags:

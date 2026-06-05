@@ -9,9 +9,9 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "posts"
-OUTPUT_DIR = Path(__file__).resolve().parents[1] / "source" / "_posts"
+OUTPUT_DIR = Path(__file__).resolve().parent / "source" / "_posts"
 
 
 def extract_meta(soup: BeautifulSoup, prop: str) -> str | None:

@@ -1,8 +1,8 @@
 ---
 title: "leetcode 221 Solution"
 disableNunjucks: true
-date: 2016-01-14T22:02:10.000Z
-updated: 2023-01-06T08:17:38.207Z
+date: 2016-01-14T14:02:10.000Z
+updated: 2023-01-06T00:17:38.207Z
 categories:
   - "algrithom"
 tags:

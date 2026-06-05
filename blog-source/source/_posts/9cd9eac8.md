@@ -1,8 +1,8 @@
 ---
 title: "leetcode 322 Solution"
 disableNunjucks: true
-date: 2016-02-01T22:13:23.000Z
-updated: 2023-01-06T08:17:38.270Z
+date: 2016-02-01T14:13:23.000Z
+updated: 2023-01-06T00:17:38.270Z
 categories:
   - "algrithom"
 tags:

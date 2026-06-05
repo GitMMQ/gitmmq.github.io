@@ -29,8 +29,8 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://thyrsi.com/t6/626/1544146169x2890211738.jpg">
 <meta property="og:image" content="http://thyrsi.com/t6/626/1544146212x2890211738.jpg">
-<meta property="article:published_time" content="2022-12-27T01:31:26.976Z">
-<meta property="article:modified_time" content="2022-12-27T22:40:43.799Z">
+<meta property="article:published_time" content="2022-12-26T17:31:26.976Z">
+<meta property="article:modified_time" content="2022-12-27T14:40:43.799Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="Tech, Data, Vision">
 <meta name="twitter:card" content="summary">
@@ -181,7 +181,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-count">384</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -190,7 +190,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-count">85</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -251,7 +251,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 09:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T09:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -358,153 +358,89 @@ import java.util.Queue;
     Node leftChild;
     Node rightChild;
 
-    public Node(E data, double weight) {
-        super();
-        this.data = data;
-        this.weight = weight;
-    }
-
-    public String toString() {
-        return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
-    }
+<pre><code>public Node(E data, double weight) {
+    super();
+    this.data = data;
+    this.weight = weight;
 }
 
-public static void main(String[] args) {
-    List&amp;lt;Node&amp;gt; nodes = new ArrayList&amp;lt;Node&amp;gt;();
-
-    nodes.add(new Node(&quot;A&quot;, 40.0));
-    nodes.add(new Node(&quot;B&quot;, 8.0));
-    nodes.add(new Node(&quot;C&quot;, 10.0));
-    nodes.add(new Node(&quot;D&quot;, 30.0));
-    nodes.add(new Node(&quot;E&quot;, 10.0));
-    nodes.add(new Node(&quot;F&quot;, 2.0));
-    
-    Node root = HuffmanTree.createTree(nodes);
-    
-    System.out.println(breadthFirst(root));
-
-}
-
-/**
- * 构造哈夫曼树
- * 
- * @param nodes
- *            节点集合
- * @return 构造出来的哈夫曼树的根节点
- */
-private static Node createTree(List&amp;lt;Node&amp;gt; nodes) {
-    // 只要nodes数组中还有2个以上的节点
-    while (nodes.size() &amp;gt; 1) {
-        quickSort(nodes);
-        //获取权值最小的两个节点
-        Node left = nodes.get(nodes.size()-1);
-        Node right = nodes.get(nodes.size()-2);
-        
-        //生成新节点，新节点的权值为两个子节点的权值之和
-        Node parent = new Node(null, left.weight + right.weight);
-        
-        //让新节点作为两个权值最小节点的父节点
-        parent.leftChild = left;
-        parent.rightChild = right;
-        
-        //删除权值最小的两个节点
-        nodes.remove(nodes.size()-1);
-        nodes.remove(nodes.size()-1);
-        
-        //将新节点加入到集合中
-        nodes.add(parent);
-    }
-    
-    return nodes.get(0);
-}
-
-/**
- * 将指定集合中的i和j索引处的元素交换
- * 
- * @param nodes
- * @param i
- * @param j
- */
-private static void swap(List&amp;lt;Node&amp;gt; nodes, int i, int j) {
-    Node tmp;
-    tmp = nodes.get(i);
-    nodes.set(i, nodes.get(j));
-    nodes.set(j, tmp);
-}
-
-/**
- * 实现快速排序算法，用于对节点进行排序
- * 
- * @param nodes
- * @param start
- * @param end
- */
-private static void subSort(List&amp;lt;Node&amp;gt; nodes, int start, int end) {
-    if (start &amp;lt; end) {
-        // 以第一个元素作为分界值
-        Node base = nodes.get(start);
-        // i从左边搜索，搜索大于分界值的元素的索引
-        int i = start;
-        // j从右边开始搜索，搜索小于分界值的元素的索引
-        int j = end + 1;
-        while (true) {
-            // 找到大于分界值的元素的索引，或者i已经到了end处
-            while (i &amp;lt; end &amp;amp;&amp;amp; nodes.get(++i).weight &amp;gt;= base.weight)
-                ;
-            // 找到小于分界值的元素的索引，或者j已经到了start处
-            while (j &amp;gt; start &amp;amp;&amp;amp; nodes.get(--j).weight &amp;lt;= base.weight)
-                ;
-
-            if (i &amp;lt; j) {
-                swap(nodes, i, j);
-            } else {
-                break;
-            }
-        }
-
-        swap(nodes, start, j);
-
-        //递归左边子序列
-        subSort(nodes, start, j - 1);
-        //递归右边子序列
-        subSort(nodes, j + 1, end);
-    }
-}
-
-public static void quickSort(List&amp;lt;Node&amp;gt; nodes){
-    subSort(nodes, 0, nodes.size()-1);
-}
-
-//广度优先遍历
-public static List&amp;lt;Node&amp;gt; breadthFirst(Node root){
-    Queue&amp;lt;Node&amp;gt; queue = new ArrayDeque&amp;lt;Node&amp;gt;();
-    List&amp;lt;Node&amp;gt; list = new ArrayList&amp;lt;Node&amp;gt;();
-    
-    if(root!=null){
-        //将根元素加入“队列”
-        queue.offer(root);
-    }
-    
-    while(!queue.isEmpty()){
-        //将该队列的“队尾”元素加入到list中
-        list.add(queue.peek());
-        Node p = queue.poll();
-        
-        //如果左子节点不为null，将它加入到队列
-        if(p.leftChild != null){
-            queue.offer(p.leftChild);
-        }
-        
-        //如果右子节点不为null，将它加入到队列
-        if(p.rightChild != null){
-            queue.offer(p.rightChild);
-        }
-    }
-    
-    return list;
+public String toString() {
+    return &quot;Node[data=&quot; + data + &quot;, weight=&quot; + weight + &quot;]&quot;;
 }
 </code></pre>
+<p>}</p>
+<p>public static void main(String[] args) {<br>    List&amp;lt;Node&amp;gt; nodes &#x3D; new ArrayList&amp;lt;Node&amp;gt;();</p>
+<pre><code>nodes.add(new Node(&quot;A&quot;, 40.0));
+nodes.add(new Node(&quot;B&quot;, 8.0));
+nodes.add(new Node(&quot;C&quot;, 10.0));
+nodes.add(new Node(&quot;D&quot;, 30.0));
+nodes.add(new Node(&quot;E&quot;, 10.0));
+nodes.add(new Node(&quot;F&quot;, 2.0));
+
+Node root = HuffmanTree.createTree(nodes);
+
+System.out.println(breadthFirst(root));
+</code></pre>
+<p>}</p>
+<p>&#x2F;**</p>
+<ul>
+<li><p>构造哈夫曼树</p>
+</li>
+<li></li>
+<li><p>@param nodes</p>
+</li>
+<li><pre><code>       节点集合
+</code></pre>
+</li>
+<li><p>@return 构造出来的哈夫曼树的根节点<br> *&#x2F;<br>private static Node createTree(List&amp;lt;Node&amp;gt; nodes) {<br> &#x2F;&#x2F; 只要nodes数组中还有2个以上的节点<br> while (nodes.size() &amp;gt; 1) {<br> quickSort(nodes);<br> &#x2F;&#x2F;获取权值最小的两个节点<br> Node left &#x3D; nodes.get(nodes.size()-1);<br> Node right &#x3D; nodes.get(nodes.size()-2);<br><br> &#x2F;&#x2F;生成新节点，新节点的权值为两个子节点的权值之和<br> Node parent &#x3D; new Node(null, left.weight + right.weight);<br><br> &#x2F;&#x2F;让新节点作为两个权值最小节点的父节点<br> parent.leftChild &#x3D; left;<br> parent.rightChild &#x3D; right;<br><br> &#x2F;&#x2F;删除权值最小的两个节点<br> nodes.remove(nodes.size()-1);<br> nodes.remove(nodes.size()-1);<br><br> &#x2F;&#x2F;将新节点加入到集合中<br> nodes.add(parent);<br> }</p>
+<p> return nodes.get(0);</p>
+</li>
+</ul>
+<p>}</p>
+<p>&#x2F;**</p>
+<ul>
+<li>将指定集合中的i和j索引处的元素交换</li>
+<li></li>
+<li>@param nodes</li>
+<li>@param i</li>
+<li>@param j<br> *&#x2F;<br>private static void swap(List&amp;lt;Node&amp;gt; nodes, int i, int j) {<br> Node tmp;<br> tmp &#x3D; nodes.get(i);<br> nodes.set(i, nodes.get(j));<br> nodes.set(j, tmp);<br>}</li>
+</ul>
+<p>&#x2F;**</p>
+<ul>
+<li>实现快速排序算法，用于对节点进行排序</li>
+<li></li>
+<li>@param nodes</li>
+<li>@param start</li>
+<li>@param end<br> *&#x2F;<br>private static void subSort(List&amp;lt;Node&amp;gt; nodes, int start, int end) {<br> if (start &amp;lt; end) {<br> &#x2F;&#x2F; 以第一个元素作为分界值<br> Node base &#x3D; nodes.get(start);<br> &#x2F;&#x2F; i从左边搜索，搜索大于分界值的元素的索引<br> int i &#x3D; start;<br> &#x2F;&#x2F; j从右边开始搜索，搜索小于分界值的元素的索引<br> int j &#x3D; end + 1;<br> while (true) {<br>     &#x2F;&#x2F; 找到大于分界值的元素的索引，或者i已经到了end处<br>     while (i &amp;lt; end &amp;amp;&amp;amp; nodes.get(++i).weight &amp;gt;&#x3D; base.weight)<br>         ;<br>     &#x2F;&#x2F; 找到小于分界值的元素的索引，或者j已经到了start处<br>     while (j &amp;gt; start &amp;amp;&amp;amp; nodes.get(–j).weight &amp;lt;&#x3D; base.weight)<br>         ;<br><br>     if (i &amp;lt; j) {<br>         swap(nodes, i, j);<br>     } else {<br>         break;<br>     }<br> }<br><br> swap(nodes, start, j);<br><br> &#x2F;&#x2F;递归左边子序列<br> subSort(nodes, start, j - 1);<br> &#x2F;&#x2F;递归右边子序列<br> subSort(nodes, j + 1, end);<br> }</li>
+</ul>
+<p>}</p>
+<p>public static void quickSort(List&amp;lt;Node&amp;gt; nodes){<br>    subSort(nodes, 0, nodes.size()-1);<br>}</p>
+<p>&#x2F;&#x2F;广度优先遍历<br>public static List&amp;lt;Node&amp;gt; breadthFirst(Node root){<br>    Queue&amp;lt;Node&amp;gt; queue &#x3D; new ArrayDeque&amp;lt;Node&amp;gt;();<br>    List&amp;lt;Node&amp;gt; list &#x3D; new ArrayList&amp;lt;Node&amp;gt;();</p>
+<pre><code>if(root!=null){
+    //将根元素加入“队列”
+    queue.offer(root);
+}
+
+while(!queue.isEmpty()){
+    //将该队列的“队尾”元素加入到list中
+    list.add(queue.peek());
+    Node p = queue.poll();
+    
+    //如果左子节点不为null，将它加入到队列
+    if(p.leftChild != null){
+        queue.offer(p.leftChild);
+    }
+    
+    //如果右子节点不为null，将它加入到队列
+    if(p.rightChild != null){
+        queue.offer(p.rightChild);
+    }
+}
+
+return list;
+</code></pre>
 <p>}<br></code></pre></p>
+<p>}<br/></p></code></pre>
 
     </div>
 

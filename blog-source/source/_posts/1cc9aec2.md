@@ -1,8 +1,8 @@
 ---
 title: "mysql-自增主键为什么不是连续的"
 disableNunjucks: true
-date: 2019-12-13T22:15:28.000Z
-updated: 2023-01-18T15:34:38.821Z
+date: 2019-12-13T14:15:28.000Z
+updated: 2023-01-18T07:34:38.821Z
 categories:
   - "mysql"
 tags:

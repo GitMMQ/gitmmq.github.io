@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">369</span>
+          <span class="site-state-item-count">384</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -184,7 +184,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-count">85</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -215,7 +215,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/45253a41.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/9fd79a5e.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -233,7 +233,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/45253a41.html" class="post-title-link" itemprop="url">Zookeeper功能实践</a>
+          <a href="/posts/9fd79a5e.html" class="post-title-link" itemprop="url">Agent Hermes 与 OpenClaw 记忆系统深度解析</a>
         </h2>
 
         <div class="post-meta-container">
@@ -244,7 +244,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2023-08-14 15:13:43" itemprop="dateCreated datePublished" datetime="2023-08-14T15:13:43+08:00">2023-08-14</time>
+      <time title="创建时间：2026-06-05 04:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T04:00:00+08:00">2026-06-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -252,7 +252,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -266,380 +266,575 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>当谈论ZooKeeper时，以下是一些关键概念的详细解释：</p>
+          <blockquote>
+<p>最后更新 | Last updated: 2026-06-05</p>
+</blockquote>
+<hr/>
+<h2>一、设计哲学对比 | Design Philosophy Comparison</h2>
+<p><strong>中文</strong></p>
+<p>记忆系统是个人 Agent「是否越用越懂你」的核心。两个框架在此采取了截然不同的路径：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>OpenClaw（龙虾）</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>存储介质</td>
+<td>纯 Markdown 文件</td>
+<td>Markdown + SQLite + 可选外部 Provider</td>
+</tr>
+<tr>
+<td>更新方式</td>
+<td>Agent 按规则写入 MEMORY.md</td>
+<td>Agent 主动管理 + 闭环学习自动沉淀</td>
+</tr>
+<tr>
+<td>检索方式</td>
+<td>全量注入系统提示词</td>
+<td>分层：冻结注入 + FTS5 按需检索 + 语义搜索</td>
+</tr>
+<tr>
+<td>技能与记忆关系</td>
+<td>Skills 与 Memory 分离</td>
+<td>Skills 是「程序性记忆」的产出</td>
+</tr>
+<tr>
+<td>容量策略</td>
+<td>文件大小无硬限，但全量进 Prompt</td>
+<td>持久记忆有字符上限，技能渐进式披露</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>Memory is central to whether a personal agent "knows you better over time." The two frameworks take fundamentally different approaches:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>OpenClaw (Lobster)</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage medium</td>
+<td>Plain Markdown files</td>
+<td>Markdown + SQLite + optional external providers</td>
+</tr>
+<tr>
+<td>Update model</td>
+<td>Agent writes to MEMORY.md per rules</td>
+<td>Agent-managed + closed-loop auto-curation</td>
+</tr>
+<tr>
+<td>Retrieval</td>
+<td>Full injection into system prompt</td>
+<td>Layered: frozen injection + FTS5 on-demand + semantic search</td>
+</tr>
+<tr>
+<td>Skills vs memory</td>
+<td>Skills and memory are separate</td>
+<td>Skills are procedural memory output</td>
+</tr>
+<tr>
+<td>Capacity strategy</td>
+<td>No hard file limit, but full content in prompt</td>
+<td>Char limits on persistent memory; progressive skill disclosure</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>二、OpenClaw 记忆架构 | OpenClaw Memory Architecture</h2>
+<p><strong>中文</strong></p>
+<h3>2.1 核心理念：文件即记忆</h3>
+<p>OpenClaw 将 Agent 的「身份」与「知识」完全外化为工作区中的 Markdown 文件。默认路径：<code>~/.openclaw/workspace/</code>。</p>
+<pre><code class="language-text">~/.openclaw/workspace/
+├── SOUL.md            # 人格（每次会话注入，通常人工维护）
+├── AGENTS.md          # 操作手册（含记忆规则）
+├── USER.md            # 用户偏好
+├── MEMORY.md          # 长期记忆（Agent 可更新）
+├── memory/            # 日记式记忆
+│   ├── 2026-06-01.md
+│   └── 2026-06-05.md
+└── skills/            # 技能（与记忆分离）
+    └── weather/SKILL.md
+</code></pre>
+<h3>2.2 系统提示词注入顺序</h3>
+<p>OpenClaw 在会话启动时按固定顺序组装系统提示词：</p>
 <ol>
-<li><p><strong>ZNode（Zookeeper节点）</strong>：<br/>ZNode是ZooKeeper中的基本数据单元。可以将其视为类似于文件系统中的文件或目录。每个ZNode都有一个唯一的路径标识，类似于文件系统中的绝对路径。ZNode可以保存数据，并且可以有子节点。ZooKeeper中的所有信息都存储在ZNode中。</p>
-</li>
-<li><p><strong>Watcher（监视器）</strong>：<br/>Watcher是一种机制，用于让客户端能够在ZooKeeper数据发生变化时收到通知。当某个ZNode的状态发生变化（例如数据更新、子节点变化等），注册在该ZNode上的Watcher将被触发，从而通知客户端。这使得客户端能够实时监测和响应数据变化。</p>
-</li>
-<li><p><strong>ACL（访问控制列表）</strong>：<br/>访问控制列表定义了谁有权访问ZooKeeper中的ZNode以及执行什么类型的操作（读、写、创建子节点等）。ZooKeeper使用ACL来保护数据的安全性。每个ZNode都有一个与之关联的ACL，以确定谁可以对该ZNode执行哪些操作。ACL是一个由权限和身份（例如认证的用户）组成的列表。</p>
-</li>
-<li><p><strong>客户端API</strong>：<br/>ZooKeeper提供了多种编程语言的客户端API，使开发人员能够与ZooKeeper集群交互。常用的客户端API有Java、Python、C等。这些API允许客户端连接到ZooKeeper集群，创建、读取、更新和删除ZNode，注册Watcher等操作。</p>
-</li>
+<li><code>SOUL.md</code> — 人格优先，影响模型注意力分配</li>
+<li><code>IDENTITY.md</code> — Agent 身份信息</li>
+<li><code>USER.md</code> — 用户上下文</li>
+<li><code>AGENTS.md</code> — 工具与流程指令</li>
+<li><code>MEMORY.md</code> — 持久知识（变化最频繁，靠后注入）</li>
 </ol>
-<p>总结一下常见的ZooKeeper操作流程：</p>
+<p>这种顺序设计确保人格指令优先于易变的记忆内容。</p>
+<h3>2.3 记忆类型划分</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>文件</th>
+<th>管理者</th>
+<th>典型内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>人格记忆</td>
+<td>SOUL.md</td>
+<td>用户（可 Git 管理）</td>
+<td>语气、边界、价值观</td>
+</tr>
+<tr>
+<td>用户画像</td>
+<td>USER.md</td>
+<td>用户 + Agent</td>
+<td>姓名、时区、沟通偏好</td>
+</tr>
+<tr>
+<td>长期事实</td>
+<td>MEMORY.md</td>
+<td>Agent</td>
+<td>项目路径、约定、重要决策</td>
+</tr>
+<tr>
+<td>日记记忆</td>
+<td>memory/*.md</td>
+<td>Agent</td>
+<td>按日归档的对话摘要</td>
+</tr>
+<tr>
+<td>程序性知识</td>
+<td>skills/*/SKILL.md</td>
+<td>用户/社区</td>
+<td>工作流、操作步骤</td>
+</tr>
+</tbody>
+</table>
+<h3>2.4 记忆更新机制</h3>
+<p>OpenClaw 的记忆更新依赖 <code>AGENTS.md</code> 中定义的规则。Agent 在会话中根据指令决定是否写入 <code>MEMORY.md</code> 或 <code>memory/YYYY-MM-DD.md</code>。没有内置的：</p>
+<ul>
+<li>自动技能生成</li>
+<li>FTS5 历史检索</li>
+<li>记忆容量管理与整合</li>
+</ul>
+<p>优势是透明、可审计；劣势是随记忆增长，系统提示词 Token 成本线性上升。</p>
+<h3>2.5 会话持久化</h3>
+<p>会话记录存储在 <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code>，用于会话连续性和可选的记忆索引，但<strong>不等于</strong>结构化记忆检索层。磁盘访问权限即信任边界。</p>
+<p><strong>English</strong></p>
+<h3>2.1 Core Idea: Files as Memory</h3>
+<p>OpenClaw externalizes agent identity and knowledge as Markdown in the workspace. Default path: <code>~/.openclaw/workspace/</code>.</p>
+<h3>2.2 System Prompt Injection Order</h3>
+<p>At session start, files assemble in fixed order: SOUL.md → IDENTITY.md → USER.md → AGENTS.md → MEMORY.md. Persona instructions precede volatile memory content.</p>
+<h3>2.3 Memory Type Taxonomy</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>File</th>
+<th>Maintainer</th>
+<th>Typical content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Persona memory</td>
+<td>SOUL.md</td>
+<td>User (Git-managed)</td>
+<td>Tone, boundaries, values</td>
+</tr>
+<tr>
+<td>User profile</td>
+<td>USER.md</td>
+<td>User + agent</td>
+<td>Name, timezone, preferences</td>
+</tr>
+<tr>
+<td>Long-term facts</td>
+<td>MEMORY.md</td>
+<td>Agent</td>
+<td>Project paths, conventions, decisions</td>
+</tr>
+<tr>
+<td>Diary memory</td>
+<td>memory/*.md</td>
+<td>Agent</td>
+<td>Daily conversation summaries</td>
+</tr>
+<tr>
+<td>Procedural knowledge</td>
+<td>skills/*/SKILL.md</td>
+<td>User/community</td>
+<td>Workflows, procedures</td>
+</tr>
+</tbody>
+</table>
+<h3>2.4 Update Mechanism</h3>
+<p>Updates follow rules in AGENTS.md. No built-in auto-skill generation, FTS5 history search, or capacity management. Transparent and auditable, but prompt token cost grows linearly with memory size.</p>
+<h3>2.5 Session Persistence</h3>
+<p>Transcripts live in <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code> for continuity and optional indexing — not a structured memory retrieval layer. Filesystem access is the trust boundary.</p>
+<hr/>
+<h2>三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</h2>
+<p><strong>中文</strong></p>
+<h3>3.1 四层记忆模型</h3>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+    subgraph L1["第一层：工作记忆 Working Memory"]
+        CTX[当前对话上下文]
+    end
+
+<pre><code>subgraph L2[&quot;第二层：会话记忆 Session Memory&quot;]
+    DB[(SQLite state.db)]
+    FTS[FTS5 全文索引]
+    TRIG[Trigram 索引 CJK]
+end
+
+subgraph L3[&quot;第三层：持久记忆 Persistent Memory&quot;]
+    MEM[MEMORY.md ~2200 chars]
+    USER[USER.md ~1375 chars]
+end
+
+subgraph L4[&quot;第四层：技能记忆 Skill Memory&quot;]
+    SKILLS[~/.hermes/skills/]
+    PROG[渐进式披露]
+end
+
+subgraph EXT[&quot;外部记忆 Provider（可选）&quot;]
+    HON[Honcho 用户建模]
+    MEM0[Mem0]
+    OTH[OpenViking / Hindsight / ...]
+end
+
+CTX --&amp;gt; DB
+DB --&amp;gt; FTS
+MEM --&amp;gt; CTX
+USER --&amp;gt; CTX
+SKILLS --&amp;gt; PROG
+EXT -.-&amp;gt; CTX&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+<h3>3.2 第一层：工作记忆</h3>
+<p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
+<h3>3.3 第二层：会话记忆（SQLite + FTS5）</h3>
+<p><strong>存储位置</strong>：<code>~/.hermes/state.db</code>（WAL 模式）</p>
+<p><strong>核心表结构</strong>：</p>
+<pre><code class="language-text">state.db
+├── sessions          — 会话元数据、Token 统计、计费
+├── messages          — 完整消息历史
+├── messages_fts      — FTS5 全文索引（content + tool_name + tool_calls）
+├── messages_fts_trigram — Trigram 分词器（中日韩子串搜索）
+└── state_meta        — 键值元数据
+</code></pre>
+<p><strong>检索工具</strong>：<code>session_search</code></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>持久记忆 MEMORY.md</th>
+<th>会话搜索 session_search</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>容量</td>
+<td>~1300 tokens 固定</td>
+<td>无限（所有历史会话）</td>
+</tr>
+<tr>
+<td>速度</td>
+<td>即时（已在 Prompt 中）</td>
+<td>~20ms FTS5 查询</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>每会话固定 Token 开销</td>
+<td>按需，无 LLM 调用</td>
+</tr>
+<tr>
+<td>用途</td>
+<td>关键事实常驻</td>
+<td>「上周我们讨论过 X 吗？」</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FTS5 查询语法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>语法</th>
+<th>示例</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关键词</td>
+<td><code>docker deployment</code></td>
+<td>隐式 AND</td>
+</tr>
+<tr>
+<td>引号短语</td>
+<td><code>"exact phrase"</code></td>
+<td>精确匹配</td>
+</tr>
+<tr>
+<td>布尔 OR</td>
+<td><code>docker OR kubernetes</code></td>
+<td>任一匹配</td>
+</tr>
+<tr>
+<td>前缀</td>
+<td><code>deploy*</code></td>
+<td>前缀匹配</td>
+</tr>
+</tbody>
+</table>
+<p><strong>写入争用处理</strong>：Gateway 多平台并发写入时，采用 1 秒超时 + 最多 15 次随机抖动重试（20–150ms）+ BEGIN IMMEDIATE 事务。</p>
+<h3>3.4 第三层：持久记忆</h3>
+<p>两个受字符上限约束的文件，位于 <code>~/.hermes/memories/</code>：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>用途</th>
+<th>上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MEMORY.md</td>
+<td>Agent 个人笔记：环境事实、约定、经验教训</td>
+<td>2,200 字符（~800 tokens）</td>
+</tr>
+<tr>
+<td>USER.md</td>
+<td>用户画像：偏好、沟通风格、期望</td>
+<td>1,375 字符（~500 tokens）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>冻结快照模式</strong>：会话启动时将记忆渲染进系统提示词后<strong>不再变更</strong>（保护 LLM 前缀缓存）。Agent 在会话中通过 <code>memory</code> 工具增删改，变更立即落盘，但下次会话才进入 Prompt。</p>
+<p><strong>memory 工具操作</strong>：</p>
+<pre><code class="language-python">memory(action="add",    target="memory", content="...")
+memory(action="replace", target="user",  old_text="dark mode", content="...")
+memory(action="remove",  target="memory", old_text="obsolete entry")
+</code></pre>
+<p><strong>安全扫描</strong>：写入前检测 Prompt 注入、凭证外泄、不可见 Unicode 字符。</p>
+<h3>3.5 第四层：技能记忆（程序性记忆）</h3>
+<p>技能是 Hermes 闭环学习的核心产出，存储于 <code>~/.hermes/skills/</code>。</p>
+<p><strong>渐进式披露（Progressive Disclosure）</strong>：</p>
+<pre><code class="language-text">Level 0: skills_list()        → [{name, description}]     (~3k tokens)
+Level 1: skill_view(name)     → 完整 SKILL.md 内容        (按需)
+Level 2: skill_view(name, path) → 特定参考文件            (按需)
+</code></pre>
+<p>效果：技能库从 40 个增长到 200 个，上下文成本几乎不变。</p>
+<p><strong>自动创建触发条件</strong>（<code>skill_manage</code> 工具）：</p>
+<ul>
+<li>完成 5+ 次工具调用的复杂任务</li>
+<li>经历错误并找到正确路径</li>
+<li>用户纠正了 Agent 做法</li>
+<li>发现非平凡工作流</li>
+</ul>
+<p><strong>自改进</strong>：优先使用 <code>patch</code>（<code>old_string</code> / <code>new_string</code>）而非全量 <code>edit</code>，节省 Token。</p>
+<h3>3.6 外部记忆 Provider</h3>
+<p>Hermes 内置 8 种可选外部 Provider，与内置记忆<strong>并行运行</strong>（不替代）：</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Honcho</td>
+<td>辩证式用户建模</td>
+</tr>
+<tr>
+<td>Mem0</td>
+<td>自动事实提取</td>
+</tr>
+<tr>
+<td>OpenViking</td>
+<td>知识图谱</td>
+</tr>
+<tr>
+<td>Hindsight</td>
+<td>长期回忆增强</td>
+</tr>
+<tr>
+<td>Holographic</td>
+<td>语义向量检索</td>
+</tr>
+<tr>
+<td>RetainDB / ByteRover / Supermemory</td>
+<td>各专精场景</td>
+</tr>
+</tbody>
+</table>
+<p>配置：<code>hermes memory setup</code> / <code>hermes memory status</code></p>
+<h3>3.7 闭环学习与记忆的协同</h3>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>sequenceDiagram
+    participant U as 用户
+    participant A as AIAgent
+    participant M as Memory Manager
+    participant S as Skill Store
+    participant DB as SQLite FTS5
+
+<pre><code>U-&amp;gt;&amp;gt;A: 复杂任务请求
+A-&amp;gt;&amp;gt;A: 执行工具（5+ 次）
+A-&amp;gt;&amp;gt;M: 策划记忆（add/replace）
+A-&amp;gt;&amp;gt;S: skill_manage(create)
+A-&amp;gt;&amp;gt;DB: 持久化会话消息
+Note over A,S: 下次同类任务
+A-&amp;gt;&amp;gt;S: skill_view（按需加载）
+A-&amp;gt;&amp;gt;DB: session_search（历史召回）
+A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+<p><strong>English</strong></p>
+<h3>3.1 Four-Layer Memory Model</h3>
+<p>Working memory (current context) → Session memory (SQLite + FTS5) → Persistent memory (MEMORY.md / USER.md with char limits) → Skill memory (progressive disclosure in <code>~/.hermes/skills/</code>). Optional external providers (Honcho, Mem0, etc.) run in parallel.</p>
+<h3>3.2 Layer 1: Working Memory</h3>
+<p>Current session messages and tool results. <code>ContextCompressor</code> summarizes when context exceeds thresholds, triggering session splits via <code>parent_session_id</code> chains.</p>
+<h3>3.3 Layer 2: Session Memory</h3>
+<p>Stored in <code>~/.hermes/state.db</code> (WAL mode). FTS5 + trigram indexes for full-text and CJK substring search. <code>session_search</code> tool for on-demand recall. Write contention handled with short timeouts and jittered retries.</p>
+<h3>3.4 Layer 3: Persistent Memory</h3>
+<p><code>MEMORY.md</code> (~2200 chars) and <code>USER.md</code> (~1375 chars) in <code>~/.hermes/memories/</code>. <strong>Frozen snapshot</strong> at session start for prefix-cache stability. <code>memory</code> tool for add/replace/remove with security scanning.</p>
+<h3>3.5 Layer 4: Skill Memory</h3>
+<p>Procedural memory in <code>~/.hermes/skills/</code> with progressive disclosure (index → full content on demand). Auto-created after complex tasks; self-improved via <code>skill_manage</code> patch.</p>
+<h3>3.6 External Memory Providers</h3>
+<p>8 optional providers (Honcho, Mem0, OpenViking, Hindsight, etc.) complement built-in memory.</p>
+<h3>3.7 Learning Loop Synergy</h3>
+<p>Task completion → memory curation → skill creation → FTS5 indexing → faster recall on similar future tasks.</p>
+<hr/>
+<h2>四、关键差异总结 | Key Differences Summary</h2>
+<p><strong>中文</strong></p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>OpenClaw 做法</th>
+<th>Hermes 做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>记住用户偏好</td>
+<td>写入 USER.md，全量注入</td>
+<td>写入 USER.md（有上限），冻结注入</td>
+</tr>
+<tr>
+<td>回忆上周对话</td>
+<td>依赖 MEMORY.md 摘要或重新阅读 jsonl</td>
+<td><code>session_search</code> FTS5 按需检索</td>
+</tr>
+<tr>
+<td>沉淀重复工作流</td>
+<td>手动编写 SKILL.md</td>
+<td>任务完成后自动生成 + patch 优化</td>
+</tr>
+<tr>
+<td>控制 Token 成本</td>
+<td>精简 Markdown 文件</td>
+<td>字符上限 + 渐进式技能披露 + 压缩</td>
+</tr>
+<tr>
+<td>跨会话用户理解</td>
+<td>静态文件累积</td>
+<td>Honcho 辩证建模 + 周期性微调</td>
+</tr>
+<tr>
+<td>记忆可审计性</td>
+<td>极高（纯文本 Git）</td>
+<td>高（Markdown + SQLite 可导出）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>OpenClaw</th>
+<th>Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Remember user preferences</td>
+<td>Write USER.md, full injection</td>
+<td>Write USER.md (capped), frozen injection</td>
+</tr>
+<tr>
+<td>Recall last week's chat</td>
+<td>MEMORY.md summary or jsonl replay</td>
+<td><code>session_search</code> FTS5 on demand</td>
+</tr>
+<tr>
+<td>Capture repeated workflows</td>
+<td>Manual SKILL.md</td>
+<td>Auto-create + patch after tasks</td>
+</tr>
+<tr>
+<td>Control token cost</td>
+<td>Trim Markdown files</td>
+<td>Char limits + progressive skills + compression</td>
+</tr>
+<tr>
+<td>Cross-session user modeling</td>
+<td>Static file accumulation</td>
+<td>Honcho dialectic + periodic nudge</td>
+</tr>
+<tr>
+<td>Auditability</td>
+<td>Very high (plain text Git)</td>
+<td>High (Markdown + exportable SQLite)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>五、最佳实践 | Best Practices</h2>
+<p><strong>中文</strong></p>
+<h3>OpenClaw</h3>
 <ol>
-<li><p><strong>连接到ZooKeeper集群</strong>：<br/>客户端使用适当的API连接到ZooKeeper集群。</p>
-</li>
-<li><p><strong>创建ZNode</strong>：<br/>客户端可以创建ZNode，为其指定路径、数据和ACL。</p>
-</li>
-<li><p><strong>读取和更新ZNode数据</strong>：<br/>客户端可以读取和更新ZNode中存储的数据。</p>
-</li>
-<li><p><strong>注册Watcher</strong>：<br/>客户端可以在ZNode上注册Watcher，以便在ZNode的状态发生变化时得到通知。</p>
-</li>
-<li><p><strong>处理Watcher触发</strong>：<br/>当ZNode的状态发生变化时，与之相关的Watcher会被触发，客户端可以在Watcher中定义响应逻辑。</p>
-</li>
-<li><p><strong>删除ZNode</strong>：<br/>客户端可以删除特定的ZNode。</p>
-</li>
-<li><p><strong>处理会话过期</strong>：<br/>客户端会话有时限，如果超过了指定的会话超时时间没有及时与ZooKeeper集群通信，会话将过期。客户端需要处理会话过期的情况。</p>
-</li>
+<li><strong>职责分离</strong>：人格写 SOUL.md，流程写 AGENTS.md，事实写 MEMORY.md</li>
+<li><strong>版本管理</strong>：SOUL.md 和 AGENTS.md 纳入 Git；MEMORY.md 可让 Agent 自管</li>
+<li><strong>控制体积</strong>：MEMORY.md 定期人工审查，避免 Prompt 膨胀</li>
+<li><strong>日记归档</strong>：用 <code>memory/YYYY-MM-DD.md</code> 分离当日 ephemeral 内容</li>
 </ol>
-<p>需要注意的是，这里只是一个概览，ZooKeeper还有更多高级功能，比如临时节点、顺序节点等。此外，ZooKeeper还用于分布式锁、配置管理等场景，使得分布式系统的管理和协调变得更加可靠和简单。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/80270766.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/80270766.html" class="post-title-link" itemprop="url">Zookeeper分布式配置中心</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-08-14 15:13:10" itemprop="dateCreated datePublished" datetime="2023-08-14T15:13:10+08:00">2023-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>实现分布式锁是 ZooKeeper 的一个常见应用场景。下面是一个使用 ZooKeeper 实现分布式锁的简单示例，基于 <code>curator</code> 库。</p>
-<p>示例代码假设你的项目中引入了 <code>curator</code> 依赖。注意，这个示例只是一个基本的演示，实际生产环境中还需要考虑更多的异常处理、超时控制、死锁处理等情况。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.locks.InterProcessMutex;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DistributedLock</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String lockPath;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> InterProcessMutex lock;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">DistributedLock</span><span class="params">(String connectString, String lockPath)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br/><span class="line">        <span class="built_in">this</span>.lockPath = lockPath;</span><br/><span class="line">        <span class="built_in">this</span>.lock = <span class="keyword">new</span> <span class="title class_">InterProcessMutex</span>(client, lockPath);</span><br/><span class="line">        client.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">acquireLock</span><span class="params">(<span class="type">long</span> timeout, TimeUnit unit)</span> {</span><br/><span class="line">        <span class="keyword">try</span> {</span><br/><span class="line">            <span class="keyword">return</span> lock.acquire(timeout, unit);</span><br/><span class="line">        } <span class="keyword">catch</span> (Exception e) {</span><br/><span class="line">            e.printStackTrace();</span><br/><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">releaseLock</span><span class="params">()</span> {</span><br/><span class="line">        <span class="keyword">try</span> {</span><br/><span class="line">            lock.release();</span><br/><span class="line">        } <span class="keyword">catch</span> (Exception e) {</span><br/><span class="line">            e.printStackTrace();</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> {</span><br/><span class="line">        CloseableUtils.closeQuietly(client);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">connectString</span> <span class="operator">=</span> <span class="string">"localhost:2181"</span>;  <span class="comment">// ZooKeeper连接地址</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">lockPath</span> <span class="operator">=</span> <span class="string">"/myApp/lock"</span>;          <span class="comment">// 锁节点路径</span></span><br/><span class="line"></span><br/><span class="line">        <span class="type">DistributedLock</span> <span class="variable">distributedLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DistributedLock</span>(connectString, lockPath);</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">try</span> {</span><br/><span class="line">            <span class="keyword">if</span> (distributedLock.acquireLock(<span class="number">10</span>, TimeUnit.SECONDS)) {</span><br/><span class="line">                System.out.println(<span class="string">"Lock acquired. Doing critical section work..."</span>);</span><br/><span class="line">                Thread.sleep(<span class="number">5000</span>);</span><br/><span class="line">            } <span class="keyword">else</span> {</span><br/><span class="line">                System.out.println(<span class="string">"Failed to acquire lock."</span>);</span><br/><span class="line">            }</span><br/><span class="line">        } <span class="keyword">catch</span> (InterruptedException e) {</span><br/><span class="line">            e.printStackTrace();</span><br/><span class="line">        } <span class="keyword">finally</span> {</span><br/><span class="line">            distributedLock.releaseLock();</span><br/><span class="line">            distributedLock.close();</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，<code>DistributedLock</code> 类封装了分布式锁的基本功能。通过 <code>acquireLock</code> 方法尝试获取锁，在锁获取成功后进入临界区执行工作。<code>releaseLock</code> 方法用于释放锁。</p>
-<p>需要注意的是，这只是一个基本的分布式锁实现示例。在实际应用中，你可能需要考虑更复杂的锁策略、超时控制、处理异常情况等。同时，ZooKeeper 还支持其他类型的分布式锁，如 <code>InterProcessSemaphoreMutex</code>、<code>InterProcessReadWriteLock</code> 等，你可以根据需求选择合适的锁类型。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7b1c422a.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/7b1c422a.html" class="post-title-link" itemprop="url">Zookeeper分布式锁</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-08-14 15:12:49" itemprop="dateCreated datePublished" datetime="2023-08-14T15:12:49+08:00">2023-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>分布式配置中心是ZooKeeper的一个常见应用场景，它允许在分布式系统中集中管理配置信息，使得配置的变更能够实时生效，而无需重新部署应用。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper来实现一个基本的分布式配置中心。</p>
-<p>示例代码基于<code>curator</code>库来实现，确保你的项目中引入了<code>curator</code>的依赖。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.NodeCache;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DistributedConfigCenter</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String configPath;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">DistributedConfigCenter</span><span class="params">(String connectString, String configPath)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br/><span class="line">        <span class="built_in">this</span>.configPath = configPath;</span><br/><span class="line">        client.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">getConfigValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">byte</span>[] data = client.getData().forPath(configPath);</span><br/><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(data);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">watchConfigChanges</span><span class="params">()</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">NodeCache</span> <span class="variable">nodeCache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NodeCache</span>(client, configPath);</span><br/><span class="line">        nodeCache.getListenable().addListener(() -&gt; {</span><br/><span class="line">            <span class="keyword">if</span> (nodeCache.getCurrentData() != <span class="literal">null</span>) {</span><br/><span class="line">                <span class="type">String</span> <span class="variable">newValue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(nodeCache.getCurrentData().getData());</span><br/><span class="line">                System.out.println(<span class="string">"Config changed: "</span> + newValue);</span><br/><span class="line">            }</span><br/><span class="line">        });</span><br/><span class="line">        nodeCache.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> {</span><br/><span class="line">        CloseableUtils.closeQuietly(client);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">connectString</span> <span class="operator">=</span> <span class="string">"localhost:2181"</span>;  <span class="comment">// ZooKeeper连接地址</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">configPath</span> <span class="operator">=</span> <span class="string">"/myApp/config"</span>;      <span class="comment">// 配置节点路径</span></span><br/><span class="line"></span><br/><span class="line">        <span class="type">DistributedConfigCenter</span> <span class="variable">configCenter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DistributedConfigCenter</span>(connectString, configPath);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 获取配置值</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> configCenter.getConfigValue();</span><br/><span class="line">        System.out.println(<span class="string">"Initial config value: "</span> + value);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 监听配置变更</span></span><br/><span class="line">        configCenter.watchConfigChanges();</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 模拟配置变更</span></span><br/><span class="line">        Thread.sleep(<span class="number">5000</span>);</span><br/><span class="line">        configCenter.client.setData().forPath(configPath, <span class="string">"newConfigValue"</span>.getBytes());</span><br/><span class="line"></span><br/><span class="line">        Thread.sleep(<span class="number">10000</span>);</span><br/><span class="line">        configCenter.close();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，<code>DistributedConfigCenter</code>类封装了配置中心的基本功能。通过<code>getConfigValue</code>方法获取配置值，通过<code>watchConfigChanges</code>方法监听配置变更。在示例的<code>main</code>方法中，首先创建一个ZooKeeper客户端并初始化配置中心，然后获取初始配置值，并监听配置变更。当配置发生变化时，会输出新的配置值。</p>
-<p>请注意，这只是一个简单的示例，实际项目中还需要考虑更多的异常处理、线程安全、定时刷新等问题。同时，还可以根据具体需求扩展更多的功能，如支持不同环境的配置、配置权限控制等。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/3c17bf11.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/3c17bf11.html" class="post-title-link" itemprop="url">Zookeeper服务注册与订阅</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-08-14 15:12:20" itemprop="dateCreated datePublished" datetime="2023-08-14T15:12:20+08:00">2023-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>ZooKeeper在服务注册与订阅（服务发现）方面，通常会使用有序临时节点来实现。当一个服务实例启动时，它会在ZooKeeper中创建一个临时节点来表示自己的存在。其他服务可以通过监听这些节点的变化来实现实时的服务发现。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper实现服务注册与订阅的基本逻辑。</p>
-<p>首先，确保你的项目中引入了ZooKeeper客户端库依赖。常用的ZooKeeper客户端库包括<code>zookeeper</code>和<code>curator</code>。</p>
-<p>示例代码基于<code>curator</code>库来实现服务注册与订阅：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.nodes.PersistentEphemeralNode;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServiceRegistry</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String basePath;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">ServiceRegistry</span><span class="params">(String connectString, String basePath)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br/><span class="line">        <span class="built_in">this</span>.basePath = basePath;</span><br/><span class="line">        client.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">registerService</span><span class="params">(String serviceName, String serviceAddress)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">servicePath</span> <span class="operator">=</span> basePath + <span class="string">"/"</span> + serviceName;</span><br/><span class="line">        <span class="type">PersistentEphemeralNode</span> <span class="variable">node</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PersistentEphemeralNode</span>(client, PersistentEphemeralNode.Mode.EPHEMERAL, servicePath, serviceAddress.getBytes());</span><br/><span class="line">        node.start();</span><br/><span class="line">        node.waitForInitialCreate();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> {</span><br/><span class="line">        CloseableUtils.closeQuietly(client);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，<code>ServiceRegistry</code>类用于服务注册，它会创建一个临时节点来表示服务实例。当服务实例启动时，可以调用<code>registerService</code>方法来注册自己的信息。</p>
-<p>下面是一个简单的服务订阅示例：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.ChildData;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCache;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServiceSubscriber</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String basePath;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">ServiceSubscriber</span><span class="params">(String connectString, String basePath)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br/><span class="line">        <span class="built_in">this</span>.basePath = basePath;</span><br/><span class="line">        client.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">subscribe</span><span class="params">(String serviceName)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">servicePath</span> <span class="operator">=</span> basePath + <span class="string">"/"</span> + serviceName;</span><br/><span class="line"></span><br/><span class="line">        <span class="type">PathChildrenCache</span> <span class="variable">cache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PathChildrenCache</span>(client, servicePath, <span class="literal">true</span>);</span><br/><span class="line">        <span class="type">PathChildrenCacheListener</span> <span class="variable">listener</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PathChildrenCacheListener</span>() {</span><br/><span class="line">            <span class="meta">@Override</span></span><br/><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">childEvent</span><span class="params">(CuratorFramework curatorFramework, PathChildrenCacheEvent event)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">                <span class="keyword">if</span> (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {</span><br/><span class="line">                    <span class="type">ChildData</span> <span class="variable">data</span> <span class="operator">=</span> event.getData();</span><br/><span class="line">                    <span class="type">String</span> <span class="variable">serviceAddress</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(data.getData());</span><br/><span class="line">                    System.out.println(<span class="string">"New service added: "</span> + serviceAddress);</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line">        };</span><br/><span class="line">        cache.getListenable().addListener(listener);</span><br/><span class="line">        cache.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> {</span><br/><span class="line">        CloseableUtils.closeQuietly(client);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-<p>在上述代码中，<code>ServiceSubscriber</code>类用于订阅服务信息变化。它会监听指定服务的节点变化，并在有新服务实例加入时输出服务地址。</p>
-<p>请注意，这只是一个基本的示例代码，实际项目中还需要考虑更多的异常处理、线程安全等问题。同时，还可以使用更高级的ZooKeeper客户端库，如Apache Curator，来简化操作和提供更多的特性。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/daad87b1.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/daad87b1.html" class="post-title-link" itemprop="url">Zookeeper快速入门</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-08-14 15:11:05" itemprop="dateCreated datePublished" datetime="2023-08-14T15:11:05+08:00">2023-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Apache ZooKeeper是一个分布式的开源协调服务，用于管理大规模分布式系统中的配置、同步、命名等任务。它提供了一组简单而强大的API，用于处理复杂的分布式系统的协调问题。以下是一些典型的ZooKeeper应用场景实战示例：</p>
+<h3>Hermes Agent</h3>
 <ol>
-<li><p><strong>分布式配置管理：</strong><br/>ZooKeeper可用于管理分布式系统的配置信息。例如，你可以将数据库连接字符串、缓存配置等保存在ZooKeeper节点中，并在分布式应用中动态获取这些配置信息。</p>
-</li>
-<li><p><strong>分布式锁：</strong><br/>ZooKeeper的有序节点特性使得它非常适合实现分布式锁。你可以在ZooKeeper中创建一个临时有序节点，节点的顺序会根据创建顺序自动排序。应用可以根据节点顺序来决定谁获得了锁。</p>
-</li>
-<li><p><strong>选举：</strong><br/>ZooKeeper可以用于在分布式系统中进行领导者选举。多个节点可以在ZooKeeper中创建临时节点，谁创建成功谁就成为领导者。当一个节点宕机时，相应的临时节点会被删除，触发新一轮的选举。</p>
-</li>
-<li><p><strong>服务发现：</strong><br/>在微服务架构中，服务发现是一个重要的问题。ZooKeeper可以用于注册和发现服务。每个服务实例可以在ZooKeeper中创建一个临时节点，其他服务可以通过监听节点变化来实时获取可用的服务实例。</p>
-</li>
-<li><p><strong>分布式同步：</strong><br/>ZooKeeper提供的有序节点和监视功能可以用于实现分布式系统的同步机制。节点的创建和删除会触发事件通知，应用可以根据这些通知来进行同步操作。</p>
-</li>
-<li><p><strong>协调任务分配：</strong><br/>在分布式任务调度场景中，ZooKeeper可以帮助协调任务的分配和执行。任务调度器可以通过ZooKeeper来进行任务的分配、状态的维护以及故障处理。</p>
-</li>
-<li><p><strong>消息队列：</strong><br/>虽然ZooKeeper不是专门的消息队列系统，但可以借助其有序节点和事件通知功能来实现简单的消息队列。每个消息可以被看作一个有序节点，消息的消费者可以监听节点变化以获取消息。</p>
-</li>
+<li><strong>善用分层</strong>：关键事实放 MEMORY.md；历史细节靠 <code>session_search</code></li>
+<li><strong>监控容量</strong>：MEMORY.md 超 80% 时主动整合条目</li>
+<li><strong>信任技能索引</strong>：不必手动维护大量 Skill，让闭环学习自动沉淀</li>
+<li><strong>选配 Provider</strong>：需要深度用户建模时启用 Honcho；简单场景用内置即可</li>
+<li><strong>从龙虾迁移</strong>：<code>hermes claw migrate</code> 导入 MEMORY.md / USER.md 条目</li>
 </ol>
-<p>这些只是ZooKeeper的一些典型应用场景，实际中还可以根据具体需求进行扩展。需要注意的是，虽然ZooKeeper在很多分布式系统场景下非常有用，但随着分布式系统技术的发展，也有一些替代方案出现，如etcd、Consul等。选择合适的工具要根据实际需求和技术背景进行权衡。</p>
+<p><strong>English</strong></p>
+<h3>OpenClaw</h3>
+<ol>
+<li>Separate concerns: SOUL.md (persona), AGENTS.md (procedures), MEMORY.md (facts)</li>
+<li>Version-control SOUL.md and AGENTS.md in Git</li>
+<li>Periodically audit MEMORY.md to control prompt size</li>
+<li>Use <code>memory/YYYY-MM-DD.md</code> for daily ephemeral content</li>
+</ol>
+<h3>Hermes Agent</h3>
+<ol>
+<li>Use layers: critical facts in MEMORY.md; historical detail via <code>session_search</code></li>
+<li>Consolidate when MEMORY.md exceeds ~80% capacity</li>
+<li>Trust the skill index — let the learning loop accumulate procedural memory</li>
+<li>Enable external providers (e.g., Honcho) only when deeper user modeling is needed</li>
+<li>Migrate from OpenClaw with <code>hermes claw migrate</code></li>
+</ol>
+<hr/>
+<h2>六、结语 | Conclusion</h2>
+<p><strong>中文</strong></p>
+<p>OpenClaw 的记忆系统是 <strong>「透明文件柜」</strong>——简单、可读、完全由人掌控，适合重视可审计性与手动定制的用户。Hermes 的记忆系统是 <strong>「分层图书馆 + 自学习档案员」</strong>——通过 SQLite 检索、字符预算、技能渐进披露和闭环学习，在 Token 成本可控的前提下实现「越用越懂你」。选择哪套记忆架构，本质上是在 <strong>可控透明度</strong> 与 <strong>自动进化效率</strong> 之间做权衡。</p>
+<p><strong>English</strong></p>
+<p>OpenClaw's memory is a <strong>transparent filing cabinet</strong> — simple, readable, fully human-controlled, ideal for users who value auditability and manual curation. Hermes's memory is a <strong>layered library with a self-learning archivist</strong> — SQLite search, char budgets, progressive skill disclosure, and closed-loop learning deliver "knows you better over time" with controlled token cost. The choice is fundamentally a tradeoff between <strong>transparent control</strong> and <strong>automatic evolutionary efficiency</strong>.</p>
 
       
     </div>
@@ -666,7 +861,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/676b1804.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/3131a1c6.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -684,7 +879,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/676b1804.html" class="post-title-link" itemprop="url">tensorflow使用指南</a>
+          <a href="/posts/3131a1c6.html" class="post-title-link" itemprop="url">Agent Hermes 与 OpenClaw（龙虾）：架构、应用与对比</a>
         </h2>
 
         <div class="post-meta-container">
@@ -695,7 +890,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2023-01-05 14:43:02" itemprop="dateCreated datePublished" datetime="2023-01-05T14:43:02+08:00">2023-01-05</time>
+      <time title="创建时间：2026-06-05 03:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T03:00:00+08:00">2026-06-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -703,7 +898,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -717,11 +912,817 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="安装"><a class="headerlink" href="#安装" title="安装"></a>安装</h1><p>可以安装Anaconda<br/>通过Anaconda Prompts进入conda 命令行</p>
-<h1 id="常用命令"><a class="headerlink" href="#常用命令" title="常用命令"></a>常用命令</h1><h2 id="更换为国内源"><a class="headerlink" href="#更换为国内源" title="更换为国内源"></a>更换为国内源</h2><h3 id="清华源"><a class="headerlink" href="#清华源" title="清华源"></a>清华源</h3><p>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</a><br/>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</a><br/>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/</a></p>
-<h3 id="中科大源"><a class="headerlink" href="#中科大源" title="中科大源"></a>中科大源</h3><p>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/pkgs/main/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/pkgs/main/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/pkgs/free/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/pkgs/free/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/</a></p>
-<h3 id="搜索时显示通道地址"><a class="headerlink" href="#搜索时显示通道地址" title="搜索时显示通道地址"></a>搜索时显示通道地址</h3><p>conda config –set show_channel_urls yes</p>
-<h3 id="还原原始通道"><a class="headerlink" href="#还原原始通道" title="还原原始通道"></a>还原原始通道</h3><p>conda config –remove-key channels</p>
+          <blockquote>
+<p>最后更新 | Last updated: 2026-06-05</p>
+</blockquote>
+<hr/>
+<h2>一、背景与定位 | Background &amp; Positioning</h2>
+<p><strong>中文</strong></p>
+<p>2026 年初，个人 AI Agent 领域出现两个现象级开源项目：</p>
+<ul>
+<li><strong>OpenClaw（龙虾）</strong>：吉祥物是太空龙虾 Molty 🦞，GitHub Star 超 35 万，社区称其为「养虾」——在本地或服务器上长期运行一只个人助理。</li>
+<li><strong>Hermes Agent（爱马仕）</strong>：由 Nous Research 发布，定位是 <strong>"The agent that grows with you"（与你共同成长的智能体）</strong>，核心差异是内置 <strong>闭环学习系统（Learning Loop）</strong>。</li>
+</ul>
+<p>二者均为 MIT 协议、可自托管、支持多渠道消息，但设计哲学不同：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>OpenClaw（龙虾）</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心问题</td>
+<td><strong>连接</strong> — 让 AI 接入工具与聊天渠道</td>
+<td><strong>进化</strong> — 让 AI 从经验中学习并自我改进</td>
+</tr>
+<tr>
+<td>架构重心</td>
+<td>Gateway 控制平面</td>
+<td>Agent Engine + 学习闭环</td>
+</tr>
+<tr>
+<td>技能来源</td>
+<td>用户/社区手动编写 SKILL.md</td>
+<td>任务完成后 <strong>自动生成 + 自我迭代</strong></td>
+</tr>
+<tr>
+<td>记忆模式</td>
+<td>Markdown 工作区文件</td>
+<td>分层记忆 + SQLite FTS5 检索</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<p>In early 2026, two standout open-source personal AI agent projects emerged:</p>
+<ul>
+<li><strong>OpenClaw (Lobster)</strong>: Mascot Molty the space lobster 🦞, 350K+ GitHub stars; Chinese communities call it "raising a lobster" — running a persistent personal assistant locally or on a server.</li>
+<li><strong>Hermes Agent</strong>: Built by Nous Research, positioned as <strong>"The agent that grows with you"</strong>, with a built-in <strong>closed learning loop</strong>.</li>
+</ul>
+<p>Both are MIT-licensed, self-hostable, and multi-channel — but their design philosophies diverge:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>OpenClaw (Lobster)</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core problem</td>
+<td><strong>Connectivity</strong> — tools + chat channels</td>
+<td><strong>Evolution</strong> — learn and improve from experience</td>
+</tr>
+<tr>
+<td>Architecture focus</td>
+<td>Gateway control plane</td>
+<td>Agent engine + learning loop</td>
+</tr>
+<tr>
+<td>Skills</td>
+<td>User/community-authored SKILL.md</td>
+<td><strong>Auto-generated + self-improving</strong> after tasks</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>Markdown workspace files</td>
+<td>Layered memory + SQLite FTS5 search</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>二、OpenClaw（龙虾）架构设计 | OpenClaw Architecture</h2>
+<p><strong>中文</strong></p>
+<p>OpenClaw 的核心理念是：<strong>Gateway 即产品</strong>。单一 TypeScript 进程监听默认端口 <code>18789</code>，统一管理所有渠道连接、会话路由与工具执行。</p>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+    subgraph Channels["消息渠道"]
+        WA[WhatsApp]
+        TG[Telegram]
+        DC[Discord]
+        SL[Slack]
+        IM[iMessage]
+        SG[Signal]
+        MORE[50+ 渠道...]
+    end
+
+<pre><code>subgraph Gateway[&quot;OpenClaw Gateway :18789&quot;]
+    ROUTE[会话路由]
+    TOOLS[工具执行]
+    MEM[记忆读写]
+end
+
+subgraph Runtime[&quot;Agent Runtime&quot;]
+    WP[工作区文件注入]
+    SK[Skills 加载]
+    LLM[LLM 推理]
+end
+
+Channels --&amp;gt; Gateway
+Gateway --&amp;gt; Runtime
+Runtime --&amp;gt; Gateway
+Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+<h3>2.1 工作区文件体系（Workspace Bootstrap）</h3>
+<p>Agent 的「人格」与「知识」以纯 Markdown 文件存在，默认位于 <code>~/.openclaw/workspace/</code>：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SOUL.md</code></td>
+<td>人格、语气、价值观、行为边界</td>
+</tr>
+<tr>
+<td><code>AGENTS.md</code></td>
+<td>操作手册：工作流、记忆规则、多 Agent 协作</td>
+</tr>
+<tr>
+<td><code>USER.md</code></td>
+<td>用户偏好与身份信息</td>
+</tr>
+<tr>
+<td><code>TOOLS.md</code></td>
+<td>工具使用指南</td>
+</tr>
+<tr>
+<td><code>MEMORY.md</code></td>
+<td>长期记忆（Agent 可周期性更新）</td>
+</tr>
+<tr>
+<td><code>HEARTBEAT.md</code></td>
+<td>主动巡检任务（如晨间简报）</td>
+</tr>
+<tr>
+<td><code>IDENTITY.md</code></td>
+<td>Agent 名称、头像等元数据</td>
+</tr>
+<tr>
+<td><code>skills/*/SKILL.md</code></td>
+<td>可扩展技能包</td>
+</tr>
+</tbody>
+</table>
+<p>每次会话启动时，这些文件按固定顺序注入系统提示词：<code>SOUL.md</code> 优先（人格），<code>MEMORY.md</code> 靠后（变化最频繁）。</p>
+<h3>2.2 三层扩展体系</h3>
+<ol>
+<li><strong>Workspace 文件</strong> — 人格与上下文</li>
+<li><strong>Skills（SKILL.md）</strong> — 按需加载的能力包</li>
+<li><strong>Channel Plugins</strong> — Matrix、Nostr、Twitch 等渠道插件</li>
+</ol>
+<h3>2.3 多 Agent 路由</h3>
+<p>Gateway 支持按发送者、工作区或 Agent 实例隔离会话，适合「一个 Gateway、多个专职 Agent」的场景。</p>
+<p><strong>English</strong></p>
+<p>OpenClaw's core idea: <strong>the Gateway is the product</strong>. A single TypeScript process on port <code>18789</code> manages all channel connections, session routing, and tool execution.</p>
+<h3>2.1 Workspace Bootstrap Files</h3>
+<p>Agent identity and knowledge live as plain Markdown under <code>~/.openclaw/workspace/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SOUL.md</code></td>
+<td>Persona, tone, values, behavioral boundaries</td>
+</tr>
+<tr>
+<td><code>AGENTS.md</code></td>
+<td>Operating manual: workflows, memory rules, multi-agent coordination</td>
+</tr>
+<tr>
+<td><code>USER.md</code></td>
+<td>User preferences and identity</td>
+</tr>
+<tr>
+<td><code>TOOLS.md</code></td>
+<td>Tool usage guidance</td>
+</tr>
+<tr>
+<td><code>MEMORY.md</code></td>
+<td>Long-term memory (periodically updated by the agent)</td>
+</tr>
+<tr>
+<td><code>HEARTBEAT.md</code></td>
+<td>Proactive checks (e.g., morning briefings)</td>
+</tr>
+<tr>
+<td><code>IDENTITY.md</code></td>
+<td>Agent name, avatar, metadata</td>
+</tr>
+<tr>
+<td><code>skills/*/SKILL.md</code></td>
+<td>Extensible skill packages</td>
+</tr>
+</tbody>
+</table>
+<p>At session start, files inject into the system prompt in a fixed order: <code>SOUL.md</code> first (persona), <code>MEMORY.md</code> last (most volatile).</p>
+<h3>2.2 Three-Layer Extension System</h3>
+<ol>
+<li><strong>Workspace files</strong> — persona and context</li>
+<li><strong>Skills (SKILL.md)</strong> — on-demand capability packs</li>
+<li><strong>Channel plugins</strong> — Matrix, Nostr, Twitch, etc.</li>
+</ol>
+<h3>2.3 Multi-Agent Routing</h3>
+<p>The Gateway isolates sessions per sender, workspace, or agent instance — one Gateway, many specialized agents.</p>
+<hr/>
+<h2>三、Hermes Agent 架构设计 | Hermes Agent Architecture</h2>
+<p><strong>中文</strong></p>
+<p>Hermes 的架构重心是 <strong>AIAgent 同步编排引擎</strong>（<code>run_agent.py</code>），而非微服务。CLI、Gateway、ACP（IDE 集成）、Cron、Batch Runner 共用同一 Agent 核心。</p>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+    subgraph Entry["入口层"]
+        CLI[CLI / TUI]
+        GW[Gateway 20+ 平台]
+        ACP[ACP - VS Code/Zed]
+        CRON[Cron 调度器]
+    end
+
+<pre><code>subgraph Core[&quot;AIAgent 核心引擎&quot;]
+    PB[Prompt Builder]
+    PR[Provider 解析 18+ 模型]
+    TD[Tool Dispatch 70+ 工具]
+    CC[上下文压缩]
+end
+
+subgraph Memory[&quot;记忆与学习&quot;]
+    WM[工作记忆]
+    SM[会话记忆 SQLite+FTS5]
+    PM[持久记忆 MEMORY.md/USER.md]
+    SKM[技能记忆 Skills]
+    HON[Honcho 用户建模]
+end
+
+subgraph Exec[&quot;执行环境&quot;]
+    T1[Local]
+    T2[Docker]
+    T3[SSH]
+    T4[Daytona/Modal Serverless]
+end
+
+Entry --&amp;gt; Core
+Core --&amp;gt; Memory
+Core --&amp;gt; Exec
+Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+<h3>3.1 Agent 循环（Agent Loop）</h3>
+<p>标准流程：</p>
+<pre><code>用户消息 → 构建 Prompt（系统提示 + 记忆 + 上下文）
+         → 调用 LLM（支持 chat_completions / codex_responses / anthropic_messages 三种 API 模式）
+         → 解析工具调用 → 执行工具 → 结果回注上下文
+         → 循环直至 LLM 不再请求工具 → 返回最终响应 → 持久化会话
+</code></pre>
+<p>设计原则包括：<strong>提示词稳定性</strong>（会话中不突变，保护前缀缓存）、<strong>可观测执行</strong>（每次工具调用对用户可见）、<strong>可中断</strong>（用户可随时取消）。</p>
+<h3>3.2 四层记忆体系</h3>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>机制</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工作记忆</td>
+<td>当前对话上下文</td>
+<td>即时可用</td>
+</tr>
+<tr>
+<td>会话记忆</td>
+<td>SQLite + FTS5 全文检索</td>
+<td>跨会话搜索历史对话，<code>session_search</code> 工具按需召回</td>
+</tr>
+<tr>
+<td>持久记忆</td>
+<td><code>MEMORY.md</code>（~2200 字符）+ <code>USER.md</code>（~1375 字符）</td>
+<td>会话启动时冻结注入系统提示词</td>
+</tr>
+<tr>
+<td>技能记忆</td>
+<td><code>~/.hermes/skills/</code> 下的 SKILL.md</td>
+<td><strong>渐进式披露</strong>：索引仅含名称/描述，全文按需加载</td>
+</tr>
+</tbody>
+</table>
+<p>此外支持 8 种外部记忆 Provider（Honcho、Mem0、Hindsight 等），用于知识图谱、语义检索、跨会话用户建模。</p>
+<h3>3.3 闭环学习（Learning Loop）</h3>
+<p>Hermes 最核心的差异化能力：</p>
+<ol>
+<li><strong>策划记忆</strong> — 任务完成后，Agent 自主判断什么值得记住</li>
+<li><strong>创建 Skill</strong> — 复杂任务（通常 5+ 次工具调用）成功后，自动生成 Markdown 格式 Skill</li>
+<li><strong>Skill 自改进</strong> — 执行失败或发现更优路径时，通过 <code>skill_manage</code> 工具 patch 更新</li>
+<li><strong>周期性微调（Periodic Nudge）</strong> — 会话间隙触发自我反思与优化</li>
+<li><strong>FTS5 召回</strong> — 按需检索历史，经 LLM 摘要后注入相关片段</li>
+</ol>
+<p>技能库可从几十个增长到上百个，而上下文 Token 成本几乎不变（仅加载索引 + 按需全文）。</p>
+<h3>3.4 工具与执行环境</h3>
+<ul>
+<li><strong>70+ 工具</strong>，28 个 toolsets，模块级自注册（<code>registry.register()</code>）</li>
+<li><strong>6 种终端后端</strong>：Local、Docker、SSH、Daytona、Modal、Singularity</li>
+<li><strong>5 种浏览器后端</strong> + MCP 双向支持（既可作 MCP 客户端，也可被 Cursor/VS Code 接入）</li>
+<li><strong>子 Agent 委派</strong>：<code>delegate_tool</code> 生成隔离子代理并行处理</li>
+</ul>
+<h3>3.5 Gateway 与多渠道</h3>
+<p>单一 Gateway 进程支持 20 个平台适配器：Telegram、Discord、Slack、WhatsApp、Signal、Matrix、钉钉、飞书、企业微信、QQ 等。与 CLI 共享斜杠命令（<code>/model</code>、<code>/skills</code>、<code>/compress</code> 等）。</p>
+<p><strong>English</strong></p>
+<p>Hermes centers on the <strong>AIAgent synchronous orchestration engine</strong> (<code>run_agent.py</code>) — not microservices. CLI, Gateway, ACP (IDE), Cron, and Batch Runner share one agent core.</p>
+<h3>3.1 Agent Loop</h3>
+<pre><code>User message → Build prompt (system + memory + context)
+            → Call LLM (3 API modes: chat_completions / codex_responses / anthropic_messages)
+            → Parse tool calls → Execute → Inject results
+            → Loop until no more tool calls → Final response → Persist session
+</code></pre>
+<p>Design principles: <strong>prompt stability</strong> (no mid-session mutations, preserves prefix cache), <strong>observable execution</strong>, <strong>interruptibility</strong>.</p>
+<h3>3.2 Four-Layer Memory</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Mechanism</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Working memory</td>
+<td>Current conversation context</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Session memory</td>
+<td>SQLite + FTS5 full-text search</td>
+<td>Cross-session recall via <code>session_search</code></td>
+</tr>
+<tr>
+<td>Persistent memory</td>
+<td><code>MEMORY.md</code> (~2200 chars) + <code>USER.md</code> (~1375 chars)</td>
+<td>Frozen into system prompt at session start</td>
+</tr>
+<tr>
+<td>Skill memory</td>
+<td><code>SKILL.md</code> under <code>~/.hermes/skills/</code></td>
+<td><strong>Progressive disclosure</strong>: index only, full content on demand</td>
+</tr>
+</tbody>
+</table>
+<p>Plus 8 external memory providers (Honcho, Mem0, Hindsight, etc.) for knowledge graphs and semantic search.</p>
+<h3>3.3 Closed Learning Loop</h3>
+<p>Hermes's key differentiator:</p>
+<ol>
+<li><strong>Curate memory</strong> — after tasks, decide what's worth remembering</li>
+<li><strong>Create skills</strong> — auto-generate Markdown skills after complex tasks (typically 5+ tool calls)</li>
+<li><strong>Self-improve skills</strong> — patch via <code>skill_manage</code> on failure or better paths</li>
+<li><strong>Periodic Nudge</strong> — self-reflection between sessions</li>
+<li><strong>FTS5 recall</strong> — search history, LLM-summarize, inject relevant snippets</li>
+</ol>
+<p>Skill libraries can grow from dozens to hundreds with near-flat context token cost.</p>
+<h3>3.4 Tools &amp; Execution Environments</h3>
+<ul>
+<li><strong>70+ tools</strong>, 28 toolsets, self-registering at import time</li>
+<li><strong>6 terminal backends</strong>: Local, Docker, SSH, Daytona, Modal, Singularity</li>
+<li><strong>5 browser backends</strong> + bidirectional MCP (client and server for Cursor/VS Code)</li>
+<li><strong>Sub-agent delegation</strong> via <code>delegate_tool</code></li>
+</ul>
+<h3>3.5 Gateway &amp; Multi-Channel</h3>
+<p>One Gateway process, 20 platform adapters: Telegram, Discord, Slack, WhatsApp, Signal, Matrix, DingTalk, Feishu, WeCom, QQ, etc. Shares slash commands with CLI (<code>/model</code>, <code>/skills</code>, <code>/compress</code>).</p>
+<hr/>
+<h2>四、典型应用场景 | Typical Use Cases</h2>
+<p><strong>中文</strong></p>
+<h3>OpenClaw（龙虾）擅长</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>口袋里的个人助理</td>
+<td>手机 Telegram/WhatsApp 发消息，Gateway 在本地/服务器响应</td>
+</tr>
+<tr>
+<td>多渠道统一入口</td>
+<td>一个 Gateway 同时服务 Discord + Slack + iMessage</td>
+</tr>
+<tr>
+<td>开发者编码助手</td>
+<td>与 Claude Code / Cursor 等 Agent Runtime 集成</td>
+</tr>
+<tr>
+<td>主动巡检</td>
+<td><code>HEARTBEAT.md</code> 定义定时检查（邮件、日历、服务器状态）</td>
+</tr>
+<tr>
+<td>多 Agent 分工</td>
+<td>不同工作区/发送者路由到不同专职 Agent</td>
+</tr>
+<tr>
+<td>社区生态</td>
+<td>海量 Skills 市场、插件、教程</td>
+</tr>
+</tbody>
+</table>
+<h3>Hermes Agent 擅长</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>长期个人进化</td>
+<td>用得越久，技能库越丰富，越贴合个人习惯</td>
+</tr>
+<tr>
+<td>自动化 Cron 任务</td>
+<td>自然语言描述日报、备份、周审计，无人值守投递到任意平台</td>
+</tr>
+<tr>
+<td>研究 / RL 轨迹</td>
+<td>批量生成 ShareGPT 格式轨迹，用于训练工具调用模型</td>
+</tr>
+<tr>
+<td>低成本 Serverless</td>
+<td>Daytona/Modal 后端：空闲休眠、按需唤醒，接近零闲置成本</td>
+</tr>
+<tr>
+<td>从龙虾迁移</td>
+<td><code>hermes claw migrate</code> 一键导入 SOUL.md、记忆、技能、API Key</td>
+</tr>
+<tr>
+<td>企业级安全审批</td>
+<td>危险命令强制审批、容器隔离、DM 配对白名单</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English</strong></p>
+<h3>OpenClaw Excels At</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pocket personal assistant</td>
+<td>Message from Telegram/WhatsApp; Gateway responds locally/on server</td>
+</tr>
+<tr>
+<td>Unified multi-channel hub</td>
+<td>One Gateway for Discord + Slack + iMessage simultaneously</td>
+</tr>
+<tr>
+<td>Developer coding assistant</td>
+<td>Integrates with Claude Code / Cursor agent runtimes</td>
+</tr>
+<tr>
+<td>Proactive monitoring</td>
+<td><code>HEARTBEAT.md</code> defines scheduled checks (email, calendar, servers)</td>
+</tr>
+<tr>
+<td>Multi-agent specialization</td>
+<td>Route by workspace/sender to dedicated agents</td>
+</tr>
+<tr>
+<td>Community ecosystem</td>
+<td>Large skills marketplace, plugins, tutorials</td>
+</tr>
+</tbody>
+</table>
+<h3>Hermes Excels At</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long-term personal evolution</td>
+<td>Richer skill library and better habit fit over time</td>
+</tr>
+<tr>
+<td>Cron automation</td>
+<td>Natural-language daily reports, backups, audits — unattended delivery</td>
+</tr>
+<tr>
+<td>Research / RL trajectories</td>
+<td>Batch ShareGPT-format trajectories for tool-calling model training</td>
+</tr>
+<tr>
+<td>Low-cost serverless</td>
+<td>Daytona/Modal backends: sleep when idle, wake on demand</td>
+</tr>
+<tr>
+<td>Migration from OpenClaw</td>
+<td><code>hermes claw migrate</code> imports SOUL.md, memory, skills, API keys</td>
+</tr>
+<tr>
+<td>Enterprise-grade safety</td>
+<td>Dangerous-command approval, container isolation, DM pairing allowlists</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>五、优缺点对比 | Pros &amp; Cons Comparison</h2>
+<p><strong>中文</strong></p>
+<h3>OpenClaw（龙虾）</h3>
+<p><strong>优点</strong><br/>
+- 社区体量极大，文档、教程、第三方 Skills 丰富<br/>
+- Gateway 架构简洁直观，「一个进程、一个端口」易于理解<br/>
+- 渠道覆盖广（50+），含 iOS/Android Nodes、Web Control UI<br/>
+- 工作区文件（SOUL.md 等）人类可读、可 Git 版本管理<br/>
+- 本地优先，数据主权在用户手中<br/>
+- 上手快：<code>openclaw onboard</code> 引导式安装</p>
+<p><strong>缺点</strong><br/>
+- 记忆与技能主要靠人工维护，缺少内置自学习闭环<br/>
+- 技能不会随使用自动优化，重复任务仍需重新推理<br/>
+- 广泛文件/系统访问带来安全风险，需仔细配置 allowlist<br/>
+- 云模型 API 费用可能较高（$10–150+/月，视用量而定）<br/>
+- 静态配置为主，「越用越懂你」需额外 Skills 或手动维护 MEMORY.md</p>
+<h3>Hermes Agent</h3>
+<p><strong>优点</strong><br/>
+- 唯一内置完整闭环学习的 Agent 框架<br/>
+- 技能自动生成与自我迭代，重复任务效率显著提升<br/>
+- 四层记忆 + FTS5 按需检索，Token 成本可控<br/>
+- 模型无关，支持 18+ Provider（OpenRouter、NIM、Kimi、GLM 等）<br/>
+- 6 种执行后端 + Serverless，$5 VPS 到 GPU 集群均可<br/>
+- 官方提供 OpenClaw 迁移工具，降低切换成本<br/>
+- 研究友好：轨迹导出、批量 Runner、RL 环境支持</p>
+<p><strong>缺点</strong><br/>
+- 生态较新，社区规模小于 OpenClaw<br/>
+- 学习闭环增加系统复杂度，调试需理解记忆/技能机制<br/>
+- 持久记忆有字符上限（MEMORY.md ~2200 字符），需主动整合<br/>
+- 企业集成与大型社区插件市场仍在建设中<br/>
+- Windows 需 WSL2，不支持原生 Windows</p>
+<p><strong>English</strong></p>
+<h3>OpenClaw (Lobster)</h3>
+<p><strong>Pros</strong><br/>
+- Massive community, docs, tutorials, third-party skills<br/>
+- Simple Gateway: one process, one port<br/>
+- Broad channel coverage (50+), iOS/Android nodes, Web Control UI<br/>
+- Human-readable workspace files, Git-versionable<br/>
+- Local-first, user data sovereignty<br/>
+- Fast onboarding via <code>openclaw onboard</code></p>
+<p><strong>Cons</strong><br/>
+- Memory and skills mostly manual; no built-in self-learning loop<br/>
+- Skills don't auto-improve; repeated tasks re-reason each time<br/>
+- Broad file/system access raises security risk; careful allowlist config needed<br/>
+- Cloud model API costs can be high ($10–150+/month depending on usage)<br/>
+- Static config; "knows you better over time" needs extra skills or manual MEMORY.md</p>
+<h3>Hermes Agent</h3>
+<p><strong>Pros</strong><br/>
+- Only major framework with a built-in closed learning loop<br/>
+- Auto-generated, self-improving skills; big gains on repeated tasks<br/>
+- Four-layer memory + FTS5 on-demand recall; controlled token cost<br/>
+- Model-agnostic, 18+ providers (OpenRouter, NIM, Kimi, GLM, etc.)<br/>
+- 6 execution backends + serverless; $5 VPS to GPU cluster<br/>
+- Official OpenClaw migration tool<br/>
+- Research-ready: trajectory export, batch runner, RL environments</p>
+<p><strong>Cons</strong><br/>
+- Newer ecosystem, smaller community than OpenClaw<br/>
+- Learning loop adds complexity; debugging requires understanding memory/skills<br/>
+- Persistent memory has char limits (~2200 for MEMORY.md); active consolidation needed<br/>
+- Enterprise integrations and large plugin marketplace still maturing<br/>
+- Windows requires WSL2; no native Windows</p>
+<hr/>
+<h2>六、架构哲学对比 | Architectural Philosophy Comparison</h2>
+<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart LR
+    subgraph OpenClaw["OpenClaw 龙虾 — 广度优先"]
+        OC_GW[Gateway 控制平面]
+        OC_WS[Workspace Markdown]
+        OC_SK[手动 Skills]
+        OC_CH[50+ 渠道]
+        OC_GW --&gt; OC_WS
+        OC_GW --&gt; OC_SK
+        OC_GW --&gt; OC_CH
+    end
+
+<pre><code>subgraph Hermes[&quot;Hermes — 深度优先&quot;]
+    HM_EN[Agent Engine]
+    HM_LL[Learning Loop]
+    HM_MEM[四层记忆]
+    HM_SK[自生成 Skills]
+    HM_GW[Gateway 20+ 平台]
+    HM_EN --&amp;gt; HM_LL
+    HM_LL --&amp;gt; HM_MEM
+    HM_LL --&amp;gt; HM_SK
+    HM_EN --&amp;gt; HM_GW
+end&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+<p><strong>中文总结</strong></p>
+<ul>
+<li><strong>龙虾</strong> 回答的是：「如何让 AI 连上我的世界？」— Gateway + 文件即配置。</li>
+<li><strong>Hermes</strong> 回答的是：「如何让 AI 在使用中变得更聪明？」— Engine + 学习闭环。</li>
+</ul>
+<p>二者并非简单替代关系。Hermes 官方提供 <code>hermes claw migrate</code>，说明其定位是承接龙虾用户、并叠加自进化能力。社区也有 <strong>HermesClaw</strong> 等项目，尝试在同一微信账号上同时运行两者。</p>
+<p><strong>选型建议：</strong></p>
+<table>
+<thead>
+<tr>
+<th>你的需求</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多渠道聊天、快速上手、庞大社区</td>
+<td>OpenClaw</td>
+</tr>
+<tr>
+<td>长期运行、自动沉淀技能、研究轨迹</td>
+<td>Hermes Agent</td>
+</tr>
+<tr>
+<td>已有龙虾部署、想尝试自学习</td>
+<td><code>hermes claw migrate</code></td>
+</tr>
+<tr>
+<td>编码为主、IDE 深度集成</td>
+<td>两者均可；OpenClaw 与 Cursor/Claude Code 生态更成熟</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English Summary</strong></p>
+<ul>
+<li><strong>OpenClaw</strong> asks: "How do I connect AI to my world?" — Gateway + files-as-config.</li>
+<li><strong>Hermes</strong> asks: "How does AI get smarter through use?" — Engine + learning loop.</li>
+</ul>
+<p>They're not simple replacements. Hermes ships <code>hermes claw migrate</code> to onboard OpenClaw users with self-evolution on top. Community projects like <strong>HermesClaw</strong> run both on the same WeChat account.</p>
+<p><strong>Selection guide:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Your need</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multi-channel chat, fast start, large community</td>
+<td>OpenClaw</td>
+</tr>
+<tr>
+<td>Long-running use, auto skill accumulation, research trajectories</td>
+<td>Hermes Agent</td>
+</tr>
+<tr>
+<td>Existing OpenClaw setup, want self-learning</td>
+<td><code>hermes claw migrate</code></td>
+</tr>
+<tr>
+<td>Coding-first, deep IDE integration</td>
+<td>Both work; OpenClaw + Cursor/Claude Code ecosystem is more mature</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>七、快速上手命令对照 | Quick Start Command Reference</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>OpenClaw（龙虾）</th>
+<th>Hermes Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安装</td>
+<td><code>npm install -g openclaw@latest</code></td>
+<td><code>curl -fsSL https://hermes-agent.nousresearch.com/install.sh \| bash</code></td>
+</tr>
+<tr>
+<td>初始化</td>
+<td><code>openclaw onboard --install-daemon</code></td>
+<td><code>hermes setup</code></td>
+</tr>
+<tr>
+<td>启动服务</td>
+<td><code>openclaw dashboard</code></td>
+<td><code>hermes gateway start</code></td>
+</tr>
+<tr>
+<td>对话</td>
+<td>Web Control UI 或聊天 App</td>
+<td><code>hermes</code> 或 Telegram 等</td>
+</tr>
+<tr>
+<td>人格配置</td>
+<td>编辑 <code>~/.openclaw/workspace/SOUL.md</code></td>
+<td><code>/personality</code> 或 SOUL 迁移</td>
+</tr>
+<tr>
+<td>技能管理</td>
+<td><code>skills/</code> 目录 + SKILL.md</td>
+<td><code>/skills</code> + 自动生成 + Skills Hub</td>
+</tr>
+<tr>
+<td>从对方迁移</td>
+<td>—</td>
+<td><code>hermes claw migrate</code></td>
+</tr>
+<tr>
+<td>诊断</td>
+<td>Gateway 日志</td>
+<td><code>hermes doctor</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2>八、延伸阅读（完整 12 篇系列）| Further Reading (Full 12-Article Series)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>主题</th>
+<th>文档</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>总览</td>
+<td><a href="./hermes-openclaw-overview.md">hermes-openclaw-overview.md</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>部署迁移</td>
+<td><a href="./deploy-migrate-operations.md">deploy-migrate-operations.md</a></td>
+</tr>
+<tr>
+<td>3</td>
+<td>工作区与 Prompt</td>
+<td><a href="./workspace-context-prompt.md">workspace-context-prompt.md</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Gateway</td>
+<td><a href="./gateway.md">gateway.md</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>记忆系统</td>
+<td><a href="./memory-system.md">memory-system.md</a></td>
+</tr>
+<tr>
+<td>6</td>
+<td>技能与学习闭环</td>
+<td><a href="./skills-learning-loop.md">skills-learning-loop.md</a></td>
+</tr>
+<tr>
+<td>7</td>
+<td>工具与执行环境</td>
+<td><a href="./tools-execution-environments.md">tools-execution-environments.md</a></td>
+</tr>
+<tr>
+<td>8</td>
+<td>插件与 MCP</td>
+<td><a href="./plugins-mcp-ecosystem.md">plugins-mcp-ecosystem.md</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td>多 Agent</td>
+<td><a href="./multi-agent-delegation.md">multi-agent-delegation.md</a></td>
+</tr>
+<tr>
+<td>10</td>
+<td>自动化调度</td>
+<td><a href="./automation-cron-heartbeat.md">automation-cron-heartbeat.md</a></td>
+</tr>
+<tr>
+<td>11</td>
+<td>模型与成本</td>
+<td><a href="./model-provider-cost.md">model-provider-cost.md</a></td>
+</tr>
+<tr>
+<td>12</td>
+<td>安全模型</td>
+<td><a href="./security-model.md">security-model.md</a></td>
+</tr>
+</tbody>
+</table>
+<p>知识点覆盖矩阵：<a href="./knowledge-map.md">knowledge-map.md</a></p>
+<hr/>
+<h2>九、结语 | Conclusion</h2>
+<p><strong>中文</strong></p>
+<p>Agent Hermes 与 OpenClaw（龙虾）代表了个人 AI Agent 的两条演进路线：<strong>连接广度</strong> 与 <strong>学习深度</strong>。龙虾用 Gateway 把 AI 带进你的消息应用和工作区；Hermes 用闭环学习让 AI 从每一次任务中沉淀经验。在实际部署中，二者可以共存、迁移、甚至互补——关键取决于你是更需要「随时随地的多渠道助理」，还是「越用越懂你的自进化伙伴」。</p>
+<p><strong>English</strong></p>
+<p>Agent Hermes and OpenClaw (Lobster) represent two evolution paths for personal AI agents: <strong>connectivity breadth</strong> vs. <strong>learning depth</strong>. OpenClaw's Gateway brings AI into your messaging apps and workspace; Hermes's closed loop turns every task into lasting experience. In practice they can coexist, migrate, and complement each other — the choice depends on whether you need an always-available multi-channel assistant or a self-evolving partner that knows you better over time.</p>
 
       
     </div>
@@ -748,7 +1749,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/936ee6a2.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c8f01db4.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -766,7 +1767,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/936ee6a2.html" class="post-title-link" itemprop="url">pytorch使用指南</a>
+          <a href="/posts/c8f01db4.html" class="post-title-link" itemprop="url">基准环境与最小集环境：概念与实践</a>
         </h2>
 
         <div class="post-meta-container">
@@ -777,258 +1778,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2023-01-05 14:34:55" itemprop="dateCreated datePublished" datetime="2023-01-05T14:34:55+08:00">2023-01-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="安装构建"><a class="headerlink" href="#安装构建" title="安装构建"></a>安装构建</h1><p><a href="https://www.tensorflow.org/install/source_windows" rel="noopener" target="_blank">https://www.tensorflow.org/install/source_windows</a></p>
-<h1 id="数据处理"><a class="headerlink" href="#数据处理" title="数据处理"></a>数据处理</h1><p><a href="https://www.tensorflow.org/learn#prepare-data" rel="noopener" target="_blank">https://www.tensorflow.org/learn#prepare-data</a></p>
-<h1 id="调试模型"><a class="headerlink" href="#调试模型" title="调试模型"></a>调试模型</h1><p><a href="https://www.tensorflow.org/learn#build-models" rel="noopener" target="_blank">https://www.tensorflow.org/learn#build-models</a></p>
-<h1 id="部署模型"><a class="headerlink" href="#部署模型" title="部署模型"></a>部署模型</h1><p><a href="https://www.tensorflow.org/learn#deploy-models" rel="noopener" target="_blank">https://www.tensorflow.org/learn#deploy-models</a></p>
-<h1 id="生产应用"><a class="headerlink" href="#生产应用" title="生产应用"></a>生产应用</h1><p><a href="https://www.tensorflow.org/learn#implement-mlops" rel="noopener" target="_blank">https://www.tensorflow.org/learn#implement-mlops</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1d208056.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/1d208056.html" class="post-title-link" itemprop="url">conda使用指南</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-01-05 14:32:24" itemprop="dateCreated datePublished" datetime="2023-01-05T14:32:24+08:00">2023-01-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="安装"><a class="headerlink" href="#安装" title="安装"></a>安装</h1><p>可以安装Anaconda<br/>通过Anaconda Prompts进入conda 命令行</p>
-<h1 id="常用命令"><a class="headerlink" href="#常用命令" title="常用命令"></a>常用命令</h1><h2 id="更换为国内源"><a class="headerlink" href="#更换为国内源" title="更换为国内源"></a>更换为国内源</h2><h3 id="清华源"><a class="headerlink" href="#清华源" title="清华源"></a>清华源</h3><p>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</a><br/>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</a><br/>conda config –add channels <a href="http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/" rel="noopener" target="_blank">http://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/</a></p>
-<h3 id="中科大源"><a class="headerlink" href="#中科大源" title="中科大源"></a>中科大源</h3><p>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/pkgs/main/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/pkgs/main/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/pkgs/free/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/pkgs/free/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/</a><br/>conda config –add channels <a href="https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/" rel="noopener" target="_blank">https://mirrors.ustc.edu.cn/anaconda/cloud/pytorch/</a><br/>conda config –set show_channel_urls yes<br/>conda config –remove-key channels</p>
-<h3 id="常用命令-1"><a class="headerlink" href="#常用命令-1" title="常用命令"></a>常用命令</h3><p>1.验证conda是否被安装：conda –version(查看conda版本的一个命令)<br/>2.更新conda至最新的版本:conda update conda<br/>3.conda –help:查看conda帮助信息<br/>4.conda list:查看当前环境中已安装的包信息<br/>5.conda search –full-name 包名  精确查找可供安装的包版本<br/>6.conda search 包名的一部分名称  模糊查找可供安装的包版本<br/>7.conda install 包名  在当前环境中安装包(当使用conda install无法进行安装时，可以使用pip install进行安装,pip install无法安装的时候，可以使用conda install 安装)<br/>8.conda remove 包名   卸载当前环境中的包<br/>9.conda update –all   更新所有包<br/>10.conda update 包名   更新指定包</p>
-<p>默认情况下，新创建的环境将会被保存在/Users/<user_name>/anaconda3/env目录下，其中，<user_name>为当前用户的用户名。<br/>创建新的环境<br/>conda create –name 新的python环境的名称<br/>conda create –name 新的python环境的名称 python=要安装的python版本<br/>conda create –name 新的python环境的名称 python=要安装的python版本 要安装的包名</user_name></user_name></p>
-<p>切换环境<br/>activate python环境名称   切换到xx环境中<br/>deactivate python环境名称  退出xx环境</p>
-<p>conda env list ：显示已创建的环境<br/>conda create –name 新的虚拟环境名称 –clone 要克隆的虚拟环境名称<br/>conda remove –name 虚拟环境的名称 –all</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/bcc8f365.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/bcc8f365.html" class="post-title-link" itemprop="url">cuda安装</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-01-05 14:29:43" itemprop="dateCreated datePublished" datetime="2023-01-05T14:29:43+08:00">2023-01-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="安装"><a class="headerlink" href="#安装" title="安装"></a>安装</h1><h2 id="默认安装位置"><a class="headerlink" href="#默认安装位置" title="默认安装位置"></a>默认安装位置</h2><p>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA</p>
-<p>nvcc –version 查看安装版本（环境变量配置）</p>
-<h2 id="cuda下载地址"><a class="headerlink" href="#cuda下载地址" title="cuda下载地址"></a>cuda下载地址</h2><h3 id="最新版本"><a class="headerlink" href="#最新版本" title="最新版本"></a>最新版本</h3><p><a href="https://developer.nvidia.com/cuda-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10" rel="noopener" target="_blank">https://developer.nvidia.com/cuda-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10</a></p>
-<h3 id="历史版本"><a class="headerlink" href="#历史版本" title="历史版本"></a>历史版本</h3><p><a href="https://developer.nvidia.com/cuda-toolkit-archive" rel="noopener" target="_blank">https://developer.nvidia.com/cuda-toolkit-archive</a></p>
-<h2 id="cudnn下载地址"><a class="headerlink" href="#cudnn下载地址" title="cudnn下载地址"></a>cudnn下载地址</h2><p><a href="https://developer.nvidia.com/rdp/cudnn-download" rel="noopener" target="_blank">https://developer.nvidia.com/rdp/cudnn-download</a></p>
-<h3 id="版本关系和查看"><a class="headerlink" href="#版本关系和查看" title="版本关系和查看"></a>版本关系和查看</h3><p>cuda： Compute Unified Device Architecture，是一种有NVIDIA推出的通用并行计算架构， 该架构使GPU能够解决复杂的计算问题。</p>
-<p>cudnn： 是NVIDIA 推出的用于深度神经网络的GPU加速库，他强调性能，易用性和低内存开销。</p>
-<p>cuda和cudnn的关系： cudnn是基于cuda架构开发的专门用于深度神经网络的GPU加速库。cuda可以理解为一个大的商圈，但这个商圈是空的，还未装修。cudnn可以理解为装修后的房间，例如负一楼专门针对游乐（深度神经网络）装修成大型游乐厂。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/39a747bc.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/39a747bc.html" class="post-title-link" itemprop="url">一些好的技术博客</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-12-29 06:57:44" itemprop="dateCreated datePublished" datetime="2022-12-29T06:57:44+08:00">2022-12-29</time>
+      <time title="创建时间：2026-06-05 02:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T02:00:00+08:00">2026-06-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1050,11 +1800,128 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>陈梓瀚 <a href="http://cppblog.com/vczh" rel="noopener" target="_blank">http://cppblog.com/vczh</a></p>
-<p>赵劼 <a href="http://blog.zhaojie.me/" rel="noopener" target="_blank">http://blog.zhaojie.me/</a></p>
-<p>martin <a href="https://www.martinfowler.com/" rel="noopener" target="_blank">https://www.martinfowler.com/</a></p>
-<p>jakewharton <a href="https://jakewharton.com/" rel="noopener" target="_blank">https://jakewharton.com/</a></p>
-<p>stallman <a href="https://stallman.org/" rel="noopener" target="_blank">https://stallman.org/</a></p>
+          <blockquote><p><strong>Baseline Environment &amp; Minimum-Set Environment: Concepts, Philosophy, and Practice</strong></p></blockquote>
+<h2 id="一、概述"><a class="headerlink" href="#一、概述" title="一、概述"></a>一、概述 | Overview</h2>
+<p><strong>中文：</strong>在微服务、云原生和持续交付日益普及的今天，<strong>环境管理</strong>已成为研发效能的关键瓶颈之一。一条业务调用链往往涉及数十甚至上百个服务；若每次开发、联调、测试都为全链路拉起一套完整环境，成本高昂、维护困难，且资源利用率极低。</p>
+<p>为此，业界逐步形成了<strong>环境分层</strong>思路：用一套稳定、完整的<strong>基准环境（Baseline Environment）</strong>承载全量服务，再用轻量、隔离的<strong>最小集环境（Minimum-Set Environment）</strong>只部署变更或必要的服务。二者协同，在<strong>稳定性、隔离性、成本</strong>之间取得平衡。</p>
+<blockquote><p><strong>English:</strong> As microservices, cloud-native architectures, and continuous delivery become mainstream, <strong>environment management</strong> has become a major bottleneck in engineering productivity. A single business call chain may involve dozens or even hundreds of services. If every development, integration, and testing session requires spinning up a full copy of the entire chain, costs soar, maintenance becomes painful, and resource utilization stays very low.</p>
+<p>The industry has responded with <strong>environment layering</strong>: a stable, complete <strong>Baseline Environment</strong> hosts all services, while lightweight, isolated <strong>Minimum-Set Environments</strong> deploy only changed or essential services. Together, they balance <strong>stability, isolation, and cost</strong>.</p></blockquote>
+<h2 id="二、核心概念"><a class="headerlink" href="#二、核心概念" title="二、核心概念"></a>二、核心概念 | Core Concepts</h2>
+<h3 id="2-1-基准环境"><a class="headerlink" href="#2-1-基准环境" title="2.1 基准环境"></a>2.1 基准环境（Baseline Environment）</h3>
+<ul>
+<li><strong>定义</strong>：包含<strong>全量稳定服务</strong>的参考环境，通常部署生产主干或最新稳定版本代码</li>
+<li><strong>定位</strong>：环境中的"锚点"与"公共底座"，为其他环境提供未变更服务的依赖支撑</li>
+<li><strong>特征</strong>：服务齐全、版本统一、变更受控、长期可用</li>
+<li><strong>类比</strong>：像城市的主干道与公共设施——稳定运行，供各分支道路接入</li>
+</ul>
+<blockquote><p><strong>Definition:</strong> A reference environment containing the <strong>full set of stable services</strong>, typically running production mainline or the latest stable release.<br/><strong>Role:</strong> The "anchor" and "shared foundation" that supplies unchanged services to other environments.<br/><strong>Characteristics:</strong> Complete service coverage, unified versions, controlled changes, long-term availability.<br/><strong>Analogy:</strong> Like a city's main roads and public infrastructure—stable and shared by all branches.</p></blockquote>
+<h3 id="2-2-最小集环境"><a class="headerlink" href="#2-2-最小集环境" title="2.2 最小集环境"></a>2.2 最小集环境（Minimum-Set Environment）</h3>
+<ul>
+<li><strong>定义</strong>：仅包含<strong>当前任务所需的最少服务子集</strong>的隔离环境</li>
+<li><strong>定位</strong>：面向特定需求、特性分支或缺陷修复的轻量工作空间</li>
+<li><strong>特征</strong>：服务精简、按需创建、可快速销毁、与基准环境协同</li>
+<li><strong>别名</strong>：子环境、特性环境、项目环境、沙箱环境</li>
+<li><strong>类比</strong>：像施工围挡内的局部改造区——只动必要部分，其余沿用主干设施</li>
+</ul>
+<blockquote><p><strong>Definition:</strong> An isolated environment containing only the <strong>minimum subset of services</strong> required for the current task.<br/><strong>Role:</strong> A lightweight workspace for a specific feature, branch, or bug fix.<br/><strong>Also known as:</strong> Sub-environment, feature environment, project environment, or sandbox.</p></blockquote>
+<h3 id="2-3-二者关系"><a class="headerlink" href="#2-3-二者关系" title="2.3 二者关系"></a>2.3 二者关系 | Relationship</h3>
+<p><strong>中文要点：</strong></p>
+<ul>
+<li>最小集环境中的服务，是基准环境服务集合的<strong>子集</strong></li>
+<li>请求通过<strong>流量路由</strong>（如灰度标、Header、Service Mesh）在两类环境间调度</li>
+<li>变更服务在最小集环境中验证，未变更服务由基准环境承接</li>
+</ul>
+<blockquote><p><strong>English:</strong> Services in the minimum-set environment are a <strong>subset</strong> of those in the baseline. Requests are routed between the two via <strong>traffic routing</strong> (e.g., canary tags, headers, Service Mesh). Changed services are validated in the minimum-set environment; unchanged services are served by the baseline.</p></blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">客户端请求 → 入口网关 / Mesh Sidecar</span><br/><span class="line">    → 解析路由标识（如 x-env-tag: feature-123）</span><br/><span class="line">    → 变更服务 → 最小集环境实例</span><br/><span class="line">    → 未变更服务 → 基准环境实例</span><br/><span class="line">    → 链路追踪串联跨环境调用</span><br/></pre></td></tr></table></figure>
+<h2 id="三、设计思想"><a class="headerlink" href="#三、设计思想" title="三、设计思想"></a>三、设计思想 | Design Philosophy</h2>
+<h3 id="3-1-分层复用"><a class="headerlink" href="#3-1-分层复用" title="3.1 分层复用"></a>3.1 分层复用，而非重复建设 | Layered Reuse, Not Duplication</h3>
+<p><strong>中文：</strong>核心思想是<strong>"共享稳定、隔离变更"</strong>。全量服务维护成本高，但大多数开发任务只改动链路中的少数服务。基准环境承担"公共部分"，最小集环境只承载"差异部分"，避免为每个需求复制整套系统。</p>
+<blockquote><p><strong>English:</strong> The core idea is <strong>"share what is stable, isolate what changes."</strong> The baseline carries the shared stable portion; the minimum-set environment holds only the delta.</p></blockquote>
+<h3 id="3-2-稳定为基线"><a class="headerlink" href="#3-2-稳定为基线" title="3.2 稳定为基线"></a>3.2 以稳定为基线，以最小为切口 | Stability as Baseline, Minimality as Entry Point</h3>
+<p><strong>中文：</strong>基准环境强调<strong>可预期性与一致性</strong>——它是比较、回归、联调的参照系。最小集环境强调<strong>敏捷与专注</strong>——只暴露与当前任务相关的复杂度，降低认知负担和故障面。</p>
+<blockquote><p><strong>English:</strong> The baseline emphasizes <strong>predictability and consistency</strong>. The minimum-set environment emphasizes <strong>agility and focus</strong>—reducing cognitive load and blast radius.</p></blockquote>
+<h3 id="3-3-控制变更边界"><a class="headerlink" href="#3-3-控制变更边界" title="3.3 控制变更边界"></a>3.3 控制变更边界 | Controlled Change Boundaries</h3>
+<p><strong>中文：</strong>基准环境通常<strong>禁止直接部署开发中特性</strong>，仅允许经过流程验证的主干/稳定版本自动同步。最小集环境则允许<strong>任意实验、破坏性测试</strong>，不影响他人与公共底座。</p>
+<blockquote><p><strong>English:</strong> The baseline prohibits direct deployment of in-development features. The minimum-set environment permits <strong>free experimentation and destructive testing</strong> without impacting others.</p></blockquote>
+<h3 id="3-4-流量驱动"><a class="headerlink" href="#3-4-流量驱动" title="3.4 流量驱动"></a>3.4 流量驱动的环境编排 | Traffic-Driven Environment Orchestration</h3>
+<p><strong>中文：</strong>环境协同的关键不在"部署了多少套"，而在"<strong>请求如何被正确路由</strong>"。通过灰度标识、链路追踪（Tracing）、服务网格（Service Mesh）等机制，使一次调用在基准与最小集之间无缝衔接。</p>
+<blockquote><p><strong>English:</strong> Effective coordination depends on <strong>how requests are routed correctly</strong> via canary tags, distributed tracing, and Service Mesh.</p></blockquote>
+<h2 id="四、意义与价值"><a class="headerlink" href="#四、意义与价值" title="四、意义与价值"></a>四、意义与价值 | Significance and Value</h2>
+<table>
+<thead><tr><th>价值维度</th><th>基准环境</th><th>最小集环境</th></tr></thead>
+<tbody>
+<tr><td><strong>成本</strong></td><td>集群内通常只需一套全量环境</td><td>按需创建，资源占用远低于全量复制</td></tr>
+<tr><td><strong>效率</strong></td><td>减少重复搭建与配置工作</td><td>分钟级创建/销毁，加速开发联调</td></tr>
+<tr><td><strong>质量</strong></td><td>提供稳定参照，利于回归与对比</td><td>隔离变更，避免"互相踩环境"</td></tr>
+<tr><td><strong>协作</strong></td><td>多团队共享同一稳定底座</td><td>每人/每需求独立工作区，并行不干扰</td></tr>
+<tr><td><strong>风险</strong></td><td>与生产版本对齐，降低环境漂移</td><td>限制变更范围，缩小故障影响面</td></tr>
+</tbody>
+</table>
+<h2 id="五、典型应用场景"><a class="headerlink" href="#五、典型应用场景" title="五、典型应用场景"></a>五、典型应用场景 | Typical Use Cases</h2>
+<ol>
+<li><strong>微服务开发联调</strong>：在最小集环境部署 1～2 个变更服务，其余依赖由基准环境提供，通过路由标识完成端到端联调。<br/><em>Microservice dev &amp; integration: deploy changed services in minimum-set; baseline supplies the rest.</em></li>
+<li><strong>特性分支验证</strong>：每个特性分支对应一个最小集环境，基准环境保持主干最新稳定态作为对照基线。<br/><em>Feature branch validation: one minimum-set per branch; baseline stays on stable mainline.</em></li>
+<li><strong>缺陷复现与修复</strong>：针对特定 Bug 创建最小集环境，在隔离条件下复现、修复、验证。<br/><em>Bug reproduction &amp; fix: isolated minimum-set for targeted debugging.</em></li>
+<li><strong>性能与兼容性基线测试</strong>：基准环境作为性能基线和兼容性参照，与最小集环境中的新版本对比指标。<br/><em>Performance &amp; compatibility testing against baseline reference.</em></li>
+<li><strong>CI/CD 与预发布</strong>：流水线在最小集环境做快速冒烟测试，基准环境提供稳定依赖注入。<br/><em>CI/CD smoke tests in minimum-set; baseline supplies stable dependencies.</em></li>
+</ol>
+<h2 id="六、优缺点分析"><a class="headerlink" href="#六、优缺点分析" title="六、优缺点分析"></a>六、优缺点分析 | Pros and Cons</h2>
+<h3 id="6-1-基准环境"><a class="headerlink" href="#6-1-基准环境" title="6.1 基准环境"></a>6.1 基准环境 | Baseline Environment</h3>
+<table>
+<thead><tr><th>优点 ✅</th><th>缺点 ❌</th></tr></thead>
+<tbody>
+<tr><td>服务完整，联调链路可达</td><td>维护成本高，需专人或平台保障</td></tr>
+<tr><td>版本稳定，结果可复现</td><td>与生产同步有延迟时，存在环境漂移</td></tr>
+<tr><td>多团队共享，资源利用率高</td><td>单点依赖：基准故障影响所有子环境</td></tr>
+<tr><td>适合作为性能/兼容性参照</td><td>全量部署耗时较长，更新需流程约束</td></tr>
+</tbody>
+</table>
+<h3 id="6-2-最小集环境"><a class="headerlink" href="#6-2-最小集环境" title="6.2 最小集环境"></a>6.2 最小集环境 | Minimum-Set Environment</h3>
+<table>
+<thead><tr><th>优点 ✅</th><th>缺点 ❌</th></tr></thead>
+<tbody>
+<tr><td>资源占用少，创建销毁快</td><td>依赖基准环境，基准不可用时无法独立工作</td></tr>
+<tr><td>隔离性好，互不干扰</td><td>路由与流量标识配置复杂，学习成本较高</td></tr>
+<tr><td>支持并行开发，提升吞吐</td><td>若子集选取不当，可能遗漏隐性依赖</td></tr>
+<tr><td>允许破坏性实验，风险可控</td><td>跨环境调用链路调试难度高于单体环境</td></tr>
+</tbody>
+</table>
+<h3 id="6-3-组合模式权衡"><a class="headerlink" href="#6-3-组合模式权衡" title="6.3 组合模式权衡"></a>6.3 组合模式的权衡 | Trade-offs</h3>
+<ul>
+<li><strong>成本 vs 仿真度</strong>：最小集环境仿真度略低于全量复制，但多数联调场景可接受</li>
+<li><strong>复杂度 vs 收益</strong>：需投入路由、Mesh、环境平台能力，规模化后收益显著</li>
+<li><strong>稳定性 vs 敏捷性</strong>：基准偏稳定，最小集偏敏捷，二者分工明确</li>
+<li><strong>适用规模</strong>：微服务数量较多、联调频繁时价值最大；单体或少量服务时可能过度设计</li>
+</ul>
+<h2 id="七、落地实践要点"><a class="headerlink" href="#七、落地实践要点" title="七、落地实践要点"></a>七、落地实践要点 | Implementation Essentials</h2>
+<h3 id="7-1-基准环境建设"><a class="headerlink" href="#7-1-基准环境建设" title="7.1 基准环境建设"></a>7.1 基准环境建设</h3>
+<ol>
+<li><strong>版本策略</strong>：仅部署主干/稳定版本，禁止特性分支直接部署</li>
+<li><strong>自动同步</strong>：生产或主干发布完成后，自动触发基准环境更新</li>
+<li><strong>可观测性</strong>：完善监控、日志、链路追踪，保障底座可诊断</li>
+<li><strong>高可用</strong>：基准环境故障会级联影响子环境，需保障 SLA</li>
+</ol>
+<h3 id="7-2-最小集环境建设"><a class="headerlink" href="#7-2-最小集环境建设" title="7.2 最小集环境建设"></a>7.2 最小集环境建设</h3>
+<ol>
+<li><strong>一键创建</strong>：提供模板化创建能力，自动完成路由、配置、域名等</li>
+<li><strong>服务子集选择</strong>：支持按调用链、依赖分析推荐最小服务集</li>
+<li><strong>生命周期管理</strong>：闲置自动回收，控制资源浪费</li>
+<li><strong>流量标识规范</strong>：统一灰度标、Header 约定，避免路由混乱</li>
+</ol>
+<h2 id="八、与其他环境对比"><a class="headerlink" href="#八、与其他环境对比" title="八、与其他环境对比"></a>八、与其他环境概念对比 | Comparison</h2>
+<table>
+<thead><tr><th>环境类型</th><th>服务范围</th><th>稳定性</th><th>典型用途</th></tr></thead>
+<tbody>
+<tr><td><strong>生产环境</strong></td><td>全量</td><td>最高</td><td>对外提供服务</td></tr>
+<tr><td><strong>预发/Staging</strong></td><td>全量</td><td>高</td><td>发布前最终验证</td></tr>
+<tr><td><strong>基准环境</strong></td><td>全量（稳定版）</td><td>高</td><td>公共底座、联调依赖</td></tr>
+<tr><td><strong>最小集环境</strong></td><td>子集（变更服务）</td><td>中（按需）</td><td>开发、自测、特性验证</td></tr>
+<tr><td><strong>本地开发环境</strong></td><td>极少</td><td>低</td><td>个人编码调试</td></tr>
+</tbody>
+</table>
+<h2 id="九、总结"><a class="headerlink" href="#九、总结" title="九、总结"></a>九、总结 | Summary</h2>
+<p><strong>中文：</strong><strong>基准环境</strong>是稳定、完整、可复用的环境基线，解决的是"全量服务从哪来、如何保持稳定"的问题；<strong>最小集环境</strong>是轻量、隔离、按需的环境切片，解决的是"如何低成本、高效率地完成变更验证"的问题。二者结合，体现了现代软件交付中<strong>"共享稳定底座 + 隔离变更验证"</strong>的核心思想。</p>
+<blockquote><p><strong>English:</strong> The <strong>Baseline Environment</strong> is a stable, complete, reusable foundation—it answers <em>where full stable services come from and how they stay reliable</em>. The <strong>Minimum-Set Environment</strong> is a lightweight, isolated, on-demand slice—it answers <em>how to validate changes cheaply and quickly</em>. Together they embody <strong>"shared stable foundation + isolated change validation"</strong> in modern software delivery.</p></blockquote>
 
       
     </div>
@@ -1073,8 +1940,632 @@
 
 
 
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7384711d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/7384711d.html" class="post-title-link" itemprop="url">Netty WebSocket协议开发</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:42:56" itemprop="dateCreated datePublished" datetime="2023-08-14T07:42:56+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>使用 Netty 开发基于 WebSocket 协议的应用是一个常见的场景。WebSocket 是一种在单个 TCP 连接上进行全双工通信的协议，通常用于实时性要求较高的应用，如聊天应用、实时数据展示等。下面是一个简单的示例，演示了如何使用 Netty 开发一个基于 WebSocket 的服务器应用。</p>
+<p>首先，确保你已经引入了 Netty 的相关依赖，可以在项目的 <code>pom.xml</code> 文件中添加以下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.netty<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>netty-all<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.66.Final<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br/><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br/></pre></td></tr></table></figure>
+<p>接下来，创建一个简单的 Netty WebSocket 服务器应用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io.netty.bootstrap.ServerBootstrap;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelFuture;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInitializer;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.EventLoopGroup;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.nio.NioEventLoopGroup;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.socket.SocketChannel;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.socket.nio.NioServerSocketChannel;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpObjectAggregator;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpServerCodec;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebSocketServerApp</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">EventLoopGroup</span> <span class="variable">bossGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>(<span class="number">1</span>);</span><br/><span class="line">        <span class="type">EventLoopGroup</span> <span class="variable">workerGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>();</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">try</span> {</span><br/><span class="line">            <span class="type">ServerBootstrap</span> <span class="variable">bootstrap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ServerBootstrap</span>()</span><br/><span class="line">                    .group(bossGroup, workerGroup)</span><br/><span class="line">                    .channel(NioServerSocketChannel.class)</span><br/><span class="line">                    .childHandler(<span class="keyword">new</span> <span class="title class_">ChannelInitializer</span>&lt;SocketChannel&gt;() {</span><br/><span class="line">                        <span class="meta">@Override</span></span><br/><span class="line">                        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">initChannel</span><span class="params">(SocketChannel ch)</span> {</span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">HttpServerCodec</span>());</span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">HttpObjectAggregator</span>(<span class="number">65536</span>)); <span class="comment">// Aggregate HTTP messages</span></span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">WebSocketServerProtocolHandler</span>(<span class="string">"/ws"</span>)); <span class="comment">// WebSocket protocol handler</span></span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">WebSocketHandler</span>()); <span class="comment">// Your WebSocket request handling logic</span></span><br/><span class="line">                        }</span><br/><span class="line">                    });</span><br/><span class="line"></span><br/><span class="line">            <span class="type">ChannelFuture</span> <span class="variable">future</span> <span class="operator">=</span> bootstrap.bind(<span class="number">8080</span>).sync();</span><br/><span class="line">            future.channel().closeFuture().sync();</span><br/><span class="line">        } <span class="keyword">catch</span> (Exception e) {</span><br/><span class="line">            e.printStackTrace();</span><br/><span class="line">        } <span class="keyword">finally</span> {</span><br/><span class="line">            bossGroup.shutdownGracefully();</span><br/><span class="line">            workerGroup.shutdownGracefully();</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的示例中，我们创建了一个简单的 WebSocket 服务器，监听在本地的 8080 端口。在 <code>initChannel</code> 方法中，我们添加了 <code>HttpServerCodec</code>、<code>HttpObjectAggregator</code> 和 <code>WebSocketServerProtocolHandler</code> 来处理 HTTP 和 WebSocket 握手。</p>
+<p>你需要自己实现一个继承自 <code>SimpleChannelInboundHandler&lt;WebSocketFrame&gt;</code> 的 <code>WebSocketHandler</code> 类，用于处理接收到的 WebSocket 数据。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.websocketx.TextWebSocketFrame;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketFrame;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler.HandshakeComplete;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebSocketHandler</span> <span class="keyword">extends</span> <span class="title class_">SimpleChannelInboundHandler</span>&lt;WebSocketFrame&gt; {</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">userEventTriggered</span><span class="params">(ChannelHandlerContext ctx, Object evt)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="keyword">if</span> (evt <span class="keyword">instanceof</span> HandshakeComplete) {</span><br/><span class="line">            <span class="comment">// WebSocket handshake completed, remove the HTTP related handlers</span></span><br/><span class="line">            ctx.pipeline().remove(HttpServerCodec.class);</span><br/><span class="line">            ctx.pipeline().remove(HttpObjectAggregator.class);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="built_in">super</span>.userEventTriggered(ctx, evt);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">channelRead0</span><span class="params">(ChannelHandlerContext ctx, WebSocketFrame frame)</span> {</span><br/><span class="line">        <span class="keyword">if</span> (frame <span class="keyword">instanceof</span> TextWebSocketFrame) {</span><br/><span class="line">            <span class="type">String</span> <span class="variable">text</span> <span class="operator">=</span> ((TextWebSocketFrame) frame).text();</span><br/><span class="line">            System.out.println(<span class="string">"Received message: "</span> + text);</span><br/><span class="line"></span><br/><span class="line">            <span class="comment">// Echo the received message back to the client</span></span><br/><span class="line">            ctx.writeAndFlush(<span class="keyword">new</span> <span class="title class_">TextWebSocketFrame</span>(<span class="string">"Echo: "</span> + text));</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> {</span><br/><span class="line">        cause.printStackTrace();</span><br/><span class="line">        ctx.close();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的示例中，<code>WebSocketHandler</code> 类继承自 <code>SimpleChannelInboundHandler&lt;WebSocketFrame&gt;</code>，用于处理接收到的 WebSocket 数据帧。在 <code>channelRead0</code> 方法中，我们处理接收到的文本数据帧，并将其回显给客户端。</p>
+<p>这只是一个简单的示例，实际的应用可能会更加复杂，需要处理更多的 WebSocket 数据帧类型、处理逻辑以及错误情况。但这个示例可以帮助你入门并理解如何使用 Netty 来开发基于 WebSocket 协议的应用。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/68c9f971.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/68c9f971.html" class="post-title-link" itemprop="url">Netty Http协议开发</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:42:37" itemprop="dateCreated datePublished" datetime="2023-08-14T07:42:37+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>使用 Netty 来开发基于 HTTP 协议的应用是相对常见的场景。HTTP 是一种基于请求-响应模式的应用层协议，用于在客户端和服务器之间传输数据。下面是一个简单的示例，演示了如何使用 Netty 开发一个基于 HTTP 的服务器应用。</p>
+<p>首先，确保你已经引入了 Netty 的相关依赖，可以在项目的 <code>pom.xml</code> 文件中添加以下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.netty<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>netty-all<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br/><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.66.Final<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br/><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br/></pre></td></tr></table></figure>
+<p>接下来，创建一个简单的 Netty HTTP 服务器应用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io.netty.bootstrap.ServerBootstrap;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelFuture;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInitializer;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.EventLoopGroup;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.nio.NioEventLoopGroup;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.socket.SocketChannel;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.socket.nio.NioServerSocketChannel;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpServerCodec;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpObjectAggregator;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpServerHandler;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HttpServerApp</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">EventLoopGroup</span> <span class="variable">bossGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>(<span class="number">1</span>);</span><br/><span class="line">        <span class="type">EventLoopGroup</span> <span class="variable">workerGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>();</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">try</span> {</span><br/><span class="line">            <span class="type">ServerBootstrap</span> <span class="variable">bootstrap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ServerBootstrap</span>()</span><br/><span class="line">                    .group(bossGroup, workerGroup)</span><br/><span class="line">                    .channel(NioServerSocketChannel.class)</span><br/><span class="line">                    .childHandler(<span class="keyword">new</span> <span class="title class_">ChannelInitializer</span>&lt;SocketChannel&gt;() {</span><br/><span class="line">                        <span class="meta">@Override</span></span><br/><span class="line">                        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">initChannel</span><span class="params">(SocketChannel ch)</span> {</span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">HttpServerCodec</span>());</span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">HttpObjectAggregator</span>(<span class="number">65536</span>)); <span class="comment">// Aggregate HTTP messages</span></span><br/><span class="line">                            ch.pipeline().addLast(<span class="keyword">new</span> <span class="title class_">HttpServerHandler</span>()); <span class="comment">// Your HTTP request handling logic</span></span><br/><span class="line">                        }</span><br/><span class="line">                    });</span><br/><span class="line"></span><br/><span class="line">            <span class="type">ChannelFuture</span> <span class="variable">future</span> <span class="operator">=</span> bootstrap.bind(<span class="number">8080</span>).sync();</span><br/><span class="line">            future.channel().closeFuture().sync();</span><br/><span class="line">        } <span class="keyword">catch</span> (Exception e) {</span><br/><span class="line">            e.printStackTrace();</span><br/><span class="line">        } <span class="keyword">finally</span> {</span><br/><span class="line">            bossGroup.shutdownGracefully();</span><br/><span class="line">            workerGroup.shutdownGracefully();</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的示例中，我们创建了一个简单的 HTTP 服务器，监听在本地的 8080 端口。在 <code>initChannel</code> 方法中，我们添加了 <code>HttpServerCodec</code>（处理 HTTP 编解码）、<code>HttpObjectAggregator</code>（将 HTTP 消息聚合成 FullHttpRequest 或 FullHttpResponse）和自定义的 <code>HttpServerHandler</code>（处理 HTTP 请求）。</p>
+<p>你需要自己实现一个继承自 <code>ChannelInboundHandlerAdapter</code> 的 <code>HttpServerHandler</code> 类，用于处理接收到的 HTTP 请求。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;</span><br/><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInboundHandlerAdapter;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.FullHttpRequest;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpResponseStatus;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpUtil;</span><br/><span class="line"><span class="keyword">import</span> io.netty.handler.codec.http.HttpVersion;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HttpServerHandler</span> <span class="keyword">extends</span> <span class="title class_">ChannelInboundHandlerAdapter</span> {</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> {</span><br/><span class="line">        <span class="keyword">if</span> (msg <span class="keyword">instanceof</span> FullHttpRequest) {</span><br/><span class="line">            <span class="type">FullHttpRequest</span> <span class="variable">request</span> <span class="operator">=</span> (FullHttpRequest) msg;</span><br/><span class="line">            <span class="type">String</span> <span class="variable">responseContent</span> <span class="operator">=</span> <span class="string">"Hello, Netty HTTP Server!"</span>;</span><br/><span class="line">            sendHttpResponse(ctx, request, responseContent);</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">sendHttpResponse</span><span class="params">(ChannelHandlerContext ctx, FullHttpRequest request, String content)</span> {</span><br/><span class="line">        <span class="type">FullHttpResponse</span> <span class="variable">response</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DefaultFullHttpResponse</span>(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);</span><br/><span class="line">        response.content().writeBytes(content.getBytes());</span><br/><span class="line">        HttpUtil.setContentLength(response, response.content().readableBytes());</span><br/><span class="line">        ctx.writeAndFlush(response);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> {</span><br/><span class="line">        cause.printStackTrace();</span><br/><span class="line">        ctx.close();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的示例中，<code>HttpServerHandler</code> 类重写了 <code>channelRead</code> 方法，处理接收到的 HTTP 请求。然后，它调用 <code>sendHttpResponse</code> 方法来构建并发送 HTTP 响应。</p>
+<p>这只是一个简单的示例，实际的应用可能会更加复杂，需要处理更多的 HTTP 请求类型、处理逻辑以及错误情况。但这个示例可以帮助你入门并理解如何使用 Netty 来开发基于 HTTP 协议的应用。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/a0ecbba.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/a0ecbba.html" class="post-title-link" itemprop="url">直接内存与Netty零拷贝详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:42:06" itemprop="dateCreated datePublished" datetime="2023-08-14T07:42:06+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>直接内存（Direct Memory）和 Netty 的零拷贝（Zero-Copy）是在优化网络应用性能时常用的概念和技术。它们都涉及到减少数据在内存之间移动的操作，以提高数据传输的效率。让我们详细解释一下这两个概念。</p>
+<p><strong>直接内存（Direct Memory）</strong>：<br/>直接内存是指在 JVM 堆之外分配的内存，通常通过 Java NIO 的 ByteBuffer 或者 Netty 中的 ByteBuf 来管理。相对于传统的堆内存（Heap Memory），直接内存的一个优势是可以减少堆内外的数据拷贝，从而提高数据传输性能。另一个优势是避免了垃圾回收对这部分内存的影响。</p>
+<p><strong>Netty 零拷贝（Zero-Copy）</strong>：<br/>零拷贝是一种技术，旨在减少数据传输过程中的内存复制操作。在传统的数据传输过程中，数据从应用程序缓冲区（如 ByteBuffer）复制到操作系统内核缓冲区，然后再从内核缓冲区复制到网络适配器，最终发送出去。这些复制操作会占用CPU时间并降低性能。</p>
+<p>Netty 零拷贝通过以下方式来优化这个过程：</p>
+<ol>
+<li>使用直接内存：Netty 默认使用直接内存，数据可以直接从应用程序的直接内存传输到网络适配器，避免了应用程序和内核缓冲区之间的复制。</li>
+<li>FileChannel.transferTo()：对于大文件传输，Netty 可以使用操作系统提供的 FileChannel.transferTo() 方法，使数据从文件通道直接传输到网络适配器，避免了数据的中间复制。</li>
+<li>CompositeBuffer：Netty 的 CompositeBuffer 允许将多个缓冲区合并为一个逻辑上的缓冲区，这样在数据发送时可以避免将多个缓冲区合并复制到一个单独的缓冲区。</li>
+</ol>
+<p>综上所述，直接内存和 Netty 零拷贝都是在优化数据传输性能方面的重要技术。它们能够减少数据在内存之间的复制，从而提高数据传输的效率。在网络应用开发中，合理使用直接内存和 Netty 零拷贝技术可以显著提升应用性能。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/f50b8681.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/f50b8681.html" class="post-title-link" itemprop="url">粘包拆包现象及解决方案</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:41:36" itemprop="dateCreated datePublished" datetime="2023-08-14T07:41:36+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/f4bd0cb7.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/f4bd0cb7.html" class="post-title-link" itemprop="url">高性能序列化协议</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:38:35" itemprop="dateCreated datePublished" datetime="2023-08-14T07:38:35+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在 Netty 中，高性能序列化协议是指在网络传输中，将对象序列化为字节流以进行传输，然后在接收端将字节流反序列化为对象。高性能序列化协议通常应该具备以下特点：</p>
+<ol>
+<li><p><strong>快速序列化与反序列化速度</strong>：在高性能应用中，序列化和反序列化的速度是关键因素。因此，高性能序列化协议应该能够以较低的开销进行快速序列化和反序列化操作。</p>
+</li>
+<li><p><strong>高效的编码和解码</strong>：协议应该对数据进行高效的编码和解码，以减少网络传输的数据量，从而提高网络传输的效率。</p>
+</li>
+<li><p><strong>小的序列化后的数据大小</strong>：序列化后的数据应该尽量小，以减少网络带宽的占用。</p>
+</li>
+<li><p><strong>支持多种数据类型</strong>：协议应该支持多种数据类型的序列化和反序列化，包括基本数据类型、自定义对象等。</p>
+</li>
+<li><p><strong>向前和向后兼容性</strong>：协议应该支持在不同版本之间进行兼容性的序列化和反序列化，以便在系统升级时能够平滑过渡。</p>
+</li>
+</ol>
+<p>在 Netty 中，有几种常见的高性能序列化协议：</p>
+<ol>
+<li><p>**Google Protocol Buffers (Protobuf)**：Protobuf 是 Google 提供的一种高效的二进制序列化协议，具有很高的性能和压缩率。Netty 内置了对 Protobuf 的支持。</p>
+</li>
+<li><p><strong>Apache Avro</strong>：Avro 是 Apache 基金会提供的一种数据序列化系统，支持动态数据模型，适用于动态数据结构的序列化。</p>
+</li>
+<li><p><strong>MessagePack</strong>：MessagePack 是一种轻量级的二进制序列化格式，可以实现高速的序列化和反序列化操作。</p>
+</li>
+<li><p><strong>Kryo</strong>：Kryo 是一个快速高效的 Java 序列化框架，能够在速度和大小之间找到一个平衡点。</p>
+</li>
+<li><p><strong>FST</strong>：FST（Fast Serialization）是一种非常快速的 Java 序列化库，性能接近 Kryo，但通常会产生更小的序列化数据。</p>
+</li>
+</ol>
+<p>在选择高性能序列化协议时，需要根据应用场景和需求来进行选择。不同的协议可能在不同的方面有所优劣，所以需要综合考虑性能、开发便利性以及数据格式的大小等因素。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7cca0e48.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/7cca0e48.html" class="post-title-link" itemprop="url">线程模型及源码剖析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:38:15" itemprop="dateCreated datePublished" datetime="2023-08-14T07:38:15+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Netty 是一个基于 NIO 的网络应用程序框架，具有高性能、高并发和灵活性等特点。它的线程模型是其核心设计之一，能够支持高效的网络通信。下面我将简要介绍 Netty 的线程模型以及对其源码的剖析。</p>
+<p><strong>Netty 线程模型：</strong></p>
+<p>Netty 的线程模型基于 Reactor 模式，通过多线程处理并发连接和 I/O 操作，以提高性能。Netty 的线程模型可以分为三部分：</p>
+<ol>
+<li><p><strong>老板线程（Boss Threads）</strong>：也称为 Acceptor 线程，负责处理客户端连接的接收，并将连接注册到工作线程中的 Selector 上。</p>
+</li>
+<li><p><strong>工作线程（Worker Threads）</strong>：每个工作线程都包含一个 Selector，负责处理已连接的客户端请求，包括读写等操作。</p>
+</li>
+<li><p><strong>业务线程（Business Threads）</strong>：在工作线程中，业务线程负责处理具体的业务逻辑，以免阻塞 I/O 线程。</p>
+</li>
+</ol>
+<p><strong>Netty 源码剖析：</strong></p>
+<p>深入理解 Netty 的源码涉及多个模块和类，以下是一些关键的类和模块：</p>
+<ol>
+<li><p><strong>EventLoopGroup 和 EventLoop</strong>：EventLoopGroup 包含一组 EventLoop，负责处理 I/O 事件。EventLoop 是一个线程，通过 Selector 轮询 I/O 事件，然后将事件分发给相关的 Channel。</p>
+</li>
+<li><p><strong>Channel</strong>：Channel 表示一个通道，可以是网络连接、文件等。它包含了与 I/O 相关的操作和状态。</p>
+</li>
+<li><p><strong>Bootstrap 和 ServerBootstrap</strong>：这些类是配置和启动 Netty 的入口，用于设置连接参数和处理器等。</p>
+</li>
+<li><p><strong>Pipeline 和 ChannelHandler</strong>：Pipeline 是一个处理器链，包含了多个 ChannelHandler，用于处理各种事件和操作。</p>
+</li>
+<li><p><strong>ByteBuf</strong>：Netty 提供了高效的字节缓冲区，用于读写数据，具有可读性、可写性、引用计数等特点。</p>
+</li>
+<li><p><strong>Future 和 Promise</strong>：Future 表示异步操作的结果，Promise 表示一个异步操作的可写入结果。</p>
+</li>
+</ol>
+<p>理解 Netty 的源码需要对 Java NIO 和网络编程有一定的了解，以及对事件驱动编程有基本的理解。你可以通过阅读 Netty 的官方文档和源码，深入了解其核心组件的设计和工作原理。从 EventLoopGroup、ChannelPipeline、ChannelHandler 等类开始，逐步追踪和分析其调用关系和内部实现，以便更好地理解 Netty 的线程模型和网络通信机制。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/c23b582b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/c23b582b.html" class="post-title-link" itemprop="url">Netty BIO、NIO及AIO线程模型详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-14 07:37:50" itemprop="dateCreated datePublished" datetime="2023-08-14T07:37:50+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/37/">37</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/39/">39</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

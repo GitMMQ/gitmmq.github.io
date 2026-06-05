@@ -1,8 +1,8 @@
 ---
 title: "leetcode 24 Solution"
 disableNunjucks: true
-date: 2016-01-21T22:09:15.000Z
-updated: 2023-01-06T08:17:38.229Z
+date: 2016-01-21T14:09:15.000Z
+updated: 2023-01-06T00:17:38.229Z
 categories:
   - "algrithom"
 tags:

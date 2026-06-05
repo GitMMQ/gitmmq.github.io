@@ -1,8 +1,8 @@
 ---
 title: "leetcode 206 Solution"
 disableNunjucks: true
-date: 2016-01-10T22:19:00.000Z
-updated: 2023-01-06T08:17:38.109Z
+date: 2016-01-10T14:19:00.000Z
+updated: 2023-01-06T00:17:38.109Z
 categories:
   - "algrithom"
 tags:

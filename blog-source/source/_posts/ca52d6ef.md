@@ -1,8 +1,8 @@
 ---
 title: "leetcode 105 Solution"
 disableNunjucks: true
-date: 2015-11-08T22:18:10.000Z
-updated: 2023-01-06T08:17:38.140Z
+date: 2015-11-08T14:18:10.000Z
+updated: 2023-01-06T00:17:38.140Z
 categories:
   - "algrithom"
 tags:
