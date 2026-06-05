@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.fastolf.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Claude Code 是 Anthropic 推出的智能体编程工具，本文系统介绍其架构设计、应用场景、优缺点及设计启示，中英文对照。A Comprehensive Introduction to Claude Code.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Claude Code 全面介绍：架构设计、应用与优缺点">
+<meta property="og:url" content="https://www.fastolf.com/posts/cd4fe79f.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="Claude Code 是 Anthropic 推出的智能体编程工具，本文系统介绍其架构设计、应用场景、优缺点及设计启示，中英文对照。A Comprehensive Introduction to Claude Code.">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-06-05T18:00:00+08:00">
+<meta property="article:modified_time" content="2026-06-05T18:00:00+08:00">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="Tech;Data;Vision">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.fastolf.com/posts/cd4fe79f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Claude Code 全面介绍：架构设计、应用与优缺点 | Qi</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/gitmmq" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qi</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/cd4fe79f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Claude Code 全面介绍：架构设计、应用与优缺点
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-06-05 18:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T18:00:00+08:00">2026-06-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8500</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>20 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+
+      
+        <p>本文系统介绍 <strong>Claude Code</strong> 的架构设计、应用场景、优缺点及设计启示，采用<strong>中英文对照</strong>形式。</p><p><em>This article provides a comprehensive bilingual introduction to Claude Code—Anthropic's agentic coding tool—covering architecture, applications, pros &amp; cons, and design insights.</em></p><hr><blockquote>
+<p><strong>Anthropic 推出的智能体编程工具：架构、应用与权衡</strong><br />
+<strong>Anthropic's agentic coding tool: architecture, applications, and trade-offs</strong></p>
+</blockquote>
+<hr />
+<h2 id="一、概述-/-Overview"><a href="#一、概述-/-Overview" class="headerlink" title="一、概述 / Overview"></a>一、概述 / Overview</h2>
+<p><strong>中文：</strong> Claude Code 是 Anthropic 于 2025 年发布的<strong>智能体编程工具（Agentic Coding Tool）</strong>。它并非新的 AI 模型，而是围绕 Claude 系列模型（Opus、Sonnet、Haiku）构建的<strong>编排层（Orchestration Layer）</strong>，使 AI 能够自主读取代码库、编辑文件、执行 Shell 命令、调用外部服务，并在多步任务中持续迭代，直到目标完成。</p>
+<p>与传统代码补全工具（如 GitHub Copilot）或 IDE 内嵌助手（如 Cursor）不同，Claude Code 的核心范式是<strong>从「建议」转向「自主执行」</strong>：用户用自然语言描述目标，系统负责规划、执行、验证与修正。</p>
+<p><strong>English:</strong> Claude Code is an <strong>agentic coding tool</strong> released by Anthropic in 2025. It is not a new AI model, but an <strong>orchestration layer</strong> built around the Claude model family (Opus, Sonnet, Haiku), enabling AI to autonomously read codebases, edit files, run shell commands, call external services, and iterate across multi-step tasks until the goal is achieved.</p>
+<p>Unlike traditional code completion tools (e.g., GitHub Copilot) or IDE-embedded assistants (e.g., Cursor), Claude Code's core paradigm shifts from <strong>"suggestion" to "autonomous execution"</strong>: users describe goals in natural language, and the system handles planning, execution, verification, and correction.</p>
+<p><strong>可用形态 / Available Interfaces:</strong></p>
+<table>
+<thead>
+<tr>
+<th>形态 / Interface</th>
+<th>说明 / Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>终端 CLI / Terminal CLI</td>
+<td>核心形态，与现有开发工具链深度集成</td>
+</tr>
+<tr>
+<td>IDE 扩展 / IDE Extension</td>
+<td>VS Code、JetBrains 等，支持内联 diff、@-mentions</td>
+</tr>
+<tr>
+<td>桌面应用 / Desktop App</td>
+<td>可视化 diff、多会话并行、定时任务</td>
+</tr>
+<tr>
+<td>浏览器 / Web</td>
+<td>无需本地环境，支持云端长任务</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>GitHub Actions、SDK 集成，自动化 PR 与代码审查</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="二、架构设计-/-Architecture-Design"><a href="#二、架构设计-/-Architecture-Design" class="headerlink" title="二、架构设计 / Architecture Design"></a>二、架构设计 / Architecture Design</h2>
+<h3 id="2.1-核心哲学：简单循环-+-厚重基础设施-/-Core-Philosophy:-Simple-Loop-+-Heavy-Infrastructure"><a href="#2.1-核心哲学：简单循环-+-厚重基础设施-/-Core-Philosophy:-Simple-Loop-+-Heavy-Infrastructure" class="headerlink" title="2.1 核心哲学：简单循环 + 厚重基础设施 / Core Philosophy: Simple Loop + Heavy Infrastructure"></a>2.1 核心哲学：简单循环 + 厚重基础设施 / Core Philosophy: Simple Loop + Heavy Infrastructure</h3>
+<p><strong>中文：</strong> Claude Code 的架构有一个反直觉的特点：据学术研究分析，其代码库中仅约 <strong>1.6%</strong> 是 AI 决策逻辑，其余 <strong>98.4%</strong> 是确定性的基础设施——权限门控、上下文管理、工具路由、恢复逻辑等。核心智能体循环极其简单：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">while (model_requests_tool) {</span><br><span class="line">    call_model();</span><br><span class="line">    dispatch_tools();</span><br><span class="line">    check_stop_conditions();</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<p>真正的工程复杂度在于<strong>围绕循环构建的系统（Harness）</strong>，而非循环本身。</p>
+<p><strong>English:</strong> Claude Code's architecture has a counterintuitive characteristic: according to academic source analysis, only about <strong>1.6%</strong> of its codebase is AI decision logic; the remaining <strong>98.4%</strong> is deterministic infrastructure—permission gates, context management, tool routing, recovery logic, and more. The core agent loop is remarkably simple:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">while (model_requests_tool) {</span><br><span class="line">    call_model();</span><br><span class="line">    dispatch_tools();</span><br><span class="line">    check_stop_conditions();</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<p>The real engineering complexity lies in the <strong>harness built around the loop</strong>, not in the loop itself.</p>
+<hr />
+<h3 id="2.2-系统分层-/-System-Layers"><a href="#2.2-系统分层-/-System-Layers" class="headerlink" title="2.2 系统分层 / System Layers"></a>2.2 系统分层 / System Layers</h3>
+<p><strong>中文：</strong> 系统可分解为 <strong>7 个组件</strong>，跨越 <strong>5 个架构层</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│  用户层 / User Layer                                     │</span><br><span class="line">│  开发者 / Developer                                      │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  接口层 / Interface Layer                                │</span><br><span class="line">│  Terminal CLI │ IDE Extension │ Desktop App │ Web/CI-CD │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  智能体层 / Agent Layer                                   │</span><br><span class="line">│  Agent Loop (while-tool_call)                           │</span><br><span class="line">│  Permission System (7 modes + ML classifier)          │</span><br><span class="line">│  Context Management (5-layer compaction)                │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  工具层 / Tool Layer                                      │</span><br><span class="line">│  Built-in Tools │ Subagents │ MCP │ Skills &amp; Plugins     │</span><br><span class="line">└────────────────────────┬────────────────────────────────┘</span><br><span class="line">                         │</span><br><span class="line">┌────────────────────────▼────────────────────────────────┐</span><br><span class="line">│  持久化层 / Persistence Layer                             │</span><br><span class="line">│  Session Storage (JSONL) │ CLAUDE.md │ File-based Memory│</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+<p><strong>English:</strong> The system decomposes into <strong>7 components</strong> across <strong>5 architectural layers</strong>: User → Interfaces → Agent Loop → Permission System → Tools → State &amp; Persistence → Execution Environment.</p>
+<hr />
+<h3 id="2.3-九步回合流水线-/-Nine-Step-Turn-Pipeline"><a href="#2.3-九步回合流水线-/-Nine-Step-Turn-Pipeline" class="headerlink" title="2.3 九步回合流水线 / Nine-Step Turn Pipeline"></a>2.3 九步回合流水线 / Nine-Step Turn Pipeline</h3>
+<p><strong>中文：</strong> 每一轮交互遵循严格的九步流水线：</p>
+<table>
+<thead>
+<tr>
+<th>步骤 / Step</th>
+<th>名称 / Name</th>
+<th>功能 / Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>设置解析 / Settings Resolution</td>
+<td>加载配置、环境变量、权限模式</td>
+</tr>
+<tr>
+<td>2</td>
+<td>状态初始化 / State Initialization</td>
+<td>恢复会话状态、工作目录</td>
+</tr>
+<tr>
+<td>3</td>
+<td>上下文组装 / Context Assembly</td>
+<td>从 9 个有序来源构建上下文窗口</td>
+</tr>
+<tr>
+<td>4</td>
+<td>上下文压缩 / Context Compaction</td>
+<td>五层压缩管道，防止超出 token 限制</td>
+</tr>
+<tr>
+<td>5</td>
+<td>模型调用 / Model Call</td>
+<td>向 Claude API 发送请求</td>
+</tr>
+<tr>
+<td>6</td>
+<td>工具分发 / Tool Dispatch</td>
+<td>解析模型返回的工具调用</td>
+</tr>
+<tr>
+<td>7</td>
+<td>权限门控 / Permission Gate</td>
+<td>评估操作是否需要用户批准</td>
+</tr>
+<tr>
+<td>8</td>
+<td>工具执行 / Tool Execution</td>
+<td>在沙箱/本地环境中执行</td>
+</tr>
+<tr>
+<td>9</td>
+<td>停止条件检查 / Stop Check</td>
+<td>判断是否完成任务或需继续</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English:</strong> Each interaction round follows a strict nine-step pipeline: Settings Resolution → State Initialization → Context Assembly → Context Compaction → Model Call → Tool Dispatch → Permission Gate → Tool Execution → Stop Condition Check.</p>
+<hr />
+<h3 id="2.4-内置工具集-/-Built-in-Tool-Set"><a href="#2.4-内置工具集-/-Built-in-Tool-Set" class="headerlink" title="2.4 内置工具集 / Built-in Tool Set"></a>2.4 内置工具集 / Built-in Tool Set</h3>
+<p><strong>中文：</strong> Claude Code 的核心工具集精简而强大，遵循「搜索，不索引（Search, Don't Index）」哲学——使用 ripgrep 而非向量数据库进行代码搜索，以降低运维复杂度与安全风险。</p>
+<table>
+<thead>
+<tr>
+<th>工具 / Tool</th>
+<th>功能 / Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Bash</code></td>
+<td>通用适配器，执行任意 Shell 命令</td>
+</tr>
+<tr>
+<td><code>Read</code></td>
+<td>读取文件内容</td>
+</tr>
+<tr>
+<td><code>Edit</code> / <code>Write</code></td>
+<td>编辑或创建文件</td>
+</tr>
+<tr>
+<td><code>Grep</code></td>
+<td>基于 ripgrep 的内容搜索</td>
+</tr>
+<tr>
+<td><code>Glob</code></td>
+<td>文件名模式匹配</td>
+</tr>
+<tr>
+<td><code>Task</code></td>
+<td>生成子智能体，隔离上下文执行子任务</td>
+</tr>
+<tr>
+<td><code>TodoWrite</code></td>
+<td>任务列表管理，追踪多步进度</td>
+</tr>
+</tbody>
+</table>
+<p><strong>English:</strong> Claude Code's core toolset is lean yet powerful, following a <strong>"Search, Don't Index"</strong> philosophy—using ripgrep rather than vector databases for code search, reducing operational complexity and security risks. The eight core tools are listed in the table above.</p>
+<hr />
+<h3 id="2.5-权限系统-/-Permission-System"><a href="#2.5-权限系统-/-Permission-System" class="headerlink" title="2.5 权限系统 / Permission System"></a>2.5 权限系统 / Permission System</h3>
+<p><strong>中文：</strong> 权限系统是 Claude Code 安全架构的核心，采用<strong>拒绝优先（Deny-First）</strong>规则引擎，提供 <strong>7 种权限模式</strong>，形成渐进的信任光谱：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plan → default → acceptEdits → auto → dontAsk → bypassPermissions</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>plan</strong>：仅规划，不执行任何修改操作</li>
+<li><strong>default</strong>：每次危险操作需用户确认</li>
+<li><strong>acceptEdits</strong>：自动接受文件编辑，其他操作需确认</li>
+<li><strong>auto</strong>：ML 分类器（yoloClassifier）自动筛选低风险操作</li>
+<li><strong>dontAsk</strong>：不再询问，自动执行（高风险）</li>
+<li><strong>bypassPermissions</strong>：跳过所有权限检查（仅限受信环境）</li>
+</ul>
+<p>据 Anthropic 内部数据，用户对 Claude 请求的批准率高达 <strong>93%</strong>，系统设计大量代码来处理剩余 7% 的边缘情况。</p>
+<p><strong>English:</strong> The permission system is the core of Claude Code's security architecture, using a <strong>deny-first</strong> rule engine with <strong>7 permission modes</strong> forming a graduated trust spectrum (see above). According to Anthropic internal data, users approve Claude's requests <strong>93%</strong> of the time; the system invests significant engineering in handling the remaining 7% edge cases.</p>
+<hr />
+<h3 id="2.6-上下文管理-/-Context-Management"><a href="#2.6-上下文管理-/-Context-Management" class="headerlink" title="2.6 上下文管理 / Context Management"></a>2.6 上下文管理 / Context Management</h3>
+<p><strong>中文：</strong> Claude Code 在固定上下文窗口（约 200K tokens，因模型而异）内运行，采用<strong>五层压缩管道</strong>主动管理上下文：</p>
+<ol>
+<li><strong>预算削减 / Budget Reduction</strong> — 按优先级裁剪低价值内容</li>
+<li><strong>Snip</strong> — 截断过长的工具输出</li>
+<li><strong>Microcompact</strong> — 压缩重复或冗余信息</li>
+<li><strong>Context Collapse</strong> — 合并相似上下文片段</li>
+<li><strong>Auto-Compact</strong> — LLM 驱动的智能摘要</li>
+</ol>
+<p><strong>CLAUDE.md 层级体系</strong>（4 级）提供持久化项目上下文：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">~/.claude/CLAUDE.md          → 全局用户偏好</span><br><span class="line">./CLAUDE.md                  → 项目根目录规则</span><br><span class="line">./src/CLAUDE.md              → 子目录特定规则</span><br><span class="line">./src/module/CLAUDE.md       → 模块级规则</span><br></pre></td></tr></table></figure>
+<p>记忆系统采用<strong>纯文件存储</strong>（Markdown 文件），无向量数据库，完全可检查、可编辑、可版本控制。</p>
+<p><strong>English:</strong> Claude Code operates within a fixed context window (~200K tokens, varying by model), using a <strong>five-layer compaction pipeline</strong> for proactive context management (listed above). The <strong>CLAUDE.md hierarchy</strong> (4 levels) provides persistent project context, and the memory system uses <strong>file-based storage</strong> (Markdown files) with no vector database—fully inspectable, editable, and version-controllable.</p>
+<hr />
+<h3 id="2.7-扩展机制-/-Extension-Mechanisms"><a href="#2.7-扩展机制-/-Extension-Mechanisms" class="headerlink" title="2.7 扩展机制 / Extension Mechanisms"></a>2.7 扩展机制 / Extension Mechanisms</h3>
+<p><strong>中文：</strong> Claude Code 提供四种扩展机制，形成可定制的智能体平台：</p>
+<table>
+<thead>
+<tr>
+<th>机制 / Mechanism</th>
+<th>说明 / Description</th>
+<th>典型用途 / Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCP</strong></td>
+<td>Model Context Protocol，连接外部服务</td>
+<td>查询数据库、发送 Slack 消息、控制浏览器</td>
+</tr>
+<tr>
+<td><strong>Skills</strong></td>
+<td>可复用的知识与工作流</td>
+<td>代码审查流程、部署检查清单</td>
+</tr>
+<tr>
+<td><strong>Hooks</strong></td>
+<td>27 种生命周期事件拦截</td>
+<td>每次文件编辑后运行 ESLint</td>
+</tr>
+<tr>
+<td><strong>Plugins</strong></td>
+<td>打包分发上述功能的安装单元</td>
+<td>跨项目复用、团队共享</td>
+</tr>
+</tbody>
+</table>
+<p><strong>子智能体（Subagents）</strong> 通过 <code>Task</code> 工具生成，在隔离的上下文窗口中运行，仅向父智能体返回摘要，防止上下文爆炸。更新的 <strong>Agent Teams</strong> 功能支持多会话协作，共享任务与点对点通信。</p>
+<p><strong>English:</strong> Claude Code provides four extension mechanisms forming a customizable agent platform (see table). <strong>Subagents</strong> spawn via the <code>Task</code> tool, running in isolated context windows and returning only summaries to the parent. The newer <strong>Agent Teams</strong> feature supports multi-session collaboration with shared tasks and peer-to-peer messaging.</p>
+<hr />
+<h3 id="2.8-会话存储-/-Session-Storage"><a href="#2.8-会话存储-/-Session-Storage" class="headerlink" title="2.8 会话存储 / Session Storage"></a>2.8 会话存储 / Session Storage</h3>
+<p><strong>中文：</strong> 所有交互以 <strong>append-only JSONL</strong> 格式持久化，支持确定性审计与回放。子智能体隔离可通过 <strong>Git Worktrees</strong> 实现，确保并行智能体互不干扰。</p>
+<p><strong>English:</strong> All interactions are persisted in <strong>append-only JSONL</strong> format, enabling deterministic auditing and replay. Subagent isolation can be achieved via <strong>Git Worktrees</strong>, ensuring parallel agents do not interfere with each other.</p>
+<hr />
+<h2 id="三、应用场景-/-Application-Scenarios"><a href="#三、应用场景-/-Application-Scenarios" class="headerlink" title="三、应用场景 / Application Scenarios"></a>三、应用场景 / Application Scenarios</h2>
+<h3 id="3.1-复杂多文件重构-/-Complex-Multi-File-Refactoring"><a href="#3.1-复杂多文件重构-/-Complex-Multi-File-Refactoring" class="headerlink" title="3.1 复杂多文件重构 / Complex Multi-File Refactoring"></a>3.1 复杂多文件重构 / Complex Multi-File Refactoring</h3>
+<p><strong>中文：</strong> 当需要在数十个文件间协调修改时（如认证层重构、API 版本迁移），Claude Code 可自主规划变更顺序、逐文件执行、运行测试验证，并在失败时自动修正。</p>
+<p><strong>English:</strong> When coordinated changes across dozens of files are needed (e.g., auth layer refactoring, API version migration), Claude Code autonomously plans change order, executes file by file, runs tests for verification, and auto-corrects on failure.</p>
+<hr />
+<h3 id="3.2-测试驱动开发循环-/-Test-Driven-Development-Loop"><a href="#3.2-测试驱动开发循环-/-Test-Driven-Development-Loop" class="headerlink" title="3.2 测试驱动开发循环 / Test-Driven Development Loop"></a>3.2 测试驱动开发循环 / Test-Driven Development Loop</h3>
+<p><strong>中文：</strong> Claude Code 可编写测试 → 运行测试 → 读取失败输出 → 修复实现 → 再次运行，形成完整的 TDD 闭环，无需人工介入每一步。</p>
+<p><strong>English:</strong> Claude Code can write tests → run tests → read failure output → fix implementation → run again, forming a complete TDD loop without human intervention at each step.</p>
+<hr />
+<h3 id="3.3-Git-工作流自动化-/-Git-Workflow-Automation"><a href="#3.3-Git-工作流自动化-/-Git-Workflow-Automation" class="headerlink" title="3.3 Git 工作流自动化 / Git Workflow Automation"></a>3.3 Git 工作流自动化 / Git Workflow Automation</h3>
+<p><strong>中文：</strong> 从读取 Issue、编写代码、运行测试到提交 PR，Claude Code 可端到端处理整个开发流程，与 GitHub、GitLab 深度集成。</p>
+<p><strong>English:</strong> From reading issues, writing code, and running tests to submitting PRs, Claude Code can handle the entire development workflow end-to-end, with deep GitHub and GitLab integration.</p>
+<hr />
+<h3 id="3.4-代码库探索与文档-/-Codebase-Exploration-&amp;-Documentation"><a href="#3.4-代码库探索与文档-/-Codebase-Exploration-&amp;-Documentation" class="headerlink" title="3.4 代码库探索与文档 / Codebase Exploration &amp; Documentation"></a>3.4 代码库探索与文档 / Codebase Exploration &amp; Documentation</h3>
+<p><strong>中文：</strong> 利用 agentic search（基于 grep，非 RAG），Claude Code 可在数秒内映射并解释整个代码库结构，生成架构文档或 onboarding 指南。</p>
+<p><strong>English:</strong> Using agentic search (grep-based, not RAG), Claude Code can map and explain entire codebase structure in seconds, generating architecture docs or onboarding guides.</p>
+<hr />
+<h3 id="3.5-CI/CD-与自动化-/-CI/CD-&amp;-Automation"><a href="#3.5-CI/CD-与自动化-/-CI/CD-&amp;-Automation" class="headerlink" title="3.5 CI/CD 与自动化 / CI/CD &amp; Automation"></a>3.5 CI/CD 与自动化 / CI/CD &amp; Automation</h3>
+<p><strong>中文：</strong> 通过 GitHub Actions 集成或 SDK，Claude Code 可在 CI 流水线中自动审查 PR、修复 lint 错误、更新依赖，实现「无人值守」的代码维护。</p>
+<p><strong>English:</strong> Via GitHub Actions integration or SDK, Claude Code can automatically review PRs, fix lint errors, and update dependencies in CI pipelines, enabling "unattended" code maintenance.</p>
+<hr />
+<h3 id="3.6-团队知识沉淀-/-Team-Knowledge-Capture"><a href="#3.6-团队知识沉淀-/-Team-Knowledge-Capture" class="headerlink" title="3.6 团队知识沉淀 / Team Knowledge Capture"></a>3.6 团队知识沉淀 / Team Knowledge Capture</h3>
+<p><strong>中文：</strong> 通过 <code>CLAUDE.md</code>、Skills 和 Hooks，团队可将编码规范、审查流程、部署检查清单固化为可复用的智能体能力，新成员快速获得团队最佳实践。</p>
+<p><strong>English:</strong> Through <code>CLAUDE.md</code>, Skills, and Hooks, teams can codify coding standards, review processes, and deployment checklists into reusable agent capabilities, giving new members rapid access to team best practices.</p>
+<hr />
+<h2 id="四、优缺点分析-/-Pros-and-Cons-Analysis"><a href="#四、优缺点分析-/-Pros-and-Cons-Analysis" class="headerlink" title="四、优缺点分析 / Pros and Cons Analysis"></a>四、优缺点分析 / Pros and Cons Analysis</h2>
+<h3 id="4.1-优点-/-Advantages"><a href="#4.1-优点-/-Advantages" class="headerlink" title="4.1 优点 / Advantages"></a>4.1 优点 / Advantages</h3>
+<table>
+<thead>
+<tr>
+<th>维度 / Dimension</th>
+<th>中文</th>
+<th>English</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>高自主性</strong></td>
+<td>可委托完整的多步任务，从规划到验证全程自主执行，适合「委派模式」工作流</td>
+<td>Can delegate complete multi-step tasks, autonomously executing from planning to verification—ideal for "delegation mode" workflows</td>
+</tr>
+<tr>
+<td><strong>终端原生集成</strong></td>
+<td>与现有 CLI 工具链（git、docker、kubectl 等）无缝协作，无需切换界面</td>
+<td>Seamlessly works with existing CLI toolchain (git, docker, kubectl, etc.) without context switching</td>
+</tr>
+<tr>
+<td><strong>上下文持久化</strong></td>
+<td>CLAUDE.md 层级 + 文件记忆，跨会话保持项目知识与编码规范</td>
+<td>CLAUDE.md hierarchy + file memory maintains project knowledge and coding standards across sessions</td>
+</tr>
+<tr>
+<td><strong>安全权限模型</strong></td>
+<td>7 级权限模式 + ML 分类器，在自主性与安全性间取得平衡</td>
+<td>7-level permission modes + ML classifier balance autonomy and security</td>
+</tr>
+<tr>
+<td><strong>高度可扩展</strong></td>
+<td>MCP、Skills、Hooks、Plugins 四层扩展，可连接任意外部系统</td>
+<td>MCP, Skills, Hooks, Plugins—four extension layers connecting to any external system</td>
+</tr>
+<tr>
+<td><strong>子智能体隔离</strong></td>
+<td>Task 工具 + Git Worktrees 支持并行任务，互不干扰</td>
+<td>Task tool + Git Worktrees enable parallel tasks without interference</td>
+</tr>
+<tr>
+<td><strong>审计可追溯</strong></td>
+<td>append-only JSONL 会话存储，每次交互可回放、可审计</td>
+<td>Append-only JSONL session storage enables replay and audit of every interaction</td>
+</tr>
+<tr>
+<td><strong>复杂任务效率高</strong></td>
+<td>对于跨多文件、需执行命令的复杂任务，token 效率优于交互式 IDE 工具</td>
+<td>Higher token efficiency than interactive IDE tools for complex multi-file, command-executing tasks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="4.2-缺点与局限-/-Disadvantages-&amp;-Limitations"><a href="#4.2-缺点与局限-/-Disadvantages-&amp;-Limitations" class="headerlink" title="4.2 缺点与局限 / Disadvantages &amp; Limitations"></a>4.2 缺点与局限 / Disadvantages &amp; Limitations</h3>
+<table>
+<thead>
+<tr>
+<th>维度 / Dimension</th>
+<th>中文</th>
+<th>English</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>模型绑定</strong></td>
+<td>仅支持 Anthropic Claude 模型，无法切换至 GPT、Gemini 等</td>
+<td>Only supports Anthropic Claude models; cannot switch to GPT, Gemini, etc.</td>
+</tr>
+<tr>
+<td><strong>学习曲线陡峭</strong></td>
+<td>终端优先的设计对不熟悉 CLI 的开发者不够友好</td>
+<td>Terminal-first design is less friendly to developers unfamiliar with CLI</td>
+</tr>
+<tr>
+<td><strong>非实时补全</strong></td>
+<td>不适合「边写边提示下一行」的编码场景，那是 Cursor 等 IDE 工具的强项</td>
+<td>Not suited for "suggest next line while typing" scenarios—that's the strength of IDE tools like Cursor</td>
+</tr>
+<tr>
+<td><strong>使用配额限制</strong></td>
+<td>Pro/Max 计划有滚动窗口与周限额，重度用户可能受限</td>
+<td>Pro/Max plans have rolling window and weekly limits that may constrain power users</td>
+</tr>
+<tr>
+<td><strong>成本考量</strong></td>
+<td>复杂自主任务的 API 调用量较大，重度使用成本高于 IDE 订阅制工具</td>
+<td>Complex autonomous tasks consume significant API calls; heavy usage costs more than IDE subscription tools</td>
+</tr>
+<tr>
+<td><strong>GUI 体验有限</strong></td>
+<td>终端版缺乏可视化 diff（桌面应用和 IDE 扩展可部分弥补）</td>
+<td>Terminal version lacks visual diff (partially addressed by desktop app and IDE extensions)</td>
+</tr>
+<tr>
+<td><strong>网络依赖</strong></td>
+<td>核心功能需联网调用 Claude API，离线不可用</td>
+<td>Core functionality requires internet for Claude API calls; offline use not supported</td>
+</tr>
+<tr>
+<td><strong>长任务不确定性</strong></td>
+<td>自主执行的长任务可能偏离预期，需中途干预或重新定向</td>
+<td>Long autonomous tasks may drift from expectations, requiring mid-course intervention</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="五、与其他工具的定位对比-/-Positioning-vs.-Other-Tools"><a href="#五、与其他工具的定位对比-/-Positioning-vs.-Other-Tools" class="headerlink" title="五、与其他工具的定位对比 / Positioning vs. Other Tools"></a>五、与其他工具的定位对比 / Positioning vs. Other Tools</h2>
+<p><strong>中文：</strong></p>
+<p>Claude Code 与 Cursor 等 IDE 工具并非竞争关系，而是覆盖同一工作流的不同环节：</p>
+<table>
+<thead>
+<tr>
+<th>场景 / Scenario</th>
+<th>更适合的工具 / Better Tool</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>边写代码边获得行级建议</td>
+<td><strong>Cursor</strong>（交互式、人在回路）</td>
+</tr>
+<tr>
+<td>委托完整的多步开发任务</td>
+<td><strong>Claude Code</strong>（自主式、智能体驱动）</td>
+</tr>
+<tr>
+<td>快速 inline 编辑</td>
+<td><strong>Cursor</strong></td>
+</tr>
+<tr>
+<td>大规模跨文件重构</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+<tr>
+<td>实时 Tab 补全</td>
+<td><strong>Cursor</strong></td>
+</tr>
+<tr>
+<td>自动化测试-修复循环</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+<tr>
+<td>可视化 diff 审查</td>
+<td><strong>Cursor / Claude Code Desktop</strong></td>
+</tr>
+<tr>
+<td>CI/CD 无人值守自动化</td>
+<td><strong>Claude Code</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>English:</strong></p>
+<p>Claude Code and IDE tools like Cursor are not competitors—they cover different parts of the same workflow (see table above). The key insight: <strong>Cursor is a force multiplier on your keystrokes; Claude Code is a delegate for whole jobs.</strong></p>
+<hr />
+<h2 id="六、设计启示-/-Design-Insights-for-Agent-Builders"><a href="#六、设计启示-/-Design-Insights-for-Agent-Builders" class="headerlink" title="六、设计启示 / Design Insights for Agent Builders"></a>六、设计启示 / Design Insights for Agent Builders</h2>
+<p><strong>中文：</strong> Claude Code 的架构为构建 AI 智能体系统提供了重要启示：</p>
+<ol>
+<li><strong>模型是小部分，基础设施是大头</strong> — 投资应集中在 Harness（权限、上下文、工具路由）而非模型调用本身</li>
+<li><strong>简单循环足够</strong> — 无需 DAG、分类器或 RAG；让模型决定一切</li>
+<li><strong>搜索优于索引</strong> — grep 比向量搜索更简单、更安全、在 agentic 场景下同样有效</li>
+<li><strong>权限是产品特性，不是障碍</strong> — 93% 批准率说明用户信任自主性，但 7% 的边缘情况值得大量工程投入</li>
+<li><strong>文件即记忆</strong> — 可检查、可编辑、可版本控制的 Markdown 优于黑盒向量数据库</li>
+<li><strong>扩展性决定平台价值</strong> — MCP、Skills、Hooks、Plugins 四层机制使 Claude Code 从工具演变为平台</li>
+</ol>
+<p><strong>English:</strong> Claude Code's architecture offers key insights for building AI agent systems (listed above). As frontier models converge, <strong>harness + model co-optimization</strong> is the differentiator.</p>
+<hr />
+<h2 id="七、总结-/-Summary"><a href="#七、总结-/-Summary" class="headerlink" title="七、总结 / Summary"></a>七、总结 / Summary</h2>
+<p><strong>中文：</strong> Claude Code 代表了 AI 辅助编程从「自动补全」到「自主智能体」的范式转变。其架构哲学——<strong>简单循环 + 厚重基础设施</strong>——证明了一个反直觉的事实：构建优秀智能体系统的关键，不在于更复杂的 AI 逻辑，而在于更可靠的确定性系统。对于需要委托复杂、多步、跨文件开发任务的团队，Claude Code 是目前最成熟的终端原生智能体编程解决方案。</p>
+<p><strong>English:</strong> Claude Code represents the paradigm shift in AI-assisted programming from "autocomplete" to "autonomous agent." Its architectural philosophy—<strong>simple loop + heavy infrastructure</strong>—proves a counterintuitive truth: the key to building excellent agent systems lies not in more complex AI logic, but in more reliable deterministic systems. For teams needing to delegate complex, multi-step, cross-file development tasks, Claude Code is currently the most mature terminal-native agentic coding solution.</p>
+<hr />
+<h2 id="参考资料-/-References"><a href="#参考资料-/-References" class="headerlink" title="参考资料 / References"></a>参考资料 / References</h2>
+<ul>
+<li><a href="https://code.claude.com/docs/en/overview">Claude Code Official Documentation</a></li>
+<li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code Works (Official)</a></li>
+<li><a href="https://code.claude.com/docs/en/features-overview">Extend Claude Code - Features Overview</a></li>
+<li><a href="https://arxiv.org/pdf/2604.14228">Dive into Claude Code (arXiv Academic Paper)</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code">VILA-Lab/Dive-into-Claude-Code (GitHub)</a></li>
+</ul>
+
+    
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/e601e6a8.html" rel="prev" title="LLM Wiki 介绍：思想、意义、应用场景与优缺点">
+      <i class="fa fa-chevron-left"></i> LLM Wiki 介绍：思想、意义、应用场景与优缺点
+    </a></div>
+      <div class="post-nav-item">
+    </div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">361</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meng Qi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">324k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">19:37</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div>
+<span id="timeDate">loading...</span><span id="times">loading...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("1/1/2018 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
