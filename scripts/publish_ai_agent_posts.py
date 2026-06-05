@@ -6,8 +6,10 @@ from __future__ import annotations
 import hashlib
 import html
 import re
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 import markdown
 from markdown.extensions.tables import TableExtension
@@ -20,6 +22,12 @@ TZ = timezone(timedelta(hours=8))
 BASE_DATE_BATCH1 = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
 BASE_DATE_BATCH2 = datetime(2026, 6, 6, 10, 0, 0, tzinfo=TZ)
 TOTAL_POST_COUNT = 372  # 360 original + 4 batch1 + 8 batch2
+ORIGINAL_TAG_COUNT = 18
+MECHINE_CATEGORY_COUNT = 44  # 32 original + 12 AI agent series
+TAG_CLOUD_SIZE = {
+    12: ('24px', '#363636'),
+    1: ('12px', '#ccc'),
+}
 
 SERIES_SHORT = {
     "hermes-openclaw-overview.md": "总览",
@@ -182,6 +190,132 @@ def already_indexed(content: str, pid: str) -> bool:
     return f"/posts/{pid}.html" in content
 
 
+def tag_dir_name(tag: str) -> str:
+    if re.fullmatch(r"[\x00-\x7f]+", tag):
+        return tag.replace(" ", "-")
+    return tag
+
+
+def tag_href(tag: str) -> str:
+    name = tag_dir_name(tag)
+    if re.fullmatch(r"[\x00-\x7f]+", tag):
+        return f"/tags/{name}/"
+    return f"/tags/{quote(name)}/"
+
+
+def collect_tag_posts(rendered_posts: list[dict]) -> dict[str, list[dict]]:
+    tag_posts: dict[str, list[dict]] = defaultdict(list)
+    for post in rendered_posts:
+        for tag in post["tags"].split(";"):
+            tag = tag.strip()
+            if tag:
+                tag_posts[tag].append(post)
+    for tag in tag_posts:
+        tag_posts[tag].sort(key=lambda p: p["published"], reverse=True)
+    return dict(tag_posts)
+
+
+def post_tags_html(tags: str) -> str:
+    links = [
+        f'<a href="{tag_href(tag.strip())}" rel="tag"># {html.escape(tag.strip())}</a>'
+        for tag in tags.split(";")
+        if tag.strip()
+    ]
+    return (
+        "\n          <div class=\"post-tags\">\n              "
+        + "\n              ".join(links)
+        + "\n          </div>\n"
+    )
+
+
+def tag_cloud_link(tag: str, count: int) -> str:
+    size, color = TAG_CLOUD_SIZE.get(count, ('15.6px', '#a7a7a7'))
+    if count >= 8:
+        size, color = ('24px', '#363636')
+    elif count >= 3:
+        size, color = ('19.2px', '#818181')
+    return (
+        f'<a href="{tag_href(tag)}" style="font-size: {size}; color: {color}">'
+        f"{html.escape(tag)}</a>"
+    )
+
+
+def tag_articles_html(posts: list[dict]) -> str:
+    by_year: dict[str, list[dict]] = defaultdict(list)
+    for post in posts:
+        by_year[post["published"].strftime("%Y")].append(post)
+
+    blocks: list[str] = []
+    for year in sorted(by_year, reverse=True):
+        blocks.append(
+            f"""    <div class="collection-year">
+      <span class="collection-header">{year}</span>
+    </div>
+"""
+        )
+        for post in by_year[year]:
+            blocks.append(
+                archive_article_block(
+                    pid=post["pid"],
+                    title=post["title"],
+                    published=post["published"],
+                )
+            )
+    return "".join(blocks)
+
+
+def patch_sidebar_site_state(content: str, *, tag_count: int | None = None) -> str:
+    content = re.sub(
+        r"(<div class=\"site-state-item site-state-posts\">.*?<span class=\"site-state-item-count\">)\d+(</span>)",
+        rf"\g<1>{TOTAL_POST_COUNT}\g<2>",
+        content,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if tag_count is not None:
+        content = re.sub(
+            r"(<div class=\"site-state-item site-state-tags\">.*?<span class=\"site-state-item-count\">)\d+(</span>)",
+            rf"\g<1>{tag_count}\g<2>",
+            content,
+            count=1,
+            flags=re.DOTALL,
+        )
+    return content
+
+
+def render_tag_page(template: str, tag: str, posts: list[dict], tag_count: int) -> str:
+    slug = tag_dir_name(tag)
+    page = template
+    page = page.replace("标签: hexo", f"标签: {tag}")
+    page = page.replace("https://www.fastolf.com/tags/hexo/index.html", tag_href(tag).rstrip("/") + "/index.html")
+    page = page.replace('href="https://www.fastolf.com/tags/hexo/"', f'href="https://www.fastolf.com{tag_href(tag)}"')
+    page = page.replace("<title>标签: hexo | Qi", f"<title>标签: {html.escape(tag)} | Qi")
+    page = page.replace(
+        """        <h2 class="collection-header">hexo
+          <small>标签</small>
+        </h2>""",
+        f"""        <h2 class="collection-header">{html.escape(tag)}
+          <small>标签</small>
+        </h2>""",
+    )
+
+    articles_start = """        </h2>
+      </div>
+
+      """
+    articles_end = """    </div>
+  </div>
+  
+  
+  
+
+"""
+    start_idx = page.index(articles_start) + len(articles_start)
+    end_idx = page.index(articles_end, start_idx)
+    page = page[:start_idx] + tag_articles_html(posts) + page[end_idx:]
+    return patch_sidebar_site_state(page, tag_count=tag_count)
+
+
 def post_id(slug: str) -> str:
     return hashlib.md5(slug.encode()).hexdigest()[:8]
 
@@ -261,6 +395,7 @@ def render_post_page(
     pid: str,
     title: str,
     description: str,
+    tags: str,
     body_html: str,
     published: datetime,
     chars: int,
@@ -286,7 +421,7 @@ def render_post_page(
     page = page.replace('datetime="2026-06-05T10:00:00+08:00">2026-06-05', f'datetime="{iso_local(published)}">{date_display}')
     page = page.replace("<span>8500</span>", f"<span>{chars}</span>")
     page = page.replace("<span>18 分钟</span>", f"<span>{minutes} 分钟</span>")
-    page = page.replace('Tech;Data;Vision', 'AI Agent;Hermes;OpenClaw')
+    page = page.replace("Tech;Data;Vision", tags)
     page = page.replace(
         re.search(r'<span class="site-state-item-count">\d+</span>', page).group(0),
         f'<span class="site-state-item-count">{TOTAL_POST_COUNT}</span>',
@@ -327,7 +462,8 @@ def render_post_page(
 
     nav_pattern = re.compile(r"<div class=\"post-nav\">.*?</div>\s*</div>\s*</footer>", re.DOTALL)
     nav_html = (
-        "    <div class=\"post-nav\">\n"
+        post_tags_html(tags)
+        + "        <div class=\"post-nav\">\n"
         f"      <div class=\"post-nav-item\">\n{prev_block}</div>\n"
         f"      <div class=\"post-nav-item\">\n{next_block}</div>\n"
         "    </div>\n      </footer>"
@@ -560,6 +696,7 @@ def main() -> None:
             pid=post["pid"],
             title=post["title"],
             description=post["description"],
+            tags=post["tags"],
             body_html=post["body_html"],
             published=post["published"],
             chars=post["chars"],
@@ -746,7 +883,64 @@ def main() -> None:
         baidu = baidu[:baidu_insert] + baidu_urls + baidu[baidu_insert:]
     (ROOT / "baidusitemap.xml").write_text(baidu, encoding="utf-8")
 
-    print(f"Updated site indexes. New posts this run: {len(missing_desc)} on homepage.")
+    # tags/index.html + per-tag archive pages
+    tag_posts = collect_tag_posts(rendered_posts)
+    total_tag_count = ORIGINAL_TAG_COUNT + len(tag_posts)
+    tag_template = (ROOT / "tags" / "hexo" / "index.html").read_text(encoding="utf-8")
+
+    tags_index = (ROOT / "tags" / "index.html").read_text(encoding="utf-8")
+    tags_index = re.sub(
+        r"(目前共计 )\d+( 个标签)",
+        rf"\g<1>{total_tag_count}\g<2>",
+        tags_index,
+        count=1,
+    )
+    new_tag_links = [
+        tag_cloud_link(tag, len(posts))
+        for tag, posts in sorted(tag_posts.items())
+        if tag_href(tag) not in tags_index
+    ]
+    if new_tag_links:
+        tags_index = tags_index.replace(
+            '</div>\n          </div>\n        \n      </div>',
+            " " + " ".join(new_tag_links) + '</div>\n          </div>\n        \n      </div>',
+            1,
+        )
+    tags_index = patch_sidebar_site_state(tags_index, tag_count=total_tag_count)
+    (ROOT / "tags" / "index.html").write_text(tags_index, encoding="utf-8")
+
+    for tag, posts in tag_posts.items():
+        tag_dir = ROOT / "tags" / tag_dir_name(tag)
+        tag_dir.mkdir(parents=True, exist_ok=True)
+        tag_page = render_tag_page(tag_template, tag, posts, total_tag_count)
+        (tag_dir / "index.html").write_text(tag_page, encoding="utf-8")
+        print(f"Wrote tag page {tag_href(tag)} ({len(posts)} posts)")
+
+    # categories/index.html — bump mechine post count
+    categories_index = (ROOT / "categories" / "index.html").read_text(encoding="utf-8")
+    categories_index = re.sub(
+        r'(href="/categories/mechine/">mechine</a><span class="category-list-count">)\d+(</span>)',
+        rf"\g<1>{MECHINE_CATEGORY_COUNT}\g<2>",
+        categories_index,
+        count=1,
+    )
+    categories_index = patch_sidebar_site_state(categories_index, tag_count=total_tag_count)
+    (ROOT / "categories" / "index.html").write_text(categories_index, encoding="utf-8")
+
+    # Refresh sidebar counts on key listing pages
+    for rel_path in (
+        "archives/index.html",
+        "archives/2026/index.html",
+        "categories/mechine/index.html",
+    ):
+        path = ROOT / rel_path
+        text = path.read_text(encoding="utf-8")
+        path.write_text(patch_sidebar_site_state(text, tag_count=total_tag_count), encoding="utf-8")
+
+    print(
+        f"Updated site indexes. New posts this run: {len(missing_desc)} on homepage. "
+        f"Tags: {total_tag_count}, mechine: {MECHINE_CATEGORY_COUNT}."
+    )
 
 
 if __name__ == "__main__":
