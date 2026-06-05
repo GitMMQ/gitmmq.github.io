@@ -484,11 +484,24 @@ They're not simple replacements. Hermes ships `hermes claw migrate` to onboard O
 
 ---
 
-## 八、延伸阅读 | Further Reading
+## 八、延伸阅读（完整 12 篇系列）| Further Reading (Full 12-Article Series)
 
-- [记忆系统深度解析](./memory-system.md)
-- [Gateway 架构深度解析](./gateway.md)
-- [安全模型深度解析](./security-model.md)
+| # | 主题 | 文档 |
+|---|------|------|
+| 1 | 总览 | [hermes-openclaw-overview.md](./hermes-openclaw-overview.md) |
+| 2 | 部署迁移 | [deploy-migrate-operations.md](./deploy-migrate-operations.md) |
+| 3 | 工作区与 Prompt | [workspace-context-prompt.md](./workspace-context-prompt.md) |
+| 4 | Gateway | [gateway.md](./gateway.md) |
+| 5 | 记忆系统 | [memory-system.md](./memory-system.md) |
+| 6 | 技能与学习闭环 | [skills-learning-loop.md](./skills-learning-loop.md) |
+| 7 | 工具与执行环境 | [tools-execution-environments.md](./tools-execution-environments.md) |
+| 8 | 插件与 MCP | [plugins-mcp-ecosystem.md](./plugins-mcp-ecosystem.md) |
+| 9 | 多 Agent | [multi-agent-delegation.md](./multi-agent-delegation.md) |
+| 10 | 自动化调度 | [automation-cron-heartbeat.md](./automation-cron-heartbeat.md) |
+| 11 | 模型与成本 | [model-provider-cost.md](./model-provider-cost.md) |
+| 12 | 安全模型 | [security-model.md](./security-model.md) |
+
+知识点覆盖矩阵：[knowledge-map.md](./knowledge-map.md)
 
 ---
 

@@ -17,7 +17,24 @@ DOCS = ROOT / "docs" / "ai-agents"
 TEMPLATE_POST = ROOT / "posts" / "e601e6a8.html"
 CATEGORY = "mechine"
 TZ = timezone(timedelta(hours=8))
-BASE_DATE = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
+BASE_DATE_BATCH1 = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
+BASE_DATE_BATCH2 = datetime(2026, 6, 6, 10, 0, 0, tzinfo=TZ)
+TOTAL_POST_COUNT = 372  # 360 original + 4 batch1 + 8 batch2
+
+SERIES_SHORT = {
+    "hermes-openclaw-overview.md": "总览",
+    "memory-system.md": "记忆",
+    "gateway.md": "Gateway",
+    "security-model.md": "安全",
+    "skills-learning-loop.md": "技能",
+    "tools-execution-environments.md": "工具",
+    "workspace-context-prompt.md": "工作区",
+    "automation-cron-heartbeat.md": "自动化",
+    "model-provider-cost.md": "模型",
+    "multi-agent-delegation.md": "多Agent",
+    "plugins-mcp-ecosystem.md": "插件MCP",
+    "deploy-migrate-operations.md": "部署",
+}
 
 POSTS = [
     {
@@ -27,6 +44,8 @@ POSTS = [
         "excerpt_zh": "本文对比 Agent Hermes 与 OpenClaw（龙虾）两大个人 AI Agent 框架的架构哲学、应用场景与优缺点，采用中英文对照形式。",
         "excerpt_en": "A bilingual comparison of Agent Hermes and OpenClaw (Lobster): architecture, use cases, and pros & cons.",
         "tags": "AI Agent;Hermes;OpenClaw",
+        "batch": 1,
+        "hour_offset": 0,
     },
     {
         "md": "memory-system.md",
@@ -35,6 +54,8 @@ POSTS = [
         "excerpt_zh": "对比 Hermes 四层记忆（SQLite FTS5 + 技能渐进披露）与 OpenClaw Markdown 工作区文件记忆体系。",
         "excerpt_en": "Deep dive into Hermes four-layer memory vs OpenClaw workspace Markdown memory.",
         "tags": "AI Agent;Memory;Hermes;OpenClaw",
+        "batch": 1,
+        "hour_offset": 1,
     },
     {
         "md": "gateway.md",
@@ -43,6 +64,8 @@ POSTS = [
         "excerpt_zh": "OpenClaw「Gateway 即产品」与 Hermes「Agent 引擎消息前端」的架构对比与生产部署指南。",
         "excerpt_en": "Gateway architecture comparison: OpenClaw control plane vs Hermes GatewayRunner.",
         "tags": "AI Agent;Gateway;Hermes;OpenClaw",
+        "batch": 1,
+        "hour_offset": 2,
     },
     {
         "md": "security-model.md",
@@ -51,8 +74,112 @@ POSTS = [
         "excerpt_zh": "OpenClaw「身份先行」与 Hermes「七层纵深防御」安全模型对比及生产硬化清单。",
         "excerpt_en": "Security model comparison: OpenClaw access-control-first vs Hermes defense-in-depth.",
         "tags": "AI Agent;Security;Hermes;OpenClaw",
+        "batch": 1,
+        "hour_offset": 3,
+    },
+    {
+        "md": "skills-learning-loop.md",
+        "title": "Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析",
+        "description": "全面对比 SKILL.md 标准、渐进式披露、Skills Hub/ClawHub、skill_manage 自生成与 Skill Workshop 提案队列，中英文对照。",
+        "excerpt_zh": "Hermes 闭环学习自动沉淀技能 vs OpenClaw 手动编写与 Skill Workshop 提案审核。",
+        "excerpt_en": "Skills systems compared: Hermes auto-learning loop vs OpenClaw ClawHub and Skill Workshop.",
+        "tags": "AI Agent;Skills;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 0,
+    },
+    {
+        "md": "tools-execution-environments.md",
+        "title": "Agent Hermes 与 OpenClaw 工具链与执行环境全解析",
+        "description": "系统讲解 Hermes 70+ 工具与 6 种执行后端、OpenClaw tools.profile 与沙箱策略，中英文对照。",
+        "excerpt_zh": "工具集、终端后端、Docker 持久沙箱、浏览器自动化与后台进程管理全面对比。",
+        "excerpt_en": "Tools, toolsets, execution backends, sandboxing, and browser automation compared.",
+        "tags": "AI Agent;Tools;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 1,
+    },
+    {
+        "md": "workspace-context-prompt.md",
+        "title": "Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析",
+        "description": "深度解析 SOUL/AGENTS/HEARTBEAT 等 Bootstrap 文件、Prompt 分层与 contextVisibility，中英文对照。",
+        "excerpt_zh": "OpenClaw 8 大 Bootstrap 文件与 Hermes Prompt 三层组装、前缀缓存稳定性设计。",
+        "excerpt_en": "Workspace bootstrap files, prompt tiers, and context assembly compared.",
+        "tags": "AI Agent;Prompt;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 2,
+    },
+    {
+        "md": "automation-cron-heartbeat.md",
+        "title": "Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析",
+        "description": "Cron 调度、HEARTBEAT 主动巡检、no-agent 模式与 wakeAgent 门控、context_from 流水线，中英文对照。",
+        "excerpt_zh": "Hermes cronjob 全生命周期与 OpenClaw HEARTBEAT.md 主动巡检模式对比。",
+        "excerpt_en": "Cron automation, HEARTBEAT proactive checks, and pipeline chaining compared.",
+        "tags": "AI Agent;Cron;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 3,
+    },
+    {
+        "md": "model-provider-cost.md",
+        "title": "Agent Hermes 与 OpenClaw 模型 Provider 与 Token 成本优化全解析",
+        "description": "18+ Provider 配置、fallback、credential pool、Prompt 缓存与上下文压缩的成本优化策略，中英文对照。",
+        "excerpt_zh": "模型切换、多 Provider 容灾、Anthropic 前缀缓存与 Cron Token 成本控制。",
+        "excerpt_en": "Model providers, fallback, prompt caching, and token cost optimization.",
+        "tags": "AI Agent;Model;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 4,
+    },
+    {
+        "md": "multi-agent-delegation.md",
+        "title": "Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析",
+        "description": "多 Agent 工作区隔离、session.dmScope、delegate_task 与 sessions_spawn 风险治理，中英文对照。",
+        "excerpt_zh": "个人助理 vs 团队 Agent 模式，子代理并行与会话隔离最佳实践。",
+        "excerpt_en": "Multi-agent routing, sub-agent delegation, and session isolation compared.",
+        "tags": "AI Agent;Multi-Agent;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 5,
+    },
+    {
+        "md": "plugins-mcp-ecosystem.md",
+        "title": "Agent Hermes 与 OpenClaw 插件体系与 MCP 生态全解析",
+        "description": "插件发现机制、MCP 双向集成、渠道插件与供应链安全策略全面对比，中英文对照。",
+        "excerpt_zh": "Hermes MCP 客户端/服务端与 OpenClaw 进程内插件、plugins.allow 白名单对比。",
+        "excerpt_en": "Plugin systems and bidirectional MCP integration compared.",
+        "tags": "AI Agent;MCP;Plugins;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 6,
+    },
+    {
+        "md": "deploy-migrate-operations.md",
+        "title": "Agent Hermes 与 OpenClaw 部署迁移与运维实战指南",
+        "description": "安装初始化、hermes claw migrate、openclaw onboard、渠道配置、doctor/audit 运维清单，中英文对照。",
+        "excerpt_zh": "从安装到生产的完整路径：迁移、渠道接入、Gateway 服务化与故障排查。",
+        "excerpt_en": "Install, migrate, channel setup, and operations runbooks compared.",
+        "tags": "AI Agent;Deploy;Hermes;OpenClaw",
+        "batch": 2,
+        "hour_offset": 7,
     },
 ]
+
+
+def series_links_html() -> str:
+    links = [
+        f'<a href="/posts/{post_id(md)}.html">{label}</a>'
+        for md, label in SERIES_SHORT.items()
+    ]
+    return (
+        "<p>系列文章（12 篇）："
+        + " · ".join(links)
+        + "</p>"
+        + "<p><em>12-article series: Hermes × OpenClaw bilingual technical docs.</em></p>"
+    )
+
+
+def published_at(meta: dict) -> datetime:
+    base = BASE_DATE_BATCH1 if meta.get("batch", 1) == 1 else BASE_DATE_BATCH2
+    return base + timedelta(hours=meta.get("hour_offset", 0))
+
+
+def already_indexed(content: str, pid: str) -> bool:
+    return f"/posts/{pid}.html" in content
 
 
 def post_id(slug: str) -> str:
@@ -160,7 +287,10 @@ def render_post_page(
     page = page.replace("<span>8500</span>", f"<span>{chars}</span>")
     page = page.replace("<span>18 分钟</span>", f"<span>{minutes} 分钟</span>")
     page = page.replace('Tech;Data;Vision', 'AI Agent;Hermes;OpenClaw')
-    page = page.replace("<span class=\"site-state-item-count\">360</span>", "<span class=\"site-state-item-count\">364</span>")
+    page = page.replace(
+        re.search(r'<span class="site-state-item-count">\d+</span>', page).group(0),
+        f'<span class="site-state-item-count">{TOTAL_POST_COUNT}</span>',
+    )
 
     # Replace article body (first post-body block on the page)
     body_pattern = re.compile(
@@ -378,30 +508,20 @@ def main() -> None:
     template = TEMPLATE_POST.read_text(encoding="utf-8")
     rendered_posts = []
 
-    for i, meta in enumerate(POSTS):
+    series_html = series_links_html()
+    for meta in POSTS:
         md_path = DOCS / meta["md"]
         md_text = md_path.read_text(encoding="utf-8")
         slug = meta["md"]
         pid = post_id(slug)
-        published = BASE_DATE + timedelta(hours=i)
+        published = published_at(meta)
         body_html = md_to_html(md_text)
         chars = word_count(re.sub(r"<[^>]+>", "", body_html))
         minutes = reading_minutes(chars)
         excerpt_html = (
             f"<p>{html.escape(meta['excerpt_zh'])}</p>"
             f"<p><em>{html.escape(meta['excerpt_en'])}</em></p>"
-            "<p>系列文章：<a href=\"/posts/"
-            + post_id("hermes-openclaw-overview.md")
-            + ".html\">总览</a> · "
-            "<a href=\"/posts/"
-            + post_id("memory-system.md")
-            + ".html\">记忆系统</a> · "
-            "<a href=\"/posts/"
-            + post_id("gateway.md")
-            + ".html\">Gateway</a> · "
-            "<a href=\"/posts/"
-            + post_id("security-model.md")
-            + ".html\">安全模型</a></p>"
+            + series_html
         )
         rendered_posts.append(
             {
@@ -470,22 +590,29 @@ def main() -> None:
     )
     (ROOT / "posts" / "e601e6a8.html").write_text(llm_post, encoding="utf-8")
 
-    # index.html - prepend home blocks
+    # index.html - prepend home blocks (idempotent: only missing posts)
     index = (ROOT / "index.html").read_text(encoding="utf-8")
     marker = '  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">\n    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e601e6a8.html">'
-    blocks = "".join(
-        home_article_block(
-            pid=p["pid"],
-            title=p["title"],
-            excerpt_html=p["excerpt_html"],
-            published=p["published"],
-            chars=p["chars"],
-            minutes=p["minutes"],
+    missing_desc = [p for p in rendered_posts_desc if not already_indexed(index, p["pid"])]
+    if missing_desc:
+        blocks = "".join(
+            home_article_block(
+                pid=p["pid"],
+                title=p["title"],
+                excerpt_html=p["excerpt_html"],
+                published=p["published"],
+                chars=p["chars"],
+                minutes=p["minutes"],
+            )
+            for p in missing_desc
         )
-        for p in rendered_posts_desc
+        index = index.replace(marker, blocks + "\n" + marker, 1)
+    index = re.sub(
+        r'(<span class="site-state-item-count">)\d+(</span>)',
+        rf"\g<1>{TOTAL_POST_COUNT}\g<2>",
+        index,
+        count=1,
     )
-    index = index.replace(marker, blocks + "\n" + marker, 1)
-    index = index.replace("<span class=\"site-state-item-count\">360</span>", "<span class=\"site-state-item-count\">364</span>")
     (ROOT / "index.html").write_text(index, encoding="utf-8")
 
     # archives/index.html
@@ -509,14 +636,24 @@ def main() -> None:
 
     </header>
   </article>"""
-    arch_blocks = "".join(
+    def prepend_archive_blocks(content: str, marker: str, blocks: str) -> str:
+        missing = [p for p in rendered_posts_desc if not already_indexed(content, p["pid"])]
+        if not missing:
+            return content
+        new_blocks = "".join(
+            archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
+            for p in missing
+        )
+        return content.replace(marker, new_blocks + marker, 1)
+
+    arch_blocks_all = "".join(
         archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
         for p in rendered_posts_desc
     )
-    archives = archives.replace(arch_marker, arch_blocks + arch_marker, 1)
+    archives = prepend_archive_blocks(archives, arch_marker, arch_blocks_all)
     (ROOT / "archives" / "index.html").write_text(archives, encoding="utf-8")
 
-    # archives/2026/index.html
+    # archives/2026/index.html — insert before first 2026-06-05 LLM Wiki entry
     arch2026 = (ROOT / "archives" / "2026" / "index.html").read_text(encoding="utf-8")
     arch2026_marker = """  <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -537,7 +674,19 @@ def main() -> None:
 
     </header>
   </article>"""
-    arch2026 = arch2026.replace(arch2026_marker, arch_blocks + arch2026_marker, 1)
+    missing_2026 = [p for p in rendered_posts_desc if not already_indexed(arch2026, p["pid"])]
+    if missing_2026:
+        new_blocks = "".join(
+            archive_article_block(pid=p["pid"], title=p["title"], published=p["published"])
+            for p in missing_2026
+        )
+        arch2026 = arch2026.replace(arch2026_marker, new_blocks + arch2026_marker, 1)
+        arch2026 = re.sub(
+            r"(太棒了! 目前共计 )\d+( 篇日志)",
+            rf"\g<1>{TOTAL_POST_COUNT}\g<2>",
+            arch2026,
+            count=1,
+        )
     (ROOT / "archives" / "2026" / "index.html").write_text(arch2026, encoding="utf-8")
 
     # categories/mechine/index.html
@@ -554,45 +703,50 @@ def main() -> None:
       </div>
     </header>
   </article>"""
-    cat_blocks = "".join(
-        category_article_block(pid=p["pid"], title=p["title"], published=p["published"])
-        for p in rendered_posts_desc
-    )
-    cat = cat.replace(cat_marker, cat_blocks + cat_marker, 1)
+    cat = prepend_archive_blocks(cat, cat_marker, "")
     (ROOT / "categories" / "mechine" / "index.html").write_text(cat, encoding="utf-8")
 
-    # search.xml
+    # search.xml (idempotent)
     search = (ROOT / "search.xml").read_text(encoding="utf-8")
-    insert_at = search.index("<entry>\n      <title>LLM Wiki")
-    search_entries = "".join(
-        search_entry(pid=p["pid"], title=p["title"], excerpt_html=p["excerpt_html"])
-        for p in rendered_posts_desc
-    )
-    search = search[:insert_at] + search_entries + "\n    \n    \n    " + search[insert_at:]
+    missing_search = [p for p in rendered_posts_desc if f"/posts/{p['pid']}.html" not in search]
+    if missing_search:
+        insert_at = search.index("<entry>\n      <title>LLM Wiki")
+        search_entries = "".join(
+            search_entry(pid=p["pid"], title=p["title"], excerpt_html=p["excerpt_html"])
+            for p in missing_search
+        )
+        search = search[:insert_at] + search_entries + "\n    \n    \n    " + search[insert_at:]
     (ROOT / "search.xml").write_text(search, encoding="utf-8")
 
-    # sitemap.xml + sitemap.txt + baidusitemap.xml
+    # sitemap.xml + sitemap.txt + baidusitemap.xml (idempotent)
     sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
-    sitemap_insert = sitemap.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
-    sitemap_urls = "".join(sitemap_url(p["pid"], p["published"]) for p in rendered_posts_desc)
-    sitemap = sitemap[:sitemap_insert] + sitemap_urls + sitemap[sitemap_insert:]
+    missing_sitemap = [p for p in rendered_posts_desc if f"posts/{p['pid']}.html" not in sitemap]
+    if missing_sitemap:
+        sitemap_insert = sitemap.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
+        sitemap_urls = "".join(sitemap_url(p["pid"], p["published"]) for p in missing_sitemap)
+        sitemap = sitemap[:sitemap_insert] + sitemap_urls + sitemap[sitemap_insert:]
     (ROOT / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 
     sitemap_txt = (ROOT / "sitemap.txt").read_text(encoding="utf-8")
-    txt_lines = [f"https://www.fastolf.com/posts/{p['pid']}.html\n" for p in rendered_posts_desc]
-    sitemap_txt = "".join(txt_lines) + sitemap_txt
+    for p in rendered_posts_desc:
+        url = f"https://www.fastolf.com/posts/{p['pid']}.html\n"
+        if url.strip() not in sitemap_txt:
+            sitemap_txt = url + sitemap_txt
     (ROOT / "sitemap.txt").write_text(sitemap_txt, encoding="utf-8")
 
     baidu = (ROOT / "baidusitemap.xml").read_text(encoding="utf-8")
-    baidu_insert = baidu.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
-    baidu_urls = "".join(
-        f"  <url>\n    <loc>https://www.fastolf.com/posts/{p['pid']}.html</loc>\n    <lastmod>{p['published'].strftime('%Y-%m-%d')}</lastmod>\n  </url>\n"
-        for p in rendered_posts_desc
-    )
-    baidu = baidu[:baidu_insert] + baidu_urls + baidu[baidu_insert:]
+    missing_baidu = [p for p in rendered_posts_desc if f"posts/{p['pid']}.html" not in baidu]
+    if missing_baidu:
+        baidu_insert = baidu.index("<url>\n    <loc>https://www.fastolf.com/posts/e601e6a8.html</loc>")
+        baidu_urls = "".join(
+            f"  <url>\n    <loc>https://www.fastolf.com/posts/{p['pid']}.html</loc>\n"
+            f"    <lastmod>{p['published'].strftime('%Y-%m-%d')}</lastmod>\n  </url>\n"
+            for p in missing_baidu
+        )
+        baidu = baidu[:baidu_insert] + baidu_urls + baidu[baidu_insert:]
     (ROOT / "baidusitemap.xml").write_text(baidu, encoding="utf-8")
 
-    print("Updated index, archives, categories, search, sitemaps.")
+    print(f"Updated site indexes. New posts this run: {len(missing_desc)} on homepage.")
 
 
 if __name__ == "__main__":
