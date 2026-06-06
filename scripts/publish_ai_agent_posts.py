@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import html
+import json
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
@@ -18,6 +19,14 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs" / "ai-agents"
 TEMPLATE_POST = ROOT / "posts" / "e601e6a8.html"
 CATEGORY = "mechine"
+MERMAID_CONFIG = {
+    "js": "/lib/mermaid/dist/mermaid.min.js",
+    "theme": {
+        "light": "default",
+        "dark": "dark",
+    },
+}
+MERMAID_TAG_SCRIPT = '<script src="/js/third-party/tags/mermaid.js" defer></script>'
 TZ = timezone(timedelta(hours=8))
 BASE_DATE_BATCH1 = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
 BASE_DATE_BATCH2 = datetime(2026, 6, 6, 10, 0, 0, tzinfo=TZ)
@@ -323,6 +332,38 @@ def patch_sidebar_site_state(content: str, *, tag_count: int | None = None) -> s
     return content
 
 
+def ensure_mermaid_assets(page: str) -> str:
+    """Add NexT Mermaid config and client script to script-rendered posts."""
+    config_pattern = re.compile(
+        r'(<script class="next-config" data-name="main" type="application/json">)'
+        r"(.*?)"
+        r"(</script>)",
+        re.DOTALL,
+    )
+
+    def _config_replacer(match: re.Match[str]) -> str:
+        config = json.loads(match.group(2))
+        config["mermaid"] = MERMAID_CONFIG
+        return (
+            match.group(1)
+            + json.dumps(config, ensure_ascii=False, separators=(",", ":"))
+            + match.group(3)
+        )
+
+    page, count = config_pattern.subn(_config_replacer, page, count=1)
+    if count == 0:
+        raise ValueError("post template missing NexT main config")
+
+    if MERMAID_TAG_SCRIPT not in page:
+        next_boot = '<script src="/js/next-boot.js" defer></script>'
+        if next_boot in page:
+            page = page.replace(next_boot, next_boot + MERMAID_TAG_SCRIPT, 1)
+        else:
+            page = page.replace("</head>", f"{MERMAID_TAG_SCRIPT}\n</head>", 1)
+
+    return page
+
+
 def render_tag_page(template: str, tag: str, posts: list[dict], tag_count: int) -> str:
     page = template
     for label in ("hexo", "MCP"):
@@ -403,11 +444,7 @@ def md_to_html(md_text: str) -> str:
 
     def mermaid_replacer(match: re.Match[str]) -> str:
         code = html.escape(match.group(1).strip())
-        return (
-            '<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / '
-            '<em>Architecture diagram (Mermaid source)</em></p>'
-            f'<pre><code>{code}</code></pre></div>'
-        )
+        return f'\n<pre><code class="mermaid">{code}</code></pre>\n'
 
     text = re.sub(r"```mermaid\s*\n(.*?)```", mermaid_replacer, text, flags=re.DOTALL)
     body = markdown.markdown(
@@ -534,7 +571,7 @@ def render_post_page(
         "    </div>\n      </footer>"
     )
     page = nav_pattern.sub(nav_html, page, count=1)
-    return page
+    return ensure_mermaid_assets(page)
 
 
 def home_article_block(
