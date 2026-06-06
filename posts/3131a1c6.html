@@ -386,24 +386,20 @@
         SG[Signal]
         MORE[50+ 渠道...]
     end
-
-<pre><code>subgraph Gateway[&quot;OpenClaw Gateway :18789&quot;]
-    ROUTE[会话路由]
-    TOOLS[工具执行]
-    MEM[记忆读写]
-end
-
-subgraph Runtime[&quot;Agent Runtime&quot;]
-    WP[工作区文件注入]
-    SK[Skills 加载]
-    LLM[LLM 推理]
-end
-
-Channels --&amp;gt; Gateway
-Gateway --&amp;gt; Runtime
-Runtime --&amp;gt; Gateway
-Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Gateway["OpenClaw Gateway :18789"]
+        ROUTE[会话路由]
+        TOOLS[工具执行]
+        MEM[记忆读写]
+    end
+    subgraph Runtime["Agent Runtime"]
+        WP[工作区文件注入]
+        SK[Skills 加载]
+        LLM[LLM 推理]
+    end
+    Channels --&gt; Gateway
+    Gateway --&gt; Runtime
+    Runtime --&gt; Gateway
+    Gateway --&gt; Channels</code></pre>
 <h3>2.1 工作区文件体系（Workspace Bootstrap）</h3>
 <p>Agent 的「人格」与「知识」以纯 Markdown 文件存在，默认位于 <code>~/.openclaw/workspace/</code>：</p>
 <table>
@@ -523,34 +519,29 @@ Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;
         ACP[ACP - VS Code/Zed]
         CRON[Cron 调度器]
     end
-
-<pre><code>subgraph Core[&quot;AIAgent 核心引擎&quot;]
-    PB[Prompt Builder]
-    PR[Provider 解析 18+ 模型]
-    TD[Tool Dispatch 70+ 工具]
-    CC[上下文压缩]
-end
-
-subgraph Memory[&quot;记忆与学习&quot;]
-    WM[工作记忆]
-    SM[会话记忆 SQLite+FTS5]
-    PM[持久记忆 MEMORY.md/USER.md]
-    SKM[技能记忆 Skills]
-    HON[Honcho 用户建模]
-end
-
-subgraph Exec[&quot;执行环境&quot;]
-    T1[Local]
-    T2[Docker]
-    T3[SSH]
-    T4[Daytona/Modal Serverless]
-end
-
-Entry --&amp;gt; Core
-Core --&amp;gt; Memory
-Core --&amp;gt; Exec
-Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Core["AIAgent 核心引擎"]
+        PB[Prompt Builder]
+        PR[Provider 解析 18+ 模型]
+        TD[Tool Dispatch 70+ 工具]
+        CC[上下文压缩]
+    end
+    subgraph Memory["记忆与学习"]
+        WM[工作记忆]
+        SM[会话记忆 SQLite+FTS5]
+        PM[持久记忆 MEMORY.md/USER.md]
+        SKM[技能记忆 Skills]
+        HON[Honcho 用户建模]
+    end
+    subgraph Exec["执行环境"]
+        T1[Local]
+        T2[Docker]
+        T3[SSH]
+        T4[Daytona/Modal Serverless]
+    end
+    Entry --&gt; Core
+    Core --&gt; Memory
+    Core --&gt; Exec
+    Memory --&gt;|闭环学习| SKM</code></pre>
 <h3>3.1 Agent 循环（Agent Loop）</h3>
 <p>标准流程：</p>
 <pre><code>用户消息 → 构建 Prompt（系统提示 + 记忆 + 上下文）
@@ -890,19 +881,17 @@ Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;
         OC_GW --&gt; OC_SK
         OC_GW --&gt; OC_CH
     end
-
-<pre><code>subgraph Hermes[&quot;Hermes — 深度优先&quot;]
-    HM_EN[Agent Engine]
-    HM_LL[Learning Loop]
-    HM_MEM[四层记忆]
-    HM_SK[自生成 Skills]
-    HM_GW[Gateway 20+ 平台]
-    HM_EN --&amp;gt; HM_LL
-    HM_LL --&amp;gt; HM_MEM
-    HM_LL --&amp;gt; HM_SK
-    HM_EN --&amp;gt; HM_GW
-end&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Hermes["Hermes — 深度优先"]
+        HM_EN[Agent Engine]
+        HM_LL[Learning Loop]
+        HM_MEM[四层记忆]
+        HM_SK[自生成 Skills]
+        HM_GW[Gateway 20+ 平台]
+        HM_EN --&gt; HM_LL
+        HM_LL --&gt; HM_MEM
+        HM_LL --&gt; HM_SK
+        HM_EN --&gt; HM_GW
+    end</code></pre>
 <p><strong>中文总结</strong></p>
 <ul>
 <li><strong>龙虾</strong> 回答的是：「如何让 AI 连上我的世界？」— Gateway + 文件即配置。</li>

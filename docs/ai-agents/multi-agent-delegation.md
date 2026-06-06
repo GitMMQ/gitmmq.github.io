@@ -45,18 +45,15 @@ flowchart TB
         WB[WhatsApp biz]
         TG[Telegram DM]
     end
-
     subgraph GW["OpenClaw Gateway :18789"]
         BIND[bindings 确定性匹配]
         ROUTE[sessionKey 路由]
     end
-
     subgraph Agents["agents.list"]
         A1[main — workspace-personal]
         A2[work — workspace-work]
         A3[family — workspace-family]
     end
-
     WA --> BIND
     WB --> BIND
     TG --> BIND

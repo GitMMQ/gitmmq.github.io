@@ -131,29 +131,24 @@ flowchart TB
     subgraph L1["第一层：工作记忆 Working Memory"]
         CTX[当前对话上下文]
     end
-
     subgraph L2["第二层：会话记忆 Session Memory"]
         DB[(SQLite state.db)]
         FTS[FTS5 全文索引]
         TRIG[Trigram 索引 CJK]
     end
-
     subgraph L3["第三层：持久记忆 Persistent Memory"]
         MEM[MEMORY.md ~2200 chars]
         USER[USER.md ~1375 chars]
     end
-
     subgraph L4["第四层：技能记忆 Skill Memory"]
         SKILLS[~/.hermes/skills/]
         PROG[渐进式披露]
     end
-
     subgraph EXT["外部记忆 Provider（可选）"]
         HON[Honcho 用户建模]
         MEM0[Mem0]
         OTH[OpenViking / Hindsight / ...]
     end
-
     CTX --> DB
     DB --> FTS
     MEM --> CTX
@@ -269,7 +264,6 @@ sequenceDiagram
     participant M as Memory Manager
     participant S as Skill Store
     participant DB as SQLite FTS5
-
     U->>A: 复杂任务请求
     A->>A: 执行工具（5+ 次）
     A->>M: 策划记忆（add/replace）

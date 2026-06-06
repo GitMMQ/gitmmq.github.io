@@ -39,27 +39,23 @@ flowchart TB
         O[总览 overview]
         D[部署迁移 deploy-migrate]
     end
-
     subgraph L1["L1 核心架构"]
         G[Gateway]
         A[Agent循环与Prompt agent-loop 合并入 workspace-context]
         W[工作区上下文 workspace-context]
         M[记忆 memory]
     end
-
     subgraph L2["L2 能力扩展"]
         S[技能 skills-learning]
         T[工具执行 tools-execution]
         P[插件MCP plugins-mcp]
         MA[多Agent multi-agent]
     end
-
     subgraph L3["L3 运行与治理"]
         AU[自动化 automation-cron]
         MO[模型成本 model-provider]
         SE[安全 security]
     end
-
     O --> G & W & M
     D --> G & T
     W --> S & T

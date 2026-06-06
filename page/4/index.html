@@ -391,31 +391,27 @@
         MAC[macOS App]
         IOS[iOS/Android Nodes]
     end
-
-<pre><code>subgraph GW[&quot;OpenClaw Gateway :18789&quot;]
-    WS[WebSocket Server]
-    ROUTE[会话路由 sessionKey]
-    AUTH[认证 gateway.auth]
-    TOOLS[工具执行]
-    MEM[记忆读写]
-end
-
-subgraph Agent[&quot;Agent Runtime&quot;]
-    WP[Workspace 文件注入]
-    SK[Skills 加载]
-    LLM[LLM 调用]
-end
-
-PHONE --&amp;gt; WS
-WEB --&amp;gt; WS
-MAC --&amp;gt; WS
-IOS --&amp;gt; WS
-WS --&amp;gt; ROUTE
-ROUTE --&amp;gt; Agent
-Agent --&amp;gt; TOOLS
-Agent --&amp;gt; MEM
-Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph GW["OpenClaw Gateway :18789"]
+        WS[WebSocket Server]
+        ROUTE[会话路由 sessionKey]
+        AUTH[认证 gateway.auth]
+        TOOLS[工具执行]
+        MEM[记忆读写]
+    end
+    subgraph Agent["Agent Runtime"]
+        WP[Workspace 文件注入]
+        SK[Skills 加载]
+        LLM[LLM 调用]
+    end
+    PHONE --&gt; WS
+    WEB --&gt; WS
+    MAC --&gt; WS
+    IOS --&gt; WS
+    WS --&gt; ROUTE
+    ROUTE --&gt; Agent
+    Agent --&gt; TOOLS
+    Agent --&gt; MEM
+    Agent --&gt; WS</code></pre>
 <p>OpenClaw 没有独立的「编排微服务层」——Gateway 接收消息、路由会话、调用 LLM、执行工具、写回响应，全部在一个进程中完成。</p>
 <h3>2.2 消息处理流程</h3>
 <pre><code class="language-text">1. 聊天 App 发来消息
@@ -508,30 +504,26 @@ Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;
         WA[whatsapp.py]
         CN[dingtalk / feishu / wecom / qqbot]
     end
-
-<pre><code>subgraph GR[&quot;GatewayRunner (gateway/run.py)&quot;]
-    HANDLE[_handle_message]
-    AUTHZ[用户授权]
-    SLASH[斜杠命令分发]
-    AGENT[AIAgent 创建]
-    GUARD[双层消息守卫]
-end
-
-subgraph Core[&quot;共享核心&quot;]
-    AI[AIAgent run_agent.py]
-    SS[SessionStore SQLite]
-    DEL[delivery.py 出站投递]
-end
-
-Platforms --&amp;gt; HANDLE
-HANDLE --&amp;gt; AUTHZ
-AUTHZ --&amp;gt; SLASH
-SLASH --&amp;gt; AGENT
-AGENT --&amp;gt; AI
-AI --&amp;gt; SS
-AI --&amp;gt; DEL
-DEL --&amp;gt; Platforms&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph GR["GatewayRunner (gateway/run.py)"]
+        HANDLE[_handle_message]
+        AUTHZ[用户授权]
+        SLASH[斜杠命令分发]
+        AGENT[AIAgent 创建]
+        GUARD[双层消息守卫]
+    end
+    subgraph Core["共享核心"]
+        AI[AIAgent run_agent.py]
+        SS[SessionStore SQLite]
+        DEL[delivery.py 出站投递]
+    end
+    Platforms --&gt; HANDLE
+    HANDLE --&gt; AUTHZ
+    AUTHZ --&gt; SLASH
+    SLASH --&gt; AGENT
+    AGENT --&gt; AI
+    AI --&gt; SS
+    AI --&gt; DEL
+    DEL --&gt; Platforms</code></pre>
 <p>Hermes Gateway 是 <strong>AIAgent 引擎的消息前端</strong>，本身不包含独立的 LLM 编排逻辑。</p>
 <h3>3.2 关键源文件</h3>
 <table>
@@ -1299,36 +1291,30 @@ hermes gateway stop --all  # 停止所有 Profile（更新时用）
     subgraph L1["第一层：工作记忆 Working Memory"]
         CTX[当前对话上下文]
     end
-
-<pre><code>subgraph L2[&quot;第二层：会话记忆 Session Memory&quot;]
-    DB[(SQLite state.db)]
-    FTS[FTS5 全文索引]
-    TRIG[Trigram 索引 CJK]
-end
-
-subgraph L3[&quot;第三层：持久记忆 Persistent Memory&quot;]
-    MEM[MEMORY.md ~2200 chars]
-    USER[USER.md ~1375 chars]
-end
-
-subgraph L4[&quot;第四层：技能记忆 Skill Memory&quot;]
-    SKILLS[~/.hermes/skills/]
-    PROG[渐进式披露]
-end
-
-subgraph EXT[&quot;外部记忆 Provider（可选）&quot;]
-    HON[Honcho 用户建模]
-    MEM0[Mem0]
-    OTH[OpenViking / Hindsight / ...]
-end
-
-CTX --&amp;gt; DB
-DB --&amp;gt; FTS
-MEM --&amp;gt; CTX
-USER --&amp;gt; CTX
-SKILLS --&amp;gt; PROG
-EXT -.-&amp;gt; CTX&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph L2["第二层：会话记忆 Session Memory"]
+        DB[(SQLite state.db)]
+        FTS[FTS5 全文索引]
+        TRIG[Trigram 索引 CJK]
+    end
+    subgraph L3["第三层：持久记忆 Persistent Memory"]
+        MEM[MEMORY.md ~2200 chars]
+        USER[USER.md ~1375 chars]
+    end
+    subgraph L4["第四层：技能记忆 Skill Memory"]
+        SKILLS[~/.hermes/skills/]
+        PROG[渐进式披露]
+    end
+    subgraph EXT["外部记忆 Provider（可选）"]
+        HON[Honcho 用户建模]
+        MEM0[Mem0]
+        OTH[OpenViking / Hindsight / ...]
+    end
+    CTX --&gt; DB
+    DB --&gt; FTS
+    MEM --&gt; CTX
+    USER --&gt; CTX
+    SKILLS --&gt; PROG
+    EXT -.-&gt; CTX</code></pre>
 <h3>3.2 第一层：工作记忆</h3>
 <p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
 <h3>3.3 第二层：会话记忆（SQLite + FTS5）</h3>
@@ -1496,17 +1482,15 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
     participant M as Memory Manager
     participant S as Skill Store
     participant DB as SQLite FTS5
-
-<pre><code>U-&amp;gt;&amp;gt;A: 复杂任务请求
-A-&amp;gt;&amp;gt;A: 执行工具（5+ 次）
-A-&amp;gt;&amp;gt;M: 策划记忆（add/replace）
-A-&amp;gt;&amp;gt;S: skill_manage(create)
-A-&amp;gt;&amp;gt;DB: 持久化会话消息
-Note over A,S: 下次同类任务
-A-&amp;gt;&amp;gt;S: skill_view（按需加载）
-A-&amp;gt;&amp;gt;DB: session_search（历史召回）
-A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    U-&gt;&gt;A: 复杂任务请求
+    A-&gt;&gt;A: 执行工具（5+ 次）
+    A-&gt;&gt;M: 策划记忆（add/replace）
+    A-&gt;&gt;S: skill_manage(create)
+    A-&gt;&gt;DB: 持久化会话消息
+    Note over A,S: 下次同类任务
+    A-&gt;&gt;S: skill_view（按需加载）
+    A-&gt;&gt;DB: session_search（历史召回）
+    A-&gt;&gt;U: 更高效响应</code></pre>
 <p><strong>English</strong></p>
 <h3>3.1 Four-Layer Memory Model</h3>
 <p>Working memory (current context) → Session memory (SQLite + FTS5) → Persistent memory (MEMORY.md / USER.md with char limits) → Skill memory (progressive disclosure in <code>~/.hermes/skills/</code>). Optional external providers (Honcho, Mem0, etc.) run in parallel.</p>
@@ -1820,24 +1804,20 @@ A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;
         SG[Signal]
         MORE[50+ 渠道...]
     end
-
-<pre><code>subgraph Gateway[&quot;OpenClaw Gateway :18789&quot;]
-    ROUTE[会话路由]
-    TOOLS[工具执行]
-    MEM[记忆读写]
-end
-
-subgraph Runtime[&quot;Agent Runtime&quot;]
-    WP[工作区文件注入]
-    SK[Skills 加载]
-    LLM[LLM 推理]
-end
-
-Channels --&amp;gt; Gateway
-Gateway --&amp;gt; Runtime
-Runtime --&amp;gt; Gateway
-Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Gateway["OpenClaw Gateway :18789"]
+        ROUTE[会话路由]
+        TOOLS[工具执行]
+        MEM[记忆读写]
+    end
+    subgraph Runtime["Agent Runtime"]
+        WP[工作区文件注入]
+        SK[Skills 加载]
+        LLM[LLM 推理]
+    end
+    Channels --&gt; Gateway
+    Gateway --&gt; Runtime
+    Runtime --&gt; Gateway
+    Gateway --&gt; Channels</code></pre>
 <h3>2.1 工作区文件体系（Workspace Bootstrap）</h3>
 <p>Agent 的「人格」与「知识」以纯 Markdown 文件存在，默认位于 <code>~/.openclaw/workspace/</code>：</p>
 <table>
@@ -1957,34 +1937,29 @@ Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;
         ACP[ACP - VS Code/Zed]
         CRON[Cron 调度器]
     end
-
-<pre><code>subgraph Core[&quot;AIAgent 核心引擎&quot;]
-    PB[Prompt Builder]
-    PR[Provider 解析 18+ 模型]
-    TD[Tool Dispatch 70+ 工具]
-    CC[上下文压缩]
-end
-
-subgraph Memory[&quot;记忆与学习&quot;]
-    WM[工作记忆]
-    SM[会话记忆 SQLite+FTS5]
-    PM[持久记忆 MEMORY.md/USER.md]
-    SKM[技能记忆 Skills]
-    HON[Honcho 用户建模]
-end
-
-subgraph Exec[&quot;执行环境&quot;]
-    T1[Local]
-    T2[Docker]
-    T3[SSH]
-    T4[Daytona/Modal Serverless]
-end
-
-Entry --&amp;gt; Core
-Core --&amp;gt; Memory
-Core --&amp;gt; Exec
-Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Core["AIAgent 核心引擎"]
+        PB[Prompt Builder]
+        PR[Provider 解析 18+ 模型]
+        TD[Tool Dispatch 70+ 工具]
+        CC[上下文压缩]
+    end
+    subgraph Memory["记忆与学习"]
+        WM[工作记忆]
+        SM[会话记忆 SQLite+FTS5]
+        PM[持久记忆 MEMORY.md/USER.md]
+        SKM[技能记忆 Skills]
+        HON[Honcho 用户建模]
+    end
+    subgraph Exec["执行环境"]
+        T1[Local]
+        T2[Docker]
+        T3[SSH]
+        T4[Daytona/Modal Serverless]
+    end
+    Entry --&gt; Core
+    Core --&gt; Memory
+    Core --&gt; Exec
+    Memory --&gt;|闭环学习| SKM</code></pre>
 <h3>3.1 Agent 循环（Agent Loop）</h3>
 <p>标准流程：</p>
 <pre><code>用户消息 → 构建 Prompt（系统提示 + 记忆 + 上下文）
@@ -2324,19 +2299,17 @@ Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;
         OC_GW --&gt; OC_SK
         OC_GW --&gt; OC_CH
     end
-
-<pre><code>subgraph Hermes[&quot;Hermes — 深度优先&quot;]
-    HM_EN[Agent Engine]
-    HM_LL[Learning Loop]
-    HM_MEM[四层记忆]
-    HM_SK[自生成 Skills]
-    HM_GW[Gateway 20+ 平台]
-    HM_EN --&amp;gt; HM_LL
-    HM_LL --&amp;gt; HM_MEM
-    HM_LL --&amp;gt; HM_SK
-    HM_EN --&amp;gt; HM_GW
-end&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph Hermes["Hermes — 深度优先"]
+        HM_EN[Agent Engine]
+        HM_LL[Learning Loop]
+        HM_MEM[四层记忆]
+        HM_SK[自生成 Skills]
+        HM_GW[Gateway 20+ 平台]
+        HM_EN --&gt; HM_LL
+        HM_LL --&gt; HM_MEM
+        HM_LL --&gt; HM_SK
+        HM_EN --&gt; HM_GW
+    end</code></pre>
 <p><strong>中文总结</strong></p>
 <ul>
 <li><strong>龙虾</strong> 回答的是：「如何让 AI 连上我的世界？」— Gateway + 文件即配置。</li>

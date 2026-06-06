@@ -246,7 +246,6 @@ flowchart TB
     L5[5. 上下文文件扫描<br/>Prompt 注入检测]
     L6[6. 跨会话隔离<br/>Cron 路径加固]
     L7[7. 输入净化<br/>工作目录 Allowlist]
-
     L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7
 ```
 

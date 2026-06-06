@@ -39,7 +39,6 @@ flowchart TB
         PI[pip entry_points]
         N[Nix extraPlugins]
     end
-
     subgraph Categories["子类别路由"]
         G[通用 plugins/ — tools/hooks/commands]
         PL[platforms/ — Gateway 渠道]
@@ -48,7 +47,6 @@ flowchart TB
         CE[context_engine/ — 压缩引擎]
         MP[model-providers/ — 推理后端]
     end
-
     Sources --> PM[PluginManager]
     PM --> Categories
 ```

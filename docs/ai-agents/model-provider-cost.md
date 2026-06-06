@@ -189,7 +189,6 @@ sequenceDiagram
     participant A as AIAgent
     participant P as 主 Provider
     participant F as fallback_providers
-
     U->>A: 新轮次开始
     A->>P: 调用主模型
     P-->>A: 429 / 503

@@ -142,20 +142,17 @@ flowchart LR
         S3[技能索引 Level 0]
         S4[平台 hints]
     end
-
     subgraph Context["context tier（项目相关）"]
         C1[AGENTS.md]
         C2[.cursorrules]
         C3[CLAUDE.md / .hermes.md]
     end
-
     subgraph Volatile["volatile tier（会话内冻结）"]
         V1[MEMORY.md 快照]
         V2[USER.md 快照]
         V3[外部记忆 Provider 块]
         V4[时间戳/会话元数据]
     end
-
     Stable --> Context --> Volatile
 ```
 
@@ -289,7 +286,6 @@ sequenceDiagram
     participant P as Prompt Builder
     participant L as LLM
     participant T as Tools
-
     C->>G: 用户消息
     G->>P: 构建 Prompt
     Note over P: OpenClaw: bootstrap + skills XML + tools

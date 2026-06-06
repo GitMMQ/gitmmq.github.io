@@ -404,31 +404,27 @@
         MAC[macOS App]
         IOS[iOS/Android Nodes]
     end
-
-<pre><code>subgraph GW[&quot;OpenClaw Gateway :18789&quot;]
-    WS[WebSocket Server]
-    ROUTE[会话路由 sessionKey]
-    AUTH[认证 gateway.auth]
-    TOOLS[工具执行]
-    MEM[记忆读写]
-end
-
-subgraph Agent[&quot;Agent Runtime&quot;]
-    WP[Workspace 文件注入]
-    SK[Skills 加载]
-    LLM[LLM 调用]
-end
-
-PHONE --&amp;gt; WS
-WEB --&amp;gt; WS
-MAC --&amp;gt; WS
-IOS --&amp;gt; WS
-WS --&amp;gt; ROUTE
-ROUTE --&amp;gt; Agent
-Agent --&amp;gt; TOOLS
-Agent --&amp;gt; MEM
-Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph GW["OpenClaw Gateway :18789"]
+        WS[WebSocket Server]
+        ROUTE[会话路由 sessionKey]
+        AUTH[认证 gateway.auth]
+        TOOLS[工具执行]
+        MEM[记忆读写]
+    end
+    subgraph Agent["Agent Runtime"]
+        WP[Workspace 文件注入]
+        SK[Skills 加载]
+        LLM[LLM 调用]
+    end
+    PHONE --&gt; WS
+    WEB --&gt; WS
+    MAC --&gt; WS
+    IOS --&gt; WS
+    WS --&gt; ROUTE
+    ROUTE --&gt; Agent
+    Agent --&gt; TOOLS
+    Agent --&gt; MEM
+    Agent --&gt; WS</code></pre>
 <p>OpenClaw 没有独立的「编排微服务层」——Gateway 接收消息、路由会话、调用 LLM、执行工具、写回响应，全部在一个进程中完成。</p>
 <h3>2.2 消息处理流程</h3>
 <pre><code class="language-text">1. 聊天 App 发来消息
@@ -521,30 +517,26 @@ Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;
         WA[whatsapp.py]
         CN[dingtalk / feishu / wecom / qqbot]
     end
-
-<pre><code>subgraph GR[&quot;GatewayRunner (gateway/run.py)&quot;]
-    HANDLE[_handle_message]
-    AUTHZ[用户授权]
-    SLASH[斜杠命令分发]
-    AGENT[AIAgent 创建]
-    GUARD[双层消息守卫]
-end
-
-subgraph Core[&quot;共享核心&quot;]
-    AI[AIAgent run_agent.py]
-    SS[SessionStore SQLite]
-    DEL[delivery.py 出站投递]
-end
-
-Platforms --&amp;gt; HANDLE
-HANDLE --&amp;gt; AUTHZ
-AUTHZ --&amp;gt; SLASH
-SLASH --&amp;gt; AGENT
-AGENT --&amp;gt; AI
-AI --&amp;gt; SS
-AI --&amp;gt; DEL
-DEL --&amp;gt; Platforms&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph GR["GatewayRunner (gateway/run.py)"]
+        HANDLE[_handle_message]
+        AUTHZ[用户授权]
+        SLASH[斜杠命令分发]
+        AGENT[AIAgent 创建]
+        GUARD[双层消息守卫]
+    end
+    subgraph Core["共享核心"]
+        AI[AIAgent run_agent.py]
+        SS[SessionStore SQLite]
+        DEL[delivery.py 出站投递]
+    end
+    Platforms --&gt; HANDLE
+    HANDLE --&gt; AUTHZ
+    AUTHZ --&gt; SLASH
+    SLASH --&gt; AGENT
+    AGENT --&gt; AI
+    AI --&gt; SS
+    AI --&gt; DEL
+    DEL --&gt; Platforms</code></pre>
 <p>Hermes Gateway 是 <strong>AIAgent 引擎的消息前端</strong>，本身不包含独立的 LLM 编排逻辑。</p>
 <h3>3.2 关键源文件</h3>
 <table>

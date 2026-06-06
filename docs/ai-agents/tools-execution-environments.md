@@ -86,7 +86,6 @@ flowchart TB
     subgraph Hermes["Hermes Tool Dispatch"]
         TD[Tool Dispatch]
     end
-
     subgraph Backends["6 终端后端"]
         L[local — 本机 Shell]
         D[docker — 持久容器]
@@ -95,7 +94,6 @@ flowchart TB
         MO[modal — Serverless 云]
         DA[daytona — 云开发沙箱]
     end
-
     TD --> L & D & S & SI & MO & DA
 ```
 

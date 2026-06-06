@@ -51,7 +51,6 @@ flowchart TB
         MAC[macOS App]
         IOS[iOS/Android Nodes]
     end
-
     subgraph GW["OpenClaw Gateway :18789"]
         WS[WebSocket Server]
         ROUTE[会话路由 sessionKey]
@@ -59,13 +58,11 @@ flowchart TB
         TOOLS[工具执行]
         MEM[记忆读写]
     end
-
     subgraph Agent["Agent Runtime"]
         WP[Workspace 文件注入]
         SK[Skills 加载]
         LLM[LLM 调用]
     end
-
     PHONE --> WS
     WEB --> WS
     MAC --> WS
@@ -198,7 +195,6 @@ flowchart TB
         WA[whatsapp.py]
         CN[dingtalk / feishu / wecom / qqbot]
     end
-
     subgraph GR["GatewayRunner (gateway/run.py)"]
         HANDLE[_handle_message]
         AUTHZ[用户授权]
@@ -206,13 +202,11 @@ flowchart TB
         AGENT[AIAgent 创建]
         GUARD[双层消息守卫]
     end
-
     subgraph Core["共享核心"]
         AI[AIAgent run_agent.py]
         SS[SessionStore SQLite]
         DEL[delivery.py 出站投递]
     end
-
     Platforms --> HANDLE
     HANDLE --> AUTHZ
     AUTHZ --> SLASH

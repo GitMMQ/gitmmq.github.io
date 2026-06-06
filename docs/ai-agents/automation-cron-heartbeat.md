@@ -301,7 +301,6 @@ sequenceDiagram
     participant J as jobs.json
     participant A as AIAgent
     participant D as Delivery
-
     T->>L: 获取文件锁
     T->>J: 加载任务
     T->>T: 筛选 due jobs (next_run <= now)
