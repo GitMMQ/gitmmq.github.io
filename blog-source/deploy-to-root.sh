@@ -48,6 +48,9 @@ for path, data in legacy_backups.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
 
+# GitHub Pages must skip Jekyll so pre-built static HTML is served as-is.
+(root / ".nojekyll").touch(exist_ok=True)
+
 print(f"Deployed generated site from {public_dir} to {root}")
 PY
 
