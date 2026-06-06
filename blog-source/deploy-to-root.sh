@@ -21,6 +21,13 @@ content = content.replace(
 path.write_text(content, encoding="utf-8")
 PY
 
+OVERRIDES_DIR="$BLOG_DIR/overrides/js"
+for file in motion.js next-boot.js; do
+  if [ -f "$OVERRIDES_DIR/$file" ]; then
+    cp "$OVERRIDES_DIR/$file" "$BLOG_DIR/public/js/$file"
+  fi
+done
+
 python3 - "$ROOT_DIR" "$BLOG_DIR/public" <<'PY'
 import shutil
 import sys
