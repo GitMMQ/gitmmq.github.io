@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Zookeeper分布式锁 | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-overview-active">
@@ -214,7 +214,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -223,12 +223,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7b1c422a.html">
@@ -272,7 +272,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -285,9 +285,9 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><p>分布式配置中心是ZooKeeper的一个常见应用场景，它允许在分布式系统中集中管理配置信息，使得配置的变更能够实时生效，而无需重新部署应用。下面是一个简单的Java代码示例，展示了如何使用ZooKeeper来实现一个基本的分布式配置中心。</p>
 <p>示例代码基于<code>curator</code>库来实现，确保你的项目中引入了<code>curator</code>的依赖。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFramework;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.CuratorFrameworkFactory;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.framework.recipes.cache.NodeCache;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.retry.ExponentialBackoffRetry;</span><br/><span class="line"><span class="keyword">import</span> org.apache.curator.utils.CloseableUtils;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DistributedConfigCenter</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> CuratorFramework client;</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String configPath;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">DistributedConfigCenter</span><span class="params">(String connectString, String configPath)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.client = CuratorFrameworkFactory.newClient(connectString, <span class="keyword">new</span> <span class="title class_">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>));</span><br/><span class="line">        <span class="built_in">this</span>.configPath = configPath;</span><br/><span class="line">        client.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">getConfigValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">byte</span>[] data = client.getData().forPath(configPath);</span><br/><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(data);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">watchConfigChanges</span><span class="params">()</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">NodeCache</span> <span class="variable">nodeCache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NodeCache</span>(client, configPath);</span><br/><span class="line">        nodeCache.getListenable().addListener(() -&gt; {</span><br/><span class="line">            <span class="keyword">if</span> (nodeCache.getCurrentData() != <span class="literal">null</span>) {</span><br/><span class="line">                <span class="type">String</span> <span class="variable">newValue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(nodeCache.getCurrentData().getData());</span><br/><span class="line">                System.out.println(<span class="string">"Config changed: "</span> + newValue);</span><br/><span class="line">            }</span><br/><span class="line">        });</span><br/><span class="line">        nodeCache.start();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> {</span><br/><span class="line">        CloseableUtils.closeQuietly(client);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">connectString</span> <span class="operator">=</span> <span class="string">"localhost:2181"</span>;  <span class="comment">// ZooKeeper连接地址</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">configPath</span> <span class="operator">=</span> <span class="string">"/myApp/config"</span>;      <span class="comment">// 配置节点路径</span></span><br/><span class="line"></span><br/><span class="line">        <span class="type">DistributedConfigCenter</span> <span class="variable">configCenter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DistributedConfigCenter</span>(connectString, configPath);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 获取配置值</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> configCenter.getConfigValue();</span><br/><span class="line">        System.out.println(<span class="string">"Initial config value: "</span> + value);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 监听配置变更</span></span><br/><span class="line">        configCenter.watchConfigChanges();</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 模拟配置变更</span></span><br/><span class="line">        Thread.sleep(<span class="number">5000</span>);</span><br/><span class="line">        configCenter.client.setData().forPath(configPath, <span class="string">"newConfigValue"</span>.getBytes());</span><br/><span class="line"></span><br/><span class="line">        Thread.sleep(<span class="number">10000</span>);</span><br/><span class="line">        configCenter.close();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
@@ -296,13 +296,13 @@
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

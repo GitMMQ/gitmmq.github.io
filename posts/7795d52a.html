@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 143 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7795d52a.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/><span class="line">65</span><br/><span class="line">66</span><br/><span class="line">67</span><br/><span class="line">68</span><br/><span class="line">69</span><br/><span class="line">70</span><br/><span class="line">71</span><br/><span class="line">72</span><br/><span class="line">73</span><br/><span class="line">74</span><br/><span class="line">75</span><br/><span class="line">76</span><br/><span class="line">77</span><br/><span class="line">78</span><br/><span class="line">79</span><br/><span class="line">80</span><br/><span class="line">81</span><br/><span class="line">82</span><br/><span class="line">83</span><br/><span class="line">84</span><br/><span class="line">85</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s143;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 重排链表</span></span><br/><span class="line"><span class="comment"> * 给定一个单链表 L 的头节点 head ，单链表 L 表示为：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * L0 → L1 → … → Ln - 1 → Ln</span></span><br/><span class="line"><span class="comment"> * 请将其重新排列后变为：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …</span></span><br/><span class="line"><span class="comment"> * 不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/reorder-list</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"></span><br/><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span> {</span><br/><span class="line">    <span class="type">int</span> val;</span><br/><span class="line">    ListNode next;</span><br/><span class="line">    ListNode() {}</span><br/><span class="line">    ListNode(<span class="type">int</span> val) { <span class="built_in">this</span>.val = val; }</span><br/><span class="line">    ListNode(<span class="type">int</span> val, ListNode next) { <span class="built_in">this</span>.val = val; <span class="built_in">this</span>.next = next; }</span><br/><span class="line">}</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">reorderList</span><span class="params">(ListNode head)</span> {</span><br/><span class="line">        <span class="keyword">if</span>(head == <span class="literal">null</span>) {</span><br/><span class="line">            <span class="keyword">return</span>;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//找链表中间点</span></span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">mid</span> <span class="operator">=</span> findMid(head);</span><br/><span class="line">        <span class="comment">//拆分成前后两个链表</span></span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">l1</span> <span class="operator">=</span> head;</span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">l2</span> <span class="operator">=</span> mid.next;</span><br/><span class="line">        mid.next = <span class="literal">null</span>;</span><br/><span class="line">        <span class="comment">//翻转后面的链表</span></span><br/><span class="line">        l2 = reverseList(l2);</span><br/><span class="line">        <span class="comment">//两个链表合并</span></span><br/><span class="line">        mergeList(l1, l2);</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">findMid</span><span class="params">(ListNode head)</span> {</span><br/><span class="line">        <span class="comment">//快指针</span></span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">fast</span> <span class="operator">=</span> head;</span><br/><span class="line">        <span class="comment">//慢指针</span></span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">slow</span> <span class="operator">=</span> head;</span><br/><span class="line">        <span class="keyword">while</span>(fast != <span class="literal">null</span> &amp;&amp; fast.next!= <span class="literal">null</span> &amp;&amp; fast.next.next != <span class="literal">null</span>) {</span><br/><span class="line">            fast = fast.next.next;</span><br/><span class="line">            slow = slow.next;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//中间点</span></span><br/><span class="line">        <span class="keyword">return</span> slow;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> ListNode <span class="title function_">reverseList</span><span class="params">(ListNode head)</span> {</span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">pre</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br/><span class="line">        <span class="type">ListNode</span> <span class="variable">cur</span> <span class="operator">=</span> head;</span><br/><span class="line">        <span class="keyword">while</span>(cur != <span class="literal">null</span>) {</span><br/><span class="line">            <span class="type">ListNode</span> <span class="variable">tmp</span> <span class="operator">=</span> cur.next;</span><br/><span class="line">            cur.next = pre;</span><br/><span class="line">            pre = cur;</span><br/><span class="line">            cur = tmp;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> pre;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">mergeList</span><span class="params">(ListNode l1, ListNode l2)</span> {</span><br/><span class="line">        <span class="keyword">while</span>(l1 != <span class="literal">null</span> &amp;&amp; l2 != <span class="literal">null</span>) {</span><br/><span class="line">            <span class="type">ListNode</span> <span class="variable">l1_tmp</span> <span class="operator">=</span> l1.next;</span><br/><span class="line">            <span class="type">ListNode</span> <span class="variable">l2_tmp</span> <span class="operator">=</span> l2.next;</span><br/><span class="line">            <span class="comment">//l1 指向 l2</span></span><br/><span class="line">            l1.next = l2;</span><br/><span class="line">            <span class="comment">//l2 要指向 l1.next 也就是未修改指向的l1_tmp</span></span><br/><span class="line">            l2.next = l1_tmp;</span><br/><span class="line"></span><br/><span class="line">            <span class="comment">//下一步</span></span><br/><span class="line">            l1 = l1_tmp;</span><br/><span class="line">            l2 = l2_tmp;</span><br/><span class="line"></span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

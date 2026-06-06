@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 133 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5eaec0a9.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s133;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br/><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br/><span class="line"><span class="keyword">import</span> java.util.List;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 克隆图</span></span><br/><span class="line"><span class="comment"> * 给你无向 连通 图中一个节点的引用，请你返回该图的 深拷贝（克隆）。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 图中的每个节点都包含它的值 val（int） 和其邻居的列表（list[Node]）。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * class Node {</span></span><br/><span class="line"><span class="comment"> *     public int val;</span></span><br/><span class="line"><span class="comment"> *     public List&lt;Node&gt; neighbors;</span></span><br/><span class="line"><span class="comment"> * }</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/clone-graph</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"></span><br/><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> val;</span><br/><span class="line">    <span class="keyword">public</span> List&lt;Node&gt; neighbors;</span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">()</span> {</span><br/><span class="line">        val = <span class="number">0</span>;</span><br/><span class="line">        neighbors = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Node&gt;();</span><br/><span class="line">    }</span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(<span class="type">int</span> _val)</span> {</span><br/><span class="line">        val = _val;</span><br/><span class="line">        neighbors = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Node&gt;();</span><br/><span class="line">    }</span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(<span class="type">int</span> _val, ArrayList&lt;Node&gt; _neighbors)</span> {</span><br/><span class="line">        val = _val;</span><br/><span class="line">        neighbors = _neighbors;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">private</span> HashMap&lt;Node, Node&gt; visited = <span class="keyword">new</span> <span class="title class_">HashMap</span> &lt;&gt; ();</span><br/><span class="line">    <span class="keyword">public</span> Node <span class="title function_">cloneGraph</span><span class="params">(Node node)</span> {</span><br/><span class="line">        <span class="keyword">if</span> (node == <span class="literal">null</span>) {</span><br/><span class="line">            <span class="keyword">return</span> node;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 如果该节点已经被访问过了，则直接从哈希表中取出对应的克隆节点返回</span></span><br/><span class="line">        <span class="keyword">if</span> (visited.containsKey(node)) {</span><br/><span class="line">            <span class="keyword">return</span> visited.get(node);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 克隆节点，注意到为了深拷贝我们不会克隆它的邻居的列表</span></span><br/><span class="line">        <span class="type">Node</span> <span class="variable">cloneNode</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(node.val, <span class="keyword">new</span> <span class="title class_">ArrayList</span>());</span><br/><span class="line">        <span class="comment">// 哈希表存储</span></span><br/><span class="line">        visited.put(node, cloneNode);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 遍历该节点的邻居并更新克隆节点的邻居列表</span></span><br/><span class="line">        <span class="keyword">for</span> (Node neighbor: node.neighbors) {</span><br/><span class="line">            cloneNode.neighbors.add(cloneGraph(neighbor));</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> cloneNode;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 68 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/10a259ae.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/><span class="line">65</span><br/><span class="line">66</span><br/><span class="line">67</span><br/><span class="line">68</span><br/><span class="line">69</span><br/><span class="line">70</span><br/><span class="line">71</span><br/><span class="line">72</span><br/><span class="line">73</span><br/><span class="line">74</span><br/><span class="line">75</span><br/><span class="line">76</span><br/><span class="line">77</span><br/><span class="line">78</span><br/><span class="line">79</span><br/><span class="line">80</span><br/><span class="line">81</span><br/><span class="line">82</span><br/><span class="line">83</span><br/><span class="line">84</span><br/><span class="line">85</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s68;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br/><span class="line"><span class="keyword">import</span> java.util.List;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 文本左右对齐</span></span><br/><span class="line"><span class="comment"> * 给定一个单词数组 words 和一个长度 maxWidth ，重新排版单词，使其成为每行恰好有 maxWidth 个字符，且左右两端对齐的文本。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 你应该使用 “贪心算法” 来放置给定的单词；也就是说，尽可能多地往每行中放置单词。必要时可用空格 ' ' 填充，使得每行恰好有 maxWidth 个字符。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 要求尽可能均匀分配单词间的空格数量。如果某一行单词间的空格不能均匀分配，则左侧放置的空格数要多于右侧的空格数。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 文本的最后一行应为左对齐，且单词之间不插入额外的空格。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 注意:</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 单词是指由非空格字符组成的字符序列。</span></span><br/><span class="line"><span class="comment"> * 每个单词的长度大于 0，小于等于 maxWidth。</span></span><br/><span class="line"><span class="comment"> * 输入单词数组 words 至少包含一个单词。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/text-justification</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> List&lt;String&gt; <span class="title function_">fullJustify</span><span class="params">(String[] words, <span class="type">int</span> maxWidth)</span> {</span><br/><span class="line">        <span class="comment">//定义0-maxWidth个空格字符串，方便之后直接调用</span></span><br/><span class="line">        <span class="keyword">final</span> String[] space = <span class="keyword">new</span> <span class="title class_">String</span>[maxWidth+<span class="number">1</span>];</span><br/><span class="line">        <span class="type">StringBuffer</span> <span class="variable">s</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;i&lt;maxWidth+<span class="number">1</span>;i++){</span><br/><span class="line">            space[i] = s.toString();</span><br/><span class="line">            s.append(<span class="string">" "</span>);</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//新建List，用来存最后的结果。</span></span><br/><span class="line">        List&lt;String&gt; pWords = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;();</span><br/><span class="line">        <span class="comment">//遍历整个words，一行一行的排版</span></span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;words.length; i++){</span><br/><span class="line">            <span class="type">int</span> <span class="variable">curlen</span> <span class="operator">=</span> words[i].length();</span><br/><span class="line">            <span class="comment">//记录当前已读取单词的长度，当&gt;=maxWidth时进行排版</span></span><br/><span class="line">            <span class="type">int</span> <span class="variable">startI</span> <span class="operator">=</span> i;</span><br/><span class="line">            <span class="comment">//记录本次读取单词的起点</span></span><br/><span class="line">            <span class="keyword">while</span>(i &lt; words.length-<span class="number">1</span> &amp;&amp; curlen&lt;maxWidth){</span><br/><span class="line">                i++;</span><br/><span class="line">                curlen = curlen+words[i].length()+<span class="number">1</span>;</span><br/><span class="line">                <span class="comment">// 每多读一个单词都要加一个空格</span></span><br/><span class="line">            }</span><br/><span class="line">            <span class="keyword">if</span>(curlen&gt;maxWidth){</span><br/><span class="line">                <span class="comment">//当前长度&gt;maxWidth，说明已经多读取了一个单词</span></span><br/><span class="line">                curlen = curlen-words[i].length()-<span class="number">1</span>;</span><br/><span class="line">                i--;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="comment">//一行一行的排版</span></span><br/><span class="line">            pWords.add(processCurline(words,startI,i,curlen,maxWidth,space));</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> pWords;</span><br/><span class="line">    }</span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">processCurline</span><span class="params">(String[] words,<span class="type">int</span> si,<span class="type">int</span> ei,<span class="type">int</span> curlen,<span class="type">int</span> maxWidth,String[] space)</span>{</span><br/><span class="line">        <span class="type">StringBuffer</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();   <span class="comment">//用来进行排版</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">map</span> <span class="operator">=</span> ei-si;                   <span class="comment">// 记录单词之间的有几个间隙</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">addSpace</span> <span class="operator">=</span> maxWidth - curlen+map;   <span class="comment">//记录这一行总共有多少个空格</span></span><br/><span class="line">        <span class="keyword">if</span>(map==<span class="number">0</span>){               <span class="comment">//间隙为0，证明只有一个单词</span></span><br/><span class="line">            sb.append(words[ei]);</span><br/><span class="line">            sb.append(space[addSpace]);</span><br/><span class="line">            <span class="keyword">return</span> sb.toString();</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">if</span>(ei == words.length-<span class="number">1</span>){            <span class="comment">//证明要排版最后一行了，格式特殊</span></span><br/><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span>si;i&lt;ei;i++){</span><br/><span class="line">                sb.append(words[i]).append(<span class="string">" "</span>);</span><br/><span class="line">            }</span><br/><span class="line">            sb.append(words[ei]);             <span class="comment">//最后一个单词不用加空格</span></span><br/><span class="line">            sb.append(space[addSpace-map]);   <span class="comment">//如果还有多余空格，一起加上</span></span><br/><span class="line">            <span class="keyword">return</span> sb.toString();</span><br/><span class="line">        }</span><br/><span class="line">        <span class="type">int</span> <span class="variable">allAddSpace</span> <span class="operator">=</span> addSpace/map;     <span class="comment">//所有的空格数 / 间隙 = 每个间隙必加的空格数</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> addSpace % map + si;     <span class="comment">//多出来的空格要从si开始，依次加在间隙中</span></span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> si;i&lt;ei;i++){</span><br/><span class="line">            sb.append(words[i]).append(space[allAddSpace]);</span><br/><span class="line">            <span class="keyword">if</span>(i &lt; left) sb.append(<span class="string">" "</span>);     <span class="comment">// &lt;left就要多加一个空格</span></span><br/><span class="line">        }</span><br/><span class="line">        sb.append(words[ei]);</span><br/><span class="line">        <span class="keyword">return</span> sb.toString();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

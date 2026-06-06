@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 71 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/2d39ada4.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s71;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.Deque;</span><br/><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 简化路径</span></span><br/><span class="line"><span class="comment"> * 给你一个字符串 path ，表示指向某一文件或目录的 Unix 风格 绝对路径 （以 '/' 开头），请你将其转化为更加简洁的规范路径。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。任意多个连续的斜杠（即，'//'）都被视为单个斜杠 '/' 。 对于此问题，任何其他格式的点（例如，'...'）均被视为文件/目录名称。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 请注意，返回的 规范路径 必须遵循下述格式：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 始终以斜杠 '/' 开头。</span></span><br/><span class="line"><span class="comment"> * 两个目录名之间必须只有一个斜杠 '/' 。</span></span><br/><span class="line"><span class="comment"> * 最后一个目录名（如果存在）不能 以 '/' 结尾。</span></span><br/><span class="line"><span class="comment"> * 此外，路径仅包含从根目录到目标文件或目录的路径上的目录（即，不含 '.' 或 '..'）。</span></span><br/><span class="line"><span class="comment"> * 返回简化后得到的 规范路径 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/simplify-path</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> String <span class="title function_">simplifyPath</span><span class="params">(String path)</span> {</span><br/><span class="line">        <span class="comment">// 双端队列</span></span><br/><span class="line">        Deque&lt;String&gt; queue = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br/><span class="line">        <span class="comment">// 分割字符</span></span><br/><span class="line">        String[] res = path.split(<span class="string">"/"</span>);</span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; res.length; i++){</span><br/><span class="line">            <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> res[i];</span><br/><span class="line">            <span class="keyword">if</span>(s.equals(<span class="string">"."</span>) || s.equals(<span class="string">""</span>)) <span class="keyword">continue</span>;</span><br/><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (s.equals(<span class="string">".."</span>)){</span><br/><span class="line">                <span class="keyword">if</span>(!queue.isEmpty()){</span><br/><span class="line">                    queue.pollLast();</span><br/><span class="line">                }</span><br/><span class="line">            }<span class="keyword">else</span>{</span><br/><span class="line">                queue.offer(s);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">// 拼接</span></span><br/><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>(<span class="string">"/"</span>);</span><br/><span class="line">        <span class="keyword">while</span>(!queue.isEmpty()){</span><br/><span class="line">            sb.append(queue.poll());</span><br/><span class="line">            <span class="keyword">if</span>(!queue.isEmpty()){</span><br/><span class="line">                sb.append(<span class="string">"/"</span>);</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">// 判空</span></span><br/><span class="line">        <span class="keyword">return</span> sb.toString().equals(<span class="string">""</span>) ? <span class="string">"/"</span> : sb.toString();</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

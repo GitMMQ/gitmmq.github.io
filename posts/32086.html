@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>234树 | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/32086.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,9 +286,9 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><p>平衡树，子节点数目可以达到4个</p>
 <h2 id="特点"><a class="headerlink" href="#特点" title="特点"></a>特点</h2><ol>
 <li><p>若父节点中存有1个数据项，则必有2个子节点。</p>
@@ -348,9 +348,9 @@ public boolean isFull()//该节点是否已满
    { return (numItems==ORDER-1) ? true : false; }
 //-------------------------------------------------------------
 public int findItem(long key)       // 查找
-   {
+   {                                    
    for(int j=0; j&lt;ORDER-1; j++)         // 遍历数组
-      {
+      {                                 
       if(itemArray[j] == null)          // 数组未满，未找到
          break;
       else if(itemArray[j].dData == key)
@@ -361,9 +361,9 @@ public int findItem(long key)       // 查找
 //-------------------------------------------------------------
 public int insertItem(DataItem newItem)//节点未满的插入
    {
-   numItems++;
+   numItems++;                          
    long newKey = newItem.dData;         // 获得关键字
-
+ 
 <p>   for(int j=ORDER-2; j&gt;=0; j–)        // 因为节点未满，所以从倒数第二项向前查找<br/>      {<br/>      if(itemArray[j] == null)          // 没存数据<br/>         continue;<br/>      else<br/>         {<br/>         long itsKey = itemArray[j].dData;//获得关键字<br/>         if(newKey &lt; itsKey)            //插入位置在其前面，但未必相邻<br/>            itemArray[j+1] = itemArray[j]; //当前数据项后移<br/>         else<br/>            {<br/>            itemArray[j+1] = newItem;   // 在其后位置插入<br/>            return j+1;                 // 返回插入的位置下标<br/>            }                           //    new item<br/>         }  // end else (not null)<br/>      }  // end for                     // shifted all items,<br/>   //若上述代码没有执行返回操作，那么这是空节点（只有初始时根是这个情况）<br/>   itemArray[0] = newItem;              // insert new item<br/>   return 0;<br/>   }  // end insertItem()<br/>//————————————————————-<br/>public DataItem removeItem()        // 移除数据项，从后向前移除<br/>   {<br/>   // 假设节点非空<br/>   DataItem temp = itemArray[numItems-1];  // 要移除的数据项<br/>   itemArray[numItems-1] = null;           // 移除<br/>   numItems–;                             // 数据项数目减一<br/>   return temp;                            // 返回要移除的数据项<br/>   }<br/>//————————————————————-<br/>public void displayNode()           // format “/24/56/74/“<br/>   {<br/>   for(int j=0; j&lt;numItems; j++)<br/>      itemArray[j].displayItem();   // “/56”<br/>   System.out.println(“/“);         // final “/“<br/>   }<br/>//————————————————————-<br/>}  // end class Node<br/>////////////////////////////////////////////////////////////////</p>
 <p>class Tree234<br/>{<br/>private Node root = new Node();            // 创建树的根<br/>//————————————————————-<br/>//获取查找的下一个节点<br/>public Node getNextChild(Node theNode, long theValue)<br/>{<br/>int j;<br/>// 假设这个节点不是叶结点<br/>int numItems = theNode.getNumItems();//获得当前节点的数据项数目<br/>for(j=0; j&lt;numItems; j++)<br/>   {<br/>   if( theValue &lt; theNode.getItem(j).dData )<br/>      return theNode.getChild(j);  // 返回相应的节点<br/>   }  // end for<br/>return theNode.getChild(j);        // 此时j=numItems<br/>}<br/>//————————————————————-<br/>public int find(long key)<br/>   {<br/>   Node curNode = root;<br/>   int childNumber;<br/>   while(true)<br/>      {<br/>      if(( childNumber=curNode.findItem(key) ) != -1)//每次循环这句一定执行<br/>         return childNumber;               // found it<br/>      else if( curNode.isLeaf() )//叶结点上也没找到<br/>         return -1;                        // can’t find it<br/>      else                                 // 不是叶结点，则继续向下查找<br/>         curNode = getNextChild(curNode, key);<br/>      }  // end while<br/>   }<br/>//————————————————————-<br/>// 插入数据项<br/>public void insert(long dValue)<br/>   {<br/>   Node curNode = root;//当前节点标志<br/>   DataItem tempItem = new DataItem(dValue);//插入数据项封装</p>
 <p>   while(true)<br/>      {<br/>      if( curNode.isFull() )               // 是满节点<br/>         {<br/>         split(curNode);                   // 分裂<br/>         curNode = curNode.getParent();    // 回到分裂出的父节点上<br/>                                           // 继续向下查找<br/>         curNode = getNextChild(curNode, dValue);<br/>         }  // end if(node is full)<br/>//后面的操作中节点都未满，否则先执行上面的代码<br/>      else if( curNode.isLeaf() )          // 是叶结点，非满<br/>         break;                            // 跳出，直接插入</p>
@@ -389,13 +389,13 @@ public int insertItem(DataItem newItem)//节点未满的插入
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -425,7 +425,7 @@ public int insertItem(DataItem newItem)//节点未满的插入
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -456,7 +456,7 @@ public int insertItem(DataItem newItem)//节点未满的插入
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

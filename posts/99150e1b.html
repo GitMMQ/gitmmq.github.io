@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 33 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/99150e1b.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s33;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 搜索旋转排序数组</span></span><br/><span class="line"><span class="comment"> * 整数数组 nums 按升序排列，数组中的值 互不相同 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 在传递给函数之前，nums 在预先未知的某个下标 k（0 &lt;= k &lt; nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/search-in-rotated-sorted-array</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">search</span><span class="params">(<span class="type">int</span>[] nums, <span class="type">int</span> target)</span> {</span><br/><span class="line">        <span class="comment">//数组大小判断</span></span><br/><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) {</span><br/><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="comment">//只有一个值情况判断</span></span><br/><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">1</span>) {</span><br/><span class="line">            <span class="keyword">if</span>(nums[<span class="number">0</span>] == target) {</span><br/><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> nums.length - <span class="number">1</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="comment">//二分法 左右边界和中间值</span></span><br/><span class="line">        <span class="keyword">while</span>(i &lt;= j) {</span><br/><span class="line">            mid = (i + j) /<span class="number">2</span>;</span><br/><span class="line">            <span class="comment">//如果中间值 就是target 则返回mid</span></span><br/><span class="line">            <span class="keyword">if</span>(nums[mid] == target) {</span><br/><span class="line">                <span class="keyword">return</span> mid;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="comment">//如果0 ~mid 为上升，则mid在左升区间</span></span><br/><span class="line">            <span class="keyword">if</span>(nums[<span class="number">0</span>] &lt;= nums[mid]) {</span><br/><span class="line">                <span class="comment">//如果 target 在i ~ mid之间</span></span><br/><span class="line">                <span class="keyword">if</span>(nums[i] &lt;= target &amp;&amp; target &lt; nums[mid]) {</span><br/><span class="line">                    j = mid - <span class="number">1</span>;</span><br/><span class="line">                } <span class="keyword">else</span> {</span><br/><span class="line">                    <span class="comment">// target 在mid ~ j之间</span></span><br/><span class="line">                    i = mid + <span class="number">1</span>;</span><br/><span class="line">                }</span><br/><span class="line">                <span class="comment">//如果0 ~mid 为下降，则mid在右降区间</span></span><br/><span class="line">            } <span class="keyword">else</span> {</span><br/><span class="line">                <span class="comment">//如果 target 在i ~ mid之间</span></span><br/><span class="line">                <span class="keyword">if</span>(nums[mid] &lt; target &amp;&amp; target &lt;= nums[nums.length - <span class="number">1</span>]) {</span><br/><span class="line">                    i = mid + <span class="number">1</span>;</span><br/><span class="line">                } <span class="keyword">else</span> {</span><br/><span class="line">                    j = mid -<span class="number">1</span> ;</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

@@ -41,6 +41,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 127 Solution | Qi</title>
+  
 
 
 
@@ -49,8 +50,7 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/96cbbf13.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-
-
-
+    
+    
+    
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/><span class="line">65</span><br/><span class="line">66</span><br/><span class="line">67</span><br/><span class="line">68</span><br/><span class="line">69</span><br/><span class="line">70</span><br/><span class="line">71</span><br/><span class="line">72</span><br/><span class="line">73</span><br/><span class="line">74</span><br/><span class="line">75</span><br/><span class="line">76</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s127;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.*;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 单词接龙</span></span><br/><span class="line"><span class="comment"> * 字典 wordList 中从单词 beginWord 和 endWord 的 转换序列 是一个按下述规格形成的序列 beginWord -&gt; s1 -&gt; s2 -&gt; ... -&gt; sk：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 每一对相邻的单词只差一个字母。</span></span><br/><span class="line"><span class="comment"> *  对于 1 &lt;= i &lt;= k 时，每个 si 都在 wordList 中。注意， beginWord 不需要在 wordList 中。</span></span><br/><span class="line"><span class="comment"> * sk == endWord</span></span><br/><span class="line"><span class="comment"> * 给你两个单词 beginWord 和 endWord 和一个字典 wordList ，返回 从 beginWord 到 endWord 的 最短转换序列 中的 单词数目 。如果不存在这样的转换序列，返回 0 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/word-ladder</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    Map&lt;String, Integer&gt; wordId = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Integer&gt;();</span><br/><span class="line">    List&lt;List&lt;Integer&gt;&gt; edge = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;List&lt;Integer&gt;&gt;();</span><br/><span class="line">    <span class="type">int</span> <span class="variable">nodeNum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">ladderLength</span><span class="params">(String beginWord, String endWord, List&lt;String&gt; wordList)</span> {</span><br/><span class="line">        <span class="keyword">for</span> (String word : wordList) {</span><br/><span class="line">            addEdge(word);</span><br/><span class="line">        }</span><br/><span class="line">        addEdge(beginWord);</span><br/><span class="line">        <span class="keyword">if</span> (!wordId.containsKey(endWord)) {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">        }</span><br/><span class="line">        <span class="type">int</span>[] dis = <span class="keyword">new</span> <span class="title class_">int</span>[nodeNum];</span><br/><span class="line">        Arrays.fill(dis, Integer.MAX_VALUE);</span><br/><span class="line">        <span class="type">int</span> <span class="variable">beginId</span> <span class="operator">=</span> wordId.get(beginWord), endId = wordId.get(endWord);</span><br/><span class="line">        dis[beginId] = <span class="number">0</span>;</span><br/><span class="line"></span><br/><span class="line">        Queue&lt;Integer&gt; que = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;Integer&gt;();</span><br/><span class="line">        que.offer(beginId);</span><br/><span class="line">        <span class="keyword">while</span> (!que.isEmpty()) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> que.poll();</span><br/><span class="line">            <span class="keyword">if</span> (x == endId) {</span><br/><span class="line">                <span class="keyword">return</span> dis[endId] / <span class="number">2</span> + <span class="number">1</span>;</span><br/><span class="line">            }</span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> it : edge.get(x)) {</span><br/><span class="line">                <span class="keyword">if</span> (dis[it] == Integer.MAX_VALUE) {</span><br/><span class="line">                    dis[it] = dis[x] + <span class="number">1</span>;</span><br/><span class="line">                    que.offer(it);</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addEdge</span><span class="params">(String word)</span> {</span><br/><span class="line">        addWord(word);</span><br/><span class="line">        <span class="type">int</span> <span class="variable">id1</span> <span class="operator">=</span> wordId.get(word);</span><br/><span class="line">        <span class="type">char</span>[] array = word.toCharArray();</span><br/><span class="line">        <span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> array.length;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; length; ++i) {</span><br/><span class="line">            <span class="type">char</span> <span class="variable">tmp</span> <span class="operator">=</span> array[i];</span><br/><span class="line">            array[i] = <span class="string">'*'</span>;</span><br/><span class="line">            <span class="type">String</span> <span class="variable">newWord</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(array);</span><br/><span class="line">            addWord(newWord);</span><br/><span class="line">            <span class="type">int</span> <span class="variable">id2</span> <span class="operator">=</span> wordId.get(newWord);</span><br/><span class="line">            edge.get(id1).add(id2);</span><br/><span class="line">            edge.get(id2).add(id1);</span><br/><span class="line">            array[i] = tmp;</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addWord</span><span class="params">(String word)</span> {</span><br/><span class="line">        <span class="keyword">if</span> (!wordId.containsKey(word)) {</span><br/><span class="line">            wordId.put(word, nodeNum++);</span><br/><span class="line">            edge.add(<span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Integer&gt;());</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-
+        
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
