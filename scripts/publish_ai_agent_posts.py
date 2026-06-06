@@ -510,6 +510,13 @@ def render_post_page(
     url = f"https://www.fastolf.com/posts/{pid}.html"
     date_display = published.strftime("%Y-%m-%d")
     date_title = published.strftime("%Y-%m-%d %H:%M:%S")
+    escaped_title = html.escape(title, quote=True)
+    escaped_description = html.escape(description, quote=True)
+    tag_meta = "".join(
+        f'<meta property="article:tag" content="{html.escape(tag.strip(), quote=True)}">\n'
+        for tag in tags.split(";")
+        if tag.strip()
+    )
 
     page = template
     page = page.replace("LLM Wiki 介绍：思想、意义、应用场景与优缺点", title)
@@ -518,9 +525,57 @@ def render_post_page(
         "LLM Wiki 是由 Andrej Karpathy 提出的一种个人知识库构建范式：用 LLM 将原始资料编译为结构化 Wiki 并持续维护，涵盖核心思想、意义、应用场景与优缺点分析，中英文对照。",
         description,
     )
+    page = re.sub(
+        r'<meta name="description" content="[^"]*">',
+        f'<meta name="description" content="{escaped_description}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:title" content="[^"]*">',
+        f'<meta property="og:title" content="{escaped_title}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:url" content="[^"]*">',
+        f'<meta property="og:url" content="{url}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:description" content="[^"]*">',
+        f'<meta property="og:description" content="{escaped_description}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="article:published_time" content="[^"]*">',
+        f'<meta property="article:published_time" content="{iso_z(published)}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="article:modified_time" content="[^"]*">',
+        f'<meta property="article:modified_time" content="{iso_z(published)}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'(?:<meta property="article:tag" content="[^"]*">\n)+',
+        tag_meta,
+        page,
+        count=1,
+    )
     page = page.replace('content="2026-06-05T10:00:00.000Z"', f'content="{iso_z(published)}"')
     page = page.replace('创建时间：2026-06-05 10:00:00', f"创建时间：{date_title}")
     page = page.replace('datetime="2026-06-05T10:00:00+08:00">2026-06-05', f'datetime="{iso_local(published)}">{date_display}')
+    page = re.sub(
+        r'title="创建时间：[^"]+" itemprop="dateCreated datePublished" datetime="[^"]+">[^<]+</time>',
+        f'title="创建时间：{date_title}" itemprop="dateCreated datePublished" datetime="{iso_local(published)}">{date_display}</time>',
+        page,
+        count=1,
+    )
     page = page.replace("<span>8500</span>", f"<span>{chars}</span>")
     page = page.replace("<span>18 分钟</span>", f"<span>{minutes} 分钟</span>")
     page = page.replace("Tech;Data;Vision", tags)
@@ -743,7 +798,7 @@ def sitemap_url(pid: str, published: datetime) -> str:
 
 
 def main() -> None:
-    template = TEMPLATE_POST.read_text(encoding="utf-8")
+    base_template = TEMPLATE_POST.read_text(encoding="utf-8")
     rendered_posts = []
 
     series_html = series_links_html()
@@ -793,6 +848,8 @@ def main() -> None:
             next_href = None
             next_title = None
 
+        out = ROOT / "posts" / f"{post['pid']}.html"
+        template = out.read_text(encoding="utf-8") if out.exists() else base_template
         html_page = render_post_page(
             template,
             pid=post["pid"],
@@ -808,7 +865,6 @@ def main() -> None:
             next_href=next_href,
             next_title=next_title,
         )
-        out = ROOT / "posts" / f"{post['pid']}.html"
         out.write_text(html_page, encoding="utf-8")
         print(f"Wrote {out.name} ({post['title']})")
 
