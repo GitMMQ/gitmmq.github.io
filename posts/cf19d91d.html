@@ -41,7 +41,6 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 236 Solution | Qi</title>
-  
 
 
 
@@ -50,7 +49,8 @@
 
 
 
-  
+
+
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-  
+
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -76,7 +76,7 @@
 <link rel="preload" as="style" href="/css/injector/dark.css" />
 <script>
 (function () {
-  var build = 'nex8-20260606';
+  var build = 'nex8-20260606-mermaid-text';
   document.querySelectorAll('script[src]').forEach(function (el) {
     var src = el.getAttribute('src');
     if (!src || src.indexOf('/js/') === -1) return;
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-        
-  
+
+
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    
+
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-  
+
 
 
 <div class="post-block">
-  
-  
+
+
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/cf19d91d.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-  
+
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-    
-    
-    
+
+
+
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s236;</span><br/><span class="line"></span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 null 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 图示两个链表在节点 c1 开始相交：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 题目数据 保证 整个链式结构中不存在环。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 注意，函数返回结果后，链表必须 保持其原始结构 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 自定义评测：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 评测系统 的输入如下（你设计的程序 不适用 此输入）：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * intersectVal - 相交的起始节点的值。如果不存在相交节点，这一值为 0</span></span><br/><span class="line"><span class="comment"> * listA - 第一个链表</span></span><br/><span class="line"><span class="comment"> * listB - 第二个链表</span></span><br/><span class="line"><span class="comment"> * skipA - 在 listA 中（从头节点开始）跳到交叉节点的节点数</span></span><br/><span class="line"><span class="comment"> * skipB - 在 listB 中（从头节点开始）跳到交叉节点的节点数</span></span><br/><span class="line"><span class="comment"> * 评测系统将根据这些输入创建链式数据结构，并将两个头节点 headA 和 headB 传递给你的程序。如果程序能够正确返回相交节点，那么你的解决方案将被 视作正确答案 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/intersection-of-two-linked-lists</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-    
-    
-    
+
+
+
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-        
+
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy; 
+    &copy;
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-  
+
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

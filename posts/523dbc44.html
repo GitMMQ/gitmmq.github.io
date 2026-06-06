@@ -41,7 +41,6 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 1143 Solution | Qi</title>
-  
 
 
 
@@ -50,7 +49,8 @@
 
 
 
-  
+
+
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-  
+
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -76,7 +76,7 @@
 <link rel="preload" as="style" href="/css/injector/dark.css" />
 <script>
 (function () {
-  var build = 'nex8-20260606';
+  var build = 'nex8-20260606-mermaid-text';
   document.querySelectorAll('script[src]').forEach(function (el) {
     var src = el.getAttribute('src');
     if (!src || src.indexOf('/js/') === -1) return;
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-        
-  
+
+
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    
+
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-  
+
 
 
 <div class="post-block">
-  
-  
+
+
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/523dbc44.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-  
+
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-    
-    
-    
+
+
+
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s1143;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br/><span class="line"><span class="keyword">import</span> java.util.Map;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。</span></span><br/><span class="line"><span class="comment"> * 两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/longest-common-subsequence</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">longestCommonSubsequence</span><span class="params">(String text1, String text2)</span> {</span><br/><span class="line">        <span class="comment">// 新建二维数组 m n  做动态规划</span></span><br/><span class="line">        <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> text1.length(), n = text2.length();</span><br/><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m + <span class="number">1</span>][n + <span class="number">1</span>];</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;= m; i++) {</span><br/><span class="line">            <span class="type">char</span> <span class="variable">c1</span> <span class="operator">=</span> text1.charAt(i - <span class="number">1</span>);</span><br/><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt;= n; j++) {</span><br/><span class="line">                <span class="type">char</span> <span class="variable">c2</span> <span class="operator">=</span> text2.charAt(j - <span class="number">1</span>);</span><br/><span class="line">                <span class="comment">//如果对应位置字符相同，增对应位置值 为 前一位置（i-1,j -1）值 + 1</span></span><br/><span class="line">                <span class="keyword">if</span> (c1 == c2) {</span><br/><span class="line">                    dp[i][j] = dp[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</span><br/><span class="line">                } <span class="keyword">else</span> {</span><br/><span class="line">                    <span class="comment">//否则取其中前面(i-1,j) 或者（i, j-1）最大的那个值</span></span><br/><span class="line">                    dp[i][j] = Math.max(dp[i - <span class="number">1</span>][j], dp[i][j - <span class="number">1</span>]);</span><br/><span class="line">                }</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> dp[m][n];</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-    
-    
-    
+
+
+
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-        
+
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy; 
+    &copy;
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-  
+
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

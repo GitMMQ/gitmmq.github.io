@@ -41,7 +41,6 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 8 Solution | Qi</title>
-  
 
 
 
@@ -50,7 +49,8 @@
 
 
 
-  
+
+
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-  
+
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -76,7 +76,7 @@
 <link rel="preload" as="style" href="/css/injector/dark.css" />
 <script>
 (function () {
-  var build = 'nex8-20260606';
+  var build = 'nex8-20260606-mermaid-text';
   document.querySelectorAll('script[src]').forEach(function (el) {
     var src = el.getAttribute('src');
     if (!src || src.indexOf('/js/') === -1) return;
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-        
-  
+
+
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    
+
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-  
+
 
 
 <div class="post-block">
-  
-  
+
+
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/55ff4a56.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-  
+
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-    
-    
-    
+
+
+
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/><span class="line">65</span><br/><span class="line">66</span><br/><span class="line">67</span><br/><span class="line">68</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s8;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 字符串转换整数 (atoi)</span></span><br/><span class="line"><span class="comment"> * 请你来实现一个 myAtoi(string s) 函数，使其能将字符串转换成一个 32 位有符号整数（类似 C/C++ 中的 atoi 函数）。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 函数 myAtoi(string s) 的算法如下：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 读入字符串并丢弃无用的前导空格</span></span><br/><span class="line"><span class="comment"> * 检查下一个字符（假设还未到字符末尾）为正还是负号，读取该字符（如果有）。 确定最终结果是负数还是正数。 如果两者都不存在，则假定结果为正。</span></span><br/><span class="line"><span class="comment"> * 读入下一个字符，直到到达下一个非数字字符或到达输入的结尾。字符串的其余部分将被忽略。</span></span><br/><span class="line"><span class="comment"> * 将前面步骤读入的这些数字转换为整数（即，"123" -&gt; 123， "0032" -&gt; 32）。如果没有读入数字，则整数为 0 。必要时更改符号（从步骤 2 开始）。</span></span><br/><span class="line"><span class="comment"> * 如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被固定为 −231 ，大于 231 − 1 的整数应该被固定为 231 − 1 。</span></span><br/><span class="line"><span class="comment"> * 返回整数作为最终结果。</span></span><br/><span class="line"><span class="comment"> * 注意：</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 本题中的空白字符只包括空格字符 ' ' 。</span></span><br/><span class="line"><span class="comment"> * 除前导空格或数字后的其余字符串外，请勿忽略 任何其他字符。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/string-to-integer-atoi</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">myAtoi</span><span class="params">(String s)</span> {</span><br/><span class="line">        <span class="comment">// 自动机</span></span><br/><span class="line">        HashMap&lt;String, String[]&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br/><span class="line">        map.put(<span class="string">"start"</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]{<span class="string">"start"</span>, <span class="string">"signed"</span>, <span class="string">"number"</span>, <span class="string">"end"</span>});</span><br/><span class="line">        map.put(<span class="string">"signed"</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]{<span class="string">"end"</span>, <span class="string">"end"</span>, <span class="string">"number"</span>, <span class="string">"end"</span>});</span><br/><span class="line">        map.put(<span class="string">"number"</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]{<span class="string">"end"</span>, <span class="string">"end"</span>, <span class="string">"number"</span>, <span class="string">"end"</span>});</span><br/><span class="line">        map.put(<span class="string">"end"</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]{<span class="string">"end"</span>, <span class="string">"end"</span>, <span class="string">"end"</span>, <span class="string">"end"</span>});</span><br/><span class="line">        <span class="comment">//第一步开始</span></span><br/><span class="line">        <span class="type">String</span> <span class="variable">step</span> <span class="operator">=</span> <span class="string">"start"</span>;</span><br/><span class="line">        <span class="type">long</span> <span class="variable">num</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">sign</span> <span class="operator">=</span> <span class="number">1</span>;</span><br/><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;i &lt; s.length() &amp;&amp; !step.equals(<span class="string">"end"</span>); i++) {</span><br/><span class="line">            <span class="type">char</span> <span class="variable">ch</span> <span class="operator">=</span> s.charAt(i);</span><br/><span class="line">            <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> getChar(ch);</span><br/><span class="line">            <span class="comment">//下一步，根据上一步和当前字符 匹配 自动机 得出</span></span><br/><span class="line">            step = map.get(step)[n];</span><br/><span class="line">            <span class="keyword">if</span>(<span class="string">"number"</span>.equals(step)) {</span><br/><span class="line">                num = num * <span class="number">10</span> + (ch - <span class="string">'0'</span>);</span><br/><span class="line">                num = sign == <span class="number">1</span> ? Math.min(num, (<span class="type">long</span>)Integer.MAX_VALUE) : Math.min(num, -<span class="number">1</span> * (<span class="type">long</span>)Integer.MIN_VALUE);</span><br/><span class="line">            } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"signed"</span>.equals(step)) {</span><br/><span class="line">                sign = (ch == <span class="string">'+'</span>) ? <span class="number">1</span> : -<span class="number">1</span>;</span><br/><span class="line">            } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"signed"</span>.equals(step)) {</span><br/><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> sign * (<span class="type">int</span>)num;</span><br/><span class="line"></span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">getChar</span><span class="params">(<span class="type">char</span> ch)</span> {</span><br/><span class="line">        <span class="keyword">if</span>(<span class="string">' '</span> == ch) {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br/><span class="line">        } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">'+'</span> == ch || <span class="string">'-'</span> == ch) {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br/><span class="line">        } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="number">0</span> &lt;= ch-<span class="string">'0'</span> &amp;&amp; ch-<span class="string">'0'</span> &lt;= <span class="number">9</span>) {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">2</span>;</span><br/><span class="line">        } <span class="keyword">else</span> {</span><br/><span class="line">            <span class="keyword">return</span> <span class="number">3</span>;</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-    
-    
-    
+
+
+
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-        
+
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy; 
+    &copy;
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-  
+
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
