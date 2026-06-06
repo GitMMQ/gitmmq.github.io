@@ -8,6 +8,19 @@ cd "$BLOG_DIR"
 npm run clean
 npm run build
 
+python3 - "$BLOG_DIR/public/js/third-party/tags/mermaid.js" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+content = path.read_text(encoding="utf-8")
+content = content.replace(
+    "newElement.innerHTML = element.innerHTML;",
+    "newElement.textContent = element.textContent;",
+)
+path.write_text(content, encoding="utf-8")
+PY
+
 python3 - "$ROOT_DIR" "$BLOG_DIR/public" <<'PY'
 import shutil
 import sys
