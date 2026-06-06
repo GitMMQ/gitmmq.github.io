@@ -584,22 +584,19 @@ def render_post_page(
         f'<span class="site-state-item-count">{TOTAL_POST_COUNT}</span>',
     )
 
-    # Replace article body (first post-body block on the page)
-    body_pattern = re.compile(
-        r'(<div class="post-body" itemprop="articleBody">\s*)(.*?)(\s*</div>)',
-        re.DOTALL,
+    body_start = '<div class="post-body" itemprop="articleBody">'
+    body_start_idx = page.index(body_start) + len(body_start)
+    footer_match = re.search(r"\n\s*<footer class=\"post-footer\">", page[body_start_idx:])
+    if footer_match is None:
+        raise ValueError(f"post template missing post footer for {pid}")
+    footer_idx = body_start_idx + footer_match.start()
+    page = (
+        page[:body_start_idx]
+        + "\n      \n        "
+        + body_html
+        + "\n\n      \n    </div>\n\n    \n    \n    \n"
+        + page[footer_idx:]
     )
-
-    def _body_replacer(match: re.Match[str]) -> str:
-        return (
-            match.group(1)
-            + "\n      \n        "
-            + body_html
-            + "\n\n      \n    "
-            + match.group(3)
-        )
-
-    page = body_pattern.sub(_body_replacer, page, count=1)
 
     # post nav
     prev_block = ""
