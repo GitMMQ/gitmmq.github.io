@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import html
+import json
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
@@ -18,6 +19,14 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs" / "ai-agents"
 TEMPLATE_POST = ROOT / "posts" / "e601e6a8.html"
 CATEGORY = "mechine"
+MERMAID_CONFIG = {
+    "js": "/lib/mermaid/dist/mermaid.min.js",
+    "theme": {
+        "light": "default",
+        "dark": "dark",
+    },
+}
+MERMAID_TAG_SCRIPT = '<script src="/js/third-party/tags/mermaid.js" defer></script>'
 TZ = timezone(timedelta(hours=8))
 BASE_DATE_BATCH1 = datetime(2026, 6, 5, 11, 0, 0, tzinfo=TZ)
 BASE_DATE_BATCH2 = datetime(2026, 6, 6, 10, 0, 0, tzinfo=TZ)
@@ -323,6 +332,38 @@ def patch_sidebar_site_state(content: str, *, tag_count: int | None = None) -> s
     return content
 
 
+def ensure_mermaid_assets(page: str) -> str:
+    """Add NexT Mermaid config and client script to script-rendered posts."""
+    config_pattern = re.compile(
+        r'(<script class="next-config" data-name="main" type="application/json">)'
+        r"(.*?)"
+        r"(</script>)",
+        re.DOTALL,
+    )
+
+    def _config_replacer(match: re.Match[str]) -> str:
+        config = json.loads(match.group(2))
+        config["mermaid"] = MERMAID_CONFIG
+        return (
+            match.group(1)
+            + json.dumps(config, ensure_ascii=False, separators=(",", ":"))
+            + match.group(3)
+        )
+
+    page, count = config_pattern.subn(_config_replacer, page, count=1)
+    if count == 0:
+        raise ValueError("post template missing NexT main config")
+
+    if MERMAID_TAG_SCRIPT not in page:
+        next_boot = '<script src="/js/next-boot.js" defer></script>'
+        if next_boot in page:
+            page = page.replace(next_boot, next_boot + MERMAID_TAG_SCRIPT, 1)
+        else:
+            page = page.replace("</head>", f"{MERMAID_TAG_SCRIPT}\n</head>", 1)
+
+    return page
+
+
 def render_tag_page(template: str, tag: str, posts: list[dict], tag_count: int) -> str:
     page = template
     for label in ("hexo", "MCP"):
@@ -403,11 +444,7 @@ def md_to_html(md_text: str) -> str:
 
     def mermaid_replacer(match: re.Match[str]) -> str:
         code = html.escape(match.group(1).strip())
-        return (
-            '<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / '
-            '<em>Architecture diagram (Mermaid source)</em></p>'
-            f'<pre><code>{code}</code></pre></div>'
-        )
+        return f'\n<pre><code class="mermaid">{code}</code></pre>\n'
 
     text = re.sub(r"```mermaid\s*\n(.*?)```", mermaid_replacer, text, flags=re.DOTALL)
     body = markdown.markdown(
@@ -473,6 +510,13 @@ def render_post_page(
     url = f"https://www.fastolf.com/posts/{pid}.html"
     date_display = published.strftime("%Y-%m-%d")
     date_title = published.strftime("%Y-%m-%d %H:%M:%S")
+    escaped_title = html.escape(title, quote=True)
+    escaped_description = html.escape(description, quote=True)
+    tag_meta = "".join(
+        f'<meta property="article:tag" content="{html.escape(tag.strip(), quote=True)}">\n'
+        for tag in tags.split(";")
+        if tag.strip()
+    )
 
     page = template
     page = page.replace("LLM Wiki 介绍：思想、意义、应用场景与优缺点", title)
@@ -481,9 +525,57 @@ def render_post_page(
         "LLM Wiki 是由 Andrej Karpathy 提出的一种个人知识库构建范式：用 LLM 将原始资料编译为结构化 Wiki 并持续维护，涵盖核心思想、意义、应用场景与优缺点分析，中英文对照。",
         description,
     )
+    page = re.sub(
+        r'<meta name="description" content="[^"]*">',
+        f'<meta name="description" content="{escaped_description}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:title" content="[^"]*">',
+        f'<meta property="og:title" content="{escaped_title}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:url" content="[^"]*">',
+        f'<meta property="og:url" content="{url}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="og:description" content="[^"]*">',
+        f'<meta property="og:description" content="{escaped_description}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="article:published_time" content="[^"]*">',
+        f'<meta property="article:published_time" content="{iso_z(published)}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'<meta property="article:modified_time" content="[^"]*">',
+        f'<meta property="article:modified_time" content="{iso_z(published)}">',
+        page,
+        count=1,
+    )
+    page = re.sub(
+        r'(?:<meta property="article:tag" content="[^"]*">\n)+',
+        tag_meta,
+        page,
+        count=1,
+    )
     page = page.replace('content="2026-06-05T10:00:00.000Z"', f'content="{iso_z(published)}"')
     page = page.replace('创建时间：2026-06-05 10:00:00', f"创建时间：{date_title}")
     page = page.replace('datetime="2026-06-05T10:00:00+08:00">2026-06-05', f'datetime="{iso_local(published)}">{date_display}')
+    page = re.sub(
+        r'title="创建时间：[^"]+" itemprop="dateCreated datePublished" datetime="[^"]+">[^<]+</time>',
+        f'title="创建时间：{date_title}" itemprop="dateCreated datePublished" datetime="{iso_local(published)}">{date_display}</time>',
+        page,
+        count=1,
+    )
     page = page.replace("<span>8500</span>", f"<span>{chars}</span>")
     page = page.replace("<span>18 分钟</span>", f"<span>{minutes} 分钟</span>")
     page = page.replace("Tech;Data;Vision", tags)
@@ -492,22 +584,19 @@ def render_post_page(
         f'<span class="site-state-item-count">{TOTAL_POST_COUNT}</span>',
     )
 
-    # Replace article body (first post-body block on the page)
-    body_pattern = re.compile(
-        r'(<div class="post-body" itemprop="articleBody">\s*)(.*?)(\s*</div>)',
-        re.DOTALL,
+    body_start = '<div class="post-body" itemprop="articleBody">'
+    body_start_idx = page.index(body_start) + len(body_start)
+    footer_match = re.search(r"\n\s*<footer class=\"post-footer\">", page[body_start_idx:])
+    if footer_match is None:
+        raise ValueError(f"post template missing post footer for {pid}")
+    footer_idx = body_start_idx + footer_match.start()
+    page = (
+        page[:body_start_idx]
+        + "\n      \n        "
+        + body_html
+        + "\n\n      \n    </div>\n\n    \n    \n    \n"
+        + page[footer_idx:]
     )
-
-    def _body_replacer(match: re.Match[str]) -> str:
-        return (
-            match.group(1)
-            + "\n      \n        "
-            + body_html
-            + "\n\n      \n    "
-            + match.group(3)
-        )
-
-    page = body_pattern.sub(_body_replacer, page, count=1)
 
     # post nav
     prev_block = ""
@@ -534,7 +623,7 @@ def render_post_page(
         "    </div>\n      </footer>"
     )
     page = nav_pattern.sub(nav_html, page, count=1)
-    return page
+    return ensure_mermaid_assets(page)
 
 
 def home_article_block(
@@ -706,7 +795,7 @@ def sitemap_url(pid: str, published: datetime) -> str:
 
 
 def main() -> None:
-    template = TEMPLATE_POST.read_text(encoding="utf-8")
+    base_template = TEMPLATE_POST.read_text(encoding="utf-8")
     rendered_posts = []
 
     series_html = series_links_html()
@@ -756,6 +845,8 @@ def main() -> None:
             next_href = None
             next_title = None
 
+        out = ROOT / "posts" / f"{post['pid']}.html"
+        template = out.read_text(encoding="utf-8") if out.exists() else base_template
         html_page = render_post_page(
             template,
             pid=post["pid"],
@@ -771,7 +862,6 @@ def main() -> None:
             next_href=next_href,
             next_title=next_title,
         )
-        out = ROOT / "posts" / f"{post['pid']}.html"
         out.write_text(html_page, encoding="utf-8")
         print(f"Wrote {out.name} ({post['title']})")
 

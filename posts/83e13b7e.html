@@ -18,22 +18,22 @@
 <link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
   <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false},"mermaid":{"js":"/lib/mermaid/dist/mermaid.min.js","theme":{"light":"default","dark":"dark"}}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、工具体系概览 | Tool System Overview 中文 两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：    维度 OpenClaw（龙虾） Hermes Agent     工具数量 核心内置 + 插件扩展 70+ 工具，28 toolsets   组织方式 tools.profile">
+    <meta name="description" content="系统讲解 Hermes 70+ 工具与 6 种执行后端、OpenClaw tools.profile 与沙箱策略，中英文对照。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 工具链与执行环境全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/83e13b7e.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、工具体系概览 | Tool System Overview 中文 两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：    维度 OpenClaw（龙虾） Hermes Agent     工具数量 核心内置 + 插件扩展 70+ 工具，28 toolsets   组织方式 tools.profile">
+<meta property="og:description" content="系统讲解 Hermes 70+ 工具与 6 种执行后端、OpenClaw tools.profile 与沙箱策略，中英文对照。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-05T19:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-05T19:00:00.000Z">
+<meta property="article:published_time" content="2026-06-06T03:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T03:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="Tools">
 <meta property="article:tag" content="Hermes">
 <meta property="article:tag" content="OpenClaw">
-<meta property="article:tag" content="Tools">
 <meta name="twitter:card" content="summary">
 
 
@@ -44,7 +44,6 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Agent Hermes 与 OpenClaw 工具链与执行环境全解析 | Qi</title>
-  
 
 
 
@@ -53,9 +52,10 @@
 
 
 
-  
+
+
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/third-party/tags/mermaid.js" defer></script>
 
   <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
@@ -66,7 +66,7 @@
 
 
 
-  
+
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -160,8 +160,8 @@
   </div>
 
 </header>
-        
-  
+
+
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -192,7 +192,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">372</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -216,7 +216,7 @@
       </div>
     </div>
 
-    
+
   </aside>
 
 
@@ -225,12 +225,12 @@
     <div class="main-inner post posts-expand">
 
 
-  
+
 
 
 <div class="post-block">
-  
-  
+
+
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/83e13b7e.html">
@@ -262,7 +262,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 03:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T03:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 11:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T11:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -274,7 +274,7 @@
         </span>
     </span>
 
-  
+
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -287,13 +287,15 @@
         </div>
       </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><blockquote>
+
+
+
+    <div class="post-body" itemprop="articleBody">
+
+        <blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr/>
+<hr />
 <h2>一、工具体系概览 | Tool System Overview</h2>
 <p><strong>中文</strong></p>
 <p>两个框架都将「工具」作为 Agent 连接外部世界的桥梁，但组织方式不同：</p>
@@ -381,7 +383,7 @@
 </tr>
 </tbody>
 </table>
-<hr/>
+<hr />
 <h2>二、Hermes 工具与 Toolsets | Hermes Tools &amp; Toolsets</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 工具按 <strong>toolset</strong> 分组，每个平台（CLI、Telegram、Cron 等）可独立启用/禁用 toolset 子集：</p>
@@ -470,7 +472,7 @@
 </tbody>
 </table>
 <pre><code class="language-bash">hermes tools                    # Curses UI 按平台配置 toolsets
-hermes chat --toolsets web,file -q "List files in cwd"
+hermes chat --toolsets web,file -q &quot;List files in cwd&quot;
 </code></pre>
 <p><strong>平台预设</strong>（<code>hermes tools</code> 中的 platform）：</p>
 <table>
@@ -497,26 +499,26 @@ hermes chat --toolsets web,file -q "List files in cwd"
 </table>
 <p><strong>English</strong></p>
 <p>Hermes groups 70+ tools into 28 toolsets. Each platform (CLI, Telegram, Cron, etc.) can enable/disable subsets via <code>hermes tools</code>. Categories: web, terminal/file, browser, media, memory, skills, delegation, cron, code execution, messaging, safe, RL. Presets like <code>hermes-cli</code> (full dev) and <code>hermes-telegram</code> (messaging-focused) tune the default tool surface.</p>
-<hr/>
+<hr />
 <h2>三、Hermes 六类终端后端 | Hermes Six Terminal Backends</h2>
 <p><strong>中文</strong></p>
 <p>所有 <code>terminal</code>、文件工具、<code>execute_code</code> 调用均路由到配置的<strong>执行后端</strong>：</p>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
-    subgraph Hermes["Hermes Tool Dispatch"]
+<pre><code class="mermaid">flowchart TB
+    subgraph Hermes[&quot;Hermes Tool Dispatch&quot;]
         TD[Tool Dispatch]
     end
 
-<pre><code>subgraph Backends[&quot;6 终端后端&quot;]
-    L[local — 本机 Shell]
-    D[docker — 持久容器]
-    S[ssh — 远程服务器]
-    SI[singularity — HPC 容器]
-    MO[modal — Serverless 云]
-    DA[daytona — 云开发沙箱]
-end
+    subgraph Backends[&quot;6 终端后端&quot;]
+        L[local — 本机 Shell]
+        D[docker — 持久容器]
+        S[ssh — 远程服务器]
+        SI[singularity — HPC 容器]
+        MO[modal — Serverless 云]
+        DA[daytona — 云开发沙箱]
+    end
 
-TD --&amp;gt; L &amp;amp; D &amp;amp; S &amp;amp; SI &amp;amp; MO &amp;amp; DA&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-</code></pre>
+    TD --&gt; L &amp; D &amp; S &amp; SI &amp; MO &amp; DA</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -561,18 +563,18 @@ TD --&amp;gt; L &amp;amp; D &amp;amp; S &amp;amp; SI &amp;amp; MO &amp;amp; DA&l
 <pre><code class="language-yaml"># ~/.hermes/config.yaml
 terminal:
   backend: docker
-  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
+  docker_image: &quot;nikolaik/python-nodejs:python3.11-nodejs20&quot;
   container_cpu: 1
   container_memory: 5120      # MB
   container_disk: 51200     # MB
   container_persistent: true
   docker_volumes:
-    - "/home/user/projects:/workspace/projects"
+    - &quot;/home/user/projects:/workspace/projects&quot;
 </code></pre>
 <p><code>TERMINAL_ENV</code> 环境变量可覆盖 <code>config.yaml</code> 中的 <code>terminal.backend</code>，适合单次会话临时切换。</p>
 <p><strong>English</strong></p>
 <p>All <code>terminal</code>, file, and <code>execute_code</code> calls route through the configured backend: local (default), docker, ssh, singularity, modal, or daytona. Configure in <code>~/.hermes/config.yaml</code> or override with <code>TERMINAL_ENV</code>. Docker is recommended for production Gateway isolation; SSH splits control plane from execution.</p>
-<hr/>
+<hr />
 <h2>四、Docker 持久容器生命周期 | Docker Persistent Container Lifecycle</h2>
 <p><strong>中文</strong></p>
 <p>Hermes Docker 后端的核心理念：<strong>一个长驻容器，跨工具调用、跨会话、跨子 Agent 共享</strong>。</p>
@@ -621,15 +623,21 @@ terminal:
 <p><strong>与 OpenClaw 对比</strong>：OpenClaw 可选 <code>agents.defaults.sandbox.docker</code> 按会话沙箱；Hermes Docker 默认是<strong>进程级单容器共享模型</strong>，更适合长期开发工作流。</p>
 <p><strong>English</strong></p>
 <p>Hermes Docker backend uses one long-lived container shared across tool calls, sessions, and sub-agents. Lazy creation on first use; state (cwd, packages, <code>/workspace</code> files) persists between calls. Default: container survives Hermes process exit and reattaches via label on next start. Profile-scoped isolation via <code>hermes-profile=</code> labels. Cleanup after <code>terminal.lifetime_seconds</code> of inactivity when no background processes remain.</p>
-<hr/>
+<hr />
 <h2>五、后台进程、PTY 与 sudo | Background Processes, PTY &amp; Privileges</h2>
 <p><strong>中文</strong></p>
 <h3>5.1 后台进程（Background）</h3>
 <pre><code class="language-python"># Hermes terminal 工具
-terminal(command="pytest -v tests/", background=True)
-# → {"session_id": "proc_abc123", "pid": 12345}
+terminal(command=&quot;pytest -v tests/&quot;, background=True)
+# → {&quot;session_id&quot;: &quot;proc_abc123&quot;, &quot;pid&quot;: 12345}
 
-<p>process(action&#x3D;”list”)                              # 列出运行中进程<br>process(action&#x3D;”poll”, session_id&#x3D;”proc_abc123”)  # 检查状态<br>process(action&#x3D;”wait”, session_id&#x3D;”proc_abc123”)  # 阻塞至完成<br>process(action&#x3D;”log”, session_id&#x3D;”proc_abc123”)   # 完整输出<br>process(action&#x3D;”kill”, session_id&#x3D;”proc_abc123”)  # 终止<br>process(action&#x3D;”write”, session_id&#x3D;”proc_abc123”, data&#x3D;”y”)  # 发送输入<br></code></pre></p>
+process(action=&quot;list&quot;)                              # 列出运行中进程
+process(action=&quot;poll&quot;, session_id=&quot;proc_abc123&quot;)  # 检查状态
+process(action=&quot;wait&quot;, session_id=&quot;proc_abc123&quot;)  # 阻塞至完成
+process(action=&quot;log&quot;, session_id=&quot;proc_abc123&quot;)   # 完整输出
+process(action=&quot;kill&quot;, session_id=&quot;proc_abc123&quot;)  # 终止
+process(action=&quot;write&quot;, session_id=&quot;proc_abc123&quot;, data=&quot;y&quot;)  # 发送输入
+</code></pre>
 <p><strong>两种后台模式</strong>：</p>
 <ol>
 <li><strong>长驻服务</strong>（dev server、watcher）— 永不退出</li>
@@ -665,21 +673,21 @@ terminal(command="pytest -v tests/", background=True)
 <p><strong>容器后端跳过审批</strong>：docker/singularity/modal/daytona 将容器视为信任边界，不重复主机级审批。</p>
 <p><strong>English</strong></p>
 <p>Hermes <code>terminal(background=true)</code> returns a <code>session_id</code> managed via <code>process</code> tool (list/poll/wait/log/kill/write). PTY mode (<code>pty=true</code>) enables interactive CLIs. Container backends skip host approval checks — the container is the boundary. OpenClaw mirrors this with <code>exec</code> + <code>process</code> and <code>pty</code> parameter.</p>
-<hr/>
+<hr />
 <h2>六、OpenClaw 工具 Profile 与分组 | OpenClaw Tool Profiles &amp; Groups</h2>
 <p><strong>中文</strong></p>
 <p>OpenClaw 通过 <code>tools</code> 配置控制 Agent 可见工具集：</p>
 <pre><code class="language-json5">{
   tools: {
-    profile: "messaging",           // 预设 profile
-    deny: ["group:automation", "group:runtime", "group:fs",
-           "sessions_spawn", "sessions_send"],
-    allow: ["read", "web_search"],
+    profile: &quot;messaging&quot;,           // 预设 profile
+    deny: [&quot;group:automation&quot;, &quot;group:runtime&quot;, &quot;group:fs&quot;,
+           &quot;sessions_spawn&quot;, &quot;sessions_send&quot;],
+    allow: [&quot;read&quot;, &quot;web_search&quot;],
     fs: { workspaceOnly: true },
     exec: {
-      security: "deny",             // deny | allowlist | full
-      ask: "always",                // always | on-miss | off
-      host: "sandbox",              // auto | sandbox | gateway | node
+      security: &quot;deny&quot;,             // deny | allowlist | full
+      ask: &quot;always&quot;,                // always | on-miss | off
+      host: &quot;sandbox&quot;,              // auto | sandbox | gateway | node
       timeoutSec: 1800,
     },
     elevated: { enabled: false },
@@ -732,10 +740,10 @@ terminal(command="pytest -v tests/", background=True)
 </ul>
 <p><strong>English</strong></p>
 <p>OpenClaw controls tool visibility via <code>tools.profile</code>, <code>deny</code>, <code>allow</code>, and groups (<code>group:automation</code>, <code>group:runtime</code>, <code>group:fs</code>). High-risk control-plane tools: <code>gateway</code>, <code>cron</code>, <code>sessions_spawn</code>. Hardened baseline: messaging profile, deny automation/runtime/fs groups, <code>workspaceOnly</code> fs, deny/limit exec with approvals.</p>
-<hr/>
+<hr />
 <h2>七、OpenClaw Exec 安全模型 | OpenClaw Exec Security Model</h2>
 <p><strong>中文</strong></p>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TD
+<pre><code class="mermaid">flowchart TD
     A[exec 工具调用] --&gt; B{host 路由}
     B --&gt;|auto + 有沙箱| C[sandbox]
     B --&gt;|auto + 无沙箱| D[gateway 主机]
@@ -749,7 +757,8 @@ terminal(command="pytest -v tests/", background=True)
     I --&gt; J
     J --&gt;|always| K[人工审批]
     J --&gt;|on-miss| L[未命中时询问]
-    J --&gt;|off| M[YOLO 执行]</code></pre></div>
+    J --&gt;|off| M[YOLO 执行]</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -787,7 +796,7 @@ terminal(command="pytest -v tests/", background=True)
 <p><strong>会话覆盖</strong>：<code>/exec host=auto security=allowlist ask=on-miss</code></p>
 <p><strong>English</strong></p>
 <p>OpenClaw <code>exec</code> routes by <code>host</code> (auto→sandbox or gateway, or node). Security modes: deny, allowlist, full. Ask modes gate human approval. Sandbox off by default; explicit <code>host=sandbox</code> fails closed without sandbox. PATH/loader overrides rejected on gateway/node. Use <code>process</code> for long work; use <code>cron</code> for scheduling, not sleep loops. Session overrides via <code>/exec</code>.</p>
-<hr/>
+<hr />
 <h2>八、文件安全与沙箱 | Filesystem Safety &amp; Sandboxing</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -824,7 +833,7 @@ terminal(command="pytest -v tests/", background=True)
 <p>OpenClaw <code>workspaceOnly: true</code> 限制 <code>read</code>/<code>write</code>/<code>edit</code> 仅在 workspace 目录内操作。Hermes cron 任务可通过 <code>workdir</code> 参数将文件/终端工具钉在特定项目目录。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw: <code>@openclaw/fs-safe</code>, <code>tools.fs.workspaceOnly</code>, <code>applyPatch.workspaceOnly</code> (default true). Hermes: cwd allowlist, context file scanning, env var stripping. Both constrain filesystem blast radius; Hermes cron <code>workdir</code> pins file/terminal tools to a project directory.</p>
-<hr/>
+<hr />
 <h2>九、浏览器与代码执行 | Browser &amp; Code Execution</h2>
 <p><strong>中文</strong></p>
 <h3>9.1 浏览器自动化</h3>
@@ -876,7 +885,7 @@ terminal(command="pytest -v tests/", background=True)
 </table>
 <p><strong>English</strong></p>
 <p>OpenClaw: browser plugin + SSRF policy + <code>apply_patch</code> for OpenAI models. Hermes: 5 browser backends, browse-sh skill catalog, bidirectional MCP, <code>execute_code</code> in terminal backend sandbox with credential filtering.</p>
-<hr/>
+<hr />
 <h2>十、子 Agent 委派与工具隔离 | Sub-Agent Delegation</h2>
 <p><strong>中文</strong></p>
 <p>Hermes <code>delegate_tool</code> 生成隔离子代理并行处理子任务：</p>
@@ -888,7 +897,7 @@ terminal(command="pytest -v tests/", background=True)
 <p>OpenClaw <code>sessions_spawn</code> / <code>sessions_send</code> 实现跨会话 Agent 操作，默认应对不可信面 deny。</p>
 <p><strong>English</strong></p>
 <p>Hermes <code>delegate_tool</code> spawns isolated sub-agents with reduced context, sharing the parent Docker container. Cron runs disable <code>cronjob</code> toolset to prevent recursive scheduling. OpenClaw uses <code>sessions_spawn</code>/<code>sessions_send</code> for cross-session agents — deny by default on untrusted surfaces.</p>
-<hr/>
+<hr />
 <h2>十一、生产部署对照 | Production Deployment Comparison</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -935,7 +944,7 @@ terminal(command="pytest -v tests/", background=True)
 <p><strong>English</strong></p>
 <p><strong>OpenClaw production</strong>: enable sandbox, tighten profile/deny, exec deny + ask always, audit with <code>security audit</code>.</p>
 <p><strong>Hermes production</strong>: <code>terminal.backend: docker</code> or ssh split, per-platform toolsets, manual approvals, <code>cron_mode: deny</code>, <code>hermes doctor</code>.</p>
-<hr/>
+<hr />
 <h2>十二、最佳实践 | Best Practices</h2>
 <p><strong>中文</strong></p>
 <h3>通用</h3>
@@ -961,27 +970,33 @@ terminal(command="pytest -v tests/", background=True)
 <p><strong>Universal</strong>: minimal tool surface, container as boundary, background via process not sleep loops, PTY only when needed.</p>
 <p><strong>Hermes</strong>: cron <code>enabled_toolsets</code>, modal/daytona for serverless, <code>notify_on_complete</code> for long builds.</p>
 <p><strong>OpenClaw</strong>: deny runtime/cron on shared DMs, safeBins for stdin filters only, <code>strictInlineEval</code> for inline eval.</p>
-<hr/>
+<hr />
 <h2>十三、延伸阅读 | Further Reading</h2>
 <ul>
 <li><a href="./gateway.md">Gateway 架构深度解析</a></li>
 <li><a href="./security-model.md">安全模型深度解析</a></li>
 <li><a href="./automation-cron-heartbeat.md">自动化调度与主动巡检</a></li>
-<li><a target="_blank" rel="noopener" href="https://docs.openclaw.ai/tools/exec">OpenClaw Exec 文档</a></li>
-<li><a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/tools">Hermes Tools 文档</a></li>
+<li><a href="https://docs.openclaw.ai/tools/exec">OpenClaw Exec 文档</a></li>
+<li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/tools">Hermes Tools 文档</a></li>
 </ul>
-<hr/>
+<hr />
 <h2>十四、结语 | Conclusion</h2>
 <p><strong>中文</strong></p>
 <p>工具链与执行环境决定了 Agent 能「做什么」以及「爆炸半径有多大」。OpenClaw 以 <strong>Profile + Exec 审批 + 可选沙箱</strong> 构建灵活的控制面，适合多渠道、多 Node 的广度连接场景。Hermes 以 <strong>70+ 工具、28 toolsets、6 后端、持久 Docker 容器</strong> 构建深度执行能力，适合长期开发、Serverless 和研究轨迹场景。理解两者的工具哲学——<strong>范围控制</strong> vs. <strong>执行深度</strong>——是安全配置与性能优化的前提。</p>
 <p><strong>English</strong></p>
 <p>Toolchains and execution environments define what an agent can do and its blast radius. OpenClaw uses <strong>profiles + exec approvals + optional sandbox</strong> for flexible control across channels and nodes. Hermes uses <strong>70+ tools, 28 toolsets, 6 backends, and persistent Docker containers</strong> for deep execution in long-running dev, serverless, and research scenarios. Understanding <strong>scope control</strong> vs. <strong>execution depth</strong> is prerequisite to security hardening and performance tuning.</p>
 
+
     </div>
 
-    
-    
-    
+
+
+
+
+
+
+
+
 
     <footer class="post-footer">
           <div class="post-tags">
@@ -991,21 +1006,26 @@ terminal(command="pytest -v tests/", background=True)
               <a href="/tags/Tools/" rel="tag"># Tools</a>
           </div>
 
-        
 
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/posts/13d06324.html" rel="prev" title="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析">
-                  <i class="fa fa-angle-left"></i> Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/posts/17b36b1c.html" rel="next" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
-                  Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
+
+
+          <div class="post-tags">
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
+              <a href="/tags/Hermes/" rel="tag"># Hermes</a>
+              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
           </div>
-    </footer>
+        <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/13d06324.html" rel="prev" title="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析">
+      <i class="fa fa-chevron-left"></i> Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/17b36b1c.html" rel="next" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
+      Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
   </article>
 </div>
 
@@ -1021,7 +1041,7 @@ terminal(command="pytest -v tests/", background=True)
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy; 
+    &copy;
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -1052,7 +1072,7 @@ terminal(command="pytest -v tests/", background=True)
     </div>
   </footer>
 
-  
+
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
