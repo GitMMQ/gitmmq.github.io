@@ -58,19 +58,16 @@ flowchart TB
         SG[Signal]
         MORE[50+ 渠道...]
     end
-
     subgraph Gateway["OpenClaw Gateway :18789"]
         ROUTE[会话路由]
         TOOLS[工具执行]
         MEM[记忆读写]
     end
-
     subgraph Runtime["Agent Runtime"]
         WP[工作区文件注入]
         SK[Skills 加载]
         LLM[LLM 推理]
     end
-
     Channels --> Gateway
     Gateway --> Runtime
     Runtime --> Gateway
@@ -151,14 +148,12 @@ flowchart TB
         ACP[ACP - VS Code/Zed]
         CRON[Cron 调度器]
     end
-
     subgraph Core["AIAgent 核心引擎"]
         PB[Prompt Builder]
         PR[Provider 解析 18+ 模型]
         TD[Tool Dispatch 70+ 工具]
         CC[上下文压缩]
     end
-
     subgraph Memory["记忆与学习"]
         WM[工作记忆]
         SM[会话记忆 SQLite+FTS5]
@@ -166,14 +161,12 @@ flowchart TB
         SKM[技能记忆 Skills]
         HON[Honcho 用户建模]
     end
-
     subgraph Exec["执行环境"]
         T1[Local]
         T2[Docker]
         T3[SSH]
         T4[Daytona/Modal Serverless]
     end
-
     Entry --> Core
     Core --> Memory
     Core --> Exec
@@ -421,7 +414,6 @@ flowchart LR
         OC_GW --> OC_SK
         OC_GW --> OC_CH
     end
-
     subgraph Hermes["Hermes — 深度优先"]
         HM_EN[Agent Engine]
         HM_LL[Learning Loop]

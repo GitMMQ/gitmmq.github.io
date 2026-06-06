@@ -439,18 +439,31 @@ def strip_front_matter(text: str) -> str:
     return text
 
 
+def normalize_mermaid_code(code: str) -> str:
+    # Blank lines inside <pre><code> break Python-Markdown HTML block parsing.
+    return re.sub(r"\n\s*\n", "\n", code.strip())
+
+
 def md_to_html(md_text: str) -> str:
     text = strip_front_matter(md_text)
+    mermaid_blocks: list[str] = []
 
     def mermaid_replacer(match: re.Match[str]) -> str:
-        code = html.escape(match.group(1).strip())
-        return f'\n<pre><code class="mermaid">{code}</code></pre>\n'
+        code = html.escape(normalize_mermaid_code(match.group(1)))
+        placeholder = f"MERMAIDBLOCK{len(mermaid_blocks)}PLACEHOLDER"
+        mermaid_blocks.append(
+            f'\n<pre><code class="mermaid">{code}</code></pre>\n'
+        )
+        return f"\n\n{placeholder}\n\n"
 
     text = re.sub(r"```mermaid\s*\n(.*?)```", mermaid_replacer, text, flags=re.DOTALL)
     body = markdown.markdown(
         text,
         extensions=[TableExtension(), "fenced_code", "nl2br", "sane_lists"],
     )
+    for index, block in enumerate(mermaid_blocks):
+        body = body.replace(f"<p>MERMAIDBLOCK{index}PLACEHOLDER</p>", block)
+        body = body.replace(f"MERMAIDBLOCK{index}PLACEHOLDER", block)
     # Hexo-style header anchors for h2/h3
     body = re.sub(
         r"<h2 id=\"([^\"]+)\">(.*?)</h2>",

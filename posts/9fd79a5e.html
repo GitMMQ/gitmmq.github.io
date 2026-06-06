@@ -512,36 +512,30 @@
     subgraph L1["第一层：工作记忆 Working Memory"]
         CTX[当前对话上下文]
     end
-
-<pre><code>subgraph L2[&quot;第二层：会话记忆 Session Memory&quot;]
-    DB[(SQLite state.db)]
-    FTS[FTS5 全文索引]
-    TRIG[Trigram 索引 CJK]
-end
-
-subgraph L3[&quot;第三层：持久记忆 Persistent Memory&quot;]
-    MEM[MEMORY.md ~2200 chars]
-    USER[USER.md ~1375 chars]
-end
-
-subgraph L4[&quot;第四层：技能记忆 Skill Memory&quot;]
-    SKILLS[~/.hermes/skills/]
-    PROG[渐进式披露]
-end
-
-subgraph EXT[&quot;外部记忆 Provider（可选）&quot;]
-    HON[Honcho 用户建模]
-    MEM0[Mem0]
-    OTH[OpenViking / Hindsight / ...]
-end
-
-CTX --&amp;gt; DB
-DB --&amp;gt; FTS
-MEM --&amp;gt; CTX
-USER --&amp;gt; CTX
-SKILLS --&amp;gt; PROG
-EXT -.-&amp;gt; CTX&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    subgraph L2["第二层：会话记忆 Session Memory"]
+        DB[(SQLite state.db)]
+        FTS[FTS5 全文索引]
+        TRIG[Trigram 索引 CJK]
+    end
+    subgraph L3["第三层：持久记忆 Persistent Memory"]
+        MEM[MEMORY.md ~2200 chars]
+        USER[USER.md ~1375 chars]
+    end
+    subgraph L4["第四层：技能记忆 Skill Memory"]
+        SKILLS[~/.hermes/skills/]
+        PROG[渐进式披露]
+    end
+    subgraph EXT["外部记忆 Provider（可选）"]
+        HON[Honcho 用户建模]
+        MEM0[Mem0]
+        OTH[OpenViking / Hindsight / ...]
+    end
+    CTX --&gt; DB
+    DB --&gt; FTS
+    MEM --&gt; CTX
+    USER --&gt; CTX
+    SKILLS --&gt; PROG
+    EXT -.-&gt; CTX</code></pre>
 <h3>3.2 第一层：工作记忆</h3>
 <p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
 <h3>3.3 第二层：会话记忆（SQLite + FTS5）</h3>
@@ -709,17 +703,15 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
     participant M as Memory Manager
     participant S as Skill Store
     participant DB as SQLite FTS5
-
-<pre><code>U-&amp;gt;&amp;gt;A: 复杂任务请求
-A-&amp;gt;&amp;gt;A: 执行工具（5+ 次）
-A-&amp;gt;&amp;gt;M: 策划记忆（add/replace）
-A-&amp;gt;&amp;gt;S: skill_manage(create)
-A-&amp;gt;&amp;gt;DB: 持久化会话消息
-Note over A,S: 下次同类任务
-A-&amp;gt;&amp;gt;S: skill_view（按需加载）
-A-&amp;gt;&amp;gt;DB: session_search（历史召回）
-A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    U-&gt;&gt;A: 复杂任务请求
+    A-&gt;&gt;A: 执行工具（5+ 次）
+    A-&gt;&gt;M: 策划记忆（add/replace）
+    A-&gt;&gt;S: skill_manage(create)
+    A-&gt;&gt;DB: 持久化会话消息
+    Note over A,S: 下次同类任务
+    A-&gt;&gt;S: skill_view（按需加载）
+    A-&gt;&gt;DB: session_search（历史召回）
+    A-&gt;&gt;U: 更高效响应</code></pre>
 <p><strong>English</strong></p>
 <h3>3.1 Four-Layer Memory Model</h3>
 <p>Working memory (current context) → Session memory (SQLite + FTS5) → Persistent memory (MEMORY.md / USER.md with char limits) → Skill memory (progressive disclosure in <code>~/.hermes/skills/</code>). Optional external providers (Honcho, Mem0, etc.) run in parallel.</p>

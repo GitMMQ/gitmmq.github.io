@@ -726,21 +726,19 @@ cronjob(action="create", name="ai-news-fetch",
     participant J as jobs.json
     participant A as AIAgent
     participant D as Delivery
-
-<pre><code>T-&amp;gt;&amp;gt;L: 获取文件锁
-T-&amp;gt;&amp;gt;J: 加载任务
-T-&amp;gt;&amp;gt;T: 筛选 due jobs (next_run &amp;lt;= now)
-loop 每个 due job
-    T-&amp;gt;&amp;gt;A: 创建全新会话（无历史）
-    opt 附加 skills
-    T-&amp;gt;&amp;gt;A: 注入 skills + prompt + context_from
-    opt script 预检
-    T-&amp;gt;&amp;gt;A: wakeAgent 门控
-    A-&amp;gt;&amp;gt;D: 完成 → 投递
-    T-&amp;gt;&amp;gt;J: 更新 run_count, next_run
-end
-T-&amp;gt;&amp;gt;L: 释放锁&lt;/code&gt;&lt;/pre&gt;
-</code></pre>
+    T-&gt;&gt;L: 获取文件锁
+    T-&gt;&gt;J: 加载任务
+    T-&gt;&gt;T: 筛选 due jobs (next_run &lt;= now)
+    loop 每个 due job
+        T-&gt;&gt;A: 创建全新会话（无历史）
+        opt 附加 skills
+        T-&gt;&gt;A: 注入 skills + prompt + context_from
+        opt script 预检
+        T-&gt;&gt;A: wakeAgent 门控
+        A-&gt;&gt;D: 完成 → 投递
+        T-&gt;&gt;J: 更新 run_count, next_run
+    end
+    T-&gt;&gt;L: 释放锁</code></pre>
 <p>存储：<code>jobs.json</code>（原子写）、<code>cron/output/{job_id}/</code>。Gateway 每 <strong>60s</strong> tick，<code>.tick.lock</code> 防重叠；Cron 会话禁用 <code>cronjob</code> toolset。<code>enabled_toolsets</code> 可 per-job 收紧工具 schema。</p>
 <p><strong>English</strong></p>
 <p>60s tick, file lock, fresh sessions, cron toolset disabled in cron runs, <code>enabled_toolsets</code> for cost control, fallback provider inheritance.</p>

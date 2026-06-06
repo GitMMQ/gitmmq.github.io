@@ -237,7 +237,6 @@ sequenceDiagram
     participant A as AIAgent
     participant S as Skill Index
     participant F as SKILL.md 全文
-
     U->>A: 复杂任务请求
     Note over A,S: 会话启动
     A->>S: Level 0 索引已在 stable tier

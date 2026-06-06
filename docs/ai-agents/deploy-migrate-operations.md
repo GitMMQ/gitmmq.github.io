@@ -17,19 +17,16 @@ flowchart TB
         LAP[笔记本 localhost]
         LAP --> GW1[Gateway 仅本机]
     end
-
     subgraph B["模式 B：VPS + 消息平台"]
         VPS[$5 VPS 长驻]
         PHONE[手机 Telegram/WhatsApp]
         PHONE --> VPS
     end
-
     subgraph C["模式 C：分离式 Gateway/执行"]
         GWM[Gateway 机 — 仅消息]
         EXE[执行机 — Docker/SSH]
         GWM -->|SSH| EXE
     end
-
     subgraph D["模式 D：Serverless（Hermes）"]
         GWH[Hermes Gateway]
         MOD[Modal / Daytona]
