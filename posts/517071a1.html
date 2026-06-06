@@ -41,7 +41,6 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>leetcode 27 Solution | Qi</title>
-  
 
 
 
@@ -50,7 +49,8 @@
 
 
 
-  
+
+
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
@@ -65,7 +65,7 @@
 
 
 
-  
+
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -76,7 +76,7 @@
 <link rel="preload" as="style" href="/css/injector/dark.css" />
 <script>
 (function () {
-  var build = 'nex8-20260606';
+  var build = 'nex8-20260606-mermaid-text';
   document.querySelectorAll('script[src]').forEach(function (el) {
     var src = el.getAttribute('src');
     if (!src || src.indexOf('/js/') === -1) return;
@@ -159,8 +159,8 @@
   </div>
 
 </header>
-        
-  
+
+
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    
+
   </aside>
 
 
@@ -224,12 +224,12 @@
     <div class="main-inner post posts-expand">
 
 
-  
+
 
 
 <div class="post-block">
-  
-  
+
+
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/517071a1.html">
@@ -273,7 +273,7 @@
         </span>
     </span>
 
-  
+
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -286,23 +286,23 @@
         </div>
       </header>
 
-    
-    
-    
+
+
+
     <div class="post-body" itemprop="articleBody"><h1 id="代码解析"><a class="headerlink" href="#代码解析" title="代码解析"></a>代码解析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.demo.s27;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">/**</span></span><br/><span class="line"><span class="comment"> * 移除元素</span></span><br/><span class="line"><span class="comment"> * 给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素，并返回移除后数组的新长度。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 不要使用额外的数组空间，你必须仅使用 O(1) 额外空间并 原地 修改输入数组。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 元素的顺序可以改变。你不需要考虑数组中超出新长度后面的元素。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> *  </span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 说明:</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 为什么返回数值是整数，但输出的答案是数组呢?</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 请注意，输入数组是以「引用」方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 你可以想象内部操作如下:</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * // nums 是以“引用”方式传递的。也就是说，不对实参作任何拷贝</span></span><br/><span class="line"><span class="comment"> * int len = removeElement(nums, val);</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * // 在函数里修改输入数组对于调用者是可见的。</span></span><br/><span class="line"><span class="comment"> * // 根据你的函数返回的长度, 它会打印出数组中 该长度范围内 的所有元素。</span></span><br/><span class="line"><span class="comment"> * for (int i = 0; i &lt; len; i++) {</span></span><br/><span class="line"><span class="comment"> *     print(nums[i]);</span></span><br/><span class="line"><span class="comment"> * }</span></span><br/><span class="line"><span class="comment"> *</span></span><br/><span class="line"><span class="comment"> * 来源：力扣（LeetCode）</span></span><br/><span class="line"><span class="comment"> * 链接：https://leetcode.cn/problems/remove-element</span></span><br/><span class="line"><span class="comment"> * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span></span><br/><span class="line"><span class="comment"> */</span></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">removeElement</span><span class="params">(<span class="type">int</span>[] nums, <span class="type">int</span> val)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br/><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">right</span> <span class="operator">=</span> <span class="number">0</span>; right &lt; n; right++) {</span><br/><span class="line">            <span class="keyword">if</span> (nums[right] != val) {</span><br/><span class="line">                nums[left] = nums[right];</span><br/><span class="line">                left++;</span><br/><span class="line">            }</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> left;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
 
     </div>
 
-    
-    
-    
+
+
+
 
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/leetcode/" rel="tag"># leetcode</a>
           </div>
 
-        
+
 
           <div class="post-nav">
             <div class="post-nav-item">
@@ -332,7 +332,7 @@
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy; 
+    &copy;
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -363,7 +363,7 @@
     </div>
   </footer>
 
-  
+
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

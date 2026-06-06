@@ -10,7 +10,7 @@ document.addEventListener('page:loaded', async () => {
       const box = document.createElement('div');
       box.className = 'code-container';
       const newElement = document.createElement('div');
-      newElement.innerHTML = element.innerHTML;
+      newElement.textContent = element.textContent;
       newElement.className = 'mermaid';
       box.appendChild(newElement);
       if (CONFIG.codeblock.copy_button.enable) {
