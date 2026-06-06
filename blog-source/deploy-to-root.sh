@@ -41,14 +41,6 @@ preserve = {
     "docs", "scripts",
     "baidusitemap.xml", "sitemap.txt", "sitemap.xml",
 }
-legacy_index_files = [
-    root / "categories" / "index.html",
-    root / "tags" / "index.html",
-]
-legacy_backups = {
-    path: path.read_bytes() for path in legacy_index_files if path.exists()
-}
-
 for item in root.iterdir():
     if item.name in preserve:
         continue
@@ -63,11 +55,6 @@ for item in public_dir.iterdir():
         shutil.copytree(item, target)
     else:
         shutil.copy2(item, target)
-
-for path, data in legacy_backups.items():
-    if not path.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
 
 # GitHub Pages must skip Jekyll so pre-built static HTML is served as-is.
 (root / ".nojekyll").touch(exist_ok=True)

@@ -2,6 +2,31 @@
 
 NexT.boot = {};
 
+NexT.boot.closeMobileNav = function() {
+  document.body.classList.remove('site-nav-on');
+  const toggle = document.querySelector('.site-nav-toggle .toggle');
+  if (toggle) toggle.classList.remove('toggle-close');
+};
+
+NexT.boot.ensureNavVisible = function() {
+  if (!CONFIG.motion?.enable) return;
+
+  const column = document.querySelector('.column');
+  if (column) column.style.opacity = '1';
+
+  document.querySelectorAll('.site-brand-container .toggle').forEach(toggle => {
+    toggle.style.opacity = '1';
+    toggle.style.top = '0px';
+  });
+
+  const menuItemTransition = CONFIG.motion.transition?.menu_item;
+  document.querySelectorAll('.site-nav .menu-item').forEach(item => {
+    if (item.classList.contains('animated')) return;
+    if (menuItemTransition) item.classList.add('animated', menuItemTransition);
+    else item.classList.add('animated');
+  });
+};
+
 NexT.boot.registerEvents = function() {
 
   NexT.utils.registerScrollPercent();
@@ -9,12 +34,24 @@ NexT.boot.registerEvents = function() {
   NexT.utils.updateFooterPosition();
 
   // Mobile top menu bar.
-  document.querySelector('.site-nav-toggle .toggle').addEventListener('click', event => {
+  const navToggle = document.querySelector('.site-nav-toggle .toggle');
+  navToggle?.addEventListener('click', event => {
     event.currentTarget.classList.toggle('toggle-close');
     const siteNav = document.querySelector('.site-nav');
     if (!siteNav) return;
     siteNav.style.setProperty('--scroll-height', siteNav.scrollHeight + 'px');
     document.body.classList.toggle('site-nav-on');
+  });
+
+  document.querySelectorAll('.site-nav .menu-item a[href]').forEach(link => {
+    link.addEventListener('click', () => {
+      NexT.boot.closeMobileNav();
+    });
+  });
+
+  document.addEventListener('pjax:success', () => {
+    NexT.boot.closeMobileNav();
+    NexT.boot.ensureNavVisible();
   });
 
   document.querySelectorAll('.sidebar-nav li').forEach((element, index) => {
