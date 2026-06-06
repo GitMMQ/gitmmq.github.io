@@ -29,37 +29,36 @@ for file in motion.js next-boot.js; do
   fi
 done
 
-python3 - "$ROOT_DIR" "$BLOG_DIR/public" <<'PY'
-import shutil
+python3 - "$BLOG_DIR/public" <<'PY'
+import re
 import sys
 from pathlib import Path
 
-root = Path(sys.argv[1])
-public_dir = Path(sys.argv[2])
-preserve = {
-    ".git", "blog-source", ".github", "README.md",
-    "docs", "scripts",
-    "baidusitemap.xml", "sitemap.txt", "sitemap.xml",
-}
-for item in root.iterdir():
-    if item.name in preserve:
+public = Path(sys.argv[1])
+mermaid_markers = ("language-mermaid", 'class="mermaid"', "class='mermaid'")
+script_patterns = [
+    re.compile(r'\s*<script class="next-config" data-name="mermaid"[^>]*></script>\s*'),
+    re.compile(r'\s*<script src="/js/third-party/tags/mermaid.js"[^>]*></script>\s*'),
+]
+
+for html in public.rglob("*.html"):
+    text = html.read_text(encoding="utf-8")
+    if any(marker in text for marker in mermaid_markers):
         continue
-    if item.is_dir():
-        shutil.rmtree(item)
-    else:
-        item.unlink()
+    new_text = text
+    for pattern in script_patterns:
+        new_text = pattern.sub("\n", new_text)
+    if new_text != text:
+        html.write_text(new_text, encoding="utf-8")
 
-for item in public_dir.iterdir():
-    target = root / item.name
-    if item.is_dir():
-        shutil.copytree(item, target)
-    else:
-        shutil.copy2(item, target)
+sitemap = public / "sitemap.xml"
+if sitemap.exists():
+    urls = re.findall(r"<loc>([^<]+)</loc>", sitemap.read_text(encoding="utf-8"))
+    (public / "sitemap.txt").write_text("\n".join(dict.fromkeys(urls)) + "\n", encoding="utf-8")
 
-# GitHub Pages must skip Jekyll so pre-built static HTML is served as-is.
-(root / ".nojekyll").touch(exist_ok=True)
-
-print(f"Deployed generated site from {public_dir} to {root}")
+print("Post-processed HTML (mermaid trim) and sitemap.txt")
 PY
+
+python3 "$BLOG_DIR/deploy_public_to_root.py"
 
 echo "Deployed generated site to repository root."

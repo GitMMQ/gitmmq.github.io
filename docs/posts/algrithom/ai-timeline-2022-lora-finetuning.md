@@ -6,7 +6,7 @@ categories:
 tags:
   - "AI Timeline"
   - "LoRA"
-  - "Fine-tuning"
+  - "Fine-Tuning"
   - "PEFT"
   - "Parameter-Efficient"
 description: "2022 年 LoRA 低秩适配论文发布，详解低秩分解、参数高效微调与 Stable Diffusion 社区生态，中英文对照。"
