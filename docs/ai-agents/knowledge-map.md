@@ -149,12 +149,11 @@ flowchart TB
 
 ```bash
 # 1. 编辑 docs/ai-agents/*.md
-# 2. 运行发布脚本（幂等，可重复执行）
-python3 scripts/publish_ai_agent_posts.py
-# 3. 检查 posts/*.html、index.html、search.xml
+# 2. 构建（sync + hexo + deploy）
+cd blog-source && ./deploy-to-root.sh
 ```
 
-脚本行为：
-- 扫描 `POSTS` 注册表全部 12 篇
-- 生成/覆盖 `posts/{id}.html`
-- 幂等更新首页、归档、分类、搜索、站点地图（跳过已存在条目）
+`sync_docs.py` 行为：
+- 读取 `AI_AGENT_POSTS` 注册表全部 12 篇
+- 生成/覆盖 `blog-source/source/_posts/{hash}.md`
+- Hexo 构建产出 `posts/{hash}.html` 及索引页

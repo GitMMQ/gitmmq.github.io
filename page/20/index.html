@@ -188,7 +188,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -197,7 +197,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -228,7 +228,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/9b1409.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5009.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -246,7 +246,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/9b1409.html" class="post-title-link" itemprop="url">mysql-MySQL是怎么保证主备一致的</a>
+          <a href="/posts/5009.html" class="post-title-link" itemprop="url">树状数组</a>
         </h2>
 
         <div class="post-meta-container">
@@ -257,7 +257,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-28 14:14:07" itemprop="dateCreated datePublished" datetime="2019-11-28T14:14:07+08:00">2019-11-28</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -279,180 +279,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>MySQL是怎么保证主备一致的？</p>
-<p>binlog可以用来归档，也可以用来做主备同步，但它的内容是什么样的呢？为什么备库执行了binlog就可以跟主库保持一致了呢？今天我就正式地和你介绍一下它。</p>
-<p>毫不夸张地说，MySQL能够成为现下最流行的开源数据库，binlog功不可没。</p>
-<p>在最开始，MySQL是以容易学习和方便的高可用架构，被开发人员青睐的。</p>
-<p>而它的几乎所有的高可用架构，都直接依赖于binlog。</p>
-<p>虽然这些高可用架构已经呈现出越来越复杂的趋势，但都是从最基本的一主一备演化过来的。</p>
-<p>今天这篇文章我主要为你介绍主备的基本原理。</p>
-<p>理解了背后的设计原理，你也可以从业务开发的角度，来借鉴这些设计思想。</p>
-<p>MySQL主备的基本原理如图1所示就是基本的主备切换流程。</p>
-<p>图 1 MySQL主备切换流程在状态1中，客户端的读写都直接访问节点A，而节点B是A的备库，只是将A的更新都同步过来，到本地执行。</p>
-<p>这样可以保持节点B和A的数据是相同的。</p>
-<p>当需要切换的时候，就切成状态2。</p>
-<p>这时候客户端读写访问的都是节点B，而节点A是B的备库。</p>
-<p>在状态1中，虽然节点B没有被直接访问，但是我依然建议你把节点B（也就是备库）设置成只读（readonly）模式。</p>
-<p>这样做，有以下几个考虑：</p>
-<ol>
-<li>有时候一些运营类的查询语句会被放到备库上去查，设置为只读可以防止误操作；</li>
-<li>防止切换逻辑有bug，比如切换过程中出现双写，造成主备不一致；</li>
-<li>可以用readonly状态，来判断节点的角色。</li>
-</ol>
-<p>你可能会问，我把备库设置成只读了，还怎么跟主库保持同步更新呢？这个问题，你不用担心。</p>
-<p>因为readonly设置对超级(super)权限用户是无效的，而用于同步更新的线程，就拥有超级权限。</p>
-<p>接下来，我们再看看节点A到B这条线的内部流程是什么样的。</p>
-<p>图2中画出的就是一个update语句在节点A执行，然后同步到节点B的完整流程图。</p>
-<p>图2 主备流程图图2中，包含了我在上一篇文章中讲到的binlog和redo log的写入机制相关的内容，可以看到：主库接收到客户端的更新请求后，执行内部事务的更新逻辑，同时写binlog。</p>
-<p>备库B跟主库A之间维持了一个长连接。</p>
-<p>主库A内部有一个线程，专门用于服务备库B的这个长连接。</p>
-<p>一个事务日志同步的完整过程是这样的：</p>
-<ol>
-<li><p>在备库B上通过change master命令，设置主库A的IP、端口、用户名、密码，以及要从哪个位置开始请求binlog，这个位置包含文件名和日志偏移量。</p>
-</li>
-<li><p>在备库B上执行start slave命令，这时候备库会启动两个线程，就是图中的io_thread和sql_thread。</p>
-</li>
-</ol>
-<p>其中io_thread负责与主库建立连接。</p>
-<ol start="3">
-<li><p>主库A校验完用户名、密码后，开始按照备库B传过来的位置，从本地读取binlog，发给B。</p>
-</li>
-<li><p>备库B拿到binlog后，写到本地文件，称为中转日志（relay log）。</p>
-</li>
-<li><p>sql_thread读取中转日志，解析出日志里的命令，并执行。</p>
-</li>
-</ol>
-<p>这里需要说明，后来由于多线程复制方案的引入，sql_thread演化成为了多个线程，跟我们今天要介绍的原理没有直接关系，暂且不展开。</p>
-<p>分析完了这个长连接的逻辑，我们再来看一个问题：binlog里面到底是什么内容，为什么备库拿过去可以直接执行。</p>
-<p>binlog的三种格式对比我在第15篇答疑文章中，和你提到过binlog有两种格式，一种是statement，一种是row。</p>
-<p>可能你在其他资料上还会看到有第三种格式，叫作mixed，其实它就是前两种格式的混合。</p>
-<p>为了便于描述binlog的这三种格式间的区别，我创建了一个表，并初始化几行数据。</p>
-<p>如果要在表中删除一行数据的话，我们来看看这个delete语句的binlog是怎么记录的。</p>
-<p>注意，下面这个语句包含注释，如果你用MySQL客户端来做这个实验的话，要记得加-c参数，否则客户端会自动去掉注释。</p>
-<p>当binlog_format=statement时，binlog里面记录的就是SQL语句的原文。</p>
-<p>你可以用mysql&gt; CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>a  ̀int(11) DEFAULT NULL,  t̀_modified  ̀timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  PRIMARY KEY (̀ id )̀,  KEY </code>a  ̀(̀ a )̀,  KEY t̀_modified (̀̀ t_modified )̀) ENGINE=InnoDB;insert into t values(1,1,’2018-11-13’);insert into t values(2,2,’2018-11-12’);insert into t values(3,3,’2018-11-11’);insert into t values(4,4,’2018-11-10’);insert into t values(5,5,’2018-11-09’);mysql&gt; delete from t /<em>comment</em>/  where a&gt;=4 and t_modified&lt;=’2018-11-10’ limit 1;mysql&gt; show binlog events in ‘master.000001’;命令看binlog中的内容。</p>
-<p>图3 statement格式binlog 示例现在，我们来看一下图3的输出结果。</p>
-<p>第一行SET @@SESSION.GTID_NEXT=’ANONYMOUS’你可以先忽略，后面文章我们会在介绍主备切换的时候再提到；<br/>第二行是一个BEGIN，跟第四行的commit对应，表示中间是一个事务；<br/>第三行就是真实执行的语句了。</p>
-<p>可以看到，在真实执行的delete命令之前，还有一个“use‘test’”命令。</p>
-<p>这条命令不是我们主动执行的，而是MySQL根据当前要操作的表所在的数据库，自行添加的。</p>
-<p>这样做可以保证日志传到备库去执行的时候，不论当前的工作线程在哪个库里，都能够正确地更新到test库的表t。</p>
-<p>use ‘test’命令之后的delete 语句，就是我们输入的SQL原文了。</p>
-<p>可以看到，binlog“忠实”地记录了SQL命令，甚至连注释也一并记录了。</p>
-<p>最后一行是一个COMMIT。</p>
-<p>你可以看到里面写着xid=61。</p>
-<p>你还记得这个XID是做什么用的吗？如果记忆模糊了，可以再回顾一下第15篇文章中的相关内容。</p>
-<p>为了说明statement 和 row格式的区别，我们来看一下这条delete命令的执行效果图：<br/>图4 delete执行warnings可以看到，运行这条delete命令产生了一个warning，原因是当前binlog设置的是statement格式，并且语句中有limit，所以这个命令可能是unsafe的。</p>
-<p>为什么这么说呢？这是因为delete 带limit，很可能会出现主备数据不一致的情况。</p>
-<p>比如上面这个例子：</p>
-<ol>
-<li>如果delete语句使用的是索引a，那么会根据索引a找到第一个满足条件的行，也就是说删除的是a=4这一行；</li>
-<li>但如果使用的是索引t_modified，那么删除的就是 t_modified=’2018-11-09’也就是a=5这一行。</li>
-</ol>
-<p>由于statement格式下，记录到binlog里的是语句原文，因此可能会出现这样一种情况：在主库执行这条SQL语句的时候，用的是索引a；而在备库执行这条SQL语句的时候，却使用了索引t_modified。</p>
-<p>因此，MySQL认为这样写是有风险的。</p>
-<p>那么，如果我把binlog的格式改为binlog_format=‘row’， 是不是就没有这个问题了呢？我们先来看看这时候binog中的内容吧。</p>
-<p>图5 row格式binlog 示例可以看到，与statement格式的binlog相比，前后的BEGIN和COMMIT是一样的。</p>
-<p>但是，row格式的binlog里没有了SQL语句的原文，而是替换成了两个event：Table_map和Delete_rows。</p>
-<ol>
-<li>Table_map event，用于说明接下来要操作的表是test库的表t;2. Delete_rows event，用于定义删除的行为。</li>
-</ol>
-<p>其实，我们通过图5是看不到详细信息的，还需要借助mysqlbinlog工具，用下面这个命令解析和查看binlog中的内容。</p>
-<p>因为图5中的信息显示，这个事务的binlog是从8900这个位置开始的，所以可以用start-position参数来指定从这个位置的日志开始解析。</p>
-<p>mysqlbinlog  -vv data/master.000001 –start-position=8900;图6 row格式binlog 示例的详细信息从这个图中，我们可以看到以下几个信息：<br/>server id 1，表示这个事务是在server_id=1的这个库上执行的。</p>
-<p>每个event都有CRC32的值，这是因为我把参数binlog_checksum设置成了CRC32。</p>
-<p>Table_map event跟在图5中看到的相同，显示了接下来要打开的表，map到数字226。</p>
-<p>现在我们这条SQL语句只操作了一张表，如果要操作多张表呢？每个表都有一个对应的Table_mapevent、都会map到一个单独的数字，用于区分对不同表的操作。</p>
-<p>我们在mysqlbinlog的命令中，使用了-vv参数是为了把内容都解析出来，所以从结果里面可以看到各个字段的值（比如，@1=4、 @2=4这些值）。</p>
-<p>binlog_row_image的默认配置是FULL，因此Delete_event里面，包含了删掉的行的所有字段的值。</p>
-<p>如果把binlog_row_image设置为MINIMAL，则只会记录必要的信息，在这个例子里，就是只会记录id=4这个信息。</p>
-<p>最后的Xid event，用于表示事务被正确地提交了。</p>
-<p>你可以看到，当binlog_format使用row格式的时候，binlog里面记录了真实删除行的主键id，这样binlog传到备库去的时候，就肯定会删除id=4的行，不会有主备删除不同行的问题。</p>
-<p>为什么会有mixed格式的binlog？基于上面的信息，我们来讨论一个问题：为什么会有mixed这种binlog格式的存在场景？推论过程是这样的：<br/>因为有些statement格式的binlog可能会导致主备不一致，所以要使用row格式。</p>
-<p>但row格式的缺点是，很占空间。</p>
-<p>比如你用一个delete语句删掉10万行数据，用statement的话就是一个SQL语句被记录到binlog中，占用几十个字节的空间。</p>
-<p>但如果用row格式的binlog，就要把这10万条记录都写到binlog中。</p>
-<p>这样做，不仅会占用更大的空间，同时写binlog也要耗费IO资源，影响执行速度。</p>
-<p>所以，MySQL就取了个折中方案，也就是有了mixed格式的binlog。</p>
-<p>mixed格式的意思是，MySQL自己会判断这条SQL语句是否可能引起主备不一致，如果有可能，就用row格式，否则就用statement格式。</p>
-<p>也就是说，mixed格式可以利用statment格式的优点，同时又避免了数据不一致的风险。</p>
-<p>因此，如果你的线上MySQL设置的binlog格式是statement的话，那基本上就可以认为这是一个不合理的设置。</p>
-<p>你至少应该把binlog的格式设置为mixed。</p>
-<p>比如我们这个例子，设置为mixed后，就会记录为row格式；而如果执行的语句去掉limit 1，就会记录为statement格式。</p>
-<p>当然我要说的是，现在越来越多的场景要求把MySQL的binlog格式设置成row。</p>
-<p>这么做的理由有很多，我来给你举一个可以直接看出来的好处：恢复数据。</p>
-<p>接下来，我们就分别从delete、insert和update这三种SQL语句的角度，来看看数据恢复的问题。</p>
-<p>通过图6你可以看出来，即使我执行的是delete语句，row格式的binlog也会把被删掉的行的整行信息保存起来。</p>
-<p>所以，如果你在执行完一条delete语句以后，发现删错数据了，可以直接把binlog中记录的delete语句转成insert，把被错删的数据插入回去就可以恢复了。</p>
-<p>如果你是执行错了insert语句呢？那就更直接了。</p>
-<p>row格式下，insert语句的binlog里会记录所有的字段信息，这些信息可以用来精确定位刚刚被插入的那一行。</p>
-<p>这时，你直接把insert语句转成delete语句，删除掉这被误插入的一行数据就可以了。</p>
-<p>如果执行的是update语句的话，binlog里面会记录修改前整行的数据和修改后的整行数据。</p>
-<p>所以，如果你误执行了update语句的话，只需要把这个event前后的两行信息对调一下，再去数据库里面执行，就能恢复这个更新操作了。</p>
-<p>其实，由delete、insert或者update语句导致的数据操作错误，需要恢复到操作之前状态的情况，也时有发生。</p>
-<p>MariaDB的Flashback工具就是基于上面介绍的原理来回滚数据的。</p>
-<p>虽然mixed格式的binlog现在已经用得不多了，但这里我还是要再借用一下mixed格式来说明一个问题，来看一下这条SQL语句：<br/>如果我们把binlog格式设置为mixed，你觉得MySQL会把它记录为row格式还是statement格式呢？先不要着急说结果，我们一起来看一下这条语句执行的效果。</p>
-<p>图7 mixed格式和now()可以看到，MySQL用的居然是statement格式。</p>
-<p>你一定会奇怪，如果这个binlog过了1分钟才传给备库的话，那主备的数据不就不一致了吗？接下来，我们再用mysqlbinlog工具来看看：<br/>mysql&gt; insert into t values(10,10, now());图8 TIMESTAMP 命令从图中的结果可以看到，原来binlog在记录event的时候，多记了一条命令：SETTIMESTAMP=1546103491。</p>
-<p>它用 SET TIMESTAMP命令约定了接下来的now()函数的返回时间。</p>
-<p>因此，不论这个binlog是1分钟之后被备库执行，还是3天后用来恢复这个库的备份，这个insert语句插入的行，值都是固定的。</p>
-<p>也就是说，通过这条SET TIMESTAMP命令，MySQL就确保了主备数据的一致性。</p>
-<p>我之前看过有人在重放binlog数据的时候，是这么做的：用mysqlbinlog解析出日志，然后把里面的statement语句直接拷贝出来执行。</p>
-<p>你现在知道了，这个方法是有风险的。</p>
-<p>因为有些语句的执行结果是依赖于上下文命令的，直接执行的结果很可能是错误的。</p>
-<p>所以，用binlog来恢复数据的标准做法是，用 mysqlbinlog工具解析出来，然后把解析结果整个发给MySQL执行。</p>
-<p>类似下面的命令：<br/>这个命令的意思是，将 master.000001 文件里面从第2738字节到第2973字节中间这段内容解析出来，放到MySQL去执行。</p>
-<p>循环复制问题通过上面对MySQL中binlog基本内容的理解，你现在可以知道，binlog的特性确保了在备库执行相同的binlog，可以得到与主库相同的状态。</p>
-<p>因此，我们可以认为正常情况下主备的数据是一致的。</p>
-<p>也就是说，图1中A、B两个节点的内容是一致的。</p>
-<p>其实，图1中我画的是M-S结构，但实际生产上使用比较多的是双M结构，也就是图9所示的主备切换流程。</p>
-<p>mysqlbinlog master.000001  –start-position=2738 –stop-position=2973 | mysql -h127.0.0.1 -P13000 -u$user -p$pwd;图 9 MySQL主备切换流程–双M结构对比图9和图1，你可以发现，双M结构和M-S结构，其实区别只是多了一条线，即：节点A和B之间总是互为主备关系。</p>
-<p>这样在切换的时候就不用再修改主备关系。</p>
-<p>但是，双M结构还有一个问题需要解决。</p>
-<p>业务逻辑在节点A上更新了一条语句，然后再把生成的binlog 发给节点B，节点B执行完这条更新语句后也会生成binlog。</p>
-<p>（我建议你把参数log_slave_updates设置为on，表示备库执行relay log后生成binlog）。</p>
-<p>那么，如果节点A同时是节点B的备库，相当于又把节点B新生成的binlog拿过来执行了一次，然后节点A和B间，会不断地循环执行这个更新语句，也就是循环复制了。</p>
-<p>这个要怎么解决呢？从上面的图6中可以看到，MySQL在binlog中记录了这个命令第一次执行时所在实例的serverid。</p>
-<p>因此，我们可以用下面的逻辑，来解决两个节点间的循环复制的问题：</p>
-<ol>
-<li>规定两个库的server id必须不同，如果相同，则它们之间不能设定为主备关系；</li>
-<li>一个备库接到binlog并在重放的过程中，生成与原binlog的server id相同的新的binlog；</li>
-<li>每个库在收到从自己的主库发过来的日志后，先判断server id，如果跟自己的相同，表示这个日志是自己生成的，就直接丢弃这个日志。</li>
-</ol>
-<p>按照这个逻辑，如果我们设置了双M结构，日志的执行流就会变成这样：</p>
-<ol>
-<li>从节点A更新的事务，binlog里面记的都是A的server id；</li>
-<li>传到节点B执行一次以后，节点B生成的binlog 的server id也是A的server id；</li>
-<li>再传回给节点A，A判断到这个server id与自己的相同，就不会再处理这个日志。</li>
-</ol>
-<p>所以，死循环在这里就断掉了。</p>
-<p>小结今天这篇文章，我给你介绍了MySQL binlog的格式和一些基本机制，是后面我要介绍的读写分离等系列文章的背景知识，希望你可以认真消化理解。</p>
-<p>binlog在MySQL的各种高可用方案上扮演了重要角色。</p>
-<p>今天介绍的可以说是所有MySQL高可用方案的基础。</p>
-<p>在这之上演化出了诸如多节点、半同步、MySQL group replication等相对复杂的方案。</p>
-<p>我也跟你介绍了MySQL不同格式binlog的优缺点，和设计者的思考。</p>
-<p>希望你在做系统开发时候，也能借鉴这些设计思想。</p>
-<p>最后，我给你留下一个思考题吧。</p>
-<p>说到循环复制问题的时候，我们说MySQL通过判断server id的方式，断掉死循环。</p>
-<p>但是，这个机制其实并不完备，在某些场景下，还是有可能出现死循环。</p>
-<p>你能构造出一个这样的场景吗？又应该怎么解决呢？你可以把你的设计和分析写在评论区，我会在下一篇文章跟你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期我留给你的问题是，你在什么时候会把线上生产库设置成“非双1”。</p>
-<p>我目前知道的场景，有以下这些：</p>
-<ol>
-<li>业务高峰期。</li>
-</ol>
-<p>一般如果有预知的高峰期，DBA会有预案，把主库设置成“非双1”。</p>
-<ol start="2">
-<li>备库延迟，为了让备库尽快赶上主库。</li>
-</ol>
-<p>@永恒记忆和@Second Sight提到了这个场景。</p>
-<ol start="3">
-<li><p>用备份恢复主库的副本，应用binlog的过程，这个跟上一种场景类似。</p>
-</li>
-<li><p>批量导入数据的时候。</p>
-</li>
-</ol>
-<p>一般情况下，把生产库改成“非双1”配置，是设置innodb_flush_logs_at_trx_commit=2、sync_binlog=1000。</p>
+          <p>树状数组（Fenwick Tree，也称为Binary Indexed Tree，BIT）是一种用于高效处理区间求和（或其他类似操作）的数据结构。它具有较低的内存消耗，能够在 O(log n) 的时间内更新单个元素和计算前缀和。</p>
+<p>树状数组适用于处理动态数组中的元素累加操作，如频繁更新某个位置的值以及查询某个区间的和等情况。</p>
+<p>以下是一个简单的 Java 实现示例，用于构建和使用树状数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FenwickTree</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] fenwickTree;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">FenwickTree</span><span class="params">(<span class="type">int</span> size)</span> {</span><br/><span class="line">        fenwickTree = <span class="keyword">new</span> <span class="title class_">int</span>[size + <span class="number">1</span>]; <span class="comment">// 数组下标从1开始</span></span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">update</span><span class="params">(<span class="type">int</span> index, <span class="type">int</span> value)</span> {</span><br/><span class="line">        <span class="keyword">while</span> (index &lt; fenwickTree.length) {</span><br/><span class="line">            fenwickTree[index] += value;</span><br/><span class="line">            index += index &amp; -index; <span class="comment">// 增加下一个相关的位置</span></span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">query</span><span class="params">(<span class="type">int</span> index)</span> {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br/><span class="line">        <span class="keyword">while</span> (index &gt; <span class="number">0</span>) {</span><br/><span class="line">            sum += fenwickTree[index];</span><br/><span class="line">            index -= index &amp; -index; <span class="comment">// 减去最后一个被包含的元素</span></span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> sum;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">int</span>[] input = {<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>};</span><br/><span class="line"></span><br/><span class="line">        <span class="type">FenwickTree</span> <span class="variable">fenwickTree</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FenwickTree</span>(input.length);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 构建树状数组</span></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; input.length; i++) {</span><br/><span class="line">            fenwickTree.update(i + <span class="number">1</span>, input[i]);</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 查询前缀和</span></span><br/><span class="line">        System.out.println(fenwickTree.query(<span class="number">3</span>)); <span class="comment">// 输出 9 (1 + 3 + 5)</span></span><br/><span class="line">        System.out.println(fenwickTree.query(<span class="number">6</span>)); <span class="comment">// 输出 36 (1 + 3 + 5 + 7 + 9 + 11)</span></span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，<code>FenwickTree</code> 类用于实现树状数组。<code>update</code> 方法用于更新树状数组中的一个元素，<code>query</code> 方法用于查询前缀和。树状数组中的数组大小比原始数组大小多1，因为树状数组的下标从1开始。</p>
+<p>这只是一个简单的树状数组实现示例。在实际应用中，您可能需要考虑更多的功能和优化，以满足不同的需求。</p>
 
       
     </div>
@@ -479,7 +311,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/4c5bdfaf.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/24972.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -497,7 +329,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/4c5bdfaf.html" class="post-title-link" itemprop="url">mysql-MySQL是怎么保证数据不丢的</a>
+          <a href="/posts/24972.html" class="post-title-link" itemprop="url">哈希表HashMap</a>
         </h2>
 
         <div class="post-meta-container">
@@ -508,7 +340,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-27 14:14:46" itemprop="dateCreated datePublished" datetime="2019-11-27T14:14:46+08:00">2019-11-27</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -516,7 +348,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -530,150 +362,17 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>MySQL是怎么保证数据不丢的？今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。</p>
-<p>从文章标题“MySQL是怎么保证数据不丢的？”，你就可以看出来，今天我和你介绍的方法，跟数据的可靠性有关。</p>
-<p>在专栏前面文章和答疑篇中，我都着重介绍了WAL机制（你可以再回顾下第2篇、第9篇、第12篇和第15篇文章中的相关内容），得到的结论是：只要redo log和binlog保证持久化到磁盘，就能确保MySQL异常重启后，数据可以恢复。</p>
-<p>评论区有同学又继续追问，redo log的写入流程是怎么样的，如何保证redo log真实地写入了磁盘。</p>
-<p>那么今天，我们就再一起看看MySQL写入binlog和redo log的流程。</p>
-<p>binlog的写入机制其实，binlog的写入逻辑比较简单：事务执行过程中，先把日志写到binlog cache，事务提交的时候，再把binlog cache写到binlog文件中。</p>
-<p>一个事务的binlog是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。</p>
-<p>这就涉及到了binlog cache的保存问题。</p>
-<p>系统给binlog cache分配了一片内存，每个线程一个，参数 binlog_cache_size用于控制单个线程内binlog cache所占内存的大小。</p>
-<p>如果超过了这个参数规定的大小，就要暂存到磁盘。</p>
-<p>事务提交的时候，执行器把binlog cache里的完整事务写入到binlog中，并清空binlog cache。</p>
-<p>状态如图1所示。</p>
-<p>图1 binlog写盘状态可以看到，每个线程有自己binlog cache，但是共用同一份binlog文件。</p>
-<p>图中的write，指的就是指把日志写入到文件系统的page cache，并没有把数据持久化到磁盘，所以速度比较快。</p>
-<p>图中的fsync，才是将数据持久化到磁盘的操作。</p>
-<p>一般情况下，我们认为fsync才占磁盘的IOPS。</p>
-<p>write 和fsync的时机，是由参数sync_binlog控制的：</p>
-<ol>
-<li>sync_binlog=0的时候，表示每次提交事务都只write，不fsync；</li>
-<li>sync_binlog=1的时候，表示每次提交事务都会执行fsync；</li>
-<li>sync_binlog=N(N&gt;1)的时候，表示每次提交事务都write，但累积N个事务后才fsync。</li>
-</ol>
-<p>因此，在出现IO瓶颈的场景里，将sync_binlog设置成一个比较大的值，可以提升性能。</p>
-<p>在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成0，比较常见的是将其设置为100~1000中的某个数值。</p>
-<p>但是，将sync_binlog设置为N，对应的风险是：如果主机发生异常重启，会丢失最近N个事务的binlog日志。</p>
-<p>redo log的写入机制接下来，我们再说说redo log的写入机制。</p>
-<p>在专栏的第15篇答疑文章中，我给你介绍了redo log buffer。</p>
-<p>事务在执行过程中，生成的redolog是要先写到redo log buffer的。</p>
-<p>然后就有同学问了，redo log buffer里面的内容，是不是每次生成后都要直接持久化到磁盘呢？答案是，不需要。</p>
-<p>如果事务执行期间MySQL发生异常重启，那这部分日志就丢了。</p>
-<p>由于事务并没有提交，所以这时日志丢了也不会有损失。</p>
-<p>那么，另外一个问题是，事务还没提交的时候，redo log buffer中的部分日志有没有可能被持久化到磁盘呢？答案是，确实会有。</p>
-<p>这个问题，要从redo log可能存在的三种状态说起。</p>
-<p>这三种状态，对应的就是图2 中的三个颜色块。</p>
-<p>图2 MySQL redo log存储状态这三种状态分别是：</p>
-<ol>
-<li>存在redo log buffer中，物理上是在MySQL进程内存中，就是图中的红色部分；</li>
-<li>写到磁盘(write)，但是没有持久化（fsync)，物理上是在文件系统的page cache里面，也就是图中的黄色部分；</li>
-<li>持久化到磁盘，对应的是hard disk，也就是图中的绿色部分。</li>
-</ol>
-<p>日志写到redo log buffer是很快的，wirte到page cache也差不多，但是持久化到磁盘的速度就慢多了。</p>
-<p>为了控制redo log的写入策略，InnoDB提供了innodb_flush_log_at_trx_commit参数，它有三种可能取值：</p>
-<ol>
-<li>设置为0的时候，表示每次事务提交时都只是把redo log留在redo log buffer中;2. 设置为1的时候，表示每次事务提交时都将redo log直接持久化到磁盘；</li>
-<li>设置为2的时候，表示每次事务提交时都只是把redo log写到page cache。</li>
-</ol>
-<p>InnoDB有一个后台线程，每隔1秒，就会把redo log buffer中的日志，调用write写到文件系统的page cache，然后调用fsync持久化到磁盘。</p>
-<p>注意，事务执行中间过程的redo log也是直接写在redo log buffer中的，这些redo log也会被后台线程一起持久化到磁盘。</p>
-<p>也就是说，一个没有提交的事务的redo log，也是可能已经持久化到磁盘的。</p>
-<p>实际上，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的redolog写入到磁盘中。</p>
-<ol>
-<li>一种是，redo log buffer占用的空间即将达到 innodb_log_buffer_size一半的时候，后台线程会主动写盘。</li>
-</ol>
-<p>注意，由于这个事务并没有提交，所以这个写盘动作只是write，而没有调用fsync，也就是只留在了文件系统的page cache。</p>
-<ol start="2">
-<li>另一种是，并行的事务提交的时候，顺带将这个事务的redo log buffer持久化到磁盘。</li>
-</ol>
-<p>假设一个事务A执行到一半，已经写了一些redo log到buffer中，这时候有另外一个线程的事务B提交，如果innodb_flush_log_at_trx_commit设置的是1，那么按照这个参数的逻辑，事务B要把redo log buffer里的日志全部持久化到磁盘。</p>
-<p>这时候，就会带上事务A在redolog buffer里的日志一起持久化到磁盘。</p>
-<p>这里需要说明的是，我们介绍两阶段提交的时候说过，时序上redo log先prepare， 再写binlog，最后再把redo log commit。</p>
-<p>如果把innodb_flush_log_at_trx_commit设置成1，那么redo log在prepare阶段就要持久化一次，因为有一个崩溃恢复逻辑是要依赖于prepare 的redo log，再加上binlog来恢复的。</p>
-<p>（如果你印象有点儿模糊了，可以再回顾下第15篇文章中的相关内容）。</p>
-<p>每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB就认为redo log在commit的时候就不需要fsync了，只会write到文件系统的page cache中就够了。</p>
-<p>通常我们说MySQL的“双1”配置，指的就是sync_binlog和innodb_flush_log_at_trx_commit都设置成 1。</p>
-<p>也就是说，一个事务完整提交前，需要等待两次刷盘，一次是redo log（prepare 阶段），一次是binlog。</p>
-<p>这时候，你可能有一个疑问，这意味着我从MySQL看到的TPS是每秒两万的话，每秒就会写四万次磁盘。</p>
-<p>但是，我用工具测试出来，磁盘能力也就两万左右，怎么能实现两万的TPS？解释这个问题，就要用到组提交（group commit）机制了。</p>
-<p>这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。</p>
-<p>LSN是单调递增的，用来对应redo log的一个个写入点。</p>
-<p>每次写入长度为length的redo log， LSN的值就会加上length。</p>
-<p>LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行重复的redo log。</p>
-<p>关于LSN和redo log、checkpoint的关系，我会在后面的文章中详细展开。</p>
-<p>如图3所示，是三个并发事务(trx1, trx2, trx3)在prepare 阶段，都写完redo log buffer，持久化到磁盘的过程，对应的LSN分别是50、120 和160。</p>
-<p>图3 redo log 组提交从图中可以看到，1. trx1是第一个到达的，会被选为这组的 leader；<br/>2. 等trx1要开始写盘的时候，这个组里面已经有了三个事务，这时候LSN也变成了160；<br/>3. trx1去写盘的时候，带的就是LSN=160，因此等trx1返回时，所有LSN小于等于160的redolog，都已经被持久化到磁盘；<br/>4. 这时候trx2和trx3就可以直接返回了。</p>
-<p>所以，一次组提交里面，组员越多，节约磁盘IOPS的效果越好。</p>
-<p>但如果只有单线程压测，那就只能老老实实地一个事务对应一次持久化操作了。</p>
-<p>在并发更新场景下，第一个事务写完redo log buffer以后，接下来这个fsync越晚调用，组员可能越多，节约IOPS的效果就越好。</p>
-<p>为了让一次fsync带的组员更多，MySQL有一个很有趣的优化：拖时间。</p>
-<p>在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。</p>
-<p>图4 两阶段提交图中，我把“写binlog”当成一个动作。</p>
-<p>但实际上，写binlog是分成两步的：</p>
-<ol>
-<li>先把binlog从binlog cache中写到磁盘上的binlog文件；</li>
-<li>调用fsync持久化。</li>
-</ol>
-<p>MySQL为了让组提交的效果更好，把redo log做fsync的时间拖到了步骤1之后。</p>
-<p>也就是说，上面的图变成了这样：<br/>图5 两阶段提交细化这么一来，binlog也可以组提交了。</p>
-<p>在执行图5中第4步把binlog fsync到磁盘时，如果有多个事务的binlog已经写完了，也是一起持久化的，这样也可以减少IOPS的消耗。</p>
-<p>不过通常情况下第3步执行得会很快，所以binlog的write和fsync间的间隔时间短，导致能集合到一起持久化的binlog比较少，因此binlog的组提交的效果通常不如redo log的效果那么好。</p>
-<p>如果你想提升binlog组提交的效果，可以通过设置 binlog_group_commit_sync_delay 和binlog_group_commit_sync_no_delay_count来实现。</p>
-<ol>
-<li>binlog_group_commit_sync_delay参数，表示延迟多少微秒后才调用fsync;2. binlog_group_commit_sync_no_delay_count参数，表示累积多少次以后才调用fsync。</li>
-</ol>
-<p>这两个条件是或的关系，也就是说只要有一个满足条件就会调用fsync。</p>
-<p>所以，当binlog_group_commit_sync_delay设置为0的时候，binlog_group_commit_sync_no_delay_count也无效了。</p>
-<p>之前有同学在评论区问到，WAL机制是减少磁盘写，可是每次提交事务都要写redo log和binlog，这磁盘读写次数也没变少呀？现在你就能理解了，WAL机制主要得益于两个方面：</p>
-<ol>
-<li>redo log 和 binlog都是顺序写，磁盘的顺序写比随机写速度要快；</li>
-<li>组提交机制，可以大幅度降低磁盘的IOPS消耗。</li>
-</ol>
-<p>分析到这里，我们再来回答这个问题：如果你的MySQL现在出现了性能瓶颈，而且瓶颈在IO上，可以通过哪些方法来提升性能呢？针对这个问题，可以考虑以下三种方法：</p>
-<ol>
-<li>设置 binlog_group_commit_sync_delay 和 binlog_group_commit_sync_no_delay_count参数，减少binlog的写盘次数。</li>
-</ol>
-<p>这个方法是基于“额外的故意等待”来实现的，因此可能会增加语句的响应时间，但没有丢失数据的风险。</p>
-<ol start="2">
-<li>将sync_binlog 设置为大于1的值（比较常见是100~1000）。</li>
-</ol>
-<p>这样做的风险是，主机掉电时会丢binlog日志。</p>
-<ol start="3">
-<li>将innodb_flush_log_at_trx_commit设置为2。</li>
-</ol>
-<p>这样做的风险是，主机掉电的时候会丢数据。</p>
-<p>我不建议你把innodb_flush_log_at_trx_commit 设置成0。</p>
-<p>因为把这个参数设置成0，表示redolog只保存在内存中，这样的话MySQL本身异常重启也会丢数据，风险太大。</p>
-<p>而redo log写到文件系统的page cache的速度也是很快的，所以将这个参数设置成2跟设置成0其实性能差不多，但这样做MySQL异常重启时就不会丢数据了，相比之下风险会更小。</p>
-<p>小结在专栏的第2篇和第15篇文章中，我和你分析了，如果redo log和binlog是完整的，MySQL是如何保证crash-safe的。</p>
-<p>今天这篇文章，我着重和你介绍的是MySQL是“怎么保证redo log和binlog是完整的”。</p>
-<p>希望这三篇文章串起来的内容，能够让你对crash-safe这个概念有更清晰的理解。</p>
-<p>之前的第15篇答疑文章发布之后，有同学继续留言问到了一些跟日志相关的问题，这里为了方便你回顾、学习，我再集中回答一次这些问题。</p>
-<p>问题1：执行一个update语句以后，我再去执行hexdump命令直接查看ibd文件内容，为什么没有看到数据有改变呢？回答：这可能是因为WAL机制的原因。</p>
-<p>update语句执行完成后，InnoDB只保证写完了redolog、内存，可能还没来得及将数据写到磁盘。</p>
-<p>问题2：为什么binlog cache是每个线程自己维护的，而redo log buffer是全局共用的？回答：MySQL这么设计的主要原因是，binlog是不能“被打断的”。</p>
-<p>一个事务的binlog必须连续写，因此要整个事务完成后，再一起写到文件里。</p>
-<p>而redo log并没有这个要求，中间有生成的日志可以写到redo log buffer中。</p>
-<p>redo log buffer中的内容还能“搭便车”，其他事务提交的时候可以被一起写到磁盘中。</p>
-<p>问题3：事务执行期间，还没到提交阶段，如果发生crash的话，redo log肯定丢了，这会不会导致主备不一致呢？回答：不会。</p>
-<p>因为这时候binlog 也还在binlog cache里，没发给备库。</p>
-<p>crash以后redo log和binlog都没有了，从业务角度看这个事务也没有提交，所以数据是一致的。</p>
-<p>问题4：如果binlog写完盘以后发生crash，这时候还没给客户端答复就重启了。</p>
-<p>等客户端再重连进来，发现事务已经提交成功了，这是不是bug？回答：不是。</p>
-<p>你可以设想一下更极端的情况，整个事务都提交成功了，redo log commit完成了，备库也收到binlog并执行了。</p>
-<p>但是主库和客户端网络断开了，导致事务成功的包返回不回去，这时候客户端也会收到“网络断开”的异常。</p>
-<p>这种也只能算是事务成功的，不能认为是bug。</p>
-<p>实际上数据库的crash-safe保证的是：</p>
-<ol>
-<li>如果客户端收到事务成功的消息，事务就一定持久化了；</li>
-<li>如果客户端收到事务失败（比如主键冲突、回滚等）的消息，事务就一定失败了；</li>
-<li>如果客户端收到“执行异常”的消息，应用需要重连后通过查询当前状态来继续后续的逻辑。</li>
-</ol>
-<p>此时数据库只需要保证内部（数据和日志之间，主库和备库之间）一致就可以了。</p>
-<p>最后，又到了课后问题时间。</p>
-<p>今天我留给你的思考题是：你的生产库设置的是“双1”吗？ 如果平时是的话，你有在什么场景下改成过“非双1”吗？你的这个操作又是基于什么决定的？另外，我们都知道这些设置可能有损，如果发生了异常，你的止损方案是什么？你可以把你的理解或者经验写在留言区，我会在下一篇文章的末尾选取有趣的评论和你一起分享和分析。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
+          <p>哈希表（HashMap）是一种常见的数据结构，用于存储键值对。它提供了基于键的快速查找和插入操作，具有高效的查找性能。在 Java 中，HashMap 是基于哈希表实现的，用于存储键值对的无序集合。</p>
+<p>下面将分别介绍 Java 1.7 和 Java 1.8 中 HashMap 的实现原理：</p>
+<h3 id="Java-1-7-中的-HashMap-实现原理："><a class="headerlink" href="#Java-1-7-中的-HashMap-实现原理：" title="Java 1.7 中的 HashMap 实现原理："></a>Java 1.7 中的 HashMap 实现原理：</h3><p>在 Java 1.7 中，HashMap 使用<strong>拉链法</strong>解决哈希冲突。拉链法是一种处理冲突的方法，每个哈希桶（bucket）实际上是一个链表，相同哈希值的元素被放入同一个桶中。</p>
+<p>HashMap 由一个哈希桶数组和哈希表的加载因子组成。加载因子是一个浮点数，表示哈希表在填满之前可以容纳的元素数量与当前桶数的比值。当元素数量超过加载因子与桶数的乘积时，HashMap 会自动进行扩容。</p>
+<p>在 Java 1.7 的 HashMap 中，哈希值通过调用键对象的 <code>hashCode()</code> 方法得到，然后使用一个散列函数将哈希值映射到桶索引。每个桶中都是一个链表，存储具有相同哈希值的键值对。</p>
+<h3 id="Java-1-8-中的-HashMap-实现原理："><a class="headerlink" href="#Java-1-8-中的-HashMap-实现原理：" title="Java 1.8 中的 HashMap 实现原理："></a>Java 1.8 中的 HashMap 实现原理：</h3><p>Java 1.8 中的 HashMap 在处理哈希冲突时引入了<strong>红黑树</strong>，以提高性能。当链表长度超过一定阈值时，链表会被转换为红黑树，这样可以减少查找操作的时间复杂度。</p>
+<p>Java 1.8 的 HashMap 也引入了<strong>桶位</strong>（Node 数组和 TreeNode 数组）的概念，将链表和红黑树存储在同一个数组中。HashMap 在插入、删除和查找操作时，会根据桶位的类型（链表或红黑树）选择不同的操作方式，以提高性能。</p>
+<p>此外，Java 1.8 的 HashMap 在遇到哈希冲突时会采用<strong>扰动函数</strong>，将哈希值再次散列，以减少冲突概率。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 1.8 中的 HashMap 源码片段</span></span><br/><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : hash(key.hashCode());</span><br/><span class="line"><span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> (n - <span class="number">1</span>) &amp; hash;</span><br/></pre></td></tr></table></figure>
+<p>这是 Java 1.8 中的 HashMap 根据哈希值计算桶索引的代码片段，其中 n 是哈希桶数组的大小。</p>
+<p>综上所述，Java 的 HashMap 在不同版本中采用了不同的优化策略，包括拉链法、红黑树、扰动函数等，以提供高效的查找和插入操作。当选择使用 HashMap 时，要考虑到哈希冲突、加载因子、性能等因素，以便正确使用和配置该数据结构。</p>
 
       
     </div>
@@ -700,7 +399,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/84d0671b.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/36750.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -718,7 +417,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/84d0671b.html" class="post-title-link" itemprop="url">mysql-MySQL有提高性能的冷门方法</a>
+          <a href="/posts/36750.html" class="post-title-link" itemprop="url">后缀数组</a>
         </h2>
 
         <div class="post-meta-container">
@@ -729,7 +428,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-26 14:11:42" itemprop="dateCreated datePublished" datetime="2019-11-26T14:11:42+08:00">2019-11-26</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -737,7 +436,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -751,157 +450,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>MySQL有哪些“饮鸩止渴”提高性能的方法？不知道你在实际运维过程中有没有碰到这样的情景：业务高峰期，生产环境的MySQL压力太大，没法正常响应，需要短期内、临时性地提升一些性能。</p>
-<p>我以前做业务护航的时候，就偶尔会碰上这种场景。</p>
-<p>用户的开发负责人说，不管你用什么方案，让业务先跑起来再说。</p>
-<p>但，如果是无损方案的话，肯定不需要等到这个时候才上场。</p>
-<p>今天我们就来聊聊这些临时方案，并着重说一说它们可能存在的风险。</p>
-<p>短连接风暴正常的短连接模式就是连接到数据库后，执行很少的SQL语句就断开，下次需要的时候再重连。</p>
-<p>如果使用的是短连接，在业务高峰期的时候，就可能出现连接数突然暴涨的情况。</p>
-<p>我在第1篇文章《基础架构：一条SQL查询语句是如何执行的？》中说过，MySQL建立连接的过程，成本是很高的。</p>
-<p>除了正常的网络连接三次握手外，还需要做登录权限判断和获得这个连接的数据读写权限。</p>
-<p>在数据库压力比较小的时候，这些额外的成本并不明显。</p>
-<p>但是，短连接模型存在一个风险，就是一旦数据库处理得慢一些，连接数就会暴涨。</p>
-<p>max_connections参数，用来控制一个MySQL实例同时存在的连接数的上限，超过这个值，系统就会拒绝接下来的连接请求，并报错提示“Too many connections”。</p>
-<p>对于被拒绝连接的请求来说，从业务角度看就是数据库不可用。</p>
-<p>在机器负载比较高的时候，处理现有请求的时间变长，每个连接保持的时间也更长。</p>
-<p>这时，再有新建连接的话，就可能会超过max_connections的限制。</p>
-<p>碰到这种情况时，一个比较自然的想法，就是调高max_connections的值。</p>
-<p>但这样做是有风险的。</p>
-<p>因为设计max_connections这个参数的目的是想保护MySQL，如果我们把它改得太大，让更多的连接都可以进来，那么系统的负载可能会进一步加大，大量的资源耗费在权限验证等逻辑上，结果可能是适得其反，已经连接的线程拿不到CPU资源去执行业务的SQL请求。</p>
-<p>那么这种情况下，你还有没有别的建议呢？我这里还有两种方法，但要注意，这些方法都是有损的。</p>
-<p>第一种方法：先处理掉那些占着连接但是不工作的线程。</p>
-<p>max_connections的计算，不是看谁在running，是只要连着就占用一个计数位置。</p>
-<p>对于那些不需要保持的连接，我们可以通过kill connection主动踢掉。</p>
-<p>这个行为跟事先设置wait_timeout的效果是一样的。</p>
-<p>设置wait_timeout参数表示的是，一个线程空闲wait_timeout这么多秒之后，就会被MySQL直接断开连接。</p>
-<p>但是需要注意，在show processlist的结果里，踢掉显示为sleep的线程，可能是有损的。</p>
-<p>我们来看下面这个例子。</p>
-<p>图1 sleep线程的两种状态在上面这个例子里，如果断开session A的连接，因为这时候session A还没有提交，所以MySQL只能按照回滚事务来处理；而断开session B的连接，就没什么大影响。</p>
-<p>所以，如果按照优先级来说，你应该优先断开像session B这样的事务外空闲的连接。</p>
-<p>但是，怎么判断哪些是事务外空闲的呢？session C在T时刻之后的30秒执行show processlist，看到的结果是这样的。</p>
-<p>图2 sleep线程的两种状态，show processlist结果图中id=4和id=5的两个会话都是Sleep 状态。</p>
-<p>而要看事务具体状态的话，你可以查information_schema库的innodb_trx表。</p>
-<p>图3 从information_schema.innodb_trx查询事务状态这个结果里，trx_mysql_thread_id=4，表示id=4的线程还处在事务中。</p>
-<p>因此，如果是连接数过多，你可以优先断开事务外空闲太久的连接；如果这样还不够，再考虑断开事务内空闲太久的连接。</p>
-<p>从服务端断开连接使用的是kill connection + id的命令， 一个客户端处于sleep状态时，它的连接被服务端主动断开后，这个客户端并不会马上知道。</p>
-<p>直到客户端在发起下一个请求的时候，才会收到这样的报错“ERROR 2013 (HY000): Lost connection to MySQL server during query”。</p>
-<p>从数据库端主动断开连接可能是有损的，尤其是有的应用端收到这个错误后，不重新连接，而是直接用这个已经不能用的句柄重试查询。</p>
-<p>这会导致从应用端看上去，“MySQL一直没恢复”。</p>
-<p>你可能觉得这是一个冷笑话，但实际上我碰到过不下10次。</p>
-<p>所以，如果你是一个支持业务的DBA，不要假设所有的应用代码都会被正确地处理。</p>
-<p>即使只是一个断开连接的操作，也要确保通知到业务开发团队。</p>
-<p>第二种方法：减少连接过程的消耗。</p>
-<p>有的业务代码会在短时间内先大量申请数据库连接做备用，如果现在数据库确认是被连接行为打挂了，那么一种可能的做法，是让数据库跳过权限验证阶段。</p>
-<p>跳过权限验证的方法是：重启数据库，并使用–skip-grant-tables参数启动。</p>
-<p>这样，整个MySQL会跳过所有的权限验证阶段，包括连接过程和语句执行过程在内。</p>
-<p>但是，这种方法特别符合我们标题里说的“饮鸩止渴”，风险极高，是我特别不建议使用的方案。</p>
-<p>尤其你的库外网可访问的话，就更不能这么做了。</p>
-<p>在MySQL 8.0版本里，如果你启用–skip-grant-tables参数，MySQL会默认把 –skip-networking参数打开，表示这时候数据库只能被本地的客户端连接。</p>
-<p>可见，MySQL官方对skip-grant-tables这个参数的安全问题也很重视。</p>
-<p>除了短连接数暴增可能会带来性能问题外，实际上，我们在线上碰到更多的是查询或者更新语句导致的性能问题。</p>
-<p>其中，查询问题比较典型的有两类，一类是由新出现的慢查询导致的，一类是由QPS（每秒查询数）突增导致的。</p>
-<p>而关于更新语句导致的性能问题，我会在下一篇文章和你展开说明。</p>
-<p>慢查询性能问题在MySQL中，会引发性能问题的慢查询，大体有以下三种可能：</p>
-<ol>
-<li>索引没有设计好；</li>
-<li>SQL语句没写好；</li>
-<li>MySQL选错了索引。</li>
-</ol>
-<p>接下来，我们就具体分析一下这三种可能，以及对应的解决方案。</p>
-<p>导致慢查询的第一种可能是，索引没有设计好。</p>
-<p>这种场景一般就是通过紧急创建索引来解决。</p>
-<p>MySQL 5.6版本以后，创建索引都支持Online DDL了，对于那种高峰期数据库已经被这个语句打挂了的情况，最高效的做法就是直接执行altertable 语句。</p>
-<p>比较理想的是能够在备库先执行。</p>
-<p>假设你现在的服务是一主一备，主库A、备库B，这个方案的大致流程是这样的：</p>
-<ol>
-<li>在备库B上执行 set sql_log_bin=off，也就是不写binlog，然后执行alter table 语句加上索引；</li>
-<li>执行主备切换；</li>
-<li>这时候主库是B，备库是A。</li>
-</ol>
-<p>在A上执行 set sql_log_bin=off，然后执行alter table 语句加上索引。</p>
-<p>这是一个“古老”的DDL方案。</p>
-<p>平时在做变更的时候，你应该考虑类似gh-ost这样的方案，更加稳妥。</p>
-<p>但是在需要紧急处理时，上面这个方案的效率是最高的。</p>
-<p>导致慢查询的第二种可能是，语句没写好。</p>
-<p>比如，我们犯了在第18篇文章《为什么这些SQL语句逻辑相同，性能却差异巨大？》中提到的那些错误，导致语句没有使用上索引。</p>
-<p>这时，我们可以通过改写SQL语句来处理。</p>
-<p>MySQL 5.7提供了query_rewrite功能，可以把输入的一种语句改写成另外一种模式。</p>
-<p>比如，语句被错误地写成了 select * from t where id + 1 = 10000，你可以通过下面的方式，增加一个语句改写规则。</p>
-<p>这里，call query_rewrite.flush_rewrite_rules()这个存储过程，是让插入的新规则生效，也就是我们说的“查询重写”。</p>
-<p>你可以用图4中的方法来确认改写规则是否生效。</p>
-<p>图4 查询重写效果mysql&gt; insert into query_rewrite.rewrite_rules(pattern, replacement, pattern_database) values (“select * from t where id + 1 = ?”, “select * from t where id = ? - 1”, “db1”);call query_rewrite.flush_rewrite_rules();导致慢查询的第三种可能，就是碰上了我们在第10篇文章《MySQL为什么有时候会选错索引？》中提到的情况，MySQL选错了索引。</p>
-<p>这时候，应急方案就是给这个语句加上force index。</p>
-<p>同样地，使用查询重写功能，给原来的语句加上force index，也可以解决这个问题。</p>
-<p>上面我和你讨论的由慢查询导致性能问题的三种可能情况，实际上出现最多的是前两种，即：索引没设计好和语句没写好。</p>
-<p>而这两种情况，恰恰是完全可以避免的。</p>
-<p>比如，通过下面这个过程，我们就可以预先发现问题。</p>
-<ol>
-<li>上线前，在测试环境，把慢查询日志（slow log）打开，并且把long_query_time设置成0，确保每个语句都会被记录入慢查询日志；</li>
-<li>在测试表里插入模拟线上的数据，做一遍回归测试；</li>
-<li>观察慢查询日志里每类语句的输出，特别留意Rows_examined字段是否与预期一致。</li>
-</ol>
-<p>（我们在前面文章中已经多次用到过Rows_examined方法了，相信你已经动手尝试过了。</p>
-<p>如果还有不明白的，欢迎给我留言，我们一起讨论）。</p>
-<p>不要吝啬这段花在上线前的“额外”时间，因为这会帮你省下很多故障复盘的时间。</p>
-<p>如果新增的SQL语句不多，手动跑一下就可以。</p>
-<p>而如果是新项目的话，或者是修改了原有项目的表结构设计，全量回归测试都是必要的。</p>
-<p>这时候，你需要工具帮你检查所有的SQL语句的返回结果。</p>
-<p>比如，你可以使用开源工具pt-query-digest(<a href="https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html)%E3%80%82" rel="noopener" target="_blank">https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html)。</a></p>
-<p>QPS突增问题有时候由于业务突然出现高峰，或者应用程序bug，导致某个语句的QPS突然暴涨，也可能导致MySQL压力过大，影响服务。</p>
-<p>我之前碰到过一类情况，是由一个新功能的bug导致的。</p>
-<p>当然，最理想的情况是让业务把这个功能下掉，服务自然就会恢复。</p>
-<p>而下掉一个功能，如果从数据库端处理的话，对应于不同的背景，有不同的方法可用。</p>
-<p>我这里再和你展开说明一下。</p>
-<ol>
-<li>一种是由全新业务的bug导致的。</li>
-</ol>
-<p>假设你的DB运维是比较规范的，也就是说白名单是一个个加的。</p>
-<p>这种情况下，如果你能够确定业务方会下掉这个功能，只是时间上没那么快，那么就可以从数据库端直接把白名单去掉。</p>
-<ol start="2">
-<li>如果这个新功能使用的是单独的数据库用户，可以用管理员账号把这个用户删掉，然后断开现有连接。</li>
-</ol>
-<p>这样，这个新功能的连接不成功，由它引发的QPS就会变成0。</p>
-<ol start="3">
-<li>如果这个新增的功能跟主体功能是部署在一起的，那么我们只能通过处理语句来限制。</li>
-</ol>
-<p>这时，我们可以使用上面提到的查询重写功能，把压力最大的SQL语句直接重写成”select 1”返回。</p>
-<p>当然，这个操作的风险很高，需要你特别细致。</p>
-<p>它可能存在两个副作用：</p>
-<ol>
-<li>如果别的功能里面也用到了这个SQL语句模板，会有误伤；</li>
-<li>很多业务并不是靠这一个语句就能完成逻辑的，所以如果单独把这一个语句以select 1的结果返回的话，可能会导致后面的业务逻辑一起失败。</li>
-</ol>
-<p>所以，方案3是用于止血的，跟前面提到的去掉权限验证一样，应该是你所有选项里优先级最低的一个方案。</p>
-<p>同时你会发现，其实方案1和2都要依赖于规范的运维体系：虚拟化、白名单机制、业务账号分离。</p>
-<p>由此可见，更多的准备，往往意味着更稳定的系统。</p>
-<p>小结今天这篇文章，我以业务高峰期的性能问题为背景，和你介绍了一些紧急处理的手段。</p>
-<p>这些处理手段中，既包括了粗暴地拒绝连接和断开连接，也有通过重写语句来绕过一些坑的方法；既有临时的高危方案，也有未雨绸缪的、相对安全的预案。</p>
-<p>在实际开发中，我们也要尽量避免一些低效的方法，比如避免大量地使用短连接。</p>
-<p>同时，如果你做业务开发的话，要知道，连接异常断开是常有的事，你的代码里要有正确地重连并重试的机制。</p>
-<p>DBA虽然可以通过语句重写来暂时处理问题，但是这本身是一个风险高的操作，做好SQL审计可以减少需要这类操作的机会。</p>
-<p>其实，你可以看得出来，在这篇文章中我提到的解决方法主要集中在server层。</p>
-<p>在下一篇文章中，我会继续和你讨论一些跟InnoDB有关的处理方法。</p>
-<p>最后，又到了我们的思考题时间了。</p>
-<p>今天，我留给你的课后问题是，你是否碰到过，在业务高峰期需要临时救火的场景？你又是怎么处理的呢？你可以把你的经历和经验写在留言区，我会在下一篇文章的末尾选取有趣的评论跟大家一起分享和分析。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间前两期我给你留的问题是，下面这个图的执行序列中，为什么session B的insert语句会被堵住。</p>
-<p>我们用上一篇的加锁规则来分析一下，看看session A的select语句加了哪些锁：</p>
-<ol>
-<li><p>由于是order by c desc，第一个要定位的是索引c上“最右边的”c=20的行，所以会加上间隙锁(20,25)和next-key lock (15,20]。</p>
-</li>
-<li><p>在索引c上向左遍历，要扫描到c=10才停下来，所以next-key lock会加到(5,10]，这正是阻塞session B的insert语句的原因。</p>
-</li>
-<li><p>在扫描过程中，c=20、c=15、c=10这三行都存在值，由于是select *，所以会在主键id上加三个行锁。</p>
-</li>
-</ol>
-<p>因此，session A 的select语句锁的范围就是：</p>
-<ol>
-<li>索引c上 (5, 25)；</li>
-<li>主键索引上id=15、20两个行锁。</li>
-</ol>
-<p>这里，我再啰嗦下，你会发现我在文章中，每次加锁都会说明是加在“哪个索引上”的。</p>
-<p>因为，锁就是加在索引上的，这是InnoDB的一个基础设定，需要你在分析问题的时候要一直记得。</p>
+          <p>后缀数组（Suffix Array）是一种用于字符串排序和字符串相关问题的数据结构。它可以在 O(n log n) 的时间内构建出字符串的后缀数组，其中 n 是字符串的长度。后缀数组可以用于解决很多与字符串相关的问题，如最长公共子串、模式匹配等。</p>
+<p>后缀数组的定义很简单：对于一个字符串 S，它的后缀数组 SA 是一个整数数组，其中 SA[i] 表示字符串 S 的后缀的起始位置，使得 S.substring(SA[i]) 是排在第 i 位的后缀。</p>
+<p>以下是一个简单的 Java 实现示例，用于构建后缀数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">class</span> <span class="title class_">Suffix</span> <span class="keyword">implements</span> <span class="title class_">Comparable</span>&lt;Suffix&gt; {</span><br/><span class="line">    <span class="type">int</span> index;</span><br/><span class="line">    String suffix;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">Suffix</span><span class="params">(<span class="type">int</span> index, String suffix)</span> {</span><br/><span class="line">        <span class="built_in">this</span>.index = index;</span><br/><span class="line">        <span class="built_in">this</span>.suffix = suffix;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="meta">@Override</span></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compareTo</span><span class="params">(Suffix other)</span> {</span><br/><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.suffix.compareTo(other.suffix);</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SuffixArray</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span>[] buildSuffixArray(String text) {</span><br/><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> text.length();</span><br/><span class="line">        Suffix[] suffixes = <span class="keyword">new</span> <span class="title class_">Suffix</span>[n];</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) {</span><br/><span class="line">            suffixes[i] = <span class="keyword">new</span> <span class="title class_">Suffix</span>(i, text.substring(i));</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        Arrays.sort(suffixes);</span><br/><span class="line"></span><br/><span class="line">        <span class="type">int</span>[] suffixArray = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) {</span><br/><span class="line">            suffixArray[i] = suffixes[i].index;</span><br/><span class="line">        }</span><br/><span class="line"></span><br/><span class="line">        <span class="keyword">return</span> suffixArray;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">String</span> <span class="variable">text</span> <span class="operator">=</span> <span class="string">"banana"</span>;</span><br/><span class="line">        <span class="type">int</span>[] suffixArray = buildSuffixArray(text);</span><br/><span class="line"></span><br/><span class="line">        System.out.println(<span class="string">"Suffix Array:"</span>);</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> index : suffixArray) {</span><br/><span class="line">            System.out.println(index + <span class="string">": "</span> + text.substring(index));</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的代码中，我们首先定义了一个 <code>Suffix</code> 类，用于表示后缀及其索引。然后，我们创建了一个 <code>SuffixArray</code> 类，其中的 <code>buildSuffixArray</code> 方法用于构建后缀数组。该方法首先创建一个 <code>Suffix</code> 对象数组，然后使用 <code>Arrays.sort</code> 对后缀数组进行排序，最后将排序后的索引数组返回。</p>
+<p>注意，这只是一个简化的后缀数组实现示例。实际上，构建后缀数组有更高效的算法，如倍增算法和 DC3 算法。如果需要处理大规模字符串，建议使用这些更高效的算法。</p>
 
       
     </div>
@@ -928,7 +482,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/e1607c99.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/40836.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -946,7 +500,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/e1607c99.html" class="post-title-link" itemprop="url">mysql-为什么我只改一行的语句锁这么多</a>
+          <a href="/posts/40836.html" class="post-title-link" itemprop="url">优先队列</a>
         </h2>
 
         <div class="post-meta-container">
@@ -957,7 +511,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-25 14:13:30" itemprop="dateCreated datePublished" datetime="2019-11-25T14:13:30+08:00">2019-11-25</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -965,7 +519,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -979,158 +533,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>为什么我只改一行的语句，锁这么多在上一篇文章中，我和你介绍了间隙锁和next-key lock的概念，但是并没有说明加锁规则。</p>
-<p>间隙锁的概念理解起来确实有点儿难，尤其在配合上行锁以后，很容易在判断是否会出现锁等待的问题上犯错。</p>
-<p>所以今天，我们就先从这个加锁规则开始吧。</p>
-<p>首先说明一下，这些加锁规则我没在别的地方看到过有类似的总结，以前我自己判断的时候都是想着代码里面的实现来脑补的。</p>
-<p>这次为了总结成不看代码的同学也能理解的规则，是我又重新刷了代码临时总结出来的。</p>
-<p>所以，这个规则有以下两条前提说明：</p>
-<ol>
-<li><p>MySQL后面的版本可能会改变加锁策略，所以这个规则只限于截止到现在的最新版本，即5.x系列&lt;=5.7.24，8.0系列 &lt;=8.0.13。</p>
-</li>
-<li><p>如果大家在验证中有发现bad case的话，请提出来，我会再补充进这篇文章，使得一起学习本专栏的所有同学都能受益。</p>
-</li>
-</ol>
-<p>因为间隙锁在可重复读隔离级别下才有效，所以本篇文章接下来的描述，若没有特殊说明，默认是可重复读隔离级别。</p>
-<p>我总结的加锁规则里面，包含了两个“原则”、两个“优化”和一个“bug”。</p>
-<ol>
-<li>原则1：加锁的基本单位是next-key lock。</li>
-</ol>
-<p>希望你还记得，next-key lock是前开后闭区间。</p>
-<ol start="2">
-<li><p>原则2：查找过程中访问到的对象才会加锁。</p>
-</li>
-<li><p>优化1：索引上的等值查询，给唯一索引加锁的时候，next-key lock退化为行锁。</p>
-</li>
-<li><p>优化2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-keylock退化为间隙锁。</p>
-</li>
-<li><p>一个bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止。</p>
-</li>
-</ol>
-<p>我还是以上篇文章的表t为例，和你解释一下这些规则。</p>
-<p>表t的建表语句和初始化语句如下。</p>
-<p>接下来的例子基本都是配合着图片说明的，所以我建议你可以对照着文稿看，有些例子可能会“毁三观”，也建议你读完文章后亲手实践一下。</p>
-<p>案例一：等值查询间隙锁第一个例子是关于等值条件操作间隙：</p>
-<p>图1 等值查询的间隙锁由于表t中没有id=7的记录，所以用我们上面提到的加锁规则判断一下的话：</p>
-<p>CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY `c  ̀(̀ c )̀) ENGINE=InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);1. 根据原则1，加锁单位是next-key lock，session A加锁范围就是(5,10]；</p>
-<ol start="2">
-<li>同时根据优化2，这是一个等值查询(id=7)，而id=10不满足查询条件，next-key lock退化成间隙锁，因此最终加锁的范围是(5,10)。</li>
-</ol>
-<p>所以，session B要往这个间隙里面插入id=8的记录会被锁住，但是session C修改id=10这行是可以的。</p>
-<p>案例二：非唯一索引等值锁第二个例子是关于覆盖索引上的锁：</p>
-<p>图2 只加在非唯一索引上的锁看到这个例子，你是不是有一种“该锁的不锁，不该锁的乱锁”的感觉？我们来分析一下吧。</p>
-<p>这里session A要给索引c上c=5的这一行加上读锁。</p>
-<ol>
-<li><p>根据原则1，加锁单位是next-key lock，因此会给(0,5]加上next-key lock。</p>
-</li>
-<li><p>要注意c是普通索引，因此仅访问c=5这一条记录是不能马上停下来的，需要向右遍历，查到c=10才放弃。</p>
-</li>
-</ol>
-<p>根据原则2，访问到的都要加锁，因此要给(5,10]加next-key lock。</p>
-<ol start="3">
-<li><p>但是同时这个符合优化2：等值判断，向右遍历，最后一个值不满足c=5这个等值条件，因此退化成间隙锁(5,10)。</p>
-</li>
-<li><p>根据原则2 ，只有访问到的对象才会加锁，这个查询使用覆盖索引，并不需要访问主键索引，所以主键索引上没有加任何锁，这就是为什么session B的update语句可以执行完成。</p>
-</li>
-</ol>
-<p>但session C要插入一个(7,7,7)的记录，就会被session A的间隙锁(5,10)锁住。</p>
-<p>需要注意，在这个例子中，lock in share mode只锁覆盖索引，但是如果是for update就不一样了。</p>
-<p> 执行 for update时，系统会认为你接下来要更新数据，因此会顺便给主键索引上满足条件的行加上行锁。</p>
-<p>这个例子说明，锁是加在索引上的；同时，它给我们的指导是，如果你要用lock in share mode来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段。</p>
-<p>比如，将session A的查询语句改成select d from t where c=5 lock in share mode。</p>
-<p>你可以自己验证一下效果。</p>
-<p>案例三：主键索引范围锁第三个例子是关于范围查询的。</p>
-<p>举例之前，你可以先思考一下这个问题：对于我们这个表t，下面这两条查询语句，加锁范围相同吗？你可能会想，id定义为int类型，这两个语句就是等价的吧？其实，它们并不完全等价。</p>
-<p>在逻辑上，这两条查语句肯定是等价的，但是它们的加锁规则不太一样。</p>
-<p>现在，我们就让session A执行第二个查询语句，来看看加锁效果。</p>
-<p>图3 主键索引上范围查询的锁现在我们就用前面提到的加锁规则，来分析一下session A 会加什么锁呢？mysql&gt; select * from t where id=10 for update;mysql&gt; select * from t where id&gt;=10 and id&lt;11 for update;1. 开始执行的时候，要找到第一个id=10的行，因此本该是next-key lock(5,10]。</p>
-<p> 根据优化1，主键id上的等值条件，退化成行锁，只加了id=10这一行的行锁。</p>
-<ol start="2">
-<li>范围查找就往后继续找，找到id=15这一行停下来，因此需要加next-key lock(10,15]。</li>
-</ol>
-<p>所以，session A这时候锁的范围就是主键索引上，行锁id=10和next-key lock(10,15]。</p>
-<p>这样，session B和session C的结果你就能理解了。</p>
-<p>这里你需要注意一点，首次session A定位查找id=10的行的时候，是当做等值查询来判断的，而向右扫描到id=15的时候，用的是范围查询判断。</p>
-<p>案例四：非唯一索引范围锁接下来，我们再看两个范围查询加锁的例子，你可以对照着案例三来看。</p>
-<p>需要注意的是，与案例三不同的是，案例四中查询语句的where部分用的是字段c。</p>
-<p>图4 非唯一索引范围锁这次session A用字段c来判断，加锁规则跟案例三唯一的不同是：在第一次用c=10定位记录的时候，索引c上加了(5,10]这个next-key lock后，由于索引c是非唯一索引，没有优化规则，也就是说不会蜕变为行锁，因此最终sesion A加的锁是，索引c上的(5,10] 和(10,15] 这两个next-keylock。</p>
-<p>所以从结果上来看，sesson B要插入（8,8,8)的这个insert语句时就被堵住了。</p>
-<p>这里需要扫描到c=15才停止扫描，是合理的，因为InnoDB要扫到c=15，才知道不需要继续往后找了。</p>
-<p>案例五：唯一索引范围锁bug前面的四个案例，我们已经用到了加锁规则中的两个原则和两个优化，接下来再看一个关于加锁规则中bug的案例。</p>
-<p>图5 唯一索引范围锁的bugsession A是一个范围查询，按照原则1的话，应该是索引id上只加(10,15]这个next-key lock，并且因为id是唯一键，所以循环判断到id=15这一行就应该停止了。</p>
-<p>但是实现上，InnoDB会往前扫描到第一个不满足条件的行为止，也就是id=20。</p>
-<p>而且由于这是个范围扫描，因此索引id上的(15,20]这个next-key lock也会被锁上。</p>
-<p>所以你看到了，session B要更新id=20这一行，是会被锁住的。</p>
-<p>同样地，session C要插入id=16的一行，也会被锁住。</p>
-<p>照理说，这里锁住id=20这一行的行为，其实是没有必要的。</p>
-<p>因为扫描到id=15，就可以确定不用往后再找了。</p>
-<p>但实现上还是这么做了，因此我认为这是个bug。</p>
-<p>我也曾找社区的专家讨论过，官方bug系统上也有提到，但是并未被verified。</p>
-<p>所以，认为这是bug这个事儿，也只能算我的一家之言，如果你有其他见解的话，也欢迎你提出来。</p>
-<p>案例六：非唯一索引上存在”等值”的例子接下来的例子，是为了更好地说明“间隙”这个概念。</p>
-<p>这里，我给表t插入一条新记录。</p>
-<p>新插入的这一行c=10，也就是说现在表里有两个c=10的行。</p>
-<p>那么，这时候索引c上的间隙是什么状态了呢？你要知道，由于非唯一索引上包含主键的值，所以是不可能存在“相同”的两行的。</p>
-<p>mysql&gt; insert into t values(30,10,30);图6 非唯一索引等值的例子可以看到，虽然有两个c=10，但是它们的主键值id是不同的（分别是10和30），因此这两个c=10的记录之间，也是有间隙的。</p>
-<p>图中我画出了索引c上的主键id。</p>
-<p>为了跟间隙锁的开区间形式进行区别，我用(c=10,id=30)这样的形式，来表示索引上的一行。</p>
-<p>现在，我们来看一下案例六。</p>
-<p>这次我们用delete语句来验证。</p>
-<p>注意，delete语句加锁的逻辑，其实跟select … for update 是类似的，也就是我在文章开始总结的两个“原则”、两个“优化”和一个“bug”。</p>
-<p>图7 delete 示例这时，session A在遍历的时候，先访问第一个c=10的记录。</p>
-<p>同样地，根据原则1，这里加的是(c=5,id=5)到(c=10,id=10)这个next-key lock。</p>
-<p>然后，session A向右查找，直到碰到(c=15,id=15)这一行，循环才结束。</p>
-<p>根据优化2，这是一个等值查询，向右查找到了不满足条件的行，所以会退化成(c=10,id=10) 到 (c=15,id=15)的间隙锁。</p>
-<p>也就是说，这个delete语句在索引c上的加锁范围，就是下图中蓝色区域覆盖的部分。</p>
-<p>图8 delete加锁效果示例这个蓝色区域左右两边都是虚线，表示开区间，即(c=5,id=5)和(c=15,id=15)这两行上都没有锁。</p>
-<p>案例七：limit 语句加锁例子6也有一个对照案例，场景如下所示：</p>
-<p>图9 limit 语句加锁这个例子里，session A的delete语句加了 limit 2。</p>
-<p>你知道表t里c=10的记录其实只有两条，因此加不加limit 2，删除的效果都是一样的，但是加锁的效果却不同。</p>
-<p>可以看到，session B的insert语句执行通过了，跟案例六的结果不同。</p>
-<p>这是因为，案例七里的delete语句明确加了limit 2的限制，因此在遍历到(c=10, id=30)这一行之后，满足条件的语句已经有两条，循环就结束了。</p>
-<p>因此，索引c上的加锁范围就变成了从（c=5,id=5)到（c=10,id=30)这个前开后闭区间，如下图所示：</p>
-<p>图10 带limit 2的加锁效果可以看到，(c=10,id=30）之后的这个间隙并没有在加锁范围里，因此insert语句插入c=12是可以执行成功的。</p>
-<p>这个例子对我们实践的指导意义就是，在删除数据的时候尽量加limit。</p>
-<p>这样不仅可以控制删除数据的条数，让操作更安全，还可以减小加锁的范围。</p>
-<p>案例八：一个死锁的例子前面的例子中，我们在分析的时候，是按照next-key lock的逻辑来分析的，因为这样分析比较方便。</p>
-<p>最后我们再看一个案例，目的是说明：next-key lock实际上是间隙锁和行锁加起来的结果。</p>
-<p>你一定会疑惑，这个概念不是一开始就说了吗？不要着急，我们先来看下面这个例子：</p>
-<p>图11 案例八的操作序列现在，我们按时间顺序来分析一下为什么是这样的结果。</p>
-<ol>
-<li><p>session A 启动事务后执行查询语句加lock in share mode，在索引c上加了next-keylock(5,10] 和间隙锁(10,15)；</p>
-</li>
-<li><p>session B 的update语句也要在索引c上加next-key lock(5,10] ，进入锁等待；</p>
-</li>
-<li><p>然后session A要再插入(8,8,8)这一行，被session B的间隙锁锁住。</p>
-</li>
-</ol>
-<p>由于出现了死锁，InnoDB让session B回滚。</p>
-<p>你可能会问，session B的next-key lock不是还没申请成功吗？其实是这样的，session B的“加next-key lock(5,10] ”操作，实际上分成了两步，先是加(5,10)的间隙锁，加锁成功；然后加c=10的行锁，这时候才被锁住的。</p>
-<p>也就是说，我们在分析加锁规则的时候可以用next-key lock来分析。</p>
-<p>但是要知道，具体执行的时候，是要分成间隙锁和行锁两段来执行的。</p>
-<p>小结这里我再次说明一下，我们上面的所有案例都是在可重复读隔离级别(repeatable-read)下验证的。</p>
-<p>同时，可重复读隔离级别遵守两阶段锁协议，所有加锁的资源，都是在事务提交或者回滚的时候才释放的。</p>
-<p>在最后的案例中，你可以清楚地知道next-key lock实际上是由间隙锁加行锁实现的。</p>
-<p>如果切换到读提交隔离级别(read-committed)的话，就好理解了，过程中去掉间隙锁的部分，也就是只剩下行锁的部分。</p>
-<p>其实读提交隔离级别在外键场景下还是有间隙锁，相对比较复杂，我们今天先不展开。</p>
-<p>另外，在读提交隔离级别下还有一个优化，即：语句执行过程中加上的行锁，在语句执行完成后，就要把“不满足条件的行”上的行锁直接释放了，不需要等到事务提交。</p>
-<p>也就是说，读提交隔离级别下，锁的范围更小，锁的时间更短，这也是不少业务都默认使用读提交隔离级别的原因。</p>
-<p>不过，我希望你学过今天的课程以后，可以对next-key lock的概念有更清晰的认识，并且会用加锁规则去判断语句的加锁范围。</p>
-<p>在业务需要使用可重复读隔离级别的时候，能够更细致地设计操作数据库的语句，解决幻读问题的同时，最大限度地提升系统并行处理事务的能力。</p>
-<p>经过这篇文章的介绍，你再看一下上一篇文章最后的思考题，再来尝试分析一次。</p>
-<p>我把题目重新描述和简化一下：还是我们在文章开头初始化的表t，里面有6条记录，图12的语句序列中，为什么session B的insert操作，会被锁住呢？图12 锁分析思考题另外，如果你有兴趣多做一些实验的话，可以设计好语句序列，在执行之前先自己分析一下，然后实际地验证结果是否跟你的分析一致。</p>
-<p>对于那些你自己无法解释的结果，可以发到评论区里，后面我争取挑一些有趣的案例在文章中分析。</p>
-<p>你可以把你关于思考题的分析写在留言区，也可以分享你自己设计的锁验证方案，我会在下一篇文章的末尾选取有趣的评论跟大家分享。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期的问题，我在本期继续作为了课后思考题，所以会在下篇文章再一起公布“答案”。</p>
-<p>这里，我展开回答一下评论区几位同学的问题。</p>
-<p>@令狐少侠 说，以前一直认为间隙锁只在二级索引上有。</p>
-<p>现在你知道了，有间隙的地方就可能有间隙锁。</p>
-<p>@浪里白条 同学问，如果是varchar类型，加锁规则是什么样的。</p>
-<p>回答：实际上在判断间隙的时候，varchar和int是一样的，排好序以后，相邻两个值之间就有间隙。</p>
-<p>有几位同学提到说，上一篇文章自己验证的结果跟案例一不同，就是在session A执行完这两个语句：</p>
-<p>以后，session B 的update 和session C的insert 都会被堵住。</p>
-<p>这是不是跟文章的结论矛盾？其实不是的，这个例子用的是反证假设，就是假设不堵住，会出现问题；然后，推导出sessionA需要锁整个表所有的行和所有间隙。</p>
+          <p>优先队列（Priority Queue）是一种特殊的队列，它能够根据元素的优先级自动排序。在优先队列中，元素的出队顺序不是按照它们进队的顺序，而是根据元素的优先级确定的，优先级高的元素先出队。优先队列常用于实现任务调度、最小（最大）堆等场景。</p>
+<p>Java 中的 <code>PriorityQueue</code> 类实现了优先队列的功能，它使用堆数据结构来实现自动排序。默认情况下，<code>PriorityQueue</code> 是最小堆（即优先级最小的元素先出队），但您也可以通过自定义比较器来创建最大堆。</p>
+<p>以下是一个简单的 Java 代码示例，演示如何使用 <code>PriorityQueue</code> 创建一个最小堆：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.PriorityQueue;</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PriorityQueueExample</span> {</span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="comment">// 创建一个最小堆</span></span><br/><span class="line">        PriorityQueue&lt;Integer&gt; minHeap = <span class="keyword">new</span> <span class="title class_">PriorityQueue</span>&lt;&gt;();</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 插入元素</span></span><br/><span class="line">        minHeap.add(<span class="number">5</span>);</span><br/><span class="line">        minHeap.add(<span class="number">2</span>);</span><br/><span class="line">        minHeap.add(<span class="number">8</span>);</span><br/><span class="line">        minHeap.add(<span class="number">1</span>);</span><br/><span class="line">        minHeap.add(<span class="number">10</span>);</span><br/><span class="line"></span><br/><span class="line">        <span class="comment">// 输出堆中的元素（按照升序排列）</span></span><br/><span class="line">        <span class="keyword">while</span> (!minHeap.isEmpty()) {</span><br/><span class="line">            System.out.print(minHeap.poll() + <span class="string">" "</span>);</span><br/><span class="line">        }</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在上面的代码中，我们使用 <code>PriorityQueue</code> 创建了一个最小堆。通过 <code>add</code> 方法向堆中插入元素，然后通过 <code>poll</code> 方法逐个弹出并输出堆中的元素。输出的结果将会是升序排列的。</p>
+<p>需要注意的是，<code>PriorityQueue</code> 可以存储任何实现了比较接口（如 <code>Comparable</code> 或自定义的比较器）的元素。在创建优先队列时，您可以通过构造函数传递自定义的比较器来控制元素的排序方式。</p>
+<p>虽然这只是一个简单的示例，但 <code>PriorityQueue</code> 在实际应用中具有更广泛的用途，如实现 Dijkstra 算法、优先级任务调度等。在使用时，建议您仔细阅读相关文档并根据具体需求进行定制。</p>
 
       
     </div>
@@ -1157,7 +566,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/97b6038b.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/35077.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1175,7 +584,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/97b6038b.html" class="post-title-link" itemprop="url">mysql-幻读是什么幻读有什么问题</a>
+          <a href="/posts/35077.html" class="post-title-link" itemprop="url">Trie树</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1186,7 +595,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-24 14:13:13" itemprop="dateCreated datePublished" datetime="2019-11-24T14:13:13+08:00">2019-11-24</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1194,7 +603,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -1208,169 +617,11 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>幻读是什么，幻读有什么问题？在上一篇文章最后，我给你留了一个关于加锁规则的问题。</p>
-<p>今天，我们就从这个问题说起吧。</p>
-<p>为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。</p>
-<p>建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）：</p>
-<p>这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。</p>
-<p>上期我留给你的问题是，下面的语句序列，是怎么加锁的，加的锁又是什么时候释放的呢？CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  <code>c  ̀int(11) DEFAULT NULL,  </code>d  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY `c  ̀(̀ c )̀) ENGINE=InnoDB;insert into t values(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25);比较好理解的是，这个语句会命中d=5的这一行，对应的主键id=5，因此在select 语句执行完成后，id=5这一行会加一个写锁，而且由于两阶段锁协议，这个写锁会在执行commit语句的时候释放。</p>
-<p>由于字段d上没有索引，因此这条查询语句会做全表扫描。</p>
-<p>那么，其他被扫描到的，但是不满足条件的5行记录上，会不会被加锁呢？我们知道，InnoDB的默认事务隔离级别是可重复读，所以本文接下来没有特殊说明的部分，都是设定在可重复读隔离级别下。</p>
-<p>幻读是什么？现在，我们就来分析一下，如果只在id=5这一行加锁，而其他行的不加锁的话，会怎么样。</p>
-<p>下面先来看一下这个场景（注意：这是我假设的一个场景）：</p>
-<p>图 1 假设只在id=5这一行加行锁可以看到，session A里执行了三次查询，分别是Q1、Q2和Q3。</p>
-<p>它们的SQL语句相同，都是select * from t where d=5 for update。</p>
-<p>这个语句的意思你应该很清楚了，查所有d=5的行，而且使用的是当前读，并且加上写锁。</p>
-<p>现在，我们来看一下这三条SQL语句，分别会返回什么结果。</p>
-<ol>
-<li>Q1只返回id=5这一行；</li>
-</ol>
-<p>begin;select * from t where d=5 for update;commit;2. 在T2时刻，session B把id=0这一行的d值改成了5，因此T3时刻Q2查出来的是id=0和id=5这两行；</p>
-<ol start="3">
-<li>在T4时刻，session C又插入一行（1,1,5），因此T5时刻Q3查出来的是id=0、id=1和id=5的这三行。</li>
-</ol>
-<p>其中，Q3读到id=1这一行的现象，被称为“幻读”。</p>
-<p>也就是说，幻读指的是一个事务在前后两次查询同一个范围的时候，后一次查询看到了前一次查询没有看到的行。</p>
-<p>这里，我需要对“幻读”做一个说明：</p>
-<ol>
-<li>在可重复读隔离级别下，普通的查询是快照读，是不会看到别的事务插入的数据的。</li>
-</ol>
-<p>因此，幻读在“当前读”下才会出现。</p>
-<ol start="2">
-<li>上面session B的修改结果，被session A之后的select语句用“当前读”看到，不能称为幻读。</li>
-</ol>
-<p>幻读仅专指“新插入的行”。</p>
-<p>如果只从第8篇文章《事务到底是隔离的还是不隔离的？》我们学到的事务可见性规则来分析的话，上面这三条SQL语句的返回结果都没有问题。</p>
-<p>因为这三个查询都是加了for update，都是当前读。</p>
-<p>而当前读的规则，就是要能读到所有已经提交的记录的最新值。</p>
-<p>并且，session B和sessionC的两条语句，执行后就会提交，所以Q2和Q3就是应该看到这两个事务的操作效果，而且也看到了，这跟事务的可见性规则并不矛盾。</p>
-<p>但是，这是不是真的没问题呢？不，这里还真就有问题。</p>
-<p>幻读有什么问题？首先是语义上的。</p>
-<p>session A在T1时刻就声明了，“我要把所有d=5的行锁住，不准别的事务进行读写操作”。</p>
-<p>而实际上，这个语义被破坏了。</p>
-<p>如果现在这样看感觉还不明显的话，我再往session B和session C里面分别加一条SQL语句，你再看看会出现什么现象。</p>
-<p>图 2 假设只在id=5这一行加行锁–语义被破坏session B的第二条语句update t set c=5 where id=0，语义是“我把id=0、d=5这一行的c值，改成了5”。</p>
-<p>由于在T1时刻，session A 还只是给id=5这一行加了行锁， 并没有给id=0这行加上锁。</p>
-<p>因此，session B在T2时刻，是可以执行这两条update语句的。</p>
-<p>这样，就破坏了 session A 里Q1语句要锁住所有d=5的行的加锁声明。</p>
-<p>session C也是一样的道理，对id=1这一行的修改，也是破坏了Q1的加锁声明。</p>
-<p>其次，是数据一致性的问题。</p>
-<p>我们知道，锁的设计是为了保证数据的一致性。</p>
-<p>而这个一致性，不止是数据库内部数据状态在此刻的一致性，还包含了数据和日志在逻辑上的一致性。</p>
-<p>为了说明这个问题，我给session A在T1时刻再加一个更新语句，即：update t set d=100 whered=5。</p>
-<p>图 3 假设只在id=5这一行加行锁–数据一致性问题update的加锁语义和select …for update 是一致的，所以这时候加上这条update语句也很合理。</p>
-<p>session A声明说“要给d=5的语句加上锁”，就是为了要更新数据，新加的这条update语句就是把它认为加上了锁的这一行的d值修改成了100。</p>
-<p>现在，我们来分析一下图3执行完成后，数据库里会是什么结果。</p>
-<ol>
-<li>经过T1时刻，id=5这一行变成 (5,5,100)，当然这个结果最终是在T6时刻正式提交的;2. 经过T2时刻，id=0这一行变成(0,5,5);3. 经过T4时刻，表里面多了一行(1,5,5);4. 其他行跟这个执行序列无关，保持不变。</li>
-</ol>
-<p>这样看，这些数据也没啥问题，但是我们再来看看这时候binlog里面的内容。</p>
-<ol>
-<li><p>T2时刻，session B事务提交，写入了两条语句；</p>
-</li>
-<li><p>T4时刻，session C事务提交，写入了两条语句；</p>
-</li>
-<li><p>T6时刻，session A事务提交，写入了update t set d=100 where d=5 这条语句。</p>
-</li>
-</ol>
-<p>我统一放到一起的话，就是这样的：</p>
-<p>好，你应该看出问题了。</p>
-<p>这个语句序列，不论是拿到备库去执行，还是以后用binlog来克隆一个库，这三行的结果，都变成了 (0,5,100)、(1,5,100)和(5,5,100)。</p>
-<p>也就是说，id=0和id=1这两行，发生了数据不一致。</p>
-<p>这个问题很严重，是不行的。</p>
-<p>到这里，我们再回顾一下，这个数据不一致到底是怎么引入的？我们分析一下可以知道，这是我们假设“select * from t where d=5 for update这条语句只给d=5这一行，也就是id=5的这一行加锁”导致的。</p>
-<p>所以我们认为，上面的设定不合理，要改。</p>
-<p>那怎么改呢？我们把扫描过程中碰到的行，也都加上写锁，再来看看执行效果。</p>
-<p>update t set d=5 where id=0; /<em>(0,0,5)</em>/update t set c=5 where id=0; /<em>(0,5,5)</em>/insert into t values(1,1,5); /<em>(1,1,5)</em>/update t set c=5 where id=1; /<em>(1,5,5)</em>/update t set d=100 where d=5;/<em>所有d=5的行，d改成100</em>/图 4 假设扫描到的行都被加上了行锁由于session A把所有的行都加了写锁，所以session B在执行第一个update语句的时候就被锁住了。</p>
-<p>需要等到T6时刻session A提交以后，session B才能继续执行。</p>
-<p>这样对于id=0这一行，在数据库里的最终结果还是 (0,5,5)。</p>
-<p>在binlog里面，执行序列是这样的：</p>
-<p>可以看到，按照日志顺序执行，id=0这一行的最终结果也是(0,5,5)。</p>
-<p>所以，id=0这一行的问题解决了。</p>
-<p>但同时你也可以看到，id=1这一行，在数据库里面的结果是(1,5,5)，而根据binlog的执行结果是(1,5,100)，也就是说幻读的问题还是没有解决。</p>
-<p>为什么我们已经这么“凶残”地，把所有的记录都上了锁，还是阻止不了id=1这一行的插入和更新呢？原因很简单。</p>
-<p>在T3时刻，我们给所有行加锁的时候，id=1这一行还不存在，不存在也就加不上锁。</p>
-<p>也就是说，即使把所有的记录都加上锁，还是阻止不了新插入的记录，这也是为什么“幻读”会被单独拿出来解决的原因。</p>
-<p>到这里，其实我们刚说明完文章的标题 ：幻读的定义和幻读有什么问题。</p>
-<p>接下来，我们再看看InnoDB怎么解决幻读的问题。</p>
-<p>如何解决幻读？现在你知道了，产生幻读的原因是，行锁只能锁住行，但是新插入记录这个动作，要更新的是记录之间的“间隙”。</p>
-<p>因此，为了解决幻读问题，InnoDB只好引入新的锁，也就是间隙锁(GapLock)。</p>
-<p>顾名思义，间隙锁，锁的就是两个值之间的空隙。</p>
-<p>比如文章开头的表t，初始化插入了6个记录，这就产生了7个间隙。</p>
-<p>insert into t values(1,1,5); /<em>(1,1,5)</em>/update t set c=5 where id=1; /<em>(1,5,5)</em>/update t set d=100 where d=5;/<em>所有d=5的行，d改成100</em>/update t set d=5 where id=0; /<em>(0,0,5)</em>/update t set c=5 where id=0; /<em>(0,5,5)</em>/图 5 表t主键索引上的行锁和间隙锁这样，当你执行 select * from t where d=5 for update的时候，就不止是给数据库中已有的6个记录加上了行锁，还同时加了7个间隙锁。</p>
-<p>这样就确保了无法再插入新的记录。</p>
-<p>也就是说这时候，在一行行扫描的过程中，不仅将给行加上了行锁，还给行两边的空隙，也加上了间隙锁。</p>
-<p>现在你知道了，数据行是可以加上锁的实体，数据行之间的间隙，也是可以加上锁的实体。</p>
-<p>但是间隙锁跟我们之前碰到过的锁都不太一样。</p>
-<p>比如行锁，分成读锁和写锁。</p>
-<p>下图就是这两种类型行锁的冲突关系。</p>
-<p>图6 两种行锁间的冲突关系也就是说，跟行锁有冲突关系的是“另外一个行锁”。</p>
-<p>但是间隙锁不一样，跟间隙锁存在冲突关系的，是“往这个间隙中插入一个记录”这个操作。</p>
-<p>间隙锁之间都不存在冲突关系。</p>
-<p>这句话不太好理解，我给你举个例子：</p>
-<p>图7 间隙锁之间不互锁这里session B并不会被堵住。</p>
-<p>因为表t里并没有c=7这个记录，因此session A加的是间隙锁(5,10)。</p>
-<p>而session B也是在这个间隙加的间隙锁。</p>
-<p>它们有共同的目标，即：保护这个间隙，不允许插入值。</p>
-<p>但，它们之间是不冲突的。</p>
-<p>间隙锁和行锁合称next-key lock，每个next-key lock是前开后闭区间。</p>
-<p>也就是说，我们的表t初始化以后，如果用select * from t for update要把整个表所有记录锁起来，就形成了7个next-keylock，分别是 (-∞,0]、(0,5]、(5,10]、(10,15]、(15,20]、(20, 25]、(25, +supremum]。</p>
-<p>你可能会问说，这个supremum从哪儿来的呢？这是因为+∞是开区间。</p>
-<p>实现上，InnoDB给每个索引加了一个不存在的最大值supremum，这样才符合我们前面说的“都是前开后闭区间”。</p>
-<p>间隙锁和next-key lock的引入，帮我们解决了幻读的问题，但同时也带来了一些“困扰”。</p>
-<p>在前面的文章中，就有同学提到了这个问题。</p>
-<p>我把他的问题转述一下，对应到我们这个例子的表来说，业务逻辑这样的：任意锁住一行，如果这一行不存在的话就插入，如果存在这一行就更新它的数据，代码如下：</p>
-<p>备注：这篇文章中，如果没有特别说明，我们把间隙锁记为开区间，把next-key lock记为前开后闭区间。</p>
-<p>begin;select * from t where id=N for update;/<em>如果行不存在</em>/insert into t values(N,N,N);/<em>如果行存在</em>/update t set d=N set id=N;commit;可能你会说，这个不是insert … on duplicate key update 就能解决吗？但其实在有多个唯一键的时候，这个方法是不能满足这位提问同学的需求的。</p>
-<p>至于为什么，我会在后面的文章中再展开说明。</p>
-<p>现在，我们就只讨论这个逻辑。</p>
-<p>这个同学碰到的现象是，这个逻辑一旦有并发，就会碰到死锁。</p>
-<p>你一定也觉得奇怪，这个逻辑每次操作前用for update锁起来，已经是最严格的模式了，怎么还会有死锁呢？这里，我用两个session来模拟并发，并假设N=9。</p>
-<p>图8 间隙锁导致的死锁你看到了，其实都不需要用到后面的update语句，就已经形成死锁了。</p>
-<p>我们按语句执行顺序来分析一下：</p>
-<ol>
-<li><p>session A 执行select … for update语句，由于id=9这一行并不存在，因此会加上间隙锁(5,10);2. session B 执行select … for update语句，同样会加上间隙锁(5,10)，间隙锁之间不会冲突，因此这个语句可以执行成功；</p>
-</li>
-<li><p>session B 试图插入一行(9,9,9)，被session A的间隙锁挡住了，只好进入等待；</p>
-</li>
-<li><p>session A试图插入一行(9,9,9)，被session B的间隙锁挡住了。</p>
-</li>
-</ol>
-<p>至此，两个session进入互相等待状态，形成死锁。</p>
-<p>当然，InnoDB的死锁检测马上就发现了这对死锁关系，让session A的insert语句报错返回了。</p>
-<p>你现在知道了，间隙锁的引入，可能会导致同样的语句锁住更大的范围，这其实是影响了并发度的。</p>
-<p>其实，这还只是一个简单的例子，在下一篇文章中我们还会碰到更多、更复杂的例子。</p>
-<p>你可能会说，为了解决幻读的问题，我们引入了这么一大串内容，有没有更简单一点的处理方法呢。</p>
-<p>我在文章一开始就说过，如果没有特别说明，今天和你分析的问题都是在可重复读隔离级别下的，间隙锁是在可重复读隔离级别下才会生效的。</p>
-<p>所以，你如果把隔离级别设置为读提交的话，就没有间隙锁了。</p>
-<p>但同时，你要解决可能出现的数据和日志不一致问题，需要把binlog格式设置为row。</p>
-<p>这，也是现在不少公司使用的配置组合。</p>
-<p>前面文章的评论区有同学留言说，他们公司就使用的是读提交隔离级别加binlog_format=row的组合。</p>
-<p>他曾问他们公司的DBA说，你为什么要这么配置。</p>
-<p>DBA直接答复说，因为大家都这么用呀。</p>
-<p>所以，这个同学在评论区就问说，这个配置到底合不合理。</p>
-<p>关于这个问题本身的答案是，如果读提交隔离级别够用，也就是说，业务不需要可重复读的保证，这样考虑到读提交下操作数据的锁范围更小（没有间隙锁），这个选择是合理的。</p>
-<p>但其实我想说的是，配置是否合理，跟业务场景有关，需要具体问题具体分析。</p>
-<p>但是，如果DBA认为之所以这么用的原因是“大家都这么用”，那就有问题了，或者说，迟早会出问题。</p>
-<p>比如说，大家都用读提交，可是逻辑备份的时候，mysqldump为什么要把备份线程设置成可重复读呢？（这个我在前面的文章中已经解释过了，你可以再回顾下第6篇文章《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》的内容）然后，在备份期间，备份线程用的是可重复读，而业务线程用的是读提交。</p>
-<p>同时存在两种事务隔离级别，会不会有问题？进一步地，这两个不同的隔离级别现象有什么不一样的，关于我们的业务，“用读提交就够了”这个结论是怎么得到的？如果业务开发和运维团队这些问题都没有弄清楚，那么“没问题”这个结论，本身就是有问题的。</p>
-<p>小结今天我们从上一篇文章的课后问题说起，提到了全表扫描的加锁方式。</p>
-<p>我们发现即使给所有的行都加上行锁，仍然无法解决幻读问题，因此引入了间隙锁的概念。</p>
-<p>我碰到过很多对数据库有一定了解的业务开发人员，他们在设计数据表结构和业务SQL语句的时候，对行锁有很准确的认识，但却很少考虑到间隙锁。</p>
-<p>最后的结果，就是生产库上会经常出现由于间隙锁导致的死锁现象。</p>
-<p>行锁确实比较直观，判断规则也相对简单，间隙锁的引入会影响系统的并发度，也增加了锁分析的复杂度，但也有章可循。</p>
-<p>下一篇文章，我就会为你讲解InnoDB的加锁规则，帮你理顺这其中的“章法”。</p>
-<p>作为对下一篇文章的预习，我给你留下一个思考题。</p>
-<p>图9 事务进入锁等待状态如果你之前没有了解过本篇文章的相关内容，一定觉得这三个语句简直是风马牛不相及。</p>
-<p>但实际上，这里session B和session C的insert 语句都会进入锁等待状态。</p>
-<p>你可以试着分析一下，出现这种情况的原因是什么？这里需要说明的是，这其实是我在下一篇文章介绍加锁规则后才能回答的问题，是留给你作为预习的，其中session C被锁住这个分析是有点难度的。</p>
-<p>如果你没有分析出来，也不要气馁，我会在下一篇文章和你详细说明。</p>
-<p>你也可以说说，你的线上MySQL配置的是什么隔离级别，为什么会这么配置？你有没有碰到什么场景，是必须使用可重复读隔离级别的呢？你可以把你的碰到的场景和分析写在留言区里，我会在下一篇文章选取有趣的评论跟大家一起分享和分析。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我们在本文的开头回答了上期问题。</p>
-<p>有同学的回答中还说明了读提交隔离级别下，在语句执行完成后，是只有行锁的。</p>
-<p>而且语句执行完成后，InnoDB就会把不满足条件的行行锁去掉。</p>
-<p>当然了，c=5这一行的行锁，还是会等到commit的时候才释放的。</p>
+          <p>Trie 树，也称为字典树或前缀树，是一种用于存储和检索字符串集合的数据结构。它的主要优势是可以高效地进行字符串的插入、删除和搜索操作，特别适用于大量字符串的快速查找。Trie 树的基本思想是将字符串按照字符逐层存储，每个节点代表一个字符，从根节点到叶子节点的路径表示一个完整的字符串。</p>
+<p>以下是一个简单的 Java 实现示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/><span class="line">47</span><br/><span class="line">48</span><br/><span class="line">49</span><br/><span class="line">50</span><br/><span class="line">51</span><br/><span class="line">52</span><br/><span class="line">53</span><br/><span class="line">54</span><br/><span class="line">55</span><br/><span class="line">56</span><br/><span class="line">57</span><br/><span class="line">58</span><br/><span class="line">59</span><br/><span class="line">60</span><br/><span class="line">61</span><br/><span class="line">62</span><br/><span class="line">63</span><br/><span class="line">64</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TrieNode</span> {</span><br/><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ALPHABET_SIZE</span> <span class="operator">=</span> <span class="number">26</span>;</span><br/><span class="line">    TrieNode[] children;</span><br/><span class="line">    <span class="type">boolean</span> isEndOfWord;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">TrieNode</span><span class="params">()</span> {</span><br/><span class="line">        children = <span class="keyword">new</span> <span class="title class_">TrieNode</span>[ALPHABET_SIZE];</span><br/><span class="line">        isEndOfWord = <span class="literal">false</span>;</span><br/><span class="line">    }</span><br/><span class="line">}</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Trie</span> {</span><br/><span class="line">    <span class="keyword">private</span> TrieNode root;</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="title function_">Trie</span><span class="params">()</span> {</span><br/><span class="line">        root = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">insert</span><span class="params">(String word)</span> {</span><br/><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">'a'</span>;</span><br/><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) {</span><br/><span class="line">                current.children[index] = <span class="keyword">new</span> <span class="title class_">TrieNode</span>();</span><br/><span class="line">            }</span><br/><span class="line">            current = current.children[index];</span><br/><span class="line">        }</span><br/><span class="line">        current.isEndOfWord = <span class="literal">true</span>;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">search</span><span class="params">(String word)</span> {</span><br/><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : word.toCharArray()) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">'a'</span>;</span><br/><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) {</span><br/><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br/><span class="line">            }</span><br/><span class="line">            current = current.children[index];</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> current.isEndOfWord;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">startsWith</span><span class="params">(String prefix)</span> {</span><br/><span class="line">        <span class="type">TrieNode</span> <span class="variable">current</span> <span class="operator">=</span> root;</span><br/><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : prefix.toCharArray()) {</span><br/><span class="line">            <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> c - <span class="string">'a'</span>;</span><br/><span class="line">            <span class="keyword">if</span> (current.children[index] == <span class="literal">null</span>) {</span><br/><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br/><span class="line">            }</span><br/><span class="line">            current = current.children[index];</span><br/><span class="line">        }</span><br/><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br/><span class="line">    }</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> {</span><br/><span class="line">        <span class="type">Trie</span> <span class="variable">trie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Trie</span>();</span><br/><span class="line">        trie.insert(<span class="string">"apple"</span>);</span><br/><span class="line">        System.out.println(trie.search(<span class="string">"apple"</span>));   <span class="comment">// 输出 true</span></span><br/><span class="line">        System.out.println(trie.search(<span class="string">"app"</span>));     <span class="comment">// 输出 false</span></span><br/><span class="line">        System.out.println(trie.startsWith(<span class="string">"app"</span>)); <span class="comment">// 输出 true</span></span><br/><span class="line">        trie.insert(<span class="string">"app"</span>);</span><br/><span class="line">        System.out.println(trie.search(<span class="string">"app"</span>));     <span class="comment">// 输出 true</span></span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+<p>在这个示例中，我们创建了一个 <code>TrieNode</code> 类来表示 Trie 树的节点。每个节点都包含一个字符数组作为子节点，并有一个标志来指示当前节点是否是一个单词的结尾。然后，我们创建了一个 <code>Trie</code> 类来实现 Trie 树的插入、搜索和前缀搜索功能。</p>
+<p>请注意，这只是 Trie 树的一个简单实现示例。在实际应用中，您可能需要进行更多的优化和功能扩展，以适应特定的需求。</p>
 
       
     </div>
@@ -1397,7 +648,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/f5203c05.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22933.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1415,7 +666,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/f5203c05.html" class="post-title-link" itemprop="url">mysql-为什么我只查一行的语句也执行这么慢</a>
+          <a href="/posts/22933.html" class="post-title-link" itemprop="url">JAVA-同步锁-synchronized</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1426,7 +677,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-22 14:15:35" itemprop="dateCreated datePublished" datetime="2019-11-22T14:15:35+08:00">2019-11-22</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1434,7 +685,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -1448,120 +699,67 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>为什么我只查一行的语句，也执行这么慢一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大量的数据。</p>
-<p>但有些情况下，“查一行”，也会执行得特别慢。</p>
-<p>今天，我就跟你聊聊这个有趣的话题，看看什么情况下，会出现这个现象。</p>
-<p>需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或ioutil（IO利用率）很高，这种情况下所有语句的执行都有可能变慢，不属于我们今天的讨论范围。</p>
-<p>为了便于描述，我还是构造一个表，基于这个表来说明今天的问题。</p>
-<p>这个表有两个字段id和c，并且我在里面插入了10万行记录。</p>
-<p>接下来，我会用几个不同的场景来举例，有些是前面的文章中我们已经介绍过的知识点，你看看能不能一眼看穿，来检验一下吧。</p>
-<p>第一类：查询长时间不返回如图1所示，在表t执行下面的SQL语句：</p>
-<p>查询结果长时间不返回。</p>
-<p>图1 查询长时间不返回一般碰到这种情况的话，大概率是表t被锁住了。</p>
-<p>接下来分析原因的时候，一般都是首先执行一下show processlist命令，看看当前语句处于什么状态。</p>
-<p>mysql&gt; CREATE TABLE t̀  ̀(  ìd  ̀int(11) NOT NULL,  `c  ̀int(11) DEFAULT NULL,  PRIMARY KEY (̀ id )̀) ENGINE=InnoDB;delimiter ;;create procedure idata()begin  declare i int;  set i=1;  while(i&lt;=100000)do    insert into t values(i,i);    set i=i+1;  end while;end;;delimiter ;call idata();mysql&gt; select * from t where id=1;然后我们再针对每种状态，去分析它们产生的原因、如何复现，以及如何处理。</p>
-<p>等MDL锁如图2所示，就是使用show processlist命令查看Waiting for table metadata lock的示意图。</p>
-<p>图2 Waiting for table metadata lock状态示意图出现这个状态表示的是，现在有一个线程正在表t上请求或者持有MDL写锁，把select语句堵住了。</p>
-<p>在第6篇文章《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》中，我给你介绍过一种复现方法。</p>
-<p>但需要说明的是，那个复现过程是基于MySQL 5.6版本的。</p>
-<p>而MySQL 5.7版本修改了MDL的加锁策略，所以就不能复现这个场景了。</p>
-<p>不过，在MySQL 5.7版本下复现这个场景，也很容易。</p>
-<p>如图3所示，我给出了简单的复现步骤。</p>
-<p>图3 MySQL 5.7中Waiting for table metadata lock的复现步骤session A 通过lock table命令持有表t的MDL写锁，而session B的查询需要获取MDL读锁。</p>
-<p>所以，session B进入等待状态。</p>
-<p>这类问题的处理方式，就是找到谁持有MDL写锁，然后把它kill掉。</p>
-<p>但是，由于在show processlist的结果里面，session A的Command列是“Sleep”，导致查找起来很不方便。</p>
-<p>不过有了performance_schema和sys系统库以后，就方便多了。</p>
-<p>（MySQL启动时需要设置performance_schema=on，相比于设置为off会有10%左右的性能损失)通过查询sys.schema_table_lock_waits这张表，我们就可以直接找出造成阻塞的process id，把这个连接用kill 命令断开即可。</p>
-<p>图4 查获加表锁的线程id等flush接下来，我给你举另外一种查询被堵住的情况。</p>
-<p>我在表t上，执行下面的SQL语句：</p>
-<p>这里，我先卖个关子。</p>
-<p>你可以看一下图5。</p>
-<p>我查出来这个线程的状态是Waiting for table flush，你可以设想一下这是什么原因。</p>
-<p>图5 Waiting for table flush状态示意图这个状态表示的是，现在有一个线程正要对表t做flush操作。</p>
-<p>MySQL里面对表做flush操作的用法，一般有以下两个：</p>
-<p>这两个flush语句，如果指定表t的话，代表的是只关闭表t；如果没有指定具体的表名，则表示关闭MySQL里所有打开的表。</p>
-<p>但是正常这两个语句执行起来都很快，除非它们也被别的线程堵住了。</p>
-<p>所以，出现Waiting for table flush状态的可能情况是：有一个flush tables命令被别的语句堵住mysql&gt; select * from information_schema.processlist where id=1;flush tables t with read lock;flush tables with read lock;了，然后它又堵住了我们的select语句。</p>
-<p>现在，我们一起来复现一下这种情况，复现步骤如图6所示：</p>
-<p>图6 Waiting for table flush的复现步骤在session A中，我故意每行都调用一次sleep(1)，这样这个语句默认要执行10万秒，在这期间表t一直是被session A“打开”着。</p>
-<p>然后，session B的flush tables t命令再要去关闭表t，就需要等session A的查询结束。</p>
-<p>这样，session C要再次查询的话，就会被flush 命令堵住了。</p>
-<p>图7是这个复现步骤的show processlist结果。</p>
-<p>这个例子的排查也很简单，你看到这个showprocesslist的结果，肯定就知道应该怎么做了。</p>
-<p>图 7 Waiting for table flush的show processlist 结果等行锁现在，经过了表级锁的考验，我们的select 语句终于来到引擎里了。</p>
-<p>上面这条语句的用法你也很熟悉了，我们在第8篇《事务到底是隔离的还是不隔离的？》文章介绍当前读时提到过。</p>
-<p>由于访问id=1这个记录时要加读锁，如果这时候已经有一个事务在这行记录上持有一个写锁，我们的select语句就会被堵住。</p>
-<p>复现步骤和现场如下：</p>
-<p>mysql&gt; select * from t where id=1 lock in share mode; 图 8 行锁复现图 9 行锁show processlist 现场显然，session A启动了事务，占有写锁，还不提交，是导致session B被堵住的原因。</p>
-<p>这个问题并不难分析，但问题是怎么查出是谁占着这个写锁。</p>
-<p>如果你用的是MySQL 5.7版本，可以通过sys.innodb_lock_waits 表查到。</p>
-<p>查询方法是：</p>
-<p>mysql&gt; select * from t sys.innodb_lock_waits where locked_table= ‘̀test’.’t’̀ \G图10 通过sys.innodb_lock_waits 查行锁可以看到，这个信息很全，4号线程是造成堵塞的罪魁祸首。</p>
-<p>而干掉这个罪魁祸首的方式，就是KILL QUERY 4或KILL 4。</p>
-<p>不过，这里不应该显示“KILL QUERY 4”。</p>
-<p>这个命令表示停止4号线程当前正在执行的语句，而这个方法其实是没有用的。</p>
-<p>因为占有行锁的是update语句，这个语句已经是之前执行完成了的，现在执行KILL QUERY，无法让这个事务去掉id=1上的行锁。</p>
-<p>实际上，KILL 4才有效，也就是说直接断开这个连接。</p>
-<p>这里隐含的一个逻辑就是，连接被断开的时候，会自动回滚这个连接里面正在执行的线程，也就释放了id=1上的行锁。</p>
-<p>第二类：查询慢经过了重重封“锁”，我们再来看看一些查询慢的例子。</p>
-<p>先来看一条你一定知道原因的SQL语句：</p>
-<p>mysql&gt; select * from t where c=50000 limit 1;由于字段c上没有索引，这个语句只能走id主键顺序扫描，因此需要扫描5万行。</p>
-<p>作为确认，你可以看一下慢查询日志。</p>
-<p>注意，这里为了把所有语句记录到slow log里，我在连接后先执行了 set long_query_time=0，将慢查询日志的时间阈值设置为0。</p>
-<p>图11 全表扫描5万行的slow logRows_examined显示扫描了50000行。</p>
-<p>你可能会说，不是很慢呀，11.5毫秒就返回了，我们线上一般都配置超过1秒才算慢查询。</p>
-<p>但你要记住：坏查询不一定是慢查询。</p>
-<p>我们这个例子里面只有10万行记录，数据量大起来的话，执行时间就线性涨上去了。</p>
-<p>扫描行数多，所以执行慢，这个很好理解。</p>
-<p>但是接下来，我们再看一个只扫描一行，但是执行很慢的语句。</p>
-<p>如图12所示，是这个例子的slow log。</p>
-<p>可以看到，执行的语句是虽然扫描行数是1，但执行时间却长达800毫秒。</p>
-<p>图12 扫描一行却执行得很慢是不是有点奇怪呢，这些时间都花在哪里了？如果我把这个slow log的截图再往下拉一点，你可以看到下一个语句，select * from t where id=1lock in share mode，执行时扫描行数也是1行，执行时间是0.2毫秒。</p>
-<p>图 13 加上lock in share mode的slow log看上去是不是更奇怪了？按理说lock in share mode还要加锁，时间应该更长才对啊。</p>
-<p>可能有的同学已经有答案了。</p>
-<p>如果你还没有答案的话，我再给你一个提示信息，图14是这两个mysql&gt; select * from t where id=1；</p>
-<p>语句的执行输出结果。</p>
-<p>图14 两个语句的输出结果第一个语句的查询结果里c=1，带lock in share mode的语句返回的是c=1000001。</p>
-<p>看到这里应该有更多的同学知道原因了。</p>
-<p>如果你还是没有头绪的话，也别着急。</p>
-<p>我先跟你说明一下复现步骤，再分析原因。</p>
-<p>图15 复现步骤你看到了，session A先用start transaction with consistent snapshot命令启动了一个事务，之后session B才开始执行update 语句。</p>
-<p>session B执行完100万次update语句后，id=1这一行处于什么状态呢？你可以从图16中找到答案。</p>
-<p>图16 id=1的数据状态session B更新完100万次，生成了100万个回滚日志(undo log)。</p>
-<p>带lock in share mode的SQL语句，是当前读，因此会直接读到1000001这个结果，所以速度很快；而select * from t where id=1这个语句，是一致性读，因此需要从1000001开始，依次执行undo log，执行了100万次以后，才将1这个结果返回。</p>
-<p>注意，undo log里记录的其实是“把2改成1”，“把3改成2”这样的操作逻辑，画成减1的目的是方便你看图。</p>
-<p>小结今天我给你举了在一个简单的表上，执行“查一行”，可能会出现的被锁住和执行慢的例子。</p>
-<p>这其中涉及到了表锁、行锁和一致性读的概念。</p>
-<p>在实际使用中，碰到的场景会更复杂。</p>
-<p>但大同小异，你可以按照我在文章中介绍的定位方法，来定位并解决问题。</p>
-<p>最后，我给你留一个问题吧。</p>
-<p>我们在举例加锁读的时候，用的是这个语句，select * from t where id=1 lock in share mode。</p>
-<p>由于id上有索引，所以可以直接定位到id=1这一行，因此读锁也是只加在了这一行上。</p>
-<p>但如果是下面的SQL语句，这个语句序列是怎么加锁的呢？加的锁又是什么时候释放呢？你可以把你的观点和验证方法写在留言区里，我会在下一篇文章的末尾给出我的参考答案。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间在上一篇文章最后，我留给你的问题是，希望你可以分享一下之前碰到过的、与文章中类似的场景。</p>
-<p>@封建的风 提到一个有趣的场景，值得一说。</p>
-<p>我把他的问题重写一下，表结构如下：</p>
-<p>假设现在表里面，有100万行数据，其中有10万行数据的b的值是’1234567890’， 假设现在执行语句是这么写的:这时候，MySQL会怎么执行呢？最理想的情况是，MySQL看到字段b定义的是varchar(10)，那肯定返回空呀。</p>
-<p>可惜，MySQL并没有这么做。</p>
-<p>那要不，就是把’1234567890abcd’拿到索引里面去做匹配，肯定也没能够快速判断出索引树b上并没有这个值，也很快就能返回空结果。</p>
-<p>begin;select * from t where c=5 for update;commit;mysql&gt; CREATE TABLE t̀able_a  ̀(  ìd  ̀int(11) NOT NULL,  <code>b  ̀varchar(10) DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY </code>b  ̀(̀ b )̀) ENGINE=InnoDB;mysql&gt; select * from table_a where b=’1234567890abcd’;但实际上，MySQL也不是这么做的。</p>
-<p>这条SQL语句的执行很慢，流程是这样的：</p>
-<ol>
-<li>在传给引擎执行的时候，做了字符截断。</li>
-</ol>
-<p>因为引擎里面这个行只定义了长度是10，所以只截了前10个字节，就是’1234567890’进去做匹配；</p>
-<ol start="2">
-<li><p>这样满足条件的数据有10万行；</p>
-</li>
-<li><p>因为是select *， 所以要做10万次回表；</p>
-</li>
-<li><p>但是每次回表以后查出整行，到server层一判断，b的值都不是’1234567890abcd’;5. 返回结果是空。</p>
-</li>
-</ol>
-<p>这个例子，是我们文章内容的一个很好的补充。</p>
-<p>虽然执行过程中可能经过函数操作，但是最终在拿到结果后，server层还是要做一轮判断的。</p>
+          <p>控制Java多线程环境下的线程同步</p>
+<h2 id="对象锁"><a class="headerlink" href="#对象锁" title="对象锁"></a>对象锁</h2><p>synchronized修饰方法或者代码块</p>
+<h2 id="类锁"><a class="headerlink" href="#类锁" title="类锁"></a>类锁</h2><p>synchronized修饰静态方法或者代码块</p>
+<h2 id="方法锁（对象锁）"><a class="headerlink" href="#方法锁（对象锁）" title="方法锁（对象锁）"></a>方法锁（对象锁）</h2><p>synchronized修饰方法，锁住的也是这个对象</p>
+<h2 id="示例"><a class="headerlink" href="#示例" title="示例"></a>示例</h2><pre><code>public class SynchronizeTest {
+    static class S{
+        String name;
+        public void setName(String name) throws InterruptedException {
+            synchronized (this) {
+                System.out.println("..........");
+                Thread.sleep(1000*5L);
+                this.name = name;
+            }
+        }
+        public void print(){
+            synchronized (this){
+                System.out.println(name);
+            }
+        }
+        public synchronized void doSomething1(){
+            System.out.println("doSomething1");
+            try {
+                Thread.sleep(1000*5L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        public synchronized void doSomething2(){
+            System.out.println(name);
+        }
+    }
+    public static void main(String[] args) throws Exception{
+        S s = new S();
+//        Thread t1 = new Thread(() -&gt; {
+//            try {
+//                s.setName("hello");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//        t1.start();
+//        Thread t2 = new Thread(() -&gt; {
+//                s.print();
+//        });
+//        t2.start();
+//        t1.join();
+//        t2.join();
+        Thread t1 = new Thread(() -&gt; {
+             s.doSomething1();
+        });
+        t1.start();
+        Thread t2 = new Thread(() -&gt; {
+            s.doSomething2();
+        });
+        t2.start();
+        t1.join();
+        t2.join();
+
+<pre><code>}
+</code></pre>
+<p>}<br/></p></code></pre>
 
       
     </div>
@@ -1588,7 +786,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ca522c4d.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22404.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1606,7 +804,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/ca522c4d.html" class="post-title-link" itemprop="url">mysql-为什么这些SQL语句逻辑相同性能却差异巨大</a>
+          <a href="/posts/22404.html" class="post-title-link" itemprop="url">Java-java8语法</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1617,7 +815,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-20 14:02:02" itemprop="dateCreated datePublished" datetime="2019-11-20T14:02:02+08:00">2019-11-20</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1625,7 +823,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -1639,152 +837,32 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>为什么这些SQL语句逻辑相同，性能却差异巨大？在MySQL中，有很多看上去逻辑相同，但性能却差异巨大的SQL语句。</p>
-<p>对这些语句使用不当的话，就会不经意间导致整个数据库的压力变大。</p>
-<p>我今天挑选了三个这样的案例和你分享。</p>
-<p>希望再遇到相似的问题时，你可以做到举一反三、快速解决问题。</p>
-<p>案例一：条件字段函数操作假设你现在维护了一个交易系统，其中交易记录表tradelog包含交易流水号（tradeid）、交易员id（operator）、交易时间（t_modified）等字段。</p>
-<p>为了便于描述，我们先忽略其他字段。</p>
-<p>这个表的建表语句如下：</p>
-<p>假设，现在已经记录了从2016年初到2018年底的所有数据，运营部门有一个需求是，要统计发生在所有年份中7月份的交易记录总数。</p>
-<p>这个逻辑看上去并不复杂，你的SQL语句可能会这么写：</p>
-<p>由于t_modified字段上有索引，于是你就很放心地在生产库中执行了这条语句，但却发现执行了特别久，才返回了结果。</p>
-<p>如果你问DBA同事为什么会出现这样的情况，他大概会告诉你：如果对字段做了函数计算，就用不上索引了，这是MySQL的规定。</p>
-<p>现在你已经学过了InnoDB的索引结构了，可以再追问一句为什么？为什么条件是wheret_modified=’2018-7-1’的时候可以用上索引，而改成where month(t_modified)=7的时候就不行了？下面是这个t_modified索引的示意图。</p>
-<p>方框上面的数字就是month()函数对应的值。</p>
-<p>mysql&gt; CREATE TABLE t̀radelog  ̀(  ìd  ̀int(11) NOT NULL,  t̀radeid  ̀varchar(32) DEFAULT NULL,  `operator̀  int(11) DEFAULT NULL,  t̀_modified  ̀datetime DEFAULT NULL,  PRIMARY KEY (̀ id )̀,  KEY t̀radeid  ̀(̀ tradeid )̀,  KEY t̀_modified  ̀(̀ t_modified )̀) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;mysql&gt; select count(*) from tradelog where month(t_modified)=7;图1 t_modified索引示意图如果你的SQL语句条件用的是where t_modified=’2018-7-1’的话，引擎就会按照上面绿色箭头的路线，快速定位到 t_modified=’2018-7-1’需要的结果。</p>
-<p>实际上，B+树提供的这个快速定位能力，来源于同一层兄弟节点的有序性。</p>
-<p>但是，如果计算month()函数的话，你会看到传入7的时候，在树的第一层就不知道该怎么办了。</p>
-<p>也就是说，对索引字段做函数操作，可能会破坏索引值的有序性，因此优化器就决定放弃走树搜索功能。</p>
-<p>需要注意的是，优化器并不是要放弃使用这个索引。</p>
-<p>在这个例子里，放弃了树搜索功能，优化器可以选择遍历主键索引，也可以选择遍历索引t_modified，优化器对比索引大小后发现，索引t_modified更小，遍历这个索引比遍历主键索引来得更快。</p>
-<p>因此最终还是会选择索引t_modified。</p>
-<p>接下来，我们使用explain命令，查看一下这条SQL语句的执行结果。</p>
-<p>图2 explain 结果key=”t_modified”表示的是，使用了t_modified这个索引；我在测试表数据中插入了10万行数据，rows=100335，说明这条语句扫描了整个索引的所有值；Extra字段的Using index，表示的是使用了覆盖索引。</p>
-<p>也就是说，由于在t_modified字段加了month()函数操作，导致了全索引扫描。</p>
-<p>为了能够用上索引的快速定位能力，我们就要把SQL语句改成基于字段本身的范围查询。</p>
-<p>按照下面这个写法，优化器就能按照我们预期的，用上t_modified索引的快速定位能力了。</p>
-<p>当然，如果你的系统上线时间更早，或者后面又插入了之后年份的数据的话，你就需要再把其他年份补齐。</p>
-<p>到这里我给你说明了，由于加了month()函数操作，MySQL无法再使用索引快速定位功能，而只能使用全索引扫描。</p>
-<p>不过优化器在个问题上确实有“偷懒”行为，即使是对于不改变有序性的函数，也不会考虑使用索引。</p>
-<p>比如，对于select * from tradelog where id + 1 = 10000这个SQL语句，这个加1操作并不会改变有序性，但是MySQL优化器还是不能用id索引快速定位到9999这一行。</p>
-<p>所以，需要你在写SQL语句的时候，手动改写成 where id = 10000 -1才可以。</p>
-<p>案例二：隐式类型转换接下来我再跟你说一说，另一个经常让程序员掉坑里的例子。</p>
-<p>我们一起看一下这条SQL语句：</p>
-<p>交易编号tradeid这个字段上，本来就有索引，但是explain的结果却显示，这条语句需要走全表扫描。</p>
-<p>你可能也发现了，tradeid的字段类型是varchar(32)，而输入的参数却是整型，所以需要做类型转换。</p>
-<p>那么，现在这里就有两个问题：</p>
-<p>mysql&gt; select count(*) from tradelog where    -&gt; (t_modified &gt;= ‘2016-7-1’ and t_modified&lt;’2016-8-1’) or    -&gt; (t_modified &gt;= ‘2017-7-1’ and t_modified&lt;’2017-8-1’) or     -&gt; (t_modified &gt;= ‘2018-7-1’ and t_modified&lt;’2018-8-1’);mysql&gt; select * from tradelog where tradeid=110717;1. 数据类型转换的规则是什么？2. 为什么有数据类型转换，就需要走全索引扫描？先来看第一个问题，你可能会说，数据库里面类型这么多，这种数据类型转换规则更多，我记不住，应该怎么办呢？这里有一个简单的方法，看 select “10” &gt; 9的结果：</p>
+          <p>Java 8 是 Java 编程语言的一个重要版本，引入了许多新特性和语法改进，使得编写代码更加简洁和高效。以下是一些 Java 8 中的重要语法特性的详细解释：</p>
 <ol>
-<li><p>如果规则是“将字符串转成数字”，那么就是做数字比较，结果应该是1；</p>
+<li><p><strong>Lambda 表达式</strong>：Lambda 表达式是一种更简洁的方法来表示匿名函数。它们可以用于替代需要单一抽象方法的接口实现。Lambda 表达式的语法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line">(parameters) -&gt; expression</span><br/><span class="line">或</span><br/><span class="line">(parameters) -&gt; { statements; }</span><br/></pre></td></tr></table></figure>
 </li>
-<li><p>如果规则是“将数字转成字符串”，那么就是做字符串比较，结果应该是0。</p>
+<li><p><strong>函数式接口</strong>：函数式接口是只包含一个抽象方法的接口。Java 8 中的 Lambda 表达式常常与函数式接口一起使用。例如，<code>Runnable</code> 和 <code>Callable</code> 接口就是函数式接口的例子。</p>
+</li>
+<li><p><strong>Stream API</strong>：Stream 是一种处理集合数据的新方式，它提供了一种流式处理元素的方法。Stream API 可以极大地简化集合操作，例如过滤、映射、聚合等。以下是一个使用 Stream 进行过滤的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br/><span class="line">List&lt;Integer&gt; evenNumbers = numbers.stream()</span><br/><span class="line">                                   .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>)</span><br/><span class="line">                                   .collect(Collectors.toList());</span><br/></pre></td></tr></table></figure>
+</li>
+<li><p><strong>方法引用</strong>：方法引用是一种更简洁地调用已存在方法的方式，可以使代码更易读。方法引用可以用于静态方法、实例方法以及构造函数。以下是一些方法引用的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态方法引用</span></span><br/><span class="line">Function&lt;String, Integer&gt; parseInt = Integer::parseInt;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">// 实例方法引用</span></span><br/><span class="line">List&lt;String&gt; names = Arrays.asList(<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"Charlie"</span>);</span><br/><span class="line">names.forEach(System.out::println);</span><br/><span class="line"></span><br/><span class="line"><span class="comment">// 构造函数引用</span></span><br/><span class="line">Supplier&lt;List&lt;String&gt;&gt; listSupplier = ArrayList::<span class="keyword">new</span>;</span><br/></pre></td></tr></table></figure>
+</li>
+<li><p><strong>默认方法和静态方法</strong>：Java 8 允许在接口中定义默认方法和静态方法。默认方法允许在不破坏实现类的情况下向接口添加新方法。静态方法可以直接通过接口名调用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">MyInterface</span> {</span><br/><span class="line">    <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span>;</span><br/><span class="line">    </span><br/><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">doSomethingElse</span><span class="params">()</span> {</span><br/><span class="line">        <span class="comment">// 默认实现</span></span><br/><span class="line">    }</span><br/><span class="line">    </span><br/><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">staticMethod</span><span class="params">()</span> {</span><br/><span class="line">        <span class="comment">// 静态方法实现</span></span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Optional 类</strong>：Optional 是一个容器类，可以用来处理可能为空的值，避免空指针异常。它鼓励程序员显式处理可能为空的情况。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; optionalValue = Optional.ofNullable(getValue());</span><br/><span class="line"><span class="keyword">if</span> (optionalValue.isPresent()) {</span><br/><span class="line">    <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> optionalValue.get();</span><br/><span class="line">} <span class="keyword">else</span> {</span><br/><span class="line">    <span class="comment">// 值为空的处理</span></span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
+</li>
+<li><p><strong>新的日期和时间 API</strong>：Java 8 引入了新的日期和时间 API，解决了旧的 <code>Date</code> 和 <code>Calendar</code> 类的问题。新的 API 提供了更好的可读性和易用性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now</span> <span class="operator">=</span> LocalDateTime.now();</span><br/><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">formatter</span> <span class="operator">=</span> DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br/><span class="line"><span class="type">String</span> <span class="variable">formattedDateTime</span> <span class="operator">=</span> now.format(formatter);</span><br/></pre></td></tr></table></figure>
+</li>
+<li><p><strong>默认方法的解决冲突</strong>：当一个类实现了多个接口，这些接口有相同的默认方法时，编译器会要求显示指定调用哪个接口的方法，或者在实现类中重写该方法。</p>
 </li>
 </ol>
-<p>验证结果如图3所示。</p>
-<p>图3 MySQL中字符串和数字转换的效果示意图从图中可知，select “10” &gt; 9返回的是1，所以你就能确认MySQL里的转换规则了：在MySQL中，字符串和数字做比较的话，是将字符串转换成数字。</p>
-<p>这时，你再看这个全表扫描的语句：</p>
-<p>就知道对于优化器来说，这个语句相当于：</p>
-<p>也就是说，这条语句触发了我们上面说到的规则：对索引字段做函数操作，优化器会放弃走树搜索功能。</p>
-<p>现在，我留给你一个小问题，id的类型是int，如果执行下面这个语句，是否会导致全表扫描呢？mysql&gt; select * from tradelog where tradeid=110717;mysql&gt; select * from tradelog where  CAST(tradid AS signed int) = 110717;select * from tradelog where id=”83126”;你可以先自己分析一下，再到数据库里面去验证确认。</p>
-<p>接下来，我们再来看一个稍微复杂点的例子。</p>
-<p>案例三：隐式字符编码转换假设系统里还有另外一个表trade_detail，用于记录交易的操作细节。</p>
-<p>为了便于量化分析和复现，我往交易日志表tradelog和交易详情表trade_detail这两个表里插入一些数据。</p>
-<p>这时候，如果要查询id=2的交易的所有操作步骤信息，SQL语句可以这么写：</p>
-<p>mysql&gt; CREATE TABLE t̀rade_detail  ̀(  ìd  ̀int(11) NOT NULL,  t̀radeid  ̀varchar(32) DEFAULT NULL,  t̀rade_step  ̀int(11) DEFAULT NULL, /<em>操作步骤</em>/  `step_info  ̀varchar(32) DEFAULT NULL, /<em>步骤信息</em>/  PRIMARY KEY (̀ id )̀,  KEY t̀radeid  ̀(̀ tradeid )̀) ENGINE=InnoDB DEFAULT CHARSET=utf8;insert into tradelog values(1, ‘aaaaaaaa’, 1000, now());insert into tradelog values(2, ‘aaaaaaab’, 1000, now());insert into tradelog values(3, ‘aaaaaaac’, 1000, now());insert into trade_detail values(1, ‘aaaaaaaa’, 1, ‘add’);insert into trade_detail values(2, ‘aaaaaaaa’, 2, ‘update’);insert into trade_detail values(3, ‘aaaaaaaa’, 3, ‘commit’);insert into trade_detail values(4, ‘aaaaaaab’, 1, ‘add’);insert into trade_detail values(5, ‘aaaaaaab’, 2, ‘update’);insert into trade_detail values(6, ‘aaaaaaab’, 3, ‘update again’);insert into trade_detail values(7, ‘aaaaaaab’, 4, ‘commit’);insert into trade_detail values(8, ‘aaaaaaac’, 1, ‘add’);insert into trade_detail values(9, ‘aaaaaaac’, 2, ‘update’);insert into trade_detail values(10, ‘aaaaaaac’, 3, ‘update again’);insert into trade_detail values(11, ‘aaaaaaac’, 4, ‘commit’);mysql&gt; select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2; /<em>语句Q1</em>/图4 语句Q1的explain 结果我们一起来看下这个结果：</p>
-<ol>
-<li><p>第一行显示优化器会先在交易记录表tradelog上查到id=2的行，这个步骤用上了主键索引，rows=1表示只扫描一行；</p>
-</li>
-<li><p>第二行key=NULL，表示没有用上交易详情表trade_detail上的tradeid索引，进行了全表扫描。</p>
-</li>
-</ol>
-<p>在这个执行计划里，是从tradelog表中取tradeid字段，再去trade_detail表里查询匹配字段。</p>
-<p>因此，我们把tradelog称为驱动表，把trade_detail称为被驱动表，把tradeid称为关联字段。</p>
-<p>接下来，我们看下这个explain结果表示的执行流程：</p>
-<p>图5 语句Q1的执行过程图中：</p>
-<p>第1步，是根据id在tradelog表里找到L2这一行；</p>
-<p>第2步，是从L2中取出tradeid字段的值；</p>
-<p>第3步，是根据tradeid值到trade_detail表中查找条件匹配的行。</p>
-<p>explain的结果里面第二行的key=NULL表示的就是，这个过程是通过遍历主键索引的方式，一个一个地判断tradeid的值是否匹配。</p>
-<p>进行到这里，你会发现第3步不符合我们的预期。</p>
-<p>因为表trade_detail里tradeid字段上是有索引的，我们本来是希望通过使用tradeid索引能够快速定位到等值的行。</p>
-<p>但，这里并没有。</p>
-<p>如果你去问DBA同学，他们可能会告诉你，因为这两个表的字符集不同，一个是utf8，一个是utf8mb4，所以做表连接查询的时候用不上关联字段的索引。</p>
-<p>这个回答，也是通常你搜索这个问题时会得到的答案。</p>
-<p>但是你应该再追问一下，为什么字符集不同就用不上索引呢？我们说问题是出在执行步骤的第3步，如果单独把这一步改成SQL语句的话，那就是：</p>
-<p>其中，$L2.tradeid.value的字符集是utf8mb4。</p>
-<p>参照前面的两个例子，你肯定就想到了，字符集utf8mb4是utf8的超集，所以当这两个类型的字符串在做比较的时候，MySQL内部的操作是，先把utf8字符串转成utf8mb4字符集，再做比较。</p>
-<p>因此， 在执行上面这个语句的时候，需要将被驱动数据表里的字段一个个地转换成utf8mb4，再跟L2做比较。</p>
-<p>也就是说，实际上这个语句等同于下面这个写法：</p>
-<p>CONVERT()函数，在这里的意思是把输入的字符串转成utf8mb4字符集。</p>
-<p>这就再次触发了我们上面说到的原则：对索引字段做函数操作，优化器会放弃走树搜索功能。</p>
-<p>到这里，你终于明确了，字符集不同只是条件之一，连接过程中要求在被驱动表的索引字段上加函数操作，是直接导致对被驱动表做全表扫描的原因。</p>
-<p>mysql&gt; select * from trade_detail where tradeid=$L2.tradeid.value; 这个设定很好理解，utf8mb4是utf8的超集。</p>
-<p>类似地，在程序设计语言里面，做自动类型转换的时候，为了避免数据在转换过程中由于截断导致数据错误，也都是“按数据长度增加的方向”进行转换的。</p>
-<p>select * from trade_detail  where CONVERT(traideid USING utf8mb4)=$L2.tradeid.value; 作为对比验证，我给你提另外一个需求，“查找trade_detail表里id=4的操作，对应的操作者是谁”，再来看下这个语句和它的执行计划。</p>
-<p>图6 explain 结果这个语句里trade_detail 表成了驱动表，但是explain结果的第二行显示，这次的查询操作用上了被驱动表tradelog里的索引(tradeid)，扫描行数是1。</p>
-<p>这也是两个tradeid字段的join操作，为什么这次能用上被驱动表的tradeid索引呢？我们来分析一下。</p>
-<p>假设驱动表trade_detail里id=4的行记为R4，那么在连接的时候（图5的第3步），被驱动表tradelog上执行的就是类似这样的SQL 语句：</p>
-<p>这时候$R4.tradeid.value的字符集是utf8, 按照字符集转换规则，要转成utf8mb4，所以这个过程就被改写成：</p>
-<p>你看，这里的CONVERT函数是加在输入参数上的，这样就可以用上被驱动表的traideid索引。</p>
-<p>理解了原理以后，就可以用来指导操作了。</p>
-<p>如果要优化语句的执行过程，有两种做法：</p>
-<p>比较常见的优化方法是，把trade_detail表上的tradeid字段的字符集也改成utf8mb4，这样就没有字符集转换的问题了。</p>
-<p>mysql&gt;select l.operator from tradelog l , trade_detail d where d.tradeid=l.tradeid and d.id=4;select operator from tradelog  where traideid =$R4.tradeid.value; select operator from tradelog  where traideid =CONVERT($R4.tradeid.value USING utf8mb4); select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2;如果能够修改字段的字符集的话，是最好不过了。</p>
-<p>但如果数据量比较大， 或者业务上暂时不能做这个DDL的话，那就只能采用修改SQL语句的方法了。</p>
-<p>图7 SQL语句优化后的explain结果这里，我主动把 l.tradeid转成utf8，就避免了被驱动表上的字符编码转换，从explain结果可以看到，这次索引走对了。</p>
-<p>小结今天我给你举了三个例子，其实是在说同一件事儿，即：对索引字段做函数操作，可能会破坏索引值的有序性，因此优化器就决定放弃走树搜索功能。</p>
-<p>第二个例子是隐式类型转换，第三个例子是隐式字符编码转换，它们都跟第一个例子一样，因为要求在索引字段上做函数操作而导致了全索引扫描。</p>
-<p>MySQL的优化器确实有“偷懒”的嫌疑，即使简单地把where id+1=1000改写成where id=1000-1就能够用上索引快速查找，也不会主动做这个语句重写。</p>
-<p>因此，每次你的业务代码升级时，把可能出现的、新的SQL语句explain一下，是一个很好的习惯。</p>
-<p>最后，又到了思考题时间。</p>
-<p>今天我留给你的课后问题是，你遇到过别的、类似今天我们提到的性能问题吗？你认为原因是什么，又是怎么解决的呢？你可以把你经历和分析写在留言区里，我会在下一篇文章的末尾选取有趣的评论跟大家一起分享和分析。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我在上篇文章的最后，留给你的问题是：我们文章中最后的一个方案是，通过三次limit Y,1 来得alter table trade_detail modify tradeid varchar(32) CHARACTER SET utf8mb4 default null;mysql&gt; select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid USING utf8) and l.id=2; 到需要的数据，你觉得有没有进一步的优化方法。</p>
-<p>这里我给出一种方法，取Y1、Y2和Y3里面最大的一个数，记为M，最小的一个数记为N，然后执行下面这条SQL语句：</p>
-<p>再加上取整个表总行数的C行，这个方案的扫描行数总共只需要C+M+1行。</p>
-<p>当然也可以先取回id值，在应用中确定了三个id值以后，再执行三次where id=X的语句也是可以的。</p>
-<p>@倪大人 同学在评论区就提到了这个方法。</p>
-<p>这次评论区出现了很多很棒的留言：</p>
-<p>老杨同志   20感谢老师鼓励，我本人工作时间比较长，有一定的基础，听老师的课还是收获很大。</p>
-<p>每次公司mysql&gt; select * from t limit N, M-N+1;@老杨同志 提出了重新整理的方法、@雪中鼠[悠闲] 提到了用rowid的方法，是类似的思路，就是让表里面保存一个无空洞的自增值，这样就可以用我们的随机算法1来实现；</p>
-<p>@吴宇晨 提到了拿到第一个值以后，用id迭代往下找的方案，利用了主键索引的有序性。</p>
-<p>精选留言内部有技术分享，我都去听课，但是多数情况，一两个小时的分享，就只有一两句话受益。</p>
-<p>老师的每篇文章都能命中我的知识盲点，感觉太别爽。</p>
-<p>对应今天的隐式类型转换问题也踩过坑。</p>
-<p>我们有个任务表记录待执行任务，表结构简化后如下：</p>
-<p>CREATE TABLE <code>task</code> (<code>task_id</code> int(11) NOT NULL AUTO_INCREMENT COMMENT ‘自增主键’,<code>task_type</code> int(11) DEFAULT NULL COMMENT ‘任务类型id’,<code>task_rfid</code> varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT ‘关联外键1’,PRIMARY KEY (<code>task_id</code>)) ENGINE=InnoDB AUTO_INCREMENT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT=’任务表’;task_rfid 是业务主键，当然都是数字，查询时使用sql：</p>
-<p>select * from task where task_rfid =123;其实这个语句也有隐式转换问题，但是待执行任务只有几千条记录，并没有什么感觉。</p>
-<p>这个表还有个对应的历史表，数据有几千万忽然有一天，想查一下历史记录，执行语句select * from task_history where task_rfid =99;直接就等待很长时间后超时报错了。</p>
-<p>如果仔细看，其实我的表没有task_rfid 索引，写成task_rfid =‘99’也一样是全表扫描。</p>
-<p>运维时的套路是，猜测主键task_id的范围，怎么猜，我原表有creat_time字段，我会先查select max(task_id) from task_history 然后再看看 select * from task_history where task_id = maxId - 10000的时间，估计出大概的id范围。</p>
-<p>然后语句变成select * from task_history where task_rfid =99 and id between ？ and ？;2018-12-24 作者回复你最后这个id预估，加上between ，有种神来之笔的感觉 感觉隐约里面有二分法的思想  2018-12-24可凡不凡   11.老师好2.如果在用一个 MySQL 关键字做字段,并且字段上索引,当我用这个索引作为唯一查询条件的时候 ,会 造 成隐式的转换吗? 例如:SELECT * FROM b_side_order WHERE CODE = 332924 ; (code 上有索引)3. mysql5.6 code 上有索引 intime 上没有索引语句一:SELECT * FROM b_side_order WHERE CODE = 332924 ;语句二;UPDATE b_side_order SET in_time = ‘2018-08-04 08:34:44’ WHERE 1=2 or CODE = 332924;这两个语句 执行计划走 select 走了索引,update 没有走索引 是执行计划的bug 吗??2018-12-25 作者回复1. 你好 2. CODE不是关键字呀， 另外优化器选择跟关键字无关哈，关键字的话，要用 反‘ 括起来3. 不是bug, update如果把 or 改成 and , 就能走索引 2018-12-25冠超   0非常感谢老师分享的内容，实打实地学到了。</p>
-<p>这里提个建议，希望老师能介绍一下设计表的时候要怎么考虑这方面的知识哈 2019-01-28 作者回复是这样的，其实我们整个专栏大部分的文章，最后都是为了说明 “怎么设计表”、“怎么考虑优化SQL语句”但是因为这个不是一成不变的，很多是需要考虑现实的情况，所以这个专栏就是想把对应的原理说一下，这样大家在应对不同场景的时候，可以组合来考虑。</p>
-<p>也就是说没有一段话可以把“怎么设计表”讲清楚（或者说硬写出来很可能就是一些general的没有什么针对性作用的描述）你可以把你的业务背景抽象说下，我们来具体讨论吧2019-01-28700   0老师您好，有个问题恳请指教。</p>
-<p>背景如下，我长话短说：</p>
-<p>mysql&gt;select @@version;5.6.30-logCREATE TABLE <code>t1</code> ( <code>id</code> int(11) unsigned NOT NULL AUTO_INCREMENT,<code>user_id</code> int(11) NOT NULL, <code>plan_id</code> int(11) NOT NULL DEFAULT ‘0’ , PRIMARY KEY (<code>id</code>),KEY <code>userid</code> (<code>user_id</code>) USING BTREE, KEY <code>idx_planid</code> (<code>plan_id</code>)) ENGINE=InnoDB DEFAULT CHARSET=gb2312;CREATE TABLE <code>t3</code> (<code>id</code> int(11) NOT NULL AUTO_INCREMENT,<code>status</code> int(4) NOT NULL DEFAULT ‘0’,<code>ootime</code> varchar(11) DEFAULT NULL,PRIMARY KEY (<code>id</code>),KEY <code>idx_xxoo</code> (<code>status</code>,<code>ootime</code>)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;t1 和 t3 表的字符集不一样sql 执行计划如下：</p>
-<p>explainSELECT t1.id, t1.user_idFROM t1, t3WHERE t1.plan_id = t3.idAND t3.ootime &lt; UNIX_TIMESTAMP(‘2022-01-18’)+—-+————-+——-+——-+—————+————–+———+————–+——-+—————————————-+| id | select_type | table | type | possible_keys | key | key_len | ref | rows | Extra |+—-+————-+——-+——-+—————+————–+———+————–+——-+—————————————-+| 1 | SIMPLE | t3 | index | PRIMARY | idx_xxoo | 51 | NULL | 39106 | Using where; Using index|| 1 | SIMPLE | t1 | ref | idx_planid | idx_planid | 4 | t3.id | 401 | Using join buffer (Batched Key Access) |+—-+————-+——-+——-+—————+————–+———+————–+——-+—————————————-+我的疑惑是1)t3 的 status 没出现在 where 条件中，但执行计划为什么用到了 idex_xxoo 索引？2)为什么 t3.ootime 也用到索引了，从 key_len 看出。</p>
-<p>t3.ootime 是 varchar 类型的，而 UNIX_TIMESTAMP(‘2022-01-18’) 是数值，不是发生了隐式转换吗？请老师指点。</p>
-<p>2019-01-18 作者回复这个查询语句会对t3做全索引扫描，是使用了索引的，只是没有用上快速搜索功能2019-01-19赖阿甘   0“mysql&gt;select l.operator from tradelog l , trade_detail d where d.tradeid=l.tradeid and d.id=4;”图6上面那句sql是不是写错了。</p>
-<p>d.tradeid=l.tradeid是不是该写成l.tradeid = d.tradeid？不然函数会作用在索引字段上，就只能全表扫描了2018-12-24 作者回复这个问题不是等号顺序决定的哈好问题2018-12-24Leon    16索引字段不能进行函数操作，但是索引字段的参数可以玩函数，一言以蔽之2018-12-24 作者回复精辟 2018-12-24探索无止境   5多表连接时，mysql是怎么选择驱动表和被驱动表的？这个很重要，希望老师可以讲讲2018-12-25可凡不凡   51.老师对于多表联合查询中,MySQL 对索引的选择 以后会详细介绍吗?2018-12-24 作者回复额，你是第三个提这个问题的了，我得好好考虑下安排 2018-12-24某、人   4SQL逻辑相同,性能差异较大的,通过老师所讲学习到的,和平时碰到的,大概有以下几类:一.字段发生了转换,导致本该使用索引而没有用到索引1.条件字段函数操作2.隐式类型转换3.隐式字符编码转换(如果驱动表的字符集比被驱动表得字符集小，关联列就能用到索引,如果更大,需要发生隐式编码转换,则不能用到索引,latin&lt;gbk&lt;utf8&lt;utf8mb4)二.嵌套循环,驱动表与被驱动表选择错误1.连接列上没有索引,导致大表驱动小表,或者小表驱动大表(但是大表走的是全表扫描) –连接列上建立索引2.连接列上虽然有索引,但是驱动表任然选择错误。</p>
-<p>–通过straight_join强制选择关联表顺序3.子查询导致先执行外表在执行子查询,也是驱动表与被驱动表选择错误。</p>
-<p> –可以考虑把子查询改写为内连接,或者改写内联视图(子查询放在from后组成一个临时表,在于其他表进行关联)4.只需要内连接的语句,但是写成了左连接或者右连接。</p>
-<p>比如select * from t left join b on t.id=b.idwhere b.name=’abc’驱动表被固定,大概率会扫描更多的行,导致效率降低. –根据业务情况或sql情况,把左连接或者右连接改写为内连接三.索引选择不同,造成性能差异较大1.select * from t where aid= and create_name&gt;’’ order by id limit 1;选择走id索引或者选择走(aid,create_time)索引,性能差异较大.结果集都有可能不一致–这个可以通过where条件过滤的值多少来大概判断,该走哪个索引四.其它一些因素1.比如之前学习到的是否有MDL X锁2.innodb_buffer_pool设置得太小,innodb_io_capacity设置得太小,刷脏速度跟不上3.是否是对表做了DML语句之后,马上做select,导致change buffer收益不高4.是否有数据空洞5.select选取的数据是否在buffer_pool中6.硬件原因,资源抢占原因多种多样,还需要慢慢补充。</p>
-<p>老师我问一个问题:连接列上一个是int一个是bigint或者一个是char一个varchar,为什么被驱动表上会出现(using index condition)?2018-12-24Destroy、   2老师，对于最后回答上一课的问题：mysql&gt; select * from t limit N, M-N+1;这个语句也不是取3条记录。</p>
-<p> 没理解。</p>
-<p>2018-12-27 作者回复取其中三条…2018-12-27风轨   2刚试了文中穿插得思考题:当主键是整数类型条件是字符串时，会走索引。</p>
-<p>文中提到了当字符串和数字比较时会把字符串转化为数字，所以隐式转换不会应用到字段上，所以可以走索引。</p>
-<p>另外，select ‘a’ = 0 ; 的结果是1，说明无法转换成数字的字符串都被转换成0来处理了。</p>
-<p>2018-12-24 作者回复  2018-12-24匿名的朋友   1丁奇老师，我有个疑问，就是sql语句执行时那些order by group by limit 以及where条件，有执行的先后顺序吗？2019-01-05 作者回复有，先where ,再order by 最后limit2019-01-05大坤   1之前遇到过按时间范围查询大表不走索引的情况，如果缩小时间范围，又会走索引，记得在一些文章中看到过结果数据超过全表的30%就会走全表扫描，但是前面说的时间范围查询大表，这个时间范围绝对是小于30%的情况，想请教下老师，这个优化器都是在什么情况下会放弃索引呢？2018-12-25 作者回复总体来说就是判断哪种方式消耗更小，选哪种2018-12-25Leon    1老师，经常面试被问到工作中做了什么优化，有没有好的业务表的设计，请问老师课程结束后能不能给我们一个提纲挈领的大纲套路，让我们有个脉络和思路来应付这种面试套路2018-12-25 作者回复有没有好的业务表的设计，这类问题我第一次听到，能不能展开一下，这样说不要清楚面试官的考核点是啥…2018-12-25果然如此   1我想问一个上期的问题，随机算法2虽然效率高，但是还是有个瑕疵，比如我们的随机出题算法无法直接应用，因为每次随机一个试题id，多次随机没有关联，会产生重复id，有没有更好的解决方法？2018-12-25 作者回复内存里准备个set这样的数据结构，重读的不算，这样可以不 2018-12-25长杰   1这里我给出一种方法，取 Y1、Y2 和 Y3 里面最大的一个数，记为 M，最小的一个数记为 N，然后执行下面这条 SQL 语句：</p>
-<p>mysql&gt; select * from t limit N, M-N+1;再加上取整个表总行数的 C 行，这个方案的扫描行数总共只需要 C+M 行。</p>
-<p>优化后的方案应该是C+M+1行吧？2018-12-24 作者回复你说的对  ，我改下2018-12-25asdf100   1在这个例子里，放弃了树搜索功能，优化器可以选择遍历主键索引，也可以选择遍历索引 t_modified，优化器对比索引大小后发现，索引 t_modified 更小，遍历这个索引比遍历主键索引来得更快。</p>
-<p>优化器如何对比的，根据参与字段字段类型占用空间大小吗？2018-12-24 作者回复优化器信息是引擎给的，引擎是这么判断的2018-12-24约书亚   1谁是驱动表谁是被驱动表，是否大多数情况看where条件就可以了？这是否本质上涉及到mysql底层决定用什么算法进行级联查询的问题？后面会有课程详细说明嘛？2018-12-24 作者回复可以简单看where之后剩下的行数（预判不一定准哈）2018-12-24Lukia   0老师好，之前看了《数据索引与优化》，提到表之间的连接操作可以有嵌套循环连接（本文中提到的驱动表和被驱动表）和合并扫描连接（先在临时表中针对谓词作排序）还有哈希连接。</p>
-<p>请问MySQL中是否存在后面两种方式的连接，如果有的话优化器会在什么情况下选择呢？谢谢！2019-01-29 作者回复第34、35两篇就会说到了，今晚关注下 2019-01-29涛哥哥   0老师，您好！我是做后端开发的。</p>
-<p>想问一下 mysql in关键字 的内部原理，能抽一点点篇幅讲一下吗？比如：select * from T where id in (a,b,d,c,,e,f); id是主键。</p>
-<p>1、为什么查询出来的结果集会按照id排一次序呢（是跟去重有关系么）？2、如果 in 里面的值较多的时候，就会比较慢啊（是还不如全表扫描么）？问我们公司很多后端的，都不太清楚，问我们DBA，他说默认就是这样（这不跟没说一样吗）。</p>
-<p>希望老师可以帮忙解惑。</p>
-<p>祝老师身体健康！微笑~2019-01-26 作者回复1. 优化器会排个序，目的是如果这几个记录对应的数据都不在内存里，可以触发顺序读盘，后面文章我们介绍到join的时候，会提到MRR，你关注下2. in里面值多就是多次执行树搜索，跟全表扫描的速度对比，就看in里面的数据个数的比例了。</p>
-<p>你的in里面一般多少个value呀2019-01-26```</p>
+<p>这些是 Java 8 中的一些重要语法特性。它们使得代码更加简洁、可读性更高，并且提供了更多的灵活性和功能。在使用这些特性时，要注意充分了解它们的用法和适用场景，以便编写出高质量的代码。</p>
 
       
     </div>
@@ -1811,7 +889,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/d1d469cd.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43300.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1829,7 +907,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/d1d469cd.html" class="post-title-link" itemprop="url">mysql-如何正确地显示随机消息</a>
+          <a href="/posts/43300.html" class="post-title-link" itemprop="url">JAVA-rbac权限管理</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1840,7 +918,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-19 14:10:31" itemprop="dateCreated datePublished" datetime="2019-11-19T14:10:31+08:00">2019-11-19</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1848,7 +926,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -1862,175 +940,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>如何正确地显示随机消息？我在上一篇文章，为你讲解完order by语句的几种执行模式后，就想到了之前一个做英语学习App的朋友碰到过的一个性能问题。</p>
-<p>今天这篇文章，我就从这个性能问题说起，和你说说MySQL中的另外一种排序需求，希望能够加深你对MySQL排序逻辑的理解。</p>
-<p>这个英语学习App首页有一个随机显示单词的功能，也就是根据每个用户的级别有一个单词表，然后这个用户每次访问首页的时候，都会随机滚动显示三个单词。</p>
-<p>他们发现随着单词表变大，选单词这个逻辑变得越来越慢，甚至影响到了首页的打开速度。</p>
-<p>现在，如果让你来设计这个SQL语句，你会怎么写呢？为了便于理解，我对这个例子进行了简化：去掉每个级别的用户都有一个对应的单词表这个逻辑，直接就是从一个单词表中随机选出三个单词。</p>
-<p>这个表的建表语句和初始数据的命令如下：</p>
-<p>为了便于量化说明，我在这个表里面插入了10000行记录。</p>
-<p>接下来，我们就一起看看要随机选择3个单词，有什么方法实现，存在什么问题以及如何改进。</p>
-<p>内存临时表首先，你会想到用order by rand()来实现这个逻辑。</p>
-<p>这个语句的意思很直白，随机排序取前3个。</p>
-<p>虽然这个SQL语句写法很简单，但执行流程却有点复杂的。</p>
-<p>我们先用explain命令来看看这个语句的执行情况。</p>
-<p>mysql&gt; CREATE TABLE <code>words</code> (  <code>id</code> int(11) NOT NULL AUTO_INCREMENT,  <code>word</code> varchar(64) DEFAULT NULL,  PRIMARY KEY (<code>id</code>)) ENGINE=InnoDB;delimiter ;;create procedure idata()begin  declare i int;  set i=0;  while i&lt;10000 do    insert into words(word) values(concat(char(97+(i div 1000)), char(97+(i % 1000 div 100)), char(97+(i % 100 div 10)), char(97+(i % 10))));    set i=i+1;  end while;end;;delimiter ;call idata();mysql&gt; select word from words order by rand() limit 3;图1 使用explain命令查看语句的执行情况Extra字段显示Using temporary，表示的是需要使用临时表；Using filesort，表示的是需要执行排序操作。</p>
-<p>因此这个Extra的意思就是，需要临时表，并且需要在临时表上排序。</p>
-<p>这里，你可以先回顾一下上一篇文章中全字段排序和rowid排序的内容。</p>
-<p>我把上一篇文章的两个流程图贴过来，方便你复习。</p>
-<p>图2 全字段排序图3 rowid排序然后，我再问你一个问题，你觉得对于临时内存表的排序来说，它会选择哪一种算法呢？回顾一下上一篇文章的一个结论：对于InnoDB表来说，执行全字段排序会减少磁盘访问，因此会被优先选择。</p>
-<p>我强调了“InnoDB表”，你肯定想到了，对于内存表，回表过程只是简单地根据数据行的位置，直接访问内存得到数据，根本不会导致多访问磁盘。</p>
-<p>优化器没有了这一层顾虑，那么它会优先考虑的，就是用于排序的行越少越好了，所以，MySQL这时就会选择rowid排序。</p>
-<p>理解了这个算法选择的逻辑，我们再来看看语句的执行流程。</p>
-<p>同时，通过今天的这个例子，我们来尝试分析一下语句的扫描行数。</p>
-<p>这条语句的执行流程是这样的：</p>
-<ol>
-<li>创建一个临时表。</li>
-</ol>
-<p>这个临时表使用的是memory引擎，表里有两个字段，第一个字段是double类型，为了后面描述方便，记为字段R，第二个字段是varchar(64)类型，记为字段W。</p>
-<p>并且，这个表没有建索引。</p>
-<ol start="2">
-<li>从words表中，按主键顺序取出所有的word值。</li>
-</ol>
-<p>对于每一个word值，调用rand()函数生成一个大于0小于1的随机小数，并把这个随机小数和word分别存入临时表的R和W字段中，到此，扫描行数是10000。</p>
-<ol start="3">
-<li><p>现在临时表有10000行数据了，接下来你要在这个没有索引的内存临时表上，按照字段R排序。</p>
-</li>
-<li><p>初始化 sort_buffer。</p>
-</li>
-</ol>
-<p>sort_buffer中有两个字段，一个是double类型，另一个是整型。</p>
-<ol start="5">
-<li>从内存临时表中一行一行地取出R值和位置信息（我后面会和你解释这里为什么是“位置信息”），分别存入sort_buffer中的两个字段里。</li>
-</ol>
-<p>这个过程要对内存临时表做全表扫描，此时扫描行数增加10000，变成了20000。</p>
-<ol start="6">
-<li>在sort_buffer中根据R的值进行排序。</li>
-</ol>
-<p>注意，这个过程没有涉及到表操作，所以不会增加扫描行数。</p>
-<ol start="7">
-<li>排序完成后，取出前三个结果的位置信息，依次到内存临时表中取出word值，返回给客户端。</li>
-</ol>
-<p>这个过程中，访问了表的三行数据，总扫描行数变成了20003。</p>
-<p>接下来，我们通过慢查询日志（slow log）来验证一下我们分析得到的扫描行数是否正确。</p>
-<p>其中，Rows_examined：20003就表示这个语句执行过程中扫描了20003行，也就验证了我们分析得出的结论。</p>
-<p>这里插一句题外话，在平时学习概念的过程中，你可以经常这样做，先通过原理分析算出扫描行数，然后再通过查看慢查询日志，来验证自己的结论。</p>
-<p>我自己就是经常这么做，这个过程很有趣，分析对了开心，分析错了但是弄清楚了也很开心。</p>
-<p>现在，我来把完整的排序执行流程图画出来。</p>
-<h1 id="Query-time-0-900376-Lock-time-0-000347-Rows-sent-3-Rows-examined-20003SET-timestamp-x3D-1541402277-select-word-from-words-order-by-rand-limit-3-图4-随机排序完整流程图1图中的pos就是位置信息，你可能会觉得奇怪，这里的“位置信息”是个什么概念？在上一篇文章中，我们对InnoDB表排序的时候，明明用的还是ID字段。"><a class="headerlink" href="#Query-time-0-900376-Lock-time-0-000347-Rows-sent-3-Rows-examined-20003SET-timestamp-x3D-1541402277-select-word-from-words-order-by-rand-limit-3-图4-随机排序完整流程图1图中的pos就是位置信息，你可能会觉得奇怪，这里的“位置信息”是个什么概念？在上一篇文章中，我们对InnoDB表排序的时候，明明用的还是ID字段。" title="Query_time: 0.900376  Lock_time: 0.000347 Rows_sent: 3 Rows_examined: 20003SET timestamp=1541402277;select word from words order by rand() limit 3;图4 随机排序完整流程图1图中的pos就是位置信息，你可能会觉得奇怪，这里的“位置信息”是个什么概念？在上一篇文章中，我们对InnoDB表排序的时候，明明用的还是ID字段。"></a>Query_time: 0.900376  Lock_time: 0.000347 Rows_sent: 3 Rows_examined: 20003SET timestamp=1541402277;select word from words order by rand() limit 3;图4 随机排序完整流程图1图中的pos就是位置信息，你可能会觉得奇怪，这里的“位置信息”是个什么概念？在上一篇文章中，我们对InnoDB表排序的时候，明明用的还是ID字段。</h1><p>这时候，我们就要回到一个基本概念：MySQL的表是用什么方法来定位“一行数据”的。</p>
-<p>在前面第4和第5篇介绍索引的文章中，有几位同学问到，如果把一个InnoDB表的主键删掉，是不是就没有主键，就没办法回表了？其实不是的。</p>
-<p>如果你创建的表没有主键，或者把一个表的主键删掉了，那么InnoDB会自己生成一个长度为6字节的rowid来作为主键。</p>
-<p>这也就是排序模式里面，rowid名字的来历。</p>
-<p>实际上它表示的是：每个引擎用来唯一标识数据行的信息。</p>
-<p>对于有主键的InnoDB表来说，这个rowid就是主键ID；</p>
-<p>对于没有主键的InnoDB表来说，这个rowid就是由系统生成的；</p>
-<p>MEMORY引擎不是索引组织表。</p>
-<p>在这个例子里面，你可以认为它就是一个数组。</p>
-<p>因此，这个rowid其实就是数组的下标。</p>
-<p>到这里，我来稍微小结一下：order by rand()使用了内存临时表，内存临时表排序的时候使用了rowid排序方法。</p>
-<p>磁盘临时表那么，是不是所有的临时表都是内存表呢？其实不是的。</p>
-<p>tmp_table_size这个配置限制了内存临时表的大小，默认值是16M。</p>
-<p>如果临时表大小超过了tmp_table_size，那么内存临时表就会转成磁盘临时表。</p>
-<p>磁盘临时表使用的引擎默认是InnoDB，是由参数internal_tmp_disk_storage_engine控制的。</p>
-<p>当使用磁盘临时表的时候，对应的就是一个没有显式索引的InnoDB表的排序过程。</p>
-<p>为了复现这个过程，我把tmp_table_size设置成1024，把sort_buffer_size设置成 32768, 把max_length_for_sort_data 设置成16。</p>
-<p>set tmp_table_size=1024;set sort_buffer_size=32768;set max_length_for_sort_data=16;/* 打开 optimizer_trace，只对本线程有效 <em>/SET optimizer_trace=’enabled=on’; /</em> 执行语句 <em>/select word from words order by rand() limit 3;/</em> 查看 OPTIMIZER_TRACE 输出 */SELECT * FROM <code>information_schema</code>.<code>OPTIMIZER_TRACE</code>\G图5 OPTIMIZER_TRACE部分结果然后，我们来看一下这次OPTIMIZER_TRACE的结果。</p>
-<p>因为将max_length_for_sort_data设置成16，小于word字段的长度定义，所以我们看到sort_mode里面显示的是rowid排序，这个是符合预期的，参与排序的是随机值R字段和rowid字段组成的行。</p>
-<p>这时候你可能心算了一下，发现不对。</p>
-<p>R字段存放的随机值就8个字节，rowid是6个字节（至于为什么是6字节，就留给你课后思考吧），数据总行数是10000，这样算出来就有140000字节，超过了sort_buffer_size 定义的 32768字节了。</p>
-<p>但是，number_of_tmp_files的值居然是0，难道不需要用临时文件吗？这个SQL语句的排序确实没有用到临时文件，采用是MySQL 5.6版本引入的一个新的排序算法，即：优先队列排序算法。</p>
-<p>接下来，我们就看看为什么没有使用临时文件的算法，也就是归并排序算法，而是采用了优先队列排序算法。</p>
-<p>其实，我们现在的SQL语句，只需要取R值最小的3个rowid。</p>
-<p>但是，如果使用归并排序算法的话，虽然最终也能得到前3个值，但是这个算法结束后，已经将10000行数据都排好序了。</p>
-<p>也就是说，后面的9997行也是有序的了。</p>
-<p>但，我们的查询并不需要这些数据是有序的。</p>
-<p>所以，想一下就明白了，这浪费了非常多的计算量。</p>
-<p>而优先队列算法，就可以精确地只得到三个最小值，执行流程如下：</p>
-<ol>
-<li>对于这10000个准备排序的(R,rowid)，先取前三行，构造成一个堆；</li>
-</ol>
-<p>（对数据结构印象模糊的同学，可以先设想成这是一个由三个元素组成的数组）1. 取下一个行(R’,rowid’)，跟当前堆里面最大的R比较，如果R’小于R，把这个(R,rowid)从堆中去掉，换成(R’,rowid’)；</p>
-<ol start="2">
-<li>重复第2步，直到第10000个(R’,rowid’)完成比较。</li>
-</ol>
-<p>这里我简单画了一个优先队列排序过程的示意图。</p>
-<p>图6 优先队列排序算法示例图6是模拟6个(R,rowid)行，通过优先队列排序找到最小的三个R值的行的过程。</p>
-<p>整个排序过程中，为了最快地拿到当前堆的最大值，总是保持最大值在堆顶，因此这是一个最大堆。</p>
-<p>图5的OPTIMIZER_TRACE结果中，filesort_priority_queue_optimization这个部分的chosen=true，就表示使用了优先队列排序算法，这个过程不需要临时文件，因此对应的number_of_tmp_files是0。</p>
-<p>这个流程结束后，我们构造的堆里面，就是这个10000行里面R值最小的三行。</p>
-<p>然后，依次把它们的rowid取出来，去临时表里面拿到word字段，这个过程就跟上一篇文章的rowid排序的过程一样了。</p>
-<p>我们再看一下上面一篇文章的SQL查询语句：</p>
-<p>你可能会问，这里也用到了limit，为什么没用优先队列排序算法呢？原因是，这条SQL语句是limit 1000，如果使用优先队列算法的话，需要维护的堆的大小就是1000行的(name,rowid)，超过了我设置的sort_buffer_size大小，所以只能使用归并排序算法。</p>
-<p>总之，不论是使用哪种类型的临时表，order by rand()这种写法都会让计算过程非常复杂，需要大量的扫描行数，因此排序过程的资源消耗也会很大。</p>
-<p>再回到我们文章开头的问题，怎么正确地随机排序呢？随机排序方法我们先把问题简化一下，如果只随机选择1个word值，可以怎么做呢？思路上是这样的：</p>
-<ol>
-<li>取得这个表的主键id的最大值M和最小值N;2. 用随机函数生成一个最大值到最小值之间的数 X = (M-N)*rand() + N;3. 取不小于X的第一个ID的行。</li>
-</ol>
-<p>我们把这个算法，暂时称作随机算法1。</p>
-<p>这里，我直接给你贴一下执行语句的序列:这个方法效率很高，因为取max(id)和min(id)都是不需要扫描索引的，而第三步的select也可以用索引快速定位，可以认为就只扫描了3行。</p>
-<p>但实际上，这个算法本身并不严格满足题目的随机要求，因为ID中间可能有空洞，因此选择不同行的概率不一样，不是真正的随机。</p>
-<p>select city,name,age from t where city=’杭州’ order by name limit 1000  ;mysql&gt; select max(id),min(id) into @M,@N from t ;set @X= floor((@M-@N+1)*rand() + @N);select * from t where id &gt;= @X limit 1;比如你有4个id，分别是1、2、4、5，如果按照上面的方法，那么取到 id=4的这一行的概率是取得其他行概率的两倍。</p>
-<p>如果这四行的id分别是1、2、40000、40001呢？这个算法基本就能当bug来看待了。</p>
-<p>所以，为了得到严格随机的结果，你可以用下面这个流程:1. 取得整个表的行数，并记为C。</p>
-<ol start="2">
-<li>取得 Y = floor(C * rand())。</li>
-</ol>
-<p> floor函数在这里的作用，就是取整数部分。</p>
-<ol start="3">
-<li>再用limit Y,1 取得一行。</li>
-</ol>
-<p>我们把这个算法，称为随机算法2。</p>
-<p>下面这段代码，就是上面流程的执行语句的序列。</p>
-<p>由于limit 后面的参数不能直接跟变量，所以我在上面的代码中使用了prepare+execute的方法。</p>
-<p>你也可以把拼接SQL语句的方法写在应用程序中，会更简单些。</p>
-<p>这个随机算法2，解决了算法1里面明显的概率不均匀问题。</p>
-<p>MySQL处理limit Y,1 的做法就是按顺序一个一个地读出来，丢掉前Y个，然后把下一个记录作为返回结果，因此这一步需要扫描Y+1行。</p>
-<p>再加上，第一步扫描的C行，总共需要扫描C+Y+1行，执行代价比随机算法1的代价要高。</p>
-<p>当然，随机算法2跟直接order by rand()比起来，执行代价还是小很多的。</p>
-<p>你可能问了，如果按照这个表有10000行来计算的话，C=10000，要是随机到比较大的Y值，那扫描行数也跟20000差不多了，接近order by rand()的扫描行数，为什么说随机算法2的代价要小很多呢？我就把这个问题留给你去课后思考吧。</p>
-<p>现在，我们再看看，如果我们按照随机算法2的思路，要随机取3个word值呢？你可以这么做：</p>
-<ol>
-<li><p>取得整个表的行数，记为C；</p>
-</li>
-<li><p>根据相同的随机方法得到Y1、Y2、Y3；</p>
-</li>
-</ol>
-<p>mysql&gt; select count(*) into @C from t;set @Y = floor(@C * rand());set @sql = concat(“select * from t limit “, @Y, “,1”);prepare stmt from @sql;execute stmt;DEALLOCATE prepare stmt;3. 再执行三个limit Y, 1语句得到三行数据。</p>
-<p>我们把这个算法，称作随机算法3。</p>
-<p>下面这段代码，就是上面流程的执行语句的序列。</p>
-<p>小结今天这篇文章，我是借着随机排序的需求，跟你介绍了MySQL对临时表排序的执行过程。</p>
-<p>如果你直接使用order by rand()，这个语句需要Using temporary 和 Using filesort，查询的执行代价往往是比较大的。</p>
-<p>所以，在设计的时候你要量避开这种写法。</p>
-<p>今天的例子里面，我们不是仅仅在数据库内部解决问题，还会让应用代码配合拼接SQL语句。</p>
-<p>在实际应用的过程中，比较规范的用法就是：尽量将业务逻辑写在业务代码中，让数据库只做“读写数据”的事情。</p>
-<p>因此，这类方法的应用还是比较广泛的。</p>
-<p>最后，我给你留下一个思考题吧。</p>
-<p>上面的随机算法3的总扫描行数是 C+(Y1+1)+(Y2+1)+(Y3+1)，实际上它还是可以继续优化，来进一步减少扫描行数的。</p>
-<p>我的问题是，如果你是这个需求的开发人员，你会怎么做，来减少扫描行数呢？说说你的方案，并说明你的方案需要的扫描行数。</p>
-<p>你可以把你的设计和结论写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间我在上一篇文章最后留给你的问题是，select * from t where city in (“杭州”,” 苏州 “) order byname limit 100;这个SQL语句是否需要排序？有什么方案可以避免排序？虽然有(city,name)联合索引，对于单个city内部，name是递增的。</p>
-<p>但是由于这条SQL语句不是要单独地查一个city的值，而是同时查了”杭州”和” 苏州 “两个城市，因此所有满足条件的name就不是递增的了。</p>
-<p>也就是说，这条SQL语句需要排序。</p>
-<p>mysql&gt; select count(*) into @C from t;set @Y1 = floor(@C * rand());set @Y2 = floor(@C * rand());set @Y3 = floor(@C * rand());select * from t limit @Y1，1； //在应用代码里面取Y1、Y2、Y3值，拼出SQL后执行select * from t limit @Y2，1；</p>
-<p>select * from t limit @Y3，1；</p>
-<p>那怎么避免排序呢？这里，我们要用到(city,name)联合索引的特性，把这一条语句拆成两条语句，执行流程如下：</p>
-<ol>
-<li><p>执行select * from t where city=“杭州” order by name limit 100; 这个语句是不需要排序的，客户端用一个长度为100的内存数组A保存结果。</p>
-</li>
-<li><p>执行select * from t where city=“苏州” order by name limit 100; 用相同的方法，假设结果被存进了内存数组B。</p>
-</li>
-<li><p>现在A和B是两个有序数组，然后你可以用归并排序的思想，得到name最小的前100值，就是我们需要的结果了。</p>
-</li>
-</ol>
-<p>如果把这条SQL语句里“limit 100”改成“limit 10000,100”的话，处理方式其实也差不多，即：要把上面的两条语句改成写：</p>
-<p>和这时候数据量较大，可以同时起两个连接一行行读结果，用归并排序算法拿到这两个结果集里，按顺序取第10001~10100的name值，就是需要的结果了。</p>
-<p>当然这个方案有一个明显的损失，就是从数据库返回给客户端的数据量变大了。</p>
-<p>所以，如果数据的单行比较大的话，可以考虑把这两条SQL语句改成下面这种写法：</p>
-<p>和然后，再用归并排序的方法取得按name顺序第10001~10100的name、id的值，然后拿着这100个id到数据库中去查出所有记录。</p>
-<p>上面这些方法，需要你根据性能需求和开发的复杂度做出权衡。</p>
-<p>select * from t where city=”杭州” order by name limit 10100;  select * from t where city=”苏州” order by name limit 10100。</p>
-<p>select id,name from t where city=”杭州” order by name limit 10100; select id,name from t where city=”苏州” order by name limit 10100。</p>
+          <p>RBAC : 基于角色的权限访问控制（Role-Based Access Control）通过角色绑定权限，然后给用户划分角色。在web应用中，可以将权限理解为url，一个权限对应一个url。</p>
+<h2 id="表设计"><a class="headerlink" href="#表设计" title="表设计"></a>表设计</h2><p>用户，角色，权限，权限组，菜单</p>
+<p>用户和角色，多对多<br/>角色和权限，多对多<br/>权限和权限组，多对一<br/>权限组和菜单，多对一<br/>菜单和菜单，自引用</p>
+<h2 id="系统"><a class="headerlink" href="#系统" title="系统"></a>系统</h2><p>用户登录后，取出其权限及所属菜单信息，写入session中</p>
+<p>自定义中间件，检查用户权限，进行访问控制</p>
+<p>参考：<a href="https://www.jianshu.com/p/f45b54768aa9" rel="noopener" target="_blank">https://www.jianshu.com/p/f45b54768aa9</a></p>
 
       
     </div>
@@ -2057,7 +972,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ab80f837.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1252.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2075,7 +990,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/ab80f837.html" class="post-title-link" itemprop="url">mysql-order by执行原理</a>
+          <a href="/posts/1252.html" class="post-title-link" itemprop="url">JAVA-JVM内存模型</a>
         </h2>
 
         <div class="post-meta-container">
@@ -2086,7 +1001,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-17 14:02:14" itemprop="dateCreated datePublished" datetime="2019-11-17T14:02:14+08:00">2019-11-17</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2094,7 +1009,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -2108,135 +1023,27 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>order by执行原理在你开发应用的时候，一定会经常碰到需要根据指定的字段排序来显示结果的需求。</p>
-<p>还是以我们前面举例用过的市民表为例，假设你要查询城市是“杭州”的所有人名字，并且按照姓名排序返回前1000个人的姓名、年龄。</p>
-<p>假设这个表的部分定义是这样的：<br/>这时，你的SQL语句可以这么写：<br/>CREATE TABLE <code>t</code> (  <code>id</code> int(11) NOT NULL,  <code>city</code> varchar(16) NOT NULL,  <code>name</code> varchar(16) NOT NULL,  <code>age</code> int(11) NOT NULL,  <code>addr</code> varchar(128) DEFAULT NULL,  PRIMARY KEY (<code>id</code>),  KEY <code>city</code> (<code>city</code>)) ENGINE=InnoDB;select city,name,age from t where city=’杭州’ order by name limit 1000  ;这个语句看上去逻辑很清晰，但是你了解它的执行流程吗？今天，我就和你聊聊这个语句是怎么执行的，以及有什么参数会影响执行的行为。</p>
-<p>全字段排序前面我们介绍过索引，所以你现在就很清楚了，为避免全表扫描，我们需要在city字段加上索引。</p>
-<p>在city字段上创建索引之后，我们用explain命令来看看这个语句的执行情况。</p>
-<p>图1 使用explain命令查看语句的执行情况Extra这个字段中的“Using filesort”表示的就是需要排序，MySQL会给每个线程分配一块内存用于排序，称为sort_buffer。</p>
-<p>为了说明这个SQL查询语句的执行过程，我们先来看一下city这个索引的示意图。</p>
-<p>图2 city字段的索引示意图从图中可以看到，满足city=’杭州’条件的行，是从ID_X到ID_(X+N)的这些记录。</p>
-<p>通常情况下，这个语句执行流程如下所示 ：</p>
-<ol>
-<li>初始化sort_buffer，确定放入name、city、age这三个字段；</li>
-<li>从索引city找到第一个满足city=’杭州’条件的主键id，也就是图中的ID_X；</li>
-<li>到主键id索引取出整行，取name、city、age三个字段的值，存入sort_buffer中；</li>
-<li>从索引city取下一个记录的主键id；</li>
-<li>重复步骤3、4直到city的值不满足查询条件为止，对应的主键id也就是图中的ID_Y；</li>
-<li>对sort_buffer中的数据按照字段name做快速排序；</li>
-<li>按照排序结果取前1000行返回给客户端。</li>
-</ol>
-<p>我们暂且把这个排序过程，称为全字段排序，执行流程的示意图如下所示，下一篇文章中我们还会用到这个排序。</p>
-<p>图3 全字段排序图中“按name排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数sort_buffer_size。</p>
-<p>sort_buffer_size，就是MySQL为排序开辟的内存（sort_buffer）的大小。</p>
-<p>如果要排序的数据量小于sort_buffer_size，排序就在内存中完成。</p>
-<p>但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。</p>
-<p>你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。</p>
-<p>这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files中看到是否使用了临时文件。</p>
-<p>/* 打开optimizer_trace，只对本线程有效 <em>/SET optimizer_trace=’enabled=on’; /</em> @a保存Innodb_rows_read的初始值 <em>/select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name = ‘Innodb_rows_read’;/</em> 执行语句 <em>/select city, name,age from t where city=’杭州’ order by name limit 1000; /</em> 查看 OPTIMIZER_TRACE 输出 <em>/SELECT * FROM <code>information_schema</code>.<code>OPTIMIZER_TRACE</code>\G/</em> @b保存Innodb_rows_read的当前值 <em>/select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = ‘Innodb_rows_read’;/</em> 计算Innodb_rows_read差值 */select @b-@a;图4 全排序的OPTIMIZER_TRACE部分结果number_of_tmp_files表示的是，排序过程中使用的临时文件数。</p>
-<p>你一定奇怪，为什么需要12个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。</p>
-<p>可以这么简单理解，MySQL将需要排序的数据分成12份，每一份单独排序后存在这些临时文件中。</p>
-<p>然后把这12个有序文件再合并成一个有序的大文件。</p>
-<p>如果sort_buffer_size超过了需要排序的数据量的大小，number_of_tmp_files就是0，表示排序可以直接在内存中完成。</p>
-<p>否则就需要放在临时文件中排序。</p>
-<p>sort_buffer_size越小，需要分成的份数越多，number_of_tmp_files的值就越大。</p>
-<p>接下来，我再和你解释一下图4中其他两个值的意思。</p>
-<p>我们的示例表中有4000条满足city=’杭州’的记录，所以你可以看到 examined_rows=4000，表示参与排序的行数是4000行。</p>
-<p>sort_mode 里面的packed_additional_fields的意思是，排序过程对字符串做了“紧凑”处理。</p>
-<p>即使name字段的定义是varchar(16)，在排序过程中还是要按照实际长度来分配空间的。</p>
-<p>同时，最后一个查询语句select @b-@a 的返回结果是4000，表示整个执行过程只扫描了4000行。</p>
-<p>这里需要注意的是，为了避免对结论造成干扰，我把internal_tmp_disk_storage_engine设置成MyISAM。</p>
-<p>否则，select @b-@a的结果会显示为4001。</p>
-<p>这是因为查询OPTIMIZER_TRACE这个表时，需要用到临时表，而internal_tmp_disk_storage_engine的默认值是InnoDB。</p>
-<p>如果使用的是InnoDB引擎的话，把数据从临时表取出来的时候，会让Innodb_rows_read的值加1。</p>
-<p>rowid排序在上面这个算法过程里面，只对原表的数据读了一遍，剩下的操作都是在sort_buffer和临时文件中执行的。</p>
-<p>但这个算法有一个问题，就是如果查询要返回的字段很多的话，那么sort_buffer里面要放的字段数太多，这样内存里能够同时放下的行数很少，要分成很多个临时文件，排序的性能会很差。</p>
-<p>所以如果单行很大，这个方法效率不够好。</p>
-<p>那么，如果MySQL认为排序的单行长度太大会怎么做呢？接下来，我来修改一个参数，让MySQL采用另外一种算法。</p>
-<p>max_length_for_sort_data，是MySQL中专门控制用于排序的行数据的长度的一个参数。</p>
-<p>它的意思是，如果单行的长度超过这个值，MySQL就认为单行太大，要换一个算法。</p>
-<p>city、name、age 这三个字段的定义总长度是36，我把max_length_for_sort_data设置为16，我们再来看看计算过程有什么改变。</p>
-<p>新的算法放入sort_buffer的字段，只有要排序的列（即name字段）和主键id。</p>
-<p>但这时，排序的结果就因为少了city和age字段的值，不能直接返回了，整个执行流程就变成如下所示的样子：</p>
-<ol>
-<li>初始化sort_buffer，确定放入两个字段，即name和id；</li>
-<li>从索引city找到第一个满足city=’杭州’条件的主键id，也就是图中的ID_X；</li>
-<li>到主键id索引取出整行，取name、id这两个字段，存入sort_buffer中；</li>
-<li>从索引city取下一个记录的主键id；</li>
-<li>重复步骤3、4直到不满足city=’杭州’条件为止，也就是图中的ID_Y；</li>
-<li>对sort_buffer中的数据按照字段name进行排序；</li>
-<li>遍历排序结果，取前1000行，并按照id的值回到原表中取出city、name和age三个字段返回给客户端。</li>
-</ol>
-<p>这个执行流程的示意图如下，我把它称为rowid排序。</p>
-<p>SET max_length_for_sort_data = 16;图5 rowid排序对比图3的全字段排序流程图你会发现，rowid排序多访问了一次表t的主键索引，就是步骤7。</p>
-<p>需要说明的是，最后的“结果集”是一个逻辑概念，实际上MySQL服务端从排序后的sort_buffer中依次取出id，然后到原表查到city、name和age这三个字段的结果，不需要在服务端再耗费内存存储结果，是直接返回给客户端的。</p>
-<p>根据这个说明过程和图示，你可以想一下，这个时候执行select @b-@a，结果会是多少呢？现在，我们就来看看结果有什么不同。</p>
-<p>首先，图中的examined_rows的值还是4000，表示用于排序的数据是4000行。</p>
-<p>但是select @b-@a这个语句的值变成5000了。</p>
-<p>因为这时候除了排序过程外，在排序完成后，还要根据id去原表取值。</p>
-<p>由于语句是limit 1000，因此会多读1000行。</p>
-<p>图6 rowid排序的OPTIMIZER_TRACE部分输出从OPTIMIZER_TRACE的结果中，你还能看到另外两个信息也变了。</p>
-<p>sort_mode变成了&lt;sort_key, rowid&gt;，表示参与排序的只有name和id这两个字段。</p>
-<p>number_of_tmp_files变成10了，是因为这时候参与排序的行数虽然仍然是4000行，但是每一行都变小了，因此需要排序的总数据量就变小了，需要的临时文件也相应地变少了。</p>
-<p>全字段排序 VS rowid排序我们来分析一下，从这两个执行流程里，还能得出什么结论。</p>
-<p>如果MySQL实在是担心排序内存太小，会影响排序效率，才会采用rowid排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据。</p>
-<p>如果MySQL认为内存足够大，会优先选择全字段排序，把需要的字段都放到sort_buffer中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据。</p>
-<p>这也就体现了MySQL的一个设计思想：如果内存够，就要多利用内存，尽量减少磁盘访问。</p>
-<p>对于InnoDB表来说，rowid排序会要求回表多造成磁盘读，因此不会被优先选择。</p>
-<p>这个结论看上去有点废话的感觉，但是你要记住它，下一篇文章我们就会用到。</p>
-<p>看到这里，你就了解了，MySQL做排序是一个成本比较高的操作。</p>
-<p>那么你会问，是不是所有的order by都需要排序操作呢？如果不排序就能得到正确的结果，那对系统的消耗会小很多，语句的执行时间也会变得更短。</p>
-<p>其实，并不是所有的order by语句，都需要排序操作的。</p>
-<p>从上面分析的执行过程，我们可以看到，MySQL之所以需要生成临时表，并且在临时表上做排序操作，其原因是原来的数据都是无序的。</p>
-<p>你可以设想下，如果能够保证从city这个索引上取出来的行，天然就是按照name递增排序的话，是不是就可以不用再排序了呢？确实是这样的。</p>
-<p>所以，我们可以在这个市民表上创建一个city和name的联合索引，对应的SQL语句是：<br/>作为与city索引的对比，我们来看看这个索引的示意图。</p>
-<p>图7 city和name联合索引示意图在这个索引里面，我们依然可以用树搜索的方式定位到第一个满足city=’杭州’的记录，并且额外确保了，接下来按顺序取“下一条记录”的遍历过程中，只要city的值是杭州，name的值就一定是有序的。</p>
-<p>这样整个查询过程的流程就变成了：</p>
-<ol>
-<li>从索引(city,name)找到第一个满足city=’杭州’条件的主键id；</li>
-<li>到主键id索引取出整行，取name、city、age三个字段的值，作为结果集的一部分直接返回；</li>
-<li>从索引(city,name)取下一个记录主键id；<br/>alter table t add index city_user(city, name);4. 重复步骤2、3，直到查到第1000条记录，或者是不满足city=’杭州’条件时循环结束。</li>
-</ol>
-<p>图8 引入(city,name)联合索引后，查询语句的执行计划可以看到，这个查询过程不需要临时表，也不需要排序。</p>
-<p>接下来，我们用explain的结果来印证一下。</p>
-<p>图9 引入(city,name)联合索引后，查询语句的执行计划从图中可以看到，Extra字段中没有Using filesort了，也就是不需要排序了。</p>
-<p>而且由于(city,name)这个联合索引本身有序，所以这个查询也不用把4000行全都读一遍，只要找到满足条件的前1000条记录就可以退出了。</p>
-<p>也就是说，在我们这个例子里，只需要扫描1000次。</p>
-<p>既然说到这里了，我们再往前讨论，这个语句的执行流程有没有可能进一步简化呢？不知道你还记不记得，我在第5篇文章《 深入浅出索引（下）》中，和你介绍的覆盖索引。</p>
-<p>这里我们可以再稍微复习一下。</p>
-<p>覆盖索引是指，索引上的信息足够满足查询请求，不需要再回到主键索引上去取数据。</p>
-<p>按照覆盖索引的概念，我们可以再优化一下这个查询语句的执行流程。</p>
-<p>针对这个查询，我们可以创建一个city、name和age的联合索引，对应的SQL语句就是：<br/>这时，对于city字段的值相同的行来说，还是按照name字段的值递增排序的，此时的查询语句也就不再需要排序了。</p>
-<p>这样整个查询语句的执行流程就变成了：</p>
-<ol>
-<li>从索引(city,name,age)找到第一个满足city=’杭州’条件的记录，取出其中的city、name和age这三个字段的值，作为结果集的一部分直接返回；</li>
-<li>从索引(city,name,age)取下一个记录，同样取出这三个字段的值，作为结果集的一部分直接返回；</li>
-<li>重复执行步骤2，直到查到第1000条记录，或者是不满足city=’杭州’条件时循环结束。</li>
-</ol>
-<p>图10 引入(city,name,age)联合索引后，查询语句的执行流程然后，我们再来看看explain的结果。</p>
-<p>alter table t add index city_user_age(city, name, age);图11 引入(city,name,age)联合索引后，查询语句的执行计划可以看到，Extra字段里面多了“Using index”，表示的就是使用了覆盖索引，性能上会快很多。</p>
-<p>当然，这里并不是说要为了每个查询能用上覆盖索引，就要把语句中涉及的字段都建上联合索引，毕竟索引还是有维护代价的。</p>
-<p>这是一个需要权衡的决定。</p>
-<p>小结今天这篇文章，我和你介绍了MySQL里面order by语句的几种算法流程。</p>
-<p>在开发系统的时候，你总是不可避免地会使用到order by语句。</p>
-<p>你心里要清楚每个语句的排序逻辑是怎么实现的，还要能够分析出在最坏情况下，每个语句的执行对系统资源的消耗，这样才能做到下笔如有神，不犯低级错误。</p>
-<p>最后，我给你留下一个思考题吧。</p>
-<p>假设你的表里面已经有了city_name(city, name)这个联合索引，然后你要查杭州和苏州两个城市中所有的市民的姓名，并且按名字排序，显示前100条记录。</p>
-<p>如果SQL查询语句是这么写的 ：<br/>那么，这个语句执行的时候会有排序过程吗，为什么？如果业务端代码由你来开发，需要实现一个在数据库端不需要排序的方案，你会怎么实现呢？进一步地，如果有分页需求，要显示第101页，也就是说语句最后要改成 “limit 10000,100”， 你的实现方法又会是什么呢？你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期的问题是，当MySQL去更新一行，但是要修改的值跟原来的值是相同的，这时候MySQL会真的去执行一次修改吗？还是看到值相同就直接返回呢？这是第一次我们课后问题的三个选项都有同学选的，所以我要和你需要详细说明一下。</p>
-<p>第一个选项是，MySQL读出数据，发现值与原来相同，不更新，直接返回，执行结束。</p>
-<p>这里我们可以用一个锁实验来确认。</p>
-<p>mysql&gt; select * from t where city in (‘杭州’,”苏州”) order by name limit 100;假设，当前表t里的值是(1,2)。</p>
-<p>图12 锁验证方式session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的，所以排除选项1。</p>
-<p>第二个选项是，MySQL调用了InnoDB引擎提供的接口，但是引擎发现值与原来相同，不更新，直接返回。</p>
-<p>有没有这种可能呢？这里我用一个可见性实验来确认。</p>
-<p>假设当前表里的值是(1,2)。</p>
-<p>图13 可见性验证方式session A的第二个select 语句是一致性读（快照读)，它是不能看见session B的更新的。</p>
-<p>现在它返回的是(1,3)，表示它看见了某个新的版本，这个版本只能是session A自己的update语句做更新的时候生成。</p>
-<p>（如果你对这个逻辑有疑惑的话，可以回顾下第8篇文章《事务到底是隔离的还是不隔离的？》中的相关内容）所以，我们上期思考题的答案应该是选项3，即：InnoDB认真执行了“把这个值修改成(1,2)”这个操作，该加锁的加锁，该更新的更新。</p>
-<p>然后你会说，MySQL怎么这么笨，就不会更新前判断一下值是不是相同吗？如果判断一下，不就不用浪费InnoDB操作，多去更新一次了？其实MySQL是确认了的。</p>
-<p>只是在这个语句里面，MySQL认为读出来的值，只有一个确定的(id=1), 而要写的是(a=3)，只从这两个信息是看不出来“不需要修改”的。</p>
+          <h1 id="基本内容"><a class="headerlink" href="#基本内容" title="基本内容"></a>基本内容</h1><p><img alt="JVM内存模型" src="/img/jvm_memory_20221229161909.png"/></p>
+<h2 id="指令重排-编译器、运行时"><a class="headerlink" href="#指令重排-编译器、运行时" title="指令重排(编译器、运行时)"></a>指令重排(编译器、运行时)</h2><p>从java源代码到最终实际执行的指令序列，会分别经历下面三种重排序：</p>
+<pre><code>编译器优化重排序
+指令级并行重排序
+内存系统重排序
+</code></pre>
+<h2 id="编译器优化重排序"><a class="headerlink" href="#编译器优化重排序" title="编译器优化重排序"></a>编译器优化重排序</h2><p>在执行程序时，为了提高性能，编译器和处理器会对指令做重排序。但是，JMM确保在不同的编译器和不同的处理器平台之上，通过插入特定类型的Memory Barrier来禁止特定类型的编译器重排序和处理器重排序，为上层提供一致的内存可见性保证。</p>
+<h2 id="指令级并行重排序"><a class="headerlink" href="#指令级并行重排序" title="指令级并行重排序"></a>指令级并行重排序</h2><p>编译器优化重排序：编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。<br/>指令级并行的重排序：现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</p>
+<h2 id="内存系统重排序"><a class="headerlink" href="#内存系统重排序" title="内存系统重排序"></a>内存系统重排序</h2><p>内存系统的重排序：处理器使用缓存和读写缓冲区，这使得加载和存储操作看上去可能是在乱序执行(强调的是内存缓存)。<br/>在虚拟机层面，为了尽可能减少内存操作速度远慢于CPU运行速度所带来的CPU空置的影响，虚拟机会按照自己的一些规则将程序编写顺序打乱——即写在后面的代码在时间顺序上可能会先执行，而写在前面的代码会后执行——以尽可能充分地利用CPU</p>
+<h2 id="内存屏障"><a class="headerlink" href="#内存屏障" title="内存屏障"></a>内存屏障</h2><h3 id="内存屏障类型"><a class="headerlink" href="#内存屏障类型" title="内存屏障类型"></a>内存屏障类型</h3><ul>
+<li>LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。</li>
+<li>StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。</li>
+<li>LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li>
+<li>StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。它的开销是四种屏障中最大的。在大多数处理器的实现中，这个屏障是个万能屏障，兼具其它三种内存屏障的功能</li>
+</ul>
+<h3 id="基于保守策略的JMM内存屏障插入策略："><a class="headerlink" href="#基于保守策略的JMM内存屏障插入策略：" title="基于保守策略的JMM内存屏障插入策略："></a>基于保守策略的JMM内存屏障插入策略：</h3><ul>
+<li>在每个volatile写操作的前面插入一个StoreStore屏障</li>
+<li>在每个volatile写操作的后面插入一个StoreLoad屏障</li>
+<li>在每个volatile读操作的后面插入一个LoadLoad屏障</li>
+<li>在每个volatile读操作的后面插入一个LoadStore屏障</li>
+</ul>
 
       
     </div>
@@ -2263,7 +1070,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6d416b67.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37039.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2281,7 +1088,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/6d416b67.html" class="post-title-link" itemprop="url">mysql-答疑文章（一）：日志和索引相关问题</a>
+          <a href="/posts/37039.html" class="post-title-link" itemprop="url">JAVA-JDK动态代理或CGLIB</a>
         </h2>
 
         <div class="post-meta-container">
@@ -2292,7 +1099,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-11-15 14:06:30" itemprop="dateCreated datePublished" datetime="2019-11-15T14:06:30+08:00">2019-11-15</time>
+      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2300,7 +1107,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
         </span>
     </span>
 
@@ -2314,201 +1121,14 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题解析"><a class="headerlink" href="#问题解析" title="问题解析"></a>问题解析</h1><p>答疑文章（一）：日志和索引相关问题<br/>在今天这篇答疑文章更新前，MySQL实战这个专栏已经更新了14篇。</p>
-<p>在这些文章中，大家在评论区留下了很多高质量的留言。</p>
-<p>现在，每篇文章的评论区都有热心的同学帮忙总结文章知识点，也有不少同学提出了很多高质量的问题，更有一些同学帮忙解答其他同学提出的问题。</p>
-<p>在浏览这些留言并回复的过程中，我倍受鼓舞，也尽我所知地帮助你解决问题、和你讨论。</p>
-<p>可以说，你们的留言活跃了整个专栏的氛围、提升了整个专栏的质量，谢谢你们。</p>
-<p>评论区的大多数留言我都直接回复了，对于需要展开说明的问题，我都拿出小本子记了下来。</p>
-<p>这些被记下来的问题，就是我们今天这篇答疑文章的素材了。</p>
-<p>到目前为止，我已经收集了47个问题，很难通过今天这一篇文章全部展开。</p>
-<p>所以，我就先从中找了几个联系非常紧密的问题，串了起来，希望可以帮你解决关于日志和索引的一些疑惑。</p>
-<p>而其他问题，我们就留着后面慢慢展开吧。</p>
-<p>日志相关问题我在第2篇文章《日志系统：一条SQL更新语句是如何执行的？》中，和你讲到binlog（归档日志）和redo log（重做日志）配合崩溃恢复的时候，用的是反证法，说明了如果没有两阶段提交，会导致MySQL出现主备数据不一致等问题。</p>
-<p>在这篇文章下面，很多同学在问，在两阶段提交的不同瞬间，MySQL如果发生异常重启，是怎么保证数据完整性的？现在，我们就从这个问题开始吧。</p>
-<p>我再放一次两阶段提交的图，方便你学习下面的内容。</p>
-<p>图1 两阶段提交示意图这里，我要先和你解释一个误会式的问题。</p>
-<p>有同学在评论区问到，这个图不是一个update语句的执行流程吗，怎么还会调用commit语句？他产生这个疑问的原因，是把两个“commit”的概念混淆了：</p>
-<p>他说的“commit语句”，是指MySQL语法中，用于提交一个事务的命令。</p>
-<p>一般跟begin/starttransaction 配对使用。</p>
-<p>而我们图中用到的这个“commit步骤”，指的是事务提交过程中的一个小步骤，也是最后一步。</p>
-<p>当这个步骤执行完成后，这个事务就提交完成了。</p>
-<p>“commit语句”执行的时候，会包含“commit 步骤”。</p>
-<p>而我们这个例子里面，没有显式地开启事务，因此这个update语句自己就是一个事务，在执行完成后提交事务时，就会用到这个“commit步骤“。</p>
-<p>接下来，我们就一起分析一下在两阶段提交的不同时刻，MySQL异常重启会出现什么现象。</p>
-<p>如果在图中时刻A的地方，也就是写入redo log 处于prepare阶段之后、写binlog之前，发生了崩溃（crash），由于此时binlog还没写，redo log也还没提交，所以崩溃恢复的时候，这个事务会回滚。</p>
-<p>这时候，binlog还没写，所以也不会传到备库。</p>
-<p>到这里，大家都可以理解。</p>
-<p>大家出现问题的地方，主要集中在时刻B，也就是binlog写完，redo log还没commit前发生crash，那崩溃恢复的时候MySQL会怎么处理？我们先来看一下崩溃恢复时的判断规则。</p>
-<ol>
-<li><p>如果redo log里面的事务是完整的，也就是已经有了commit标识，则直接提交；</p>
-</li>
-<li><p>如果redo log里面的事务只有完整的prepare，则判断对应的事务binlog是否存在并完整：</p>
-</li>
-</ol>
-<p>a. 如果是，则提交事务；</p>
-<p>b. 否则，回滚事务。</p>
-<p>这里，时刻B发生crash对应的就是2(a)的情况，崩溃恢复过程中事务会被提交。</p>
-<p>现在，我们继续延展一下这个问题。</p>
-<p>追问1：MySQL怎么知道binlog是完整的?回答：一个事务的binlog是有完整格式的：</p>
-<p>statement格式的binlog，最后会有COMMIT；</p>
-<p>row格式的binlog，最后会有一个XID event。</p>
-<p>另外，在MySQL 5.6.2版本以后，还引入了binlog-checksum参数，用来验证binlog内容的正确性。</p>
-<p>对于binlog日志由于磁盘原因，可能会在日志中间出错的情况，MySQL可以通过校验checksum的结果来发现。</p>
-<p>所以，MySQL还是有办法验证事务binlog的完整性的。</p>
-<p>追问2：redo log 和 binlog是怎么关联起来的?回答：它们有一个共同的数据字段，叫XID。</p>
-<p>崩溃恢复的时候，会按顺序扫描redo log：</p>
-<p>如果碰到既有prepare、又有commit的redo log，就直接提交；</p>
-<p>如果碰到只有parepare、而没有commit的redo log，就拿着XID去binlog找对应的事务。</p>
-<p>追问3：处于prepare阶段的redo log加上完整binlog，重启就能恢复，MySQL为什么要这么设计?回答：其实，这个问题还是跟我们在反证法中说到的数据与备份的一致性有关。</p>
-<p>在时刻B，也就是binlog写完以后MySQL发生崩溃，这时候binlog已经写入了，之后就会被从库（或者用这个binlog恢复出来的库）使用。</p>
-<p>所以，在主库上也要提交这个事务。</p>
-<p>采用这个策略，主库和备库的数据就保证了一致性。</p>
-<p>追问4：如果这样的话，为什么还要两阶段提交呢？干脆先redo log写完，再写binlog。</p>
-<p>崩溃恢复的时候，必须得两个日志都完整才可以。</p>
-<p>是不是一样的逻辑？回答：其实，两阶段提交是经典的分布式系统问题，并不是MySQL独有的。</p>
-<p>如果必须要举一个场景，来说明这么做的必要性的话，那就是事务的持久性问题。</p>
-<p>对于InnoDB引擎来说，如果redo log提交完成了，事务就不能回滚（如果这还允许回滚，就可能覆盖掉别的事务的更新）。</p>
-<p>而如果redo log直接提交，然后binlog写入的时候失败，InnoDB又回滚不了，数据和binlog日志又不一致了。</p>
-<p>两阶段提交就是为了给所有人一个机会，当每个人都说“我ok”的时候，再一起提交。</p>
-<p>追问5：不引入两个日志，也就没有两阶段提交的必要了。</p>
-<p>只用binlog来支持崩溃恢复，又能支持归档，不就可以了？回答：这位同学的意思是，只保留binlog，然后可以把提交流程改成这样：… -&gt; “数据更新到内存” -&gt; “写 binlog” -&gt; “提交事务”，是不是也可以提供崩溃恢复的能力？答案是不可以。</p>
-<p>如果说历史原因的话，那就是InnoDB并不是MySQL的原生存储引擎。</p>
-<p>MySQL的原生引擎是MyISAM，设计之初就有没有支持崩溃恢复。</p>
-<p>InnoDB在作为MySQL的插件加入MySQL引擎家族之前，就已经是一个提供了崩溃恢复和事务支持的引擎了。</p>
-<p>InnoDB接入了MySQL后，发现既然binlog没有崩溃恢复的能力，那就用InnoDB原有的redo log好了。</p>
-<p>而如果说实现上的原因的话，就有很多了。</p>
-<p>就按照问题中说的，只用binlog来实现崩溃恢复的流程，我画了一张示意图，这里就没有redo log了。</p>
-<p>图2 只用binlog支持崩溃恢复这样的流程下，binlog还是不能支持崩溃恢复的。</p>
-<p>我说一个不支持的点吧：binlog没有能力恢复“数据页”。</p>
-<p>如果在图中标的位置，也就是binlog2写完了，但是整个事务还没有commit的时候，MySQL发生了crash。</p>
-<p>重启后，引擎内部事务2会回滚，然后应用binlog2可以补回来；但是对于事务1来说，系统已经认为提交完成了，不会再应用一次binlog1。</p>
-<p>但是，InnoDB引擎使用的是WAL技术，执行事务的时候，写完内存和日志，事务就算完成了。</p>
-<p>如果之后崩溃，要依赖于日志来恢复数据页。</p>
-<p>也就是说在图中这个位置发生崩溃的话，事务1也是可能丢失了的，而且是数据页级的丢失。</p>
-<p>此时，binlog里面并没有记录数据页的更新细节，是补不回来的。</p>
-<p>你如果要说，那我优化一下binlog的内容，让它来记录数据页的更改可以吗？但，这其实就是又做了一个redo log出来。</p>
-<p>所以，至少现在的binlog能力，还不能支持崩溃恢复。</p>
-<p>追问6：那能不能反过来，只用redo log，不要binlog？回答：如果只从崩溃恢复的角度来讲是可以的。</p>
-<p>你可以把binlog关掉，这样就没有两阶段提交了，但系统依然是crash-safe的。</p>
-<p>但是，如果你了解一下业界各个公司的使用场景的话，就会发现在正式的生产库上，binlog都是开着的。</p>
-<p>因为binlog有着redo log无法替代的功能。</p>
-<p>一个是归档。</p>
-<p>redo log是循环写，写到末尾是要回到开头继续写的。</p>
-<p>这样历史日志没法保留，redo log也就起不到归档的作用。</p>
-<p>一个就是MySQL系统依赖于binlog。</p>
-<p>binlog作为MySQL一开始就有的功能，被用在了很多地方。</p>
-<p>其中，MySQL系统高可用的基础，就是binlog复制。</p>
-<p>还有很多公司有异构系统（比如一些数据分析系统），这些系统就靠消费MySQL的binlog来更新自己的数据。</p>
-<p>关掉binlog的话，这些下游系统就没法输入了。</p>
-<p>总之，由于现在包括MySQL高可用在内的很多系统机制都依赖于binlog，所以“鸠占鹊巢”redolog还做不到。</p>
-<p>你看，发展生态是多么重要。</p>
-<p>追问7：redo log一般设置多大？回答：redo log太小的话，会导致很快就被写满，然后不得不强行刷redo log，这样WAL机制的能力就发挥不出来了。</p>
-<p>所以，如果是现在常见的几个TB的磁盘的话，就不要太小气了，直接将redo log设置为4个文件、每个文件1GB吧。</p>
-<p>追问8：正常运行中的实例，数据写入后的最终落盘，是从redo log更新过来的还是从buffer pool更新过来的呢？回答：这个问题其实问得非常好。</p>
-<p>这里涉及到了，“redo log里面到底是什么”的问题。</p>
-<p>实际上，redo log并没有记录数据页的完整数据，所以它并没有能力自己去更新磁盘数据页，也就不存在“数据最终落盘，是由redo log更新过去”的情况。</p>
-<ol>
-<li>如果是正常运行的实例的话，数据页被修改以后，跟磁盘的数据页不一致，称为脏页。</li>
-</ol>
-<p>最终数据落盘，就是把内存中的数据页写盘。</p>
-<p>这个过程，甚至与redo log毫无关系。</p>
-<ol start="2">
-<li>在崩溃恢复场景中，InnoDB如果判断到一个数据页可能在崩溃恢复的时候丢失了更新，就会将它读到内存，然后让redo log更新内存内容。</li>
-</ol>
-<p>更新完成后，内存页变成脏页，就回到了第一种情况的状态。</p>
-<p>追问9：redo log buffer是什么？是先修改内存，还是先写redo log文件？回答：这两个问题可以一起回答。</p>
-<p>在一个事务的更新过程中，日志是要写多次的。</p>
-<p>比如下面这个事务：</p>
-<p>这个事务要往两个表中插入记录，插入数据的过程中，生成的日志都得先保存起来，但又不能在还没commit的时候就直接写到redo log文件里。</p>
-<p>所以，redo log buffer就是一块内存，用来先存redo日志的。</p>
-<p>也就是说，在执行第一个insert的时候，数据的内存被修改了，redo log buffer也写入了日志。</p>
-<p>但是，真正把日志写到redo log文件（文件名是 ib_logfile+数字），是在执行commit语句的时候做的。</p>
-<p>（这里说的是事务执行过程中不会“主动去刷盘”，以减少不必要的IO消耗。</p>
-<p>但是可能会出现“被动写入磁盘”，比如内存不够、其他事务提交等情况。</p>
-<p>这个问题我们会在后面第22篇文章《MySQL有哪些“饮鸩止渴”的提高性能的方法？》中再详细展开）。</p>
-<p>单独执行一个更新语句的时候，InnoDB会自己启动一个事务，在语句执行完成的时候提交。</p>
-<p>过程跟上面是一样的，只不过是“压缩”到了一个语句里面完成。</p>
-<p>以上这些问题，就是把大家提过的关于redo log和binlog的问题串起来，做的一次集中回答。</p>
-<p>如果你还有问题，可以在评论区继续留言补充。</p>
-<p>业务设计问题接下来，我再和你分享@ithunter 同学在第8篇文章《事务到底是隔离的还是不隔离的？》的评论区提到的跟索引相关的一个问题。</p>
-<p>我觉得这个问题挺有趣、也挺实用的，其他同学也可能会碰上这样的场景，在这里解答和分享一下。</p>
-<p>问题是这样的（我文字上稍微做了点修改，方便大家理解）：</p>
-<p>begin;insert into t1 …insert into t2 …commit;业务上有这样的需求，A、B两个用户，如果互相关注，则成为好友。</p>
-<p>设计上是有两张表，一个是like表，一个是friend表，like表有user_id、liker_id两个字段，我设置为复合唯一索引即首先，我要先赞一下这样的提问方式。</p>
-<p>虽然极客时间现在的评论区还不能追加评论，但如果大家能够一次留言就把问题讲清楚的话，其实影响也不大。</p>
-<p>所以，我希望你在留言提问的时候，也能借鉴这种方式。</p>
-<p>接下来，我把@ithunter 同学说的表模拟出来，方便我们讨论。</p>
-<p>虽然这个题干中，并没有说到friend表的索引结构。</p>
-<p>但我猜测friend_1_id和friend_2_id也有索uk_user_id_liker_id。</p>
-<p>语句执行逻辑是这样的：</p>
-<p>以A关注B为例：</p>
-<p>第一步，先查询对方有没有关注自己（B有没有关注A）select * from like where user_id = B and liker_id = A;如果有，则成为好友insert into friend;没有，则只是单向关注关系insert into like;但是如果A、B同时关注对方，会出现不会成为好友的情况。</p>
-<p>因为上面第1步，双方都没关注对方。</p>
-<p>第1步即使使用了排他锁也不行，因为记录不存在，行锁无法生效。</p>
-<p>请问这种情况，在MySQL锁层面有没有办法处理？CREATE TABLE <code>like</code> (  <code>id</code> int(11) NOT NULL AUTO_INCREMENT,  <code>user_id</code> int(11) NOT NULL,  <code>liker_id</code> int(11) NOT NULL,  PRIMARY KEY (<code>id</code>),  UNIQUE KEY <code>uk_user_id_liker_id</code> (<code>user_id</code>,<code>liker_id</code>)) ENGINE=InnoDB;CREATE TABLE <code>friend</code> (  id<code>int(11) NOT NULL AUTO_INCREMENT, </code>friend_1_id<code>int(11) NOT NULL, </code>firned_2_id<code>int(11) NOT NULL,  UNIQUE KEY</code>uk_friend<code> (</code>friend_1_id<code>,</code>firned_2_id<code>)  PRIMARY KEY (</code>id`)) ENGINE=InnoDB;引，为便于描述，我给加上唯一索引。</p>
-<p>顺便说明一下，“like”是关键字，我一般不建议使用关键字作为库名、表名、字段名或索引名。</p>
-<p>我把他的疑问翻译一下，在并发场景下，同时有两个人，设置为关注对方，就可能导致无法成功加为朋友关系。</p>
-<p>现在，我用你已经熟悉的时刻顺序表的形式，把这两个事务的执行语句列出来：</p>
-<p>图3 并发“喜欢”逻辑操作顺序由于一开始A和B之间没有关注关系，所以两个事务里面的select语句查出来的结果都是空。</p>
-<p>因此，session 1的逻辑就是“既然B没有关注A，那就只插入一个单向关注关系”。</p>
-<p>session 2也同样是这个逻辑。</p>
-<p>这个结果对业务来说就是bug了。</p>
-<p>因为在业务设定里面，这两个逻辑都执行完成以后，是应该在friend表里面插入一行记录的。</p>
-<p>如提问里面说的，“第1步即使使用了排他锁也不行，因为记录不存在，行锁无法生效”。</p>
-<p>不过，我想到了另外一个方法，来解决这个问题。</p>
-<p>首先，要给“like”表增加一个字段，比如叫作 relation_ship，并设为整型，取值1、2、3。</p>
-<p>值是1的时候，表示user_id 关注 liker_id;值是2的时候，表示liker_id 关注 user_id;值是3的时候，表示互相关注。</p>
-<p>然后，当 A关注B的时候，逻辑改成如下所示的样子：</p>
-<p>应用代码里面，比较A和B的大小，如果A&lt;B，就执行下面的逻辑如果A&gt;B，则执行下面的逻辑这个设计里，让“like”表里的数据保证user_id &lt; liker_id，这样不论是A关注B，还是B关注A，在操作“like”表的时候，如果反向的关系已经存在，就会出现行锁冲突。</p>
-<p>然后，insert … on duplicate语句，确保了在事务内部，执行了这个SQL语句后，就强行占住了这个行锁，之后的select 判断relation_ship这个逻辑时就确保了是在行锁保护下的读操作。</p>
-<p>操作符 “|” 是按位或，连同最后一句insert语句里的ignore，是为了保证重复调用时的幂等性。</p>
-<p>这样，即使在双方“同时”执行关注操作，最终数据库里的结果，也是like表里面有一条关于A和B的记录，而且relation_ship的值是3， 并且friend表里面也有了A和B的这条记录。</p>
-<p>mysql&gt; begin; /<em>启动事务</em>/insert into <code>like</code>(user_id, liker_id, relation_ship) values(A, B, 1) on duplicate key update relation_ship=relation_ship | 1;select relation_ship from <code>like</code> where user_id=A and liker_id=B;/*代码中判断返回的 relation_ship，  如果是1，事务结束，执行 commit  如果是3，则执行下面这两个语句：</p>
-<p>  */insert ignore into friend(friend_1_id, friend_2_id) values(A,B);commit;mysql&gt; begin; /<em>启动事务</em>/insert into <code>like</code>(user_id, liker_id, relation_ship) values(B, A, 2) on duplicate key update relation_ship=relation_ship | 2;select relation_ship from <code>like</code> where user_id=B and liker_id=A;/*代码中判断返回的 relation_ship，  如果是2，事务结束，执行 commit  如果是3，则执行下面这两个语句：</p>
-<p>*/insert ignore into friend(friend_1_id, friend_2_id) values(B,A);commit;不知道你会不会吐槽：之前明明还说尽量不要使用唯一索引，结果这个例子一上来我就创建了两个。</p>
-<p>这里我要再和你说明一下，之前文章我们讨论的，是在“业务开发保证不会插入重复记录”的情况下，着重要解决性能问题的时候，才建议尽量使用普通索引。</p>
-<p>而像这个例子里，按照这个设计，业务根本就是保证“我一定会插入重复数据，数据库一定要要有唯一性约束”，这时就没啥好说的了，唯一索引建起来吧。</p>
-<p>小结这是专栏的第一篇答疑文章。</p>
-<p>我针对前14篇文章，大家在评论区中的留言，从中摘取了关于日志和索引的相关问题，串成了今天这篇文章。</p>
-<p>这里我也要再和你说一声，有些我答应在答疑文章中进行扩展的话题，今天这篇文章没来得及扩展，后续我会再找机会为你解答。</p>
-<p>所以，篇幅所限，评论区见吧。</p>
-<p>最后，虽然这篇是答疑文章，但课后问题还是要有的。</p>
-<p>我们创建了一个简单的表t，并插入一行，然后对这一行做修改。</p>
-<p>这时候，表t里有唯一的一行数据(1,2)。</p>
-<p>假设，我现在要执行：</p>
-<p>你会看到这样的结果：</p>
-<p>结果显示，匹配(rows matched)了一行，修改(Changed)了0行。</p>
-<p>仅从现象上看，MySQL内部在处理这个命令的时候，可以有以下三种选择：</p>
-<ol>
-<li><p>更新都是先读后写的，MySQL读出数据，发现a的值本来就是2，不更新，直接返回，执行mysql&gt; CREATE TABLE <code>t</code> (<code>id</code> int(11) NOT NULL primary key auto_increment,<code>a</code> int(11) DEFAULT NULL) ENGINE=InnoDB;insert into t values(1,2);mysql&gt; update t set a=2 where id=1;结束；</p>
-</li>
-<li><p>MySQL调用了InnoDB引擎提供的“修改为(1,2)”这个接口，但是引擎发现值与原来相同，不更新，直接返回；</p>
-</li>
-<li><p>InnoDB认真执行了“把这个值修改成(1,2)”这个操作，该加锁的加锁，该更新的更新。</p>
-</li>
-</ol>
-<p>你觉得实际情况会是以上哪种呢？你可否用构造实验的方式，来证明你的结论？进一步地，可以思考一下，MySQL为什么要选择这种策略呢？你可以把你的验证方法和思考写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。</p>
-<p>感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p>
-<p>上期问题时间上期的问题是，用一个计数表记录一个业务表的总行数，在往业务表插入数据的时候，需要给计数值加1。</p>
-<p>逻辑实现上是启动一个事务，执行两个语句：</p>
-<ol>
-<li><p>insert into 数据表；</p>
-</li>
-<li><p>update 计数表，计数值加1。</p>
-</li>
-</ol>
-<p>从系统并发能力的角度考虑，怎么安排这两个语句的顺序。</p>
-<p>这里，我直接复制 @阿建 的回答过来供你参考：</p>
-<p>评论区有同学说，应该把update计数表放后面，因为这个计数表可能保存了多个业务表的计数值。</p>
-<p>如果把update计数表放到事务的第一个语句，多个业务表同时插入数据的话，等待时间会更长。</p>
-<p>这个答案的结论是对的，但是理解不太正确。</p>
-<p>即使我们用一个计数表记录多个业务表的行数，也肯定会给表名字段加唯一索引。</p>
-<p>类似于下面这样的表结构：</p>
-<p>并发系统性能的角度考虑，应该先插入操作记录，再更新计数表。</p>
-<p>知识点在《行锁功过：怎么减少行锁对性能的影响？》因为更新计数表涉及到行锁的竞争，先插入再更新能最大程度地减少事务之间的锁等待，提升并发度。</p>
-<p>在更新计数表的时候，一定会传入where table_name=$table_name，使用主键索引，更新加行锁只会锁在一行上。</p>
-<p>而在不同业务表插入数据，是更新不同的行，不会有行锁。</p>
+          <h1 id="使用JDK动态代理"><a class="headerlink" href="#使用JDK动态代理" title="使用JDK动态代理"></a>使用JDK动态代理</h1><p>Spring AOP默认使用JDK动态代理（基于接口的代理）。</p>
+<p>如果被代理的目标对象已经实现了接口，则使用JDK动态代理。如果目标对象未实现任何接口，则会创建CGLIB代理。</p>
+<h1 id="使用CGLIB代理注意"><a class="headerlink" href="#使用CGLIB代理注意" title="使用CGLIB代理注意"></a>使用CGLIB代理注意</h1><ul>
+<li>final方法不建议使用，因为它们无法被覆盖。</li>
+<li>除非强制使用CGLIB，需要将元素 <code>&lt;</code>aop:config<code>&gt;</code> 的属性proxy-target-class值设置为true。</li>
+<li>需要CGLIB库，找不到CGLIB库类时，Spring会发出警告。</li>
+<li>代理对象的构造函数将被调用两次。这是因为CGLIB代理会为每个代理对象生成子类。构造函数中只做赋值和初始化，不能实现其他的逻辑。</li>
+</ul>
 
       
     </div>
@@ -2528,7 +1148,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/39/">39</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/21/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/46/">46</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/21/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

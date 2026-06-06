@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2026 年 FlagOS 开放异构 AI 编译器：跨 GPU&#x2F;NPU&#x2F;CPU 的统一编译栈，背景、架构、趋势与 GitHub 生态，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 技术编年史 2026：FlagOS 开放异构 AI 编译器">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2026-flagos-heterogeneous-compiler.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2026 年 FlagOS 开放异构 AI 编译器：跨 GPU&#x2F;NPU&#x2F;CPU 的统一编译栈，背景、架构、趋势与 GitHub 生态，中英文对照。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-10T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-10T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Compiler">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="FlagOS">
+<meta property="article:tag" content="Heterogeneous Computing">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2026-flagos-heterogeneous-compiler.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2026-flagos-heterogeneous-compiler.html","path":"posts/ai-timeline-2026-flagos-heterogeneous-compiler.html","title":"AI 技术编年史 2026：FlagOS 开放异构 AI 编译器"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>AI 技术编年史 2026：FlagOS 开放异构 AI 编译器 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AI-%E6%8A%80%E6%9C%AF%E7%BC%96%E5%B9%B4%E5%8F%B2-2026%EF%BC%9AFlagOS-%E5%BC%80%E6%94%BE%E5%BC%82%E6%9E%84-AI-%E7%BC%96%E8%AF%91%E5%99%A8-FlagOS-Open-Heterogeneous-AI-Compiler"><span class="nav-number">1.</span> <span class="nav-text">AI 技术编年史 2026：FlagOS 开放异构 AI 编译器 | FlagOS Open Heterogeneous AI Compiler</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景 | Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、架构 | Architecture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9-Pros-and-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点 | Pros and Cons</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81GitHub-%E7%94%9F%E6%80%81-GitHub-Ecosystem"><span class="nav-number">1.6.</span> <span class="nav-text">六、GitHub 生态 | GitHub Ecosystem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%B7%B1%E5%85%A5%E6%8E%A2%E8%AE%A8-Extended-Discussion"><span class="nav-number">1.7.</span> <span class="nav-text">七、深入探讨 | Extended Discussion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E4%B8%8E-PyTorch-Inductor-%E5%AF%B9%E6%AF%94-vs-PyTorch-Inductor"><span class="nav-number">1.7.1.</span> <span class="nav-text">7.1 与 PyTorch Inductor 对比 | vs. PyTorch Inductor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-References"><span class="nav-number">1.8.</span> <span class="nav-text">八、参考链接 | References</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2026-flagos-heterogeneous-compiler.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="AI 技术编年史 2026：FlagOS 开放异构 AI 编译器 | Qi">
+      <meta itemprop="description" content="2026 年 FlagOS 开放异构 AI 编译器：跨 GPU&#x2F;NPU&#x2F;CPU 的统一编译栈，背景、架构、趋势与 GitHub 生态，中英文对照。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AI 技术编年史 2026：FlagOS 开放异构 AI 编译器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-05-10 10:00:00" itemprop="dateCreated datePublished" datetime="2026-05-10T10:00:00+08:00">2026-05-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2026 年 FlagOS 开放异构 AI 编译器：跨 GPU/NPU/CPU 的统一编译栈，背景、架构、趋势与 GitHub 生态，中英文对照。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="AI-技术编年史-2026：FlagOS-开放异构-AI-编译器-FlagOS-Open-Heterogeneous-AI-Compiler"><a href="#AI-技术编年史-2026：FlagOS-开放异构-AI-编译器-FlagOS-Open-Heterogeneous-AI-Compiler" class="headerlink" title="AI 技术编年史 2026：FlagOS 开放异构 AI 编译器 | FlagOS Open Heterogeneous AI Compiler"></a>AI 技术编年史 2026：FlagOS 开放异构 AI 编译器 | FlagOS Open Heterogeneous AI Compiler</h1><hr>
+<h2 id="一、背景-Background"><a href="#一、背景-Background" class="headerlink" title="一、背景 | Background"></a>一、背景 | Background</h2><p><strong>English</strong></p>
+<p>By 2026, production AI workloads routinely spanned <strong>NVIDIA GPUs, AMD accelerators, Huawei Ascend, Apple NPUs, Intel Gaudi, and custom AI chips</strong> — yet developers faced <strong>N fragmented software stacks</strong> (CUDA, ROCm, CANN, Core ML, one-off vendor SDKs). Model teams spent more time on <strong>porting kernels</strong> than on algorithms. China’s <strong>BAAI &#x2F; FlagOpen</strong> initiative released <strong>FlagOS</strong> as an <strong>open heterogeneous AI compiler and runtime OS</strong>, aiming for a <strong>“write once, run on any AI chip”</strong> abstraction without sacrificing top-tier performance on any single vendor.</p>
+<p>FlagOS built on lessons from TVM, MLIR, and PyTorch 2.x <code>torch.compile</code>, but added <strong>vendor-neutral intermediate representation (FlagIR)</strong>, <strong>auto-scheduling across memory hierarchies</strong>, and <strong>policy-driven partitioning</strong> for mixed GPU+NPU clusters. Early adopters included cloud providers offering <strong>“heterogeneous AI instances”</strong> billed by unified <strong>Effective AI FLOPs (EAF)</strong> rather than raw GPU hours.</p>
+<p>Western hyperscalers initially treated FlagOS as <strong>niche</strong>, but by H2 2026 several added <strong>read-only FlagIR import</strong> for hybrid fleets serving APAC sovereign cloud requirements — a geopolitical driver as important as raw performance.</p>
+<p><strong>中文</strong></p>
+<p>2026 年生产 AI 工作负载常跨 <strong>NVIDIA GPU、AMD、华为 Ascend、Apple NPU、Intel Gaudi 与定制 AI 芯片</strong>，开发者却面对 <strong>N 套碎片化软件栈</strong>（CUDA、ROCm、CANN、Core ML、厂商 SDK）。模型团队 <strong>移植算子</strong> 的时间常超过算法本身。中国 <strong>BAAI &#x2F; FlagOpen</strong> 发布 <strong>FlagOS</strong> 作为 <strong>开放异构 AI 编译器与运行时 OS</strong>，目标 <strong>「一次编写，任意 AI 芯片运行」</strong> 且不在任一厂商上牺牲顶尖性能。</p>
+<p>FlagOS 汲取 TVM、MLIR、PyTorch 2 <code>torch.compile</code> 经验，新增 <strong>厂商中立中间表示 FlagIR</strong>、<strong>跨存储层次自动调度</strong> 与 <strong>混合 GPU+NPU 集群策略分区</strong>。早期采用者包括以统一 <strong>有效 AI FLOPs（EAF）</strong> 计费的云 <strong>异构 AI 实例</strong>。</p>
+<p>西方 hyperscaler 起初视 FlagOS 为 <strong>小众</strong>，但 2026 下半年多家增加 <strong>只读 FlagIR 导入</strong> 以服务亚太主权云混合集群 — 地缘政治驱动力与 raw 性能同等重要。</p>
+<hr>
+<h2 id="二、架构-Architecture"><a href="#二、架构-Architecture" class="headerlink" title="二、架构 | Architecture"></a>二、架构 | Architecture</h2><p><strong>English</strong></p>
+<p><strong>FlagOS stack layers:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Frontends（前端）</span><br><span class="line">  ├── PyTorch 2.x（torch.export → FlagIR）</span><br><span class="line">  ├── ONNX / StableHLO import</span><br><span class="line">  └── Custom DSL（FlagScript, optional）</span><br><span class="line"></span><br><span class="line">FlagIR（中间表示）</span><br><span class="line">  ├── Graph-level ops（matmul, conv, MoE all-to-all）</span><br><span class="line">  ├── Loop / tile annotations</span><br><span class="line">  └── Memory scope + affinity tags</span><br><span class="line"></span><br><span class="line">Compiler Middle-End</span><br><span class="line">  ├── Graph optimization（fusion, constant fold, layout）</span><br><span class="line">  ├── Auto-tuning scheduler（Ansor-style + vendor hints）</span><br><span class="line">  └── Heterogeneous partitioner（cost model → device placement）</span><br><span class="line"></span><br><span class="line">Backends（后端）</span><br><span class="line">  ├── NVPTX / CUDA</span><br><span class="line">  ├── ROCm HIP</span><br><span class="line">  ├── Ascend CANN bridge</span><br><span class="line">  ├── Metal / Core ML</span><br><span class="line">  └── CPU LLVM + AMX/NEON</span><br><span class="line"></span><br><span class="line">Runtime（运行时）</span><br><span class="line">  ├── Unified memory pool（optional unified virtual addressing）</span><br><span class="line">  ├── Async stream orchestration</span><br><span class="line">  └── Profiler → EAF metrics export</span><br></pre></td></tr></table></figure>
+
+<p><strong>Key innovation — Policy-driven compilation:</strong> Users declare <strong>SLA JSON</strong> (max latency, max power, preferred vendors); FlagOS selects schedules and chip mix automatically. <strong>Open plugin API</strong> lets silicon vendors ship closed-source micro-kernels while keeping IR and scheduler open.</p>
+<p><strong>中文</strong></p>
+<p><strong>FlagOS 分层：</strong> 前端（PyTorch&#x2F;ONNX）→ <strong>FlagIR</strong> → 中端（图优化、自动调优、异构分区）→ 多后端（CUDA&#x2F;HIP&#x2F;CANN&#x2F;Metal&#x2F;LLVM）→ 运行时（统一内存、流编排、EAF 分析）。</p>
+<p><strong>策略驱动编译：</strong> 用户声明 SLA JSON；FlagOS 自动选调度与芯片组合。<strong>开放插件 API</strong> 允许厂商闭源微内核、开源 IR 与调度器。</p>
+<hr>
+<h2 id="三、趋势-Trends"><a href="#三、趋势-Trends" class="headerlink" title="三、趋势 | Trends"></a>三、趋势 | Trends</h2><p><strong>English</strong></p>
+<ol>
+<li><strong>FlagOS in major Chinese clouds</strong> — default compiler path for Ascend + GPU hybrid pools.</li>
+<li><strong>Upstream PyTorch integration discussions</strong> — optional FlagOS backend beside Inductor.</li>
+<li><strong>MoE-first optimizations</strong> — all-to-all + expert matmul fusion passes (see cross-chip operator post).</li>
+<li><strong>Carbon-aware scheduling</strong> — compile-time + runtime shift to lower-power chips when SLA allows.</li>
+<li><strong>Certification programs</strong> — “FlagOS Compatible” badge for AI chip startups.</li>
+<li><strong>Edge-server split</strong> — single FlagIR graph partitioned across phone NPU + edge TPU + cloud GPU.</li>
+</ol>
+<p><strong>中文</strong></p>
+<ol>
+<li>国内主流云 <strong>默认 FlagOS 路径</strong> 服务 Ascend+GPU 混合池。</li>
+<li><strong>PyTorch 上游集成</strong> 讨论 — Inductor 旁可选 FlagOS 后端。</li>
+<li><strong>MoE 优先优化</strong> — all-to-all 与专家 matmul 融合。</li>
+<li><strong>碳感知调度</strong> — SLA 允许时切低功耗芯片。</li>
+<li><strong>认证计划</strong> — AI 芯片创业公司的 FlagOS Compatible 标识。</li>
+<li><strong>端-边-云切分</strong> — 单 FlagIR 图分区至多设备。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点-Pros-and-Cons"><a href="#四、优缺点-Pros-and-Cons" class="headerlink" title="四、优缺点 | Pros and Cons"></a>四、优缺点 | Pros and Cons</h2><p><strong>English</strong></p>
+<p><strong>Pros:</strong> Reduced vendor lock-in; faster porting of new models; unified profiling; strategic autonomy for regions with mixed domestic&#x2F;international silicon; open community tuning recipes.</p>
+<p><strong>Cons:</strong> <strong>Peak performance gap</strong> vs. hand-tuned vendor SDKs (5–15% on some kernels); <strong>debugging complexity</strong> across partition boundaries; <strong>plugin trust</strong> for closed vendor blobs; <strong>adoption chicken-and-egg</strong> — chips need FlagOS, FlagOS needs chips.</p>
+<p><strong>中文</strong></p>
+<p><strong>优点：</strong> 降低厂商锁定；新模型移植更快；统一 profiling；混合国产&#x2F;国际硅片的战略自主；开放调优配方。</p>
+<p><strong>缺点：</strong> 对手工 SDK <strong>峰值性能差距</strong>（部分 kernel 5–15%）；分区边界 <strong>调试复杂</strong>；闭源插件 <strong>信任</strong> 问题；芯片与 FlagOS <strong>鸡生蛋</strong>  adoption。</p>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>国产智算中心</td>
+<td>Ascend 为主、GPU 为辅的统一训练栈</td>
+</tr>
+<tr>
+<td>跨云迁移</td>
+<td>同一 FlagIR 产物部署 AWS + 私有云</td>
+</tr>
+<tr>
+<td>MoE 大模型训练</td>
+<td>自动分区专家到不同芯片类型</td>
+</tr>
+<tr>
+<td>移动端+云端</td>
+<td>图分区：NPU 跑 encoder，云端跑 decoder</td>
+</tr>
+<tr>
+<td>芯片 bring-up</td>
+<td>新 AI 芯片仅实现后端插件即可跑 ResNet&#x2F;LLM</td>
+</tr>
+<tr>
+<td>科研复现</td>
+<td>统一 EAF 指标对比公平性</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、GitHub-生态-GitHub-Ecosystem"><a href="#六、GitHub-生态-GitHub-Ecosystem" class="headerlink" title="六、GitHub 生态 | GitHub Ecosystem"></a>六、GitHub 生态 | GitHub Ecosystem</h2><table>
+<thead>
+<tr>
+<th>Repository</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/FlagOpen/FlagOS">FlagOpen&#x2F;FlagOS</a></td>
+<td><strong>Core compiler, FlagIR spec, runtime</strong></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/pytorch/pytorch">pytorch&#x2F;pytorch</a></td>
+<td>torch.export, Inductor comparison baseline</td>
+</tr>
+<tr>
+<td>apache&#x2F;tvm &#x2F; llvm&#x2F;mlir</td>
+<td>IR and scheduling research lineage</td>
+</tr>
+<tr>
+<td>FlagOpen&#x2F;FlagPerf</td>
+<td>Benchmark suite for heterogeneous chips</td>
+</tr>
+<tr>
+<td>Vendor plugin repos (Ascend, etc.)</td>
+<td>Closed-kernel backends</td>
+</tr>
+</tbody></table>
+<p><strong>Related tooling:</strong> FlagOS ships <strong><code>flagos compile</code></strong>, <strong><code>flagos run</code></strong>, and <strong><code>flagos profile --eaf</code></strong> CLI tools documented in the main repo README.</p>
+<p><strong>中文：</strong> FlagOpen&#x2F;FlagOS 为核心；PyTorch 为前端与基线；FlagPerf 为异构 benchmark；厂商插件实现各后端。</p>
+<hr>
+<h2 id="七、深入探讨-Extended-Discussion"><a href="#七、深入探讨-Extended-Discussion" class="headerlink" title="七、深入探讨 | Extended Discussion"></a>七、深入探讨 | Extended Discussion</h2><p><strong>English</strong></p>
+<p>FlagOS competes not by hiding hardware details but by <strong>surfacing them through cost models</strong>. The <strong>heterogeneous partitioner</strong> solves a mixed-integer problem: assign each subgraph to a device minimizing <strong>latency + λ·cost + μ·power</strong> subject to memory and bandwidth constraints. When users update SLA JSON mid-deployment, FlagOS can <strong>recompile and hot-swap</strong> schedules without full model export — critical for <strong>24&#x2F;7 inference</strong> services.</p>
+<p><strong>Community governance</strong> mirrors LLVM: FlagIR spec changes require RFC + 30-day comment; backend plugins signed by vendors; <strong>FlagPerf</strong> leaderboard updated monthly with <strong>EAF&#x2F;Watt</strong> metrics preventing ** cherry-picked peak FLOPs** marketing. Chinese <strong>智算中心</strong> procurement began requiring FlagOS compatibility scores alongside raw TOPS.</p>
+<p><strong>Developer experience:</strong> <code>flagos compile model.pt --sla sla.json --targets ascend,gpu</code> emits <strong>single artifact bundle</strong> with per-backend shared libraries and <strong>unified profiling trace</strong> viewable in Chrome trace format. PyTorch users often start with <strong><code>torch.export</code></strong> → FlagOS path when Inductor lacks backend support for their chip.</p>
+<p><strong>中文</strong></p>
+<p>FlagOS 并非隐藏硬件细节，而是通过 <strong>代价模型</strong> 暴露它们。<strong>异构分区器</strong> 解混合整数问题：在内存与带宽约束下为子图分配设备，最小化 <strong>延迟+λ·成本+μ·功耗</strong>。用户 mid-deployment 更新 SLA JSON 时，FlagOS 可 <strong>重编译热替换</strong> 调度 — 对 <strong>7×24 推理</strong> 至关重要。</p>
+<p><strong>社区治理</strong> 镜像 LLVM：FlagIR 变更需 RFC+30 天评议；后端插件厂商签名；<strong>FlagPerf</strong> 月更 <strong>EAF&#x2F;Watt</strong> 榜，防 ** cherry-pick 峰值 FLOPs** 营销。国内 <strong>智算中心</strong> 采购开始要求 FlagOS 兼容评分 alongside raw TOPS。</p>
+<p><strong>开发者体验：</strong> <code>flagos compile</code> 产出 <strong>单一 artifact 包</strong> 含各后端动态库与 <strong>Chrome trace 格式</strong> 统一 profiling。PyTorch 用户在 Inductor 不支持其芯片时常走 <strong><code>torch.export</code> → FlagOS</strong>。</p>
+<h3 id="7-1-与-PyTorch-Inductor-对比-vs-PyTorch-Inductor"><a href="#7-1-与-PyTorch-Inductor-对比-vs-PyTorch-Inductor" class="headerlink" title="7.1 与 PyTorch Inductor 对比 | vs. PyTorch Inductor"></a>7.1 与 PyTorch Inductor 对比 | vs. PyTorch Inductor</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Inductor</th>
+<th>FlagOS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主要目标</td>
+<td>PyTorch 图优化</td>
+<td>跨厂商异构</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>CPU&#x2F;CUDA 为主</td>
+<td>GPU+NPU+… 平等</td>
+</tr>
+<tr>
+<td>分区</td>
+<td>有限</td>
+<td>SLA 驱动全局分区</td>
+</tr>
+<tr>
+<td>开源程度</td>
+<td>全开源</td>
+<td>IR 开源+厂商插件</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="八、参考链接-References"><a href="#八、参考链接-References" class="headerlink" title="八、参考链接 | References"></a>八、参考链接 | References</h2><ul>
+<li>FlagOpen official site and FlagOS documentation</li>
+<li>BAAI heterogeneous computing whitepaper (2025)</li>
+<li>MLIR dialect design notes for FlagIR</li>
+<li>本系列：<a href="/posts/ai-timeline-2026-cross-chip-operator.html">ai-timeline-2026-cross-chip-operator</a></li>
+</ul>
+<hr>
+<p><strong>Summary | 总结</strong></p>
+<p>FlagOS is 2026’s open answer to heterogeneous AI silos — a compiler OS that treats chips as pluggable backends under unified FlagIR and EAF metrics.</p>
+<p>FlagOS 是 2026 年对异构 AI  silo 的开放回应 — 在统一 FlagIR 与 EAF 指标下将芯片视为可插拔后端的编译器 OS。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Heterogeneous-Computing/" rel="tag"># Heterogeneous Computing</a>
+              <a href="/tags/FlagOS/" rel="tag"># FlagOS</a>
+              <a href="/tags/AI-Compiler/" rel="tag"># AI Compiler</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2026-spatial-foundation-model.html" rel="prev" title="AI 技术编年史 2026：通用空间基础大模型（2D+3D+物理）">
+                  <i class="fa fa-angle-left"></i> AI 技术编年史 2026：通用空间基础大模型（2D+3D+物理）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/lora-finetune-novel-writing-qwen-llamafactory.html" rel="next" title="LoRA 微调小说写作小模型：Qwen-1.8B-Chat + LLaMA Factory 同款文风续写">
+                  LoRA 微调小说写作小模型：Qwen-1.8B-Chat + LLaMA Factory 同款文风续写 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

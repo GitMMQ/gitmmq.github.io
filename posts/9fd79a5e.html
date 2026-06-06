@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-05   一、设计哲学对比 | Design Philosophy Comparison 中文 记忆系统是个人 Agent「是否越用越懂你」的核心。两个框架在此采取了截然不同的路径：    维度 OpenClaw（龙虾） Hermes Agent     存储介质 纯 Markdown 文件 Markdown + SQLite + 可选外">
+    <meta name="description" content="Agent Hermes 与 OpenClaw（龙虾）记忆系统深度解析Memory Systems in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive 最后更新 | Last updated: 2026-06-05   一、设计哲学对比 | Design Philosophy Comparison中文 记忆系统是个人 Agent「是否越用越懂">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 记忆系统深度解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/9fd79a5e.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-05   一、设计哲学对比 | Design Philosophy Comparison 中文 记忆系统是个人 Agent「是否越用越懂你」的核心。两个框架在此采取了截然不同的路径：    维度 OpenClaw（龙虾） Hermes Agent     存储介质 纯 Markdown 文件 Markdown + SQLite + 可选外">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw（龙虾）记忆系统深度解析Memory Systems in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive 最后更新 | Last updated: 2026-06-05   一、设计哲学对比 | Design Philosophy Comparison中文 记忆系统是个人 Agent「是否越用越懂">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-04T20:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-04T20:00:00.000Z">
+<meta property="article:published_time" content="2026-06-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T04:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Hermes">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、OpenClaw 记忆架构 | OpenClaw Memory Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 核心理念：文件即记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 系统提示词注入顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 记忆类型划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 记忆更新机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 会话持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.6.</span> <span class="nav-text">2.1 Core Idea: Files as Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.7.</span> <span class="nav-text">2.2 System Prompt Injection Order</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.8.</span> <span class="nav-text">2.3 Memory Type Taxonomy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.9.</span> <span class="nav-text">2.4 Update Mechanism</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.10.</span> <span class="nav-text">2.5 Session Persistence</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 四层记忆模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 第一层：工作记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 第二层：会话记忆（SQLite + FTS5）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 第三层：持久记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 第四层：技能记忆（程序性记忆）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 外部记忆 Provider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 闭环学习与记忆的协同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.8.</span> <span class="nav-text">3.1 Four-Layer Memory Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.9.</span> <span class="nav-text">3.2 Layer 1: Working Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.10.</span> <span class="nav-text">3.3 Layer 2: Session Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.11.</span> <span class="nav-text">3.4 Layer 3: Persistent Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.12.</span> <span class="nav-text">3.5 Layer 4: Skill Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.13.</span> <span class="nav-text">3.6 External Memory Providers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.14.</span> <span class="nav-text">3.7 Learning Loop Synergy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">四、关键差异总结 | Key Differences Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">五、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.2.</span> <span class="nav-text">Hermes Agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.3.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.4.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">六、结语 | Conclusion</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw%EF%BC%88%E9%BE%99%E8%99%BE%EF%BC%89%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw（龙虾）记忆系统深度解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Memory-Systems-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive"><span class="nav-number">2.</span> <span class="nav-text">Memory Systems in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E5%AF%B9%E6%AF%94-Design-Philosophy-Comparison"><span class="nav-number">2.1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81OpenClaw-%E8%AE%B0%E5%BF%86%E6%9E%B6%E6%9E%84-OpenClaw-Memory-Architecture"><span class="nav-number">2.2.</span> <span class="nav-text">二、OpenClaw 记忆架构 | OpenClaw Memory Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A0%B8%E5%BF%83%E7%90%86%E5%BF%B5%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8D%B3%E8%AE%B0%E5%BF%86"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 核心理念：文件即记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%E9%A1%BA%E5%BA%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 系统提示词注入顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%AE%B0%E5%BF%86%E7%B1%BB%E5%9E%8B%E5%88%92%E5%88%86"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 记忆类型划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E8%AE%B0%E5%BF%86%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.4 记忆更新机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E4%BC%9A%E8%AF%9D%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">2.2.5.</span> <span class="nav-text">2.5 会话持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Core-Idea-Files-as-Memory"><span class="nav-number">2.2.6.</span> <span class="nav-text">2.1 Core Idea: Files as Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-System-Prompt-Injection-Order"><span class="nav-number">2.2.7.</span> <span class="nav-text">2.2 System Prompt Injection Order</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Memory-Type-Taxonomy"><span class="nav-number">2.2.8.</span> <span class="nav-text">2.3 Memory Type Taxonomy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Update-Mechanism"><span class="nav-number">2.2.9.</span> <span class="nav-text">2.4 Update Mechanism</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-Session-Persistence"><span class="nav-number">2.2.10.</span> <span class="nav-text">2.5 Session Persistence</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Hermes-Agent-%E8%AE%B0%E5%BF%86%E6%9E%B6%E6%9E%84-Hermes-Agent-Memory-Architecture"><span class="nav-number">2.3.</span> <span class="nav-text">三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%9B%9B%E5%B1%82%E8%AE%B0%E5%BF%86%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text">3.1 四层记忆模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E7%AC%AC%E4%B8%80%E5%B1%82%EF%BC%9A%E5%B7%A5%E4%BD%9C%E8%AE%B0%E5%BF%86"><span class="nav-number">2.3.2.</span> <span class="nav-text">3.2 第一层：工作记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E7%AC%AC%E4%BA%8C%E5%B1%82%EF%BC%9A%E4%BC%9A%E8%AF%9D%E8%AE%B0%E5%BF%86%EF%BC%88SQLite-FTS5%EF%BC%89"><span class="nav-number">2.3.3.</span> <span class="nav-text">3.3 第二层：会话记忆（SQLite + FTS5）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E7%AC%AC%E4%B8%89%E5%B1%82%EF%BC%9A%E6%8C%81%E4%B9%85%E8%AE%B0%E5%BF%86"><span class="nav-number">2.3.4.</span> <span class="nav-text">3.4 第三层：持久记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E7%AC%AC%E5%9B%9B%E5%B1%82%EF%BC%9A%E6%8A%80%E8%83%BD%E8%AE%B0%E5%BF%86%EF%BC%88%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%AE%B0%E5%BF%86%EF%BC%89"><span class="nav-number">2.3.5.</span> <span class="nav-text">3.5 第四层：技能记忆（程序性记忆）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E5%A4%96%E9%83%A8%E8%AE%B0%E5%BF%86-Provider"><span class="nav-number">2.3.6.</span> <span class="nav-text">3.6 外部记忆 Provider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E9%97%AD%E7%8E%AF%E5%AD%A6%E4%B9%A0%E4%B8%8E%E8%AE%B0%E5%BF%86%E7%9A%84%E5%8D%8F%E5%90%8C"><span class="nav-number">2.3.7.</span> <span class="nav-text">3.7 闭环学习与记忆的协同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Four-Layer-Memory-Model"><span class="nav-number">2.3.8.</span> <span class="nav-text">3.1 Four-Layer Memory Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Layer-1-Working-Memory"><span class="nav-number">2.3.9.</span> <span class="nav-text">3.2 Layer 1: Working Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Layer-2-Session-Memory"><span class="nav-number">2.3.10.</span> <span class="nav-text">3.3 Layer 2: Session Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Layer-3-Persistent-Memory"><span class="nav-number">2.3.11.</span> <span class="nav-text">3.4 Layer 3: Persistent Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-Layer-4-Skill-Memory"><span class="nav-number">2.3.12.</span> <span class="nav-text">3.5 Layer 4: Skill Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-External-Memory-Providers"><span class="nav-number">2.3.13.</span> <span class="nav-text">3.6 External Memory Providers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-Learning-Loop-Synergy"><span class="nav-number">2.3.14.</span> <span class="nav-text">3.7 Learning Loop Synergy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%85%B3%E9%94%AE%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93-Key-Differences-Summary"><span class="nav-number">2.4.</span> <span class="nav-text">四、关键差异总结 | Key Differences Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-Best-Practices"><span class="nav-number">2.5.</span> <span class="nav-text">五、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw"><span class="nav-number">2.5.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes-Agent"><span class="nav-number">2.5.2.</span> <span class="nav-text">Hermes Agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw-1"><span class="nav-number">2.5.3.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes-Agent-1"><span class="nav-number">2.5.4.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.6.</span> <span class="nav-text">六、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-05 04:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T04:00:00+08:00">2026-06-05</time>
+      <time title="创建时间：2026-06-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T12:00:00+08:00">2026-06-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,12 +292,11 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw（龙虾）记忆系统深度解析"><a href="#Agent-Hermes-与-OpenClaw（龙虾）记忆系统深度解析" class="headerlink" title="Agent Hermes 与 OpenClaw（龙虾）记忆系统深度解析"></a>Agent Hermes 与 OpenClaw（龙虾）记忆系统深度解析</h1><h1 id="Memory-Systems-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive"><a href="#Memory-Systems-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive" class="headerlink" title="Memory Systems in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive"></a>Memory Systems in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-05</p>
 </blockquote>
-<hr/>
-<h2>一、设计哲学对比 | Design Philosophy Comparison</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="一、设计哲学对比-Design-Philosophy-Comparison"><a href="#一、设计哲学对比-Design-Philosophy-Comparison" class="headerlink" title="一、设计哲学对比 | Design Philosophy Comparison"></a>一、设计哲学对比 | Design Philosophy Comparison</h2><p><strong>中文</strong></p>
 <p>记忆系统是个人 Agent「是否越用越懂你」的核心。两个框架在此采取了截然不同的路径：</p>
 <table>
 <thead>
@@ -307,8 +306,7 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>存储介质</td>
 <td>纯 Markdown 文件</td>
 <td>Markdown + SQLite + 可选外部 Provider</td>
@@ -333,10 +331,9 @@
 <td>文件大小无硬限，但全量进 Prompt</td>
 <td>持久记忆有字符上限，技能渐进式披露</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
-<p>Memory is central to whether a personal agent "knows you better over time." The two frameworks take fundamentally different approaches:</p>
+<p>Memory is central to whether a personal agent “knows you better over time.” The two frameworks take fundamentally different approaches:</p>
 <table>
 <thead>
 <tr>
@@ -345,8 +342,7 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Storage medium</td>
 <td>Plain Markdown files</td>
 <td>Markdown + SQLite + optional external providers</td>
@@ -371,26 +367,13 @@
 <td>No hard file limit, but full content in prompt</td>
 <td>Char limits on persistent memory; progressive skill disclosure</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>二、OpenClaw 记忆架构 | OpenClaw Memory Architecture</h2>
-<p><strong>中文</strong></p>
-<h3>2.1 核心理念：文件即记忆</h3>
-<p>OpenClaw 将 Agent 的「身份」与「知识」完全外化为工作区中的 Markdown 文件。默认路径：<code>~/.openclaw/workspace/</code>。</p>
-<pre><code class="language-text">~/.openclaw/workspace/
-├── SOUL.md            # 人格（每次会话注入，通常人工维护）
-├── AGENTS.md          # 操作手册（含记忆规则）
-├── USER.md            # 用户偏好
-├── MEMORY.md          # 长期记忆（Agent 可更新）
-├── memory/            # 日记式记忆
-│   ├── 2026-06-01.md
-│   └── 2026-06-05.md
-└── skills/            # 技能（与记忆分离）
-    └── weather/SKILL.md
-</code></pre>
-<h3>2.2 系统提示词注入顺序</h3>
-<p>OpenClaw 在会话启动时按固定顺序组装系统提示词：</p>
+</tbody></table>
+<hr>
+<h2 id="二、OpenClaw-记忆架构-OpenClaw-Memory-Architecture"><a href="#二、OpenClaw-记忆架构-OpenClaw-Memory-Architecture" class="headerlink" title="二、OpenClaw 记忆架构 | OpenClaw Memory Architecture"></a>二、OpenClaw 记忆架构 | OpenClaw Memory Architecture</h2><p><strong>中文</strong></p>
+<h3 id="2-1-核心理念：文件即记忆"><a href="#2-1-核心理念：文件即记忆" class="headerlink" title="2.1 核心理念：文件即记忆"></a>2.1 核心理念：文件即记忆</h3><p>OpenClaw 将 Agent 的「身份」与「知识」完全外化为工作区中的 Markdown 文件。默认路径：<code>~/.openclaw/workspace/</code>。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~/.openclaw/workspace/</span><br><span class="line">├── SOUL.md            # 人格（每次会话注入，通常人工维护）</span><br><span class="line">├── AGENTS.md          # 操作手册（含记忆规则）</span><br><span class="line">├── USER.md            # 用户偏好</span><br><span class="line">├── MEMORY.md          # 长期记忆（Agent 可更新）</span><br><span class="line">├── memory/            # 日记式记忆</span><br><span class="line">│   ├── 2026-06-01.md</span><br><span class="line">│   └── 2026-06-05.md</span><br><span class="line">└── skills/            # 技能（与记忆分离）</span><br><span class="line">    └── weather/SKILL.md</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-系统提示词注入顺序"><a href="#2-2-系统提示词注入顺序" class="headerlink" title="2.2 系统提示词注入顺序"></a>2.2 系统提示词注入顺序</h3><p>OpenClaw 在会话启动时按固定顺序组装系统提示词：</p>
 <ol>
 <li><code>SOUL.md</code> — 人格优先，影响模型注意力分配</li>
 <li><code>IDENTITY.md</code> — Agent 身份信息</li>
@@ -399,8 +382,7 @@
 <li><code>MEMORY.md</code> — 持久知识（变化最频繁，靠后注入）</li>
 </ol>
 <p>这种顺序设计确保人格指令优先于易变的记忆内容。</p>
-<h3>2.3 记忆类型划分</h3>
-<table>
+<h3 id="2-3-记忆类型划分"><a href="#2-3-记忆类型划分" class="headerlink" title="2.3 记忆类型划分"></a>2.3 记忆类型划分</h3><table>
 <thead>
 <tr>
 <th>类型</th>
@@ -409,8 +391,7 @@
 <th>典型内容</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>人格记忆</td>
 <td>SOUL.md</td>
 <td>用户（可 Git 管理）</td>
@@ -430,35 +411,29 @@
 </tr>
 <tr>
 <td>日记记忆</td>
-<td>memory/*.md</td>
+<td>memory&#x2F;*.md</td>
 <td>Agent</td>
 <td>按日归档的对话摘要</td>
 </tr>
 <tr>
 <td>程序性知识</td>
-<td>skills/*/SKILL.md</td>
-<td>用户/社区</td>
+<td>skills&#x2F;*&#x2F;SKILL.md</td>
+<td>用户&#x2F;社区</td>
 <td>工作流、操作步骤</td>
 </tr>
-</tbody>
-</table>
-<h3>2.4 记忆更新机制</h3>
-<p>OpenClaw 的记忆更新依赖 <code>AGENTS.md</code> 中定义的规则。Agent 在会话中根据指令决定是否写入 <code>MEMORY.md</code> 或 <code>memory/YYYY-MM-DD.md</code>。没有内置的：</p>
+</tbody></table>
+<h3 id="2-4-记忆更新机制"><a href="#2-4-记忆更新机制" class="headerlink" title="2.4 记忆更新机制"></a>2.4 记忆更新机制</h3><p>OpenClaw 的记忆更新依赖 <code>AGENTS.md</code> 中定义的规则。Agent 在会话中根据指令决定是否写入 <code>MEMORY.md</code> 或 <code>memory/YYYY-MM-DD.md</code>。没有内置的：</p>
 <ul>
 <li>自动技能生成</li>
 <li>FTS5 历史检索</li>
 <li>记忆容量管理与整合</li>
 </ul>
 <p>优势是透明、可审计；劣势是随记忆增长，系统提示词 Token 成本线性上升。</p>
-<h3>2.5 会话持久化</h3>
-<p>会话记录存储在 <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code>，用于会话连续性和可选的记忆索引，但<strong>不等于</strong>结构化记忆检索层。磁盘访问权限即信任边界。</p>
+<h3 id="2-5-会话持久化"><a href="#2-5-会话持久化" class="headerlink" title="2.5 会话持久化"></a>2.5 会话持久化</h3><p>会话记录存储在 <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code>，用于会话连续性和可选的记忆索引，但<strong>不等于</strong>结构化记忆检索层。磁盘访问权限即信任边界。</p>
 <p><strong>English</strong></p>
-<h3>2.1 Core Idea: Files as Memory</h3>
-<p>OpenClaw externalizes agent identity and knowledge as Markdown in the workspace. Default path: <code>~/.openclaw/workspace/</code>.</p>
-<h3>2.2 System Prompt Injection Order</h3>
-<p>At session start, files assemble in fixed order: SOUL.md → IDENTITY.md → USER.md → AGENTS.md → MEMORY.md. Persona instructions precede volatile memory content.</p>
-<h3>2.3 Memory Type Taxonomy</h3>
-<table>
+<h3 id="2-1-Core-Idea-Files-as-Memory"><a href="#2-1-Core-Idea-Files-as-Memory" class="headerlink" title="2.1 Core Idea: Files as Memory"></a>2.1 Core Idea: Files as Memory</h3><p>OpenClaw externalizes agent identity and knowledge as Markdown in the workspace. Default path: <code>~/.openclaw/workspace/</code>.</p>
+<h3 id="2-2-System-Prompt-Injection-Order"><a href="#2-2-System-Prompt-Injection-Order" class="headerlink" title="2.2 System Prompt Injection Order"></a>2.2 System Prompt Injection Order</h3><p>At session start, files assemble in fixed order: SOUL.md → IDENTITY.md → USER.md → AGENTS.md → MEMORY.md. Persona instructions precede volatile memory content.</p>
+<h3 id="2-3-Memory-Type-Taxonomy"><a href="#2-3-Memory-Type-Taxonomy" class="headerlink" title="2.3 Memory Type Taxonomy"></a>2.3 Memory Type Taxonomy</h3><table>
 <thead>
 <tr>
 <th>Type</th>
@@ -467,8 +442,7 @@
 <th>Typical content</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Persona memory</td>
 <td>SOUL.md</td>
 <td>User (Git-managed)</td>
@@ -488,44 +462,39 @@
 </tr>
 <tr>
 <td>Diary memory</td>
-<td>memory/*.md</td>
+<td>memory&#x2F;*.md</td>
 <td>Agent</td>
 <td>Daily conversation summaries</td>
 </tr>
 <tr>
 <td>Procedural knowledge</td>
-<td>skills/*/SKILL.md</td>
-<td>User/community</td>
+<td>skills&#x2F;*&#x2F;SKILL.md</td>
+<td>User&#x2F;community</td>
 <td>Workflows, procedures</td>
 </tr>
-</tbody>
-</table>
-<h3>2.4 Update Mechanism</h3>
-<p>Updates follow rules in AGENTS.md. No built-in auto-skill generation, FTS5 history search, or capacity management. Transparent and auditable, but prompt token cost grows linearly with memory size.</p>
-<h3>2.5 Session Persistence</h3>
-<p>Transcripts live in <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code> for continuity and optional indexing — not a structured memory retrieval layer. Filesystem access is the trust boundary.</p>
-<hr/>
-<h2>三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</h2>
-<p><strong>中文</strong></p>
-<h3>3.1 四层记忆模型</h3>
-<pre><code class="mermaid">flowchart TB
-    subgraph L1["第一层：工作记忆 Working Memory"]
+</tbody></table>
+<h3 id="2-4-Update-Mechanism"><a href="#2-4-Update-Mechanism" class="headerlink" title="2.4 Update Mechanism"></a>2.4 Update Mechanism</h3><p>Updates follow rules in AGENTS.md. No built-in auto-skill generation, FTS5 history search, or capacity management. Transparent and auditable, but prompt token cost grows linearly with memory size.</p>
+<h3 id="2-5-Session-Persistence"><a href="#2-5-Session-Persistence" class="headerlink" title="2.5 Session Persistence"></a>2.5 Session Persistence</h3><p>Transcripts live in <code>~/.openclaw/agents/&lt;agent&gt;/sessions/*.jsonl</code> for continuity and optional indexing — not a structured memory retrieval layer. Filesystem access is the trust boundary.</p>
+<hr>
+<h2 id="三、Hermes-Agent-记忆架构-Hermes-Agent-Memory-Architecture"><a href="#三、Hermes-Agent-记忆架构-Hermes-Agent-Memory-Architecture" class="headerlink" title="三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture"></a>三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</h2><p><strong>中文</strong></p>
+<h3 id="3-1-四层记忆模型"><a href="#3-1-四层记忆模型" class="headerlink" title="3.1 四层记忆模型"></a>3.1 四层记忆模型</h3><pre><code class="highlight mermaid">flowchart TB
+    subgraph L1[&quot;第一层：工作记忆 Working Memory&quot;]
         CTX[当前对话上下文]
     end
-    subgraph L2["第二层：会话记忆 Session Memory"]
+    subgraph L2[&quot;第二层：会话记忆 Session Memory&quot;]
         DB[(SQLite state.db)]
         FTS[FTS5 全文索引]
         TRIG[Trigram 索引 CJK]
     end
-    subgraph L3["第三层：持久记忆 Persistent Memory"]
+    subgraph L3[&quot;第三层：持久记忆 Persistent Memory&quot;]
         MEM[MEMORY.md ~2200 chars]
         USER[USER.md ~1375 chars]
     end
-    subgraph L4["第四层：技能记忆 Skill Memory"]
+    subgraph L4[&quot;第四层：技能记忆 Skill Memory&quot;]
         SKILLS[~/.hermes/skills/]
         PROG[渐进式披露]
     end
-    subgraph EXT["外部记忆 Provider（可选）"]
+    subgraph EXT[&quot;外部记忆 Provider（可选）&quot;]
         HON[Honcho 用户建模]
         MEM0[Mem0]
         OTH[OpenViking / Hindsight / ...]
@@ -536,18 +505,12 @@
     USER --&gt; CTX
     SKILLS --&gt; PROG
     EXT -.-&gt; CTX</code></pre>
-<h3>3.2 第一层：工作记忆</h3>
-<p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
-<h3>3.3 第二层：会话记忆（SQLite + FTS5）</h3>
-<p><strong>存储位置</strong>：<code>~/.hermes/state.db</code>（WAL 模式）</p>
+
+<h3 id="3-2-第一层：工作记忆"><a href="#3-2-第一层：工作记忆" class="headerlink" title="3.2 第一层：工作记忆"></a>3.2 第一层：工作记忆</h3><p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
+<h3 id="3-3-第二层：会话记忆（SQLite-FTS5）"><a href="#3-3-第二层：会话记忆（SQLite-FTS5）" class="headerlink" title="3.3 第二层：会话记忆（SQLite + FTS5）"></a>3.3 第二层：会话记忆（SQLite + FTS5）</h3><p><strong>存储位置</strong>：<code>~/.hermes/state.db</code>（WAL 模式）</p>
 <p><strong>核心表结构</strong>：</p>
-<pre><code class="language-text">state.db
-├── sessions          — 会话元数据、Token 统计、计费
-├── messages          — 完整消息历史
-├── messages_fts      — FTS5 全文索引（content + tool_name + tool_calls）
-├── messages_fts_trigram — Trigram 分词器（中日韩子串搜索）
-└── state_meta        — 键值元数据
-</code></pre>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">state.db</span><br><span class="line">├── sessions          — 会话元数据、Token 统计、计费</span><br><span class="line">├── messages          — 完整消息历史</span><br><span class="line">├── messages_fts      — FTS5 全文索引（content + tool_name + tool_calls）</span><br><span class="line">├── messages_fts_trigram — Trigram 分词器（中日韩子串搜索）</span><br><span class="line">└── state_meta        — 键值元数据</span><br></pre></td></tr></table></figure>
+
 <p><strong>检索工具</strong>：<code>session_search</code></p>
 <table>
 <thead>
@@ -557,8 +520,7 @@
 <th>会话搜索 session_search</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>容量</td>
 <td>~1300 tokens 固定</td>
 <td>无限（所有历史会话）</td>
@@ -578,8 +540,7 @@
 <td>关键事实常驻</td>
 <td>「上周我们讨论过 X 吗？」</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>FTS5 查询语法</strong>：</p>
 <table>
 <thead>
@@ -589,15 +550,14 @@
 <th>含义</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>关键词</td>
 <td><code>docker deployment</code></td>
 <td>隐式 AND</td>
 </tr>
 <tr>
 <td>引号短语</td>
-<td><code>"exact phrase"</code></td>
+<td><code>&quot;exact phrase&quot;</code></td>
 <td>精确匹配</td>
 </tr>
 <tr>
@@ -610,11 +570,9 @@
 <td><code>deploy*</code></td>
 <td>前缀匹配</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>写入争用处理</strong>：Gateway 多平台并发写入时，采用 1 秒超时 + 最多 15 次随机抖动重试（20–150ms）+ BEGIN IMMEDIATE 事务。</p>
-<h3>3.4 第三层：持久记忆</h3>
-<p>两个受字符上限约束的文件，位于 <code>~/.hermes/memories/</code>：</p>
+<h3 id="3-4-第三层：持久记忆"><a href="#3-4-第三层：持久记忆" class="headerlink" title="3.4 第三层：持久记忆"></a>3.4 第三层：持久记忆</h3><p>两个受字符上限约束的文件，位于 <code>~/.hermes/memories/</code>：</p>
 <table>
 <thead>
 <tr>
@@ -623,8 +581,7 @@
 <th>上限</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>MEMORY.md</td>
 <td>Agent 个人笔记：环境事实、约定、经验教训</td>
 <td>2,200 字符（~800 tokens）</td>
@@ -634,22 +591,16 @@
 <td>用户画像：偏好、沟通风格、期望</td>
 <td>1,375 字符（~500 tokens）</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>冻结快照模式</strong>：会话启动时将记忆渲染进系统提示词后<strong>不再变更</strong>（保护 LLM 前缀缓存）。Agent 在会话中通过 <code>memory</code> 工具增删改，变更立即落盘，但下次会话才进入 Prompt。</p>
 <p><strong>memory 工具操作</strong>：</p>
-<pre><code class="language-python">memory(action="add",    target="memory", content="...")
-memory(action="replace", target="user",  old_text="dark mode", content="...")
-memory(action="remove",  target="memory", old_text="obsolete entry")
-</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">memory(action=<span class="string">&quot;add&quot;</span>,    target=<span class="string">&quot;memory&quot;</span>, content=<span class="string">&quot;...&quot;</span>)</span><br><span class="line">memory(action=<span class="string">&quot;replace&quot;</span>, target=<span class="string">&quot;user&quot;</span>,  old_text=<span class="string">&quot;dark mode&quot;</span>, content=<span class="string">&quot;...&quot;</span>)</span><br><span class="line">memory(action=<span class="string">&quot;remove&quot;</span>,  target=<span class="string">&quot;memory&quot;</span>, old_text=<span class="string">&quot;obsolete entry&quot;</span>)</span><br></pre></td></tr></table></figure>
+
 <p><strong>安全扫描</strong>：写入前检测 Prompt 注入、凭证外泄、不可见 Unicode 字符。</p>
-<h3>3.5 第四层：技能记忆（程序性记忆）</h3>
-<p>技能是 Hermes 闭环学习的核心产出，存储于 <code>~/.hermes/skills/</code>。</p>
+<h3 id="3-5-第四层：技能记忆（程序性记忆）"><a href="#3-5-第四层：技能记忆（程序性记忆）" class="headerlink" title="3.5 第四层：技能记忆（程序性记忆）"></a>3.5 第四层：技能记忆（程序性记忆）</h3><p>技能是 Hermes 闭环学习的核心产出，存储于 <code>~/.hermes/skills/</code>。</p>
 <p><strong>渐进式披露（Progressive Disclosure）</strong>：</p>
-<pre><code class="language-text">Level 0: skills_list()        → [{name, description}]     (~3k tokens)
-Level 1: skill_view(name)     → 完整 SKILL.md 内容        (按需)
-Level 2: skill_view(name, path) → 特定参考文件            (按需)
-</code></pre>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Level 0: skills_list()        → [&#123;name, description&#125;]     (~3k tokens)</span><br><span class="line">Level 1: skill_view(name)     → 完整 SKILL.md 内容        (按需)</span><br><span class="line">Level 2: skill_view(name, path) → 特定参考文件            (按需)</span><br></pre></td></tr></table></figure>
+
 <p>效果：技能库从 40 个增长到 200 个，上下文成本几乎不变。</p>
 <p><strong>自动创建触发条件</strong>（<code>skill_manage</code> 工具）：</p>
 <ul>
@@ -658,9 +609,8 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <li>用户纠正了 Agent 做法</li>
 <li>发现非平凡工作流</li>
 </ul>
-<p><strong>自改进</strong>：优先使用 <code>patch</code>（<code>old_string</code> / <code>new_string</code>）而非全量 <code>edit</code>，节省 Token。</p>
-<h3>3.6 外部记忆 Provider</h3>
-<p>Hermes 内置 8 种可选外部 Provider，与内置记忆<strong>并行运行</strong>（不替代）：</p>
+<p><strong>自改进</strong>：优先使用 <code>patch</code>（<code>old_string</code> &#x2F; <code>new_string</code>）而非全量 <code>edit</code>，节省 Token。</p>
+<h3 id="3-6-外部记忆-Provider"><a href="#3-6-外部记忆-Provider" class="headerlink" title="3.6 外部记忆 Provider"></a>3.6 外部记忆 Provider</h3><p>Hermes 内置 8 种可选外部 Provider，与内置记忆<strong>并行运行</strong>（不替代）：</p>
 <table>
 <thead>
 <tr>
@@ -668,8 +618,7 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <th>能力</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Honcho</td>
 <td>辩证式用户建模</td>
 </tr>
@@ -690,14 +639,12 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <td>语义向量检索</td>
 </tr>
 <tr>
-<td>RetainDB / ByteRover / Supermemory</td>
+<td>RetainDB &#x2F; ByteRover &#x2F; Supermemory</td>
 <td>各专精场景</td>
 </tr>
-</tbody>
-</table>
-<p>配置：<code>hermes memory setup</code> / <code>hermes memory status</code></p>
-<h3>3.7 闭环学习与记忆的协同</h3>
-<pre><code class="mermaid">sequenceDiagram
+</tbody></table>
+<p>配置：<code>hermes memory setup</code> &#x2F; <code>hermes memory status</code></p>
+<h3 id="3-7-闭环学习与记忆的协同"><a href="#3-7-闭环学习与记忆的协同" class="headerlink" title="3.7 闭环学习与记忆的协同"></a>3.7 闭环学习与记忆的协同</h3><pre><code class="highlight mermaid">sequenceDiagram
     participant U as 用户
     participant A as AIAgent
     participant M as Memory Manager
@@ -712,24 +659,17 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
     A-&gt;&gt;S: skill_view（按需加载）
     A-&gt;&gt;DB: session_search（历史召回）
     A-&gt;&gt;U: 更高效响应</code></pre>
+
 <p><strong>English</strong></p>
-<h3>3.1 Four-Layer Memory Model</h3>
-<p>Working memory (current context) → Session memory (SQLite + FTS5) → Persistent memory (MEMORY.md / USER.md with char limits) → Skill memory (progressive disclosure in <code>~/.hermes/skills/</code>). Optional external providers (Honcho, Mem0, etc.) run in parallel.</p>
-<h3>3.2 Layer 1: Working Memory</h3>
-<p>Current session messages and tool results. <code>ContextCompressor</code> summarizes when context exceeds thresholds, triggering session splits via <code>parent_session_id</code> chains.</p>
-<h3>3.3 Layer 2: Session Memory</h3>
-<p>Stored in <code>~/.hermes/state.db</code> (WAL mode). FTS5 + trigram indexes for full-text and CJK substring search. <code>session_search</code> tool for on-demand recall. Write contention handled with short timeouts and jittered retries.</p>
-<h3>3.4 Layer 3: Persistent Memory</h3>
-<p><code>MEMORY.md</code> (~2200 chars) and <code>USER.md</code> (~1375 chars) in <code>~/.hermes/memories/</code>. <strong>Frozen snapshot</strong> at session start for prefix-cache stability. <code>memory</code> tool for add/replace/remove with security scanning.</p>
-<h3>3.5 Layer 4: Skill Memory</h3>
-<p>Procedural memory in <code>~/.hermes/skills/</code> with progressive disclosure (index → full content on demand). Auto-created after complex tasks; self-improved via <code>skill_manage</code> patch.</p>
-<h3>3.6 External Memory Providers</h3>
-<p>8 optional providers (Honcho, Mem0, OpenViking, Hindsight, etc.) complement built-in memory.</p>
-<h3>3.7 Learning Loop Synergy</h3>
-<p>Task completion → memory curation → skill creation → FTS5 indexing → faster recall on similar future tasks.</p>
-<hr/>
-<h2>四、关键差异总结 | Key Differences Summary</h2>
-<p><strong>中文</strong></p>
+<h3 id="3-1-Four-Layer-Memory-Model"><a href="#3-1-Four-Layer-Memory-Model" class="headerlink" title="3.1 Four-Layer Memory Model"></a>3.1 Four-Layer Memory Model</h3><p>Working memory (current context) → Session memory (SQLite + FTS5) → Persistent memory (MEMORY.md &#x2F; USER.md with char limits) → Skill memory (progressive disclosure in <code>~/.hermes/skills/</code>). Optional external providers (Honcho, Mem0, etc.) run in parallel.</p>
+<h3 id="3-2-Layer-1-Working-Memory"><a href="#3-2-Layer-1-Working-Memory" class="headerlink" title="3.2 Layer 1: Working Memory"></a>3.2 Layer 1: Working Memory</h3><p>Current session messages and tool results. <code>ContextCompressor</code> summarizes when context exceeds thresholds, triggering session splits via <code>parent_session_id</code> chains.</p>
+<h3 id="3-3-Layer-2-Session-Memory"><a href="#3-3-Layer-2-Session-Memory" class="headerlink" title="3.3 Layer 2: Session Memory"></a>3.3 Layer 2: Session Memory</h3><p>Stored in <code>~/.hermes/state.db</code> (WAL mode). FTS5 + trigram indexes for full-text and CJK substring search. <code>session_search</code> tool for on-demand recall. Write contention handled with short timeouts and jittered retries.</p>
+<h3 id="3-4-Layer-3-Persistent-Memory"><a href="#3-4-Layer-3-Persistent-Memory" class="headerlink" title="3.4 Layer 3: Persistent Memory"></a>3.4 Layer 3: Persistent Memory</h3><p><code>MEMORY.md</code> (<del>2200 chars) and <code>USER.md</code> (</del>1375 chars) in <code>~/.hermes/memories/</code>. <strong>Frozen snapshot</strong> at session start for prefix-cache stability. <code>memory</code> tool for add&#x2F;replace&#x2F;remove with security scanning.</p>
+<h3 id="3-5-Layer-4-Skill-Memory"><a href="#3-5-Layer-4-Skill-Memory" class="headerlink" title="3.5 Layer 4: Skill Memory"></a>3.5 Layer 4: Skill Memory</h3><p>Procedural memory in <code>~/.hermes/skills/</code> with progressive disclosure (index → full content on demand). Auto-created after complex tasks; self-improved via <code>skill_manage</code> patch.</p>
+<h3 id="3-6-External-Memory-Providers"><a href="#3-6-External-Memory-Providers" class="headerlink" title="3.6 External Memory Providers"></a>3.6 External Memory Providers</h3><p>8 optional providers (Honcho, Mem0, OpenViking, Hindsight, etc.) complement built-in memory.</p>
+<h3 id="3-7-Learning-Loop-Synergy"><a href="#3-7-Learning-Loop-Synergy" class="headerlink" title="3.7 Learning Loop Synergy"></a>3.7 Learning Loop Synergy</h3><p>Task completion → memory curation → skill creation → FTS5 indexing → faster recall on similar future tasks.</p>
+<hr>
+<h2 id="四、关键差异总结-Key-Differences-Summary"><a href="#四、关键差异总结-Key-Differences-Summary" class="headerlink" title="四、关键差异总结 | Key Differences Summary"></a>四、关键差异总结 | Key Differences Summary</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -738,8 +678,7 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <th>Hermes 做法</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>记住用户偏好</td>
 <td>写入 USER.md，全量注入</td>
 <td>写入 USER.md（有上限），冻结注入</td>
@@ -769,8 +708,7 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <td>极高（纯文本 Git）</td>
 <td>高（Markdown + SQLite 可导出）</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <table>
 <thead>
@@ -780,14 +718,13 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Remember user preferences</td>
 <td>Write USER.md, full injection</td>
 <td>Write USER.md (capped), frozen injection</td>
 </tr>
 <tr>
-<td>Recall last week's chat</td>
+<td>Recall last week’s chat</td>
 <td>MEMORY.md summary or jsonl replay</td>
 <td><code>session_search</code> FTS5 on demand</td>
 </tr>
@@ -811,48 +748,41 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 <td>Very high (plain text Git)</td>
 <td>High (Markdown + exportable SQLite)</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>五、最佳实践 | Best Practices</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw</h3>
-<ol>
+</tbody></table>
+<hr>
+<h2 id="五、最佳实践-Best-Practices"><a href="#五、最佳实践-Best-Practices" class="headerlink" title="五、最佳实践 | Best Practices"></a>五、最佳实践 | Best Practices</h2><p><strong>中文</strong></p>
+<h3 id="OpenClaw"><a href="#OpenClaw" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><ol>
 <li><strong>职责分离</strong>：人格写 SOUL.md，流程写 AGENTS.md，事实写 MEMORY.md</li>
 <li><strong>版本管理</strong>：SOUL.md 和 AGENTS.md 纳入 Git；MEMORY.md 可让 Agent 自管</li>
 <li><strong>控制体积</strong>：MEMORY.md 定期人工审查，避免 Prompt 膨胀</li>
 <li><strong>日记归档</strong>：用 <code>memory/YYYY-MM-DD.md</code> 分离当日 ephemeral 内容</li>
 </ol>
-<h3>Hermes Agent</h3>
-<ol>
+<h3 id="Hermes-Agent"><a href="#Hermes-Agent" class="headerlink" title="Hermes Agent"></a>Hermes Agent</h3><ol>
 <li><strong>善用分层</strong>：关键事实放 MEMORY.md；历史细节靠 <code>session_search</code></li>
 <li><strong>监控容量</strong>：MEMORY.md 超 80% 时主动整合条目</li>
 <li><strong>信任技能索引</strong>：不必手动维护大量 Skill，让闭环学习自动沉淀</li>
 <li><strong>选配 Provider</strong>：需要深度用户建模时启用 Honcho；简单场景用内置即可</li>
-<li><strong>从龙虾迁移</strong>：<code>hermes claw migrate</code> 导入 MEMORY.md / USER.md 条目</li>
+<li><strong>从龙虾迁移</strong>：<code>hermes claw migrate</code> 导入 MEMORY.md &#x2F; USER.md 条目</li>
 </ol>
 <p><strong>English</strong></p>
-<h3>OpenClaw</h3>
-<ol>
+<h3 id="OpenClaw-1"><a href="#OpenClaw-1" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><ol>
 <li>Separate concerns: SOUL.md (persona), AGENTS.md (procedures), MEMORY.md (facts)</li>
 <li>Version-control SOUL.md and AGENTS.md in Git</li>
 <li>Periodically audit MEMORY.md to control prompt size</li>
 <li>Use <code>memory/YYYY-MM-DD.md</code> for daily ephemeral content</li>
 </ol>
-<h3>Hermes Agent</h3>
-<ol>
+<h3 id="Hermes-Agent-1"><a href="#Hermes-Agent-1" class="headerlink" title="Hermes Agent"></a>Hermes Agent</h3><ol>
 <li>Use layers: critical facts in MEMORY.md; historical detail via <code>session_search</code></li>
 <li>Consolidate when MEMORY.md exceeds ~80% capacity</li>
 <li>Trust the skill index — let the learning loop accumulate procedural memory</li>
 <li>Enable external providers (e.g., Honcho) only when deeper user modeling is needed</li>
 <li>Migrate from OpenClaw with <code>hermes claw migrate</code></li>
 </ol>
-<hr/>
-<h2>六、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="六、结语-Conclusion"><a href="#六、结语-Conclusion" class="headerlink" title="六、结语 | Conclusion"></a>六、结语 | Conclusion</h2><p><strong>中文</strong></p>
 <p>OpenClaw 的记忆系统是 <strong>「透明文件柜」</strong>——简单、可读、完全由人掌控，适合重视可审计性与手动定制的用户。Hermes 的记忆系统是 <strong>「分层图书馆 + 自学习档案员」</strong>——通过 SQLite 检索、字符预算、技能渐进披露和闭环学习，在 Token 成本可控的前提下实现「越用越懂你」。选择哪套记忆架构，本质上是在 <strong>可控透明度</strong> 与 <strong>自动进化效率</strong> 之间做权衡。</p>
 <p><strong>English</strong></p>
-<p>OpenClaw's memory is a <strong>transparent filing cabinet</strong> — simple, readable, fully human-controlled, ideal for users who value auditability and manual curation. Hermes's memory is a <strong>layered library with a self-learning archivist</strong> — SQLite search, char budgets, progressive skill disclosure, and closed-loop learning deliver "knows you better over time" with controlled token cost. The choice is fundamentally a tradeoff between <strong>transparent control</strong> and <strong>automatic evolutionary efficiency</strong>.</p>
+<p>OpenClaw’s memory is a <strong>transparent filing cabinet</strong> — simple, readable, fully human-controlled, ideal for users who value auditability and manual curation. Hermes’s memory is a <strong>layered library with a self-learning archivist</strong> — SQLite search, char budgets, progressive skill disclosure, and closed-loop learning deliver “knows you better over time” with controlled token cost. The choice is fundamentally a tradeoff between <strong>transparent control</strong> and <strong>automatic evolutionary efficiency</strong>.</p>
 
     </div>
 

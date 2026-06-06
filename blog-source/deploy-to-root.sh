@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BLOG_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$BLOG_DIR"
+python3 sync_docs.py
 npm run clean
 npm run build
 

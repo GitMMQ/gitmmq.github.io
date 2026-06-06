@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2021 年边缘 AI 爆发：Apple Neural Engine、高通 Hexagon、知识蒸馏与 INT8 量化。端侧部署架构、NPU 生态与开源工具中英文详解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 AI 编年史：边缘 AI、NPU 与知识蒸馏">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2021-edge-ai-npu-distillation.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2021 年边缘 AI 爆发：Apple Neural Engine、高通 Hexagon、知识蒸馏与 INT8 量化。端侧部署架构、NPU 生态与开源工具中英文详解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-20T02:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-20T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="Edge AI">
+<meta property="article:tag" content="Knowledge Distillation">
+<meta property="article:tag" content="Model Compression">
+<meta property="article:tag" content="NPU">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2021-edge-ai-npu-distillation.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2021-edge-ai-npu-distillation.html","path":"posts/ai-timeline-2021-edge-ai-npu-distillation.html","title":"2021 AI 编年史：边缘 AI、NPU 与知识蒸馏"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2021 AI 编年史：边缘 AI、NPU 与知识蒸馏 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2021-AI-%E7%BC%96%E5%B9%B4%E5%8F%B2%EF%BC%9A%E8%BE%B9%E7%BC%98-AI%E3%80%81NPU-%E4%B8%8E%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F-Edge-AI-NPU-Distillation-in-2021"><span class="nav-number">1.</span> <span class="nav-text">2021 AI 编年史：边缘 AI、NPU 与知识蒸馏 | Edge AI, NPU &amp; Distillation in 2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A6%82%E8%BF%B0%E4%B8%8E%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86-Overview-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、概述与背景知识 | Overview &amp; Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、技术架构 | Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%BA%91-%E8%BE%B9%E5%8D%8F%E5%90%8C%E9%83%A8%E7%BD%B2%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 云-边协同部署架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 知识蒸馏机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-NPU-%E7%A1%AC%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%AF%B9%E6%AF%94%EF%BC%882021%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 NPU 硬件架构对比（2021）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E9%87%8F%E5%8C%96%E6%84%9F%E7%9F%A5%E8%AE%AD%E7%BB%83-QAT-%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 量化感知训练 (QAT) 流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8F%91%E5%B1%95%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、发展趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9%E5%88%86%E6%9E%90-Pros-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点分析 | Pros &amp; Cons</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E4%B8%8E%E5%B7%A5%E5%85%B7-Open-Source-Tools"><span class="nav-number">1.6.</span> <span class="nav-text">六、开源项目与工具 | Open Source &amp; Tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE-References"><span class="nav-number">1.7.</span> <span class="nav-text">七、参考文献 | References</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2021-edge-ai-npu-distillation.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2021 AI 编年史：边缘 AI、NPU 与知识蒸馏 | Qi">
+      <meta itemprop="description" content="2021 年边缘 AI 爆发：Apple Neural Engine、高通 Hexagon、知识蒸馏与 INT8 量化。端侧部署架构、NPU 生态与开源工具中英文详解。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 AI 编年史：边缘 AI、NPU 与知识蒸馏
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-20 10:00:00" itemprop="dateCreated datePublished" datetime="2021-10-20T10:00:00+08:00">2021-10-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2021 年边缘 AI 爆发：Apple Neural Engine、高通 Hexagon、知识蒸馏与 INT8 量化。端侧部署架构、NPU 生态与开源工具中英文详解。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="2021-AI-编年史：边缘-AI、NPU-与知识蒸馏-Edge-AI-NPU-Distillation-in-2021"><a href="#2021-AI-编年史：边缘-AI、NPU-与知识蒸馏-Edge-AI-NPU-Distillation-in-2021" class="headerlink" title="2021 AI 编年史：边缘 AI、NPU 与知识蒸馏 | Edge AI, NPU &amp; Distillation in 2021"></a>2021 AI 编年史：边缘 AI、NPU 与知识蒸馏 | Edge AI, NPU &amp; Distillation in 2021</h1><hr>
+<h2 id="一、概述与背景知识-Overview-Background"><a href="#一、概述与背景知识-Overview-Background" class="headerlink" title="一、概述与背景知识 | Overview &amp; Background"></a>一、概述与背景知识 | Overview &amp; Background</h2><p><strong>English</strong></p>
+<p><strong>Edge AI</strong> runs machine learning <strong>on-device</strong> (phones, IoT, cameras, cars) rather than in the cloud — reducing <strong>latency</strong>, <strong>bandwidth cost</strong>, and <strong>privacy risk</strong>. In 2021, three forces converged:</p>
+<ol>
+<li><strong>Dedicated NPUs (Neural Processing Units)</strong> — Apple <strong>Neural Engine</strong> (A15), Qualcomm <strong>Hexagon Tensor</strong>, Google <strong>Edge TPU</strong>, Huawei <strong>Da Vinci</strong></li>
+<li><strong>Knowledge Distillation</strong> — compress large <strong>teacher models</strong> into small <strong>student models</strong></li>
+<li><strong>Quantization</strong> — INT8&#x2F;INT4 inference with minimal accuracy loss</li>
+</ol>
+<p>Landmark 2021 developments:</p>
+<ul>
+<li><strong>DistilBERT</strong> adoption peak for on-device NLP</li>
+<li><strong>MobileViT</strong> — Transformer on mobile with sub-1M params variants</li>
+<li><strong>TensorRT</strong> &#x2F; <strong>Core ML</strong> &#x2F; <strong>TFLite</strong> mature deployment pipelines</li>
+<li><strong>TinyML</strong> community growth (TensorFlow Lite Micro)</li>
+</ul>
+<p><strong>Key terms:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>NPU</strong></td>
+<td>Hardware accelerator optimized for matrix ops in neural networks</td>
+</tr>
+<tr>
+<td><strong>Knowledge distillation</strong></td>
+<td>Student learns soft labels + hidden representations from teacher</td>
+</tr>
+<tr>
+<td><strong>Quantization</strong></td>
+<td>Reduce weight&#x2F;activation precision (FP32 → INT8)</td>
+</tr>
+<tr>
+<td><strong>Latency budget</strong></td>
+<td>Max inference time allowed (e.g., 30ms for real-time camera)</td>
+</tr>
+<tr>
+<td><strong>FLOPs</strong></td>
+<td>Floating-point operations — proxy for compute cost</td>
+</tr>
+<tr>
+<td><strong>Pruning</strong></td>
+<td>Remove redundant weights&#x2F;channels</td>
+</tr>
+<tr>
+<td><strong>On-device learning</strong></td>
+<td>Fine-tuning or personalization locally (federated edge)</td>
+</tr>
+</tbody></table>
+<p><strong>中文</strong></p>
+<p><strong>边缘 AI</strong> 在 <strong>端侧设备</strong>（手机、IoT、相机、汽车）运行 ML，而非云端 — 降低 <strong>延迟</strong>、<strong>带宽成本</strong> 与 <strong>隐私风险</strong>。2021 年三股力量汇聚：</p>
+<ol>
+<li><strong>专用 NPU</strong> — Apple <strong>Neural Engine</strong>（A15）、高通 <strong>Hexagon Tensor</strong>、Google <strong>Edge TPU</strong>、华为 <strong>达芬奇</strong></li>
+<li><strong>知识蒸馏</strong> — 将大型 <strong>教师模型</strong> 压缩为小型 <strong>学生模型</strong></li>
+<li><strong>量化</strong> — INT8&#x2F;INT4 推理，精度损失最小</li>
+</ol>
+<p>2021 标志性进展：</p>
+<ul>
+<li><strong>DistilBERT</strong> 在端侧 NLP 广泛采用</li>
+<li><strong>MobileViT</strong> — 移动端 Transformer，百万参数级变体</li>
+<li><strong>TensorRT</strong> &#x2F; <strong>Core ML</strong> &#x2F; <strong>TFLite</strong> 部署流水线成熟</li>
+<li><strong>TinyML</strong> 社区增长（TensorFlow Lite Micro）</li>
+</ul>
+<p><strong>核心术语：</strong></p>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>NPU</strong></td>
+<td>针对神经网络矩阵运算优化的硬件加速器</td>
+</tr>
+<tr>
+<td><strong>知识蒸馏</strong></td>
+<td>学生从教师软标签与隐层表示学习</td>
+</tr>
+<tr>
+<td><strong>量化</strong></td>
+<td>降低权重&#x2F;激活精度（FP32 → INT8）</td>
+</tr>
+<tr>
+<td><strong>延迟预算</strong></td>
+<td>允许的最大推理时间（如相机实时 30ms）</td>
+</tr>
+<tr>
+<td><strong>FLOPs</strong></td>
+<td>浮点运算次数 — 计算成本代理指标</td>
+</tr>
+<tr>
+<td><strong>剪枝</strong></td>
+<td>移除冗余权重&#x2F;通道</td>
+</tr>
+<tr>
+<td><strong>端侧学习</strong></td>
+<td>本地微调或个性化（联邦边缘）</td>
+</tr>
+</tbody></table>
+<p>2021 年「云训练、端推理」成为默认架构 — 蒸馏与量化是连接二者的 <strong>标准桥梁</strong>。</p>
+<hr>
+<h2 id="二、技术架构-Architecture"><a href="#二、技术架构-Architecture" class="headerlink" title="二、技术架构 | Architecture"></a>二、技术架构 | Architecture</h2><h3 id="2-1-云-边协同部署架构"><a href="#2-1-云-边协同部署架构" class="headerlink" title="2.1 云-边协同部署架构"></a>2.1 云-边协同部署架构</h3><pre><code class="highlight mermaid">flowchart LR
+  subgraph Cloud[&quot;Cloud Training&quot;]
+    TD[Large Teacher Model]
+    DS[Massive Dataset]
+    TR[GPU Cluster Training]
+  end
+  subgraph Compress[&quot;Compression Pipeline&quot;]
+    KD[Knowledge Distillation]
+    QT[INT8 Quantization]
+    PR[Pruning]
+  end
+  subgraph Edge[&quot;Edge Deployment&quot;]
+    NPU[NPU / DSP / GPU]
+    RT[TensorRT / CoreML / TFLite]
+    APP[On-Device App]
+  end
+  DS --&gt; TR
+  TR --&gt; TD
+  TD --&gt; KD
+  KD --&gt; QT
+  QT --&gt; PR
+  PR --&gt; RT
+  RT --&gt; NPU
+  NPU --&gt; APP</code></pre>
+
+<h3 id="2-2-知识蒸馏机制"><a href="#2-2-知识蒸馏机制" class="headerlink" title="2.2 知识蒸馏机制"></a>2.2 知识蒸馏机制</h3><p><strong>English</strong></p>
+<p><strong>Hinton et al. distillation</strong> (2015, peak industrial use 2020–2021):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Teacher (large):  softmax(logits / T)  →  soft targets (T = temperature)</span><br><span class="line">Student (small):  learns to match soft targets + hard labels</span><br><span class="line"></span><br><span class="line">Loss = α · KL(Student || Teacher) + (1-α) · CE(Student, hard labels)</span><br><span class="line"></span><br><span class="line">Optional: intermediate layer matching (FitNets, attention transfer)</span><br></pre></td></tr></table></figure>
+
+<p><strong>2021 extensions</strong>: <strong>Self-distillation</strong> (same architecture, different augmentations), <strong>multi-teacher ensemble distillation</strong>, <strong>task-specific distillation</strong> for object detection (YOLO teacher → MobileNet student).</p>
+<p><strong>中文</strong></p>
+<p><strong>Hinton 蒸馏</strong>：学生匹配教师 <strong>软标签</strong>（温度 T 平滑）+ <strong>硬标签</strong>。<strong>2021 扩展</strong>：自蒸馏、多教师集成蒸馏、检测任务专用蒸馏（YOLO → MobileNet）。</p>
+<h3 id="2-3-NPU-硬件架构对比（2021）"><a href="#2-3-NPU-硬件架构对比（2021）" class="headerlink" title="2.3 NPU 硬件架构对比（2021）"></a>2.3 NPU 硬件架构对比（2021）</h3><table>
+<thead>
+<tr>
+<th>NPU</th>
+<th>厂商</th>
+<th>峰值算力</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Neural Engine</td>
+<td>Apple (A15)</td>
+<td>15.8 TOPS</td>
+<td>相机 ISP、Siri、Face ID</td>
+</tr>
+<tr>
+<td>Hexagon Tensor</td>
+<td>Qualcomm (SD888)</td>
+<td>26 TOPS</td>
+<td>Android AI Camera</td>
+</tr>
+<tr>
+<td>Edge TPU</td>
+<td>Google (Coral)</td>
+<td>4 TOPS (INT8)</td>
+<td>IoT vision</td>
+</tr>
+<tr>
+<td>Da Vinci</td>
+<td>Huawei (Ascend)</td>
+<td>变体</td>
+<td>手机&#x2F;边缘服务器</td>
+</tr>
+<tr>
+<td>ARM Ethos</td>
+<td>ARM</td>
+<td>可配置</td>
+<td>嵌入式 MCU→应用处理器</td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Edge Inference Stack</span><br><span class="line">Application (Camera / Voice)</span><br><span class="line">        ↓</span><br><span class="line">Runtime (Core ML / NNAPI / TFLite)</span><br><span class="line">        ↓</span><br><span class="line">Graph Optimizer (operator fusion, layout transform)</span><br><span class="line">        ↓</span><br><span class="line">NPU Driver + Firmware</span><br><span class="line">        ↓</span><br><span class="line">NPU Hardware (MAC arrays, SRAM, DMA)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-量化感知训练-QAT-流程"><a href="#2-4-量化感知训练-QAT-流程" class="headerlink" title="2.4 量化感知训练 (QAT) 流程"></a>2.4 量化感知训练 (QAT) 流程</h3><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. FP32 训练</td>
+<td>标准全精度训练教师&#x2F;学生</td>
+</tr>
+<tr>
+<td>2. QAT fine-tune</td>
+<td>插入 fake quantize 节点，模拟 INT8</td>
+</tr>
+<tr>
+<td>3. Calibration (PTQ)</td>
+<td>或仅用校准集确定 scale&#x2F;zero-point</td>
+</tr>
+<tr>
+<td>4. Export</td>
+<td>ONNX → TensorRT &#x2F; TFLite INT8</td>
+</tr>
+<tr>
+<td>5. NPU deploy</td>
+<td>硬件加速推理</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、发展趋势-Trends"><a href="#三、发展趋势-Trends" class="headerlink" title="三、发展趋势 | Trends"></a>三、发展趋势 | Trends</h2><p><strong>English</strong></p>
+<ol>
+<li><strong>Transformer on edge</strong>: MobileViT, EfficientFormer proved ViT could run at <strong>&lt;10ms</strong> on mobile NPUs.</li>
+<li><strong>Unified runtime APIs</strong>: Android <strong>NNAPI</strong>, iOS <strong>Core ML</strong>, ONNX Runtime Mobile converged developer experience.</li>
+<li><strong>Distillation → LLM era preview</strong>: Early experiments distilling BERT → TinyBERT foreshadowed 2023+ <strong>model compression for LLMs</strong>.</li>
+<li><strong>Privacy regulation</strong>: GDPR&#x2F;CCPA drove on-device <strong>face&#x2F;voice</strong> processing without cloud upload.</li>
+<li><strong>Auto-compression tools</strong>: Neural Network Intelligence (NNI) model compression toolkit; PyTorch Quantization FX.</li>
+<li><strong>Heterogeneous SoC</strong>: CPU + GPU + NPU <strong>dynamic scheduling</strong> based on workload.</li>
+</ol>
+<p><strong>中文</strong></p>
+<ol>
+<li><strong>端侧 Transformer</strong>：MobileViT、EfficientFormer 证明 ViT 可在移动端 <strong>&lt;10ms</strong> 运行。</li>
+<li><strong>统一运行时 API</strong>：Android <strong>NNAPI</strong>、iOS <strong>Core ML</strong>、ONNX Runtime Mobile 收敛开发体验。</li>
+<li><strong>蒸馏 → LLM 时代预演</strong>：BERT → TinyBERT 预示 2023+ <strong>LLM 压缩</strong>。</li>
+<li><strong>隐私法规</strong>：GDPR&#x2F;CCPA 推动 <strong>人脸&#x2F;语音</strong> 端侧处理不上云。</li>
+<li><strong>自动压缩工具</strong>：NNI 模型压缩；PyTorch Quantization FX。</li>
+<li><strong>异构 SoC</strong>：CPU + GPU + NPU <strong>动态调度</strong>。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点分析-Pros-Cons"><a href="#四、优缺点分析-Pros-Cons" class="headerlink" title="四、优缺点分析 | Pros &amp; Cons"></a>四、优缺点分析 | Pros &amp; Cons</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>优点 Advantages</th>
+<th>缺点 Disadvantages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>延迟</strong></td>
+<td>端侧 ms 级响应</td>
+<td>复杂模型仍需云端 fallback</td>
+</tr>
+<tr>
+<td><strong>隐私</strong></td>
+<td>数据不出设备</td>
+<td>端侧存储仍可能被提取</td>
+</tr>
+<tr>
+<td><strong>成本</strong></td>
+<td>无云端推理费用</td>
+<td>NPU 开发&#x2F;适配成本</td>
+</tr>
+<tr>
+<td><strong>蒸馏</strong></td>
+<td>小模型保留大模型 95%+ 精度</td>
+<td>蒸馏训练额外周期</td>
+</tr>
+<tr>
+<td><strong>量化</strong></td>
+<td>4× 加速、4× 省内存</td>
+<td>INT8 对某些层精度损失明显</td>
+</tr>
+<tr>
+<td><strong>NPU</strong></td>
+<td>能效比 GPU 高 10–100×</td>
+<td>厂商锁定、算子支持不一</td>
+</tr>
+<tr>
+<td><strong>维护</strong></td>
+<td>OTA 更新模型</td>
+<td>碎片化设备兼容测试</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>手机相机</strong></td>
+<td>夜景增强、人像分割、场景识别</td>
+</tr>
+<tr>
+<td><strong>语音唤醒</strong></td>
+<td>低功耗 keyword spotting on DSP</td>
+</tr>
+<tr>
+<td><strong>智能家居</strong></td>
+<td>端侧人脸&#x2F;手势识别（Edge TPU）</td>
+</tr>
+<tr>
+<td><strong>工业 IoT</strong></td>
+<td>缺陷检测 TinyML on MCU</td>
+</tr>
+<tr>
+<td><strong>自动驾驶 L2</strong></td>
+<td>端侧车道线&#x2F;行人检测</td>
+</tr>
+<tr>
+<td><strong>可穿戴</strong></td>
+<td>心率异常检测、跌倒检测</td>
+</tr>
+<tr>
+<td><strong>AR 眼镜</strong></td>
+<td>实时 SLAM + 物体识别</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、开源项目与工具-Open-Source-Tools"><a href="#六、开源项目与工具-Open-Source-Tools" class="headerlink" title="六、开源项目与工具 | Open Source &amp; Tools"></a>六、开源项目与工具 | Open Source &amp; Tools</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>pytorch&#x2F;pytorch</strong></td>
+<td>QAT、torch.quantization</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/pytorch/pytorch">https://github.com/pytorch/pytorch</a></td>
+</tr>
+<tr>
+<td><strong>TensorRT</strong></td>
+<td>NVIDIA 推理优化</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NVIDIA/TensorRT">https://github.com/NVIDIA/TensorRT</a></td>
+</tr>
+<tr>
+<td><strong>TensorFlow Lite</strong></td>
+<td>移动端&#x2F;嵌入式部署</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite">https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite</a></td>
+</tr>
+<tr>
+<td><strong>ONNX Runtime</strong></td>
+<td>跨平台推理</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/microsoft/onnxruntime">https://github.com/microsoft/onnxruntime</a></td>
+</tr>
+<tr>
+<td><strong>Neural Compressor</strong></td>
+<td>Intel 模型压缩</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/intel/neural-compressor">https://github.com/intel/neural-compressor</a></td>
+</tr>
+<tr>
+<td><strong>microsoft&#x2F;nni</strong></td>
+<td>蒸馏&#x2F;剪枝&#x2F;量化 AutoML</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/microsoft/nni">https://github.com/microsoft/nni</a></td>
+</tr>
+<tr>
+<td><strong>huggingface&#x2F;optimum</strong></td>
+<td>HF 模型端侧优化</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/huggingface/optimum">https://github.com/huggingface/optimum</a></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、参考文献-References"><a href="#七、参考文献-References" class="headerlink" title="七、参考文献 | References"></a>七、参考文献 | References</h2><ol>
+<li>Hinton, G., et al. <strong>“Distilling the Knowledge in a Neural Network.”</strong> NeurIPS 2014 Workshop. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1503.02531">https://arxiv.org/abs/1503.02531</a></li>
+<li>Sanh, V., et al. <strong>“DistilBERT, a distilled version of BERT.”</strong> NeurIPS 2019 (2021 端侧 peak). <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1910.01108">https://arxiv.org/abs/1910.01108</a></li>
+<li>Mehta, S., &amp; Rastegari, M. <strong>“MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer.”</strong> ICLR 2022 (arXiv 2021). <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2110.02178">https://arxiv.org/abs/2110.02178</a></li>
+<li>Jacob, B., et al. <strong>“Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference.”</strong> CVPR 2018. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1712.05877">https://arxiv.org/abs/1712.05877</a></li>
+<li>Apple Machine Learning Research. <strong>Core ML Tools.</strong> <a target="_blank" rel="noopener" href="https://github.com/apple/coremltools">https://github.com/apple/coremltools</a></li>
+<li>Google Coral. <strong>Edge TPU Documentation.</strong> <a target="_blank" rel="noopener" href="https://coral.ai/docs/">https://coral.ai/docs/</a></li>
+<li>Jacob, G., et al. <strong>“TensorFlow Lite: Machine Learning for Mobile and IoT Devices.”</strong> SysML 2018. <a target="_blank" rel="noopener" href="https://www.usenix.org/conference/sysml2018/presentation/jacob">https://www.usenix.org/conference/sysml2018/presentation/jacob</a></li>
+</ol>
+<hr>
+<p><strong>English Summary</strong>: 2021 edge AI matured through the triad of NPUs, knowledge distillation, and INT8 quantization — enabling Transformer-class models on phones and establishing the compression playbook later applied to LLMs.</p>
+<p><strong>中文总结</strong>：2021 年边缘 AI 通过 NPU、知识蒸馏与 INT8 量化三要素成熟 — 使 Transformer 级模型运行于手机，并建立日后应用于 LLM 的压缩方法论。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Edge-AI/" rel="tag"># Edge AI</a>
+              <a href="/tags/NPU/" rel="tag"># NPU</a>
+              <a href="/tags/Knowledge-Distillation/" rel="tag"># Knowledge Distillation</a>
+              <a href="/tags/Model-Compression/" rel="tag"># Model Compression</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/343ed70.html" rel="prev" title="node常见错误处理">
+                  <i class="fa fa-angle-left"></i> node常见错误处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2021-federated-learning.html" rel="next" title="2021 AI 编年史：联邦学习与隐私计算">
+                  2021 AI 编年史：联邦学习与隐私计算 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

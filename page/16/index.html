@@ -188,7 +188,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -197,7 +197,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -228,7 +228,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22404.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/51507.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -246,7 +246,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/22404.html" class="post-title-link" itemprop="url">Java-java8语法</a>
+          <a href="/posts/51507.html" class="post-title-link" itemprop="url">决策树</a>
         </h2>
 
         <div class="post-meta-container">
@@ -257,7 +257,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -279,32 +279,431 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>Java 8 是 Java 编程语言的一个重要版本，引入了许多新特性和语法改进，使得编写代码更加简洁和高效。以下是一些 Java 8 中的重要语法特性的详细解释：</p>
+          <p>用于分类和回归的非监督学习方法，通过简单的决策规则（if-else）预测目标</p>
+<h2 id="优缺点"><a class="headerlink" href="#优缺点" title="优缺点"></a>优缺点</h2><ul>
+<li>思想简单，可视乎表达，易理解，可以处理多分类问题</li>
+<li>可能会过拟合，此时需要剪枝、采用设置最小样本数目或树的深度</li>
+<li>基于启发式算法，节点采用贪婪算法（局部最优），不能保证全局最优，可以随机抽取样本，训练多个树</li>
+<li>过于复杂的概念，无法表达</li>
+</ul>
+<h2 id="决策树-CART"><a class="headerlink" href="#决策树-CART" title="决策树 CART"></a>决策树 CART</h2><p>CART: classifcation and regression tree</p>
+<h2 id="irsi数据集构建分类决策树"><a class="headerlink" href="#irsi数据集构建分类决策树" title="irsi数据集构建分类决策树"></a>irsi数据集构建分类决策树</h2><pre><code>from sklearn.datasets import load_iris
+from sklearn import tree
+
+<p>#加载iris数据集<br/>iris = load_iris()</p>
+<p>clf = tree.DecisionTreeClassifier()<br/>clf = clf.fit(iris.data, iris.target)</p>
+<p>import pydotplus<br/>dot_data = tree.export_graphviz(clf, out_file=None)<br/>#dot_data = tree.export_graphviz(clf, out_file=None,<br/>                              feature_names=iris.feature_names,<br/>                              class_names=iris.target_names,<br/>                              filled=True, rounded=True,<br/>                              special_characters=True)<br/>graph = pydotplus.graph_from_dot_data(dot_data)<br/>#导出决策树<br/>graph.write_pdf(“iris.pdf”)<br/>#Image(graph.create_png())<br/></p></code></pre>
+<p><img alt="iris树" src="http://thyrsi.com/t6/625/1543991582x2890174459.jpg"/></p>
+<h2 id="sklearn-example"><a class="headerlink" href="#sklearn-example" title="sklearn example"></a>sklearn example</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+<p>from sklearn.datasets import load_iris<br/>from sklearn.tree import DecisionTreeClassifier</p>
+<h1 id="Parameters"><a class="headerlink" href="#Parameters" title="Parameters"></a>Parameters</h1><p>n_classes = 3<br/>plot_colors = “ryb”<br/>plot_step = 0.02</p>
+<h1 id="Load-data"><a class="headerlink" href="#Load-data" title="Load data"></a>Load data</h1><p>iris = load_iris()</p>
+<p>for pairidx, pair in enumerate([[0, 1], [0, 2], [0, 3],<br/>                                [1, 2], [1, 3], [2, 3]]):<br/>    # We only take the two corresponding features<br/>    X = iris.data[:, pair]<br/>    y = iris.target</p>
+<pre><code># Train
+clf = DecisionTreeClassifier().fit(X, y)
+
+<h1 id="Plot-the-decision-boundary"><a href="#Plot-the-decision-boundary" class="headerlink" title="Plot the decision boundary"></a>Plot the decision boundary</h1><p>plt.subplot(2, 3, pairidx + 1)</p>
+<p>x_min, x_max &#x3D; X[:, 0].min() - 1, X[:, 0].max() + 1<br>y_min, y_max &#x3D; X[:, 1].min() - 1, X[:, 1].max() + 1<br>xx, yy &#x3D; np.meshgrid(np.arange(x_min, x_max, plot_step),<br>                     np.arange(y_min, y_max, plot_step))<br>plt.tight_layout(h_pad&#x3D;0.5, w_pad&#x3D;0.5, pad&#x3D;2.5)</p>
+<p>Z &#x3D; clf.predict(np.c_[xx.ravel(), yy.ravel()])<br>Z &#x3D; Z.reshape(xx.shape)<br>cs &#x3D; plt.contourf(xx, yy, Z, cmap&#x3D;plt.cm.RdYlBu)</p>
+<p>plt.xlabel(iris.feature_names[pair[0]])<br>plt.ylabel(iris.feature_names[pair[1]])</p>
+<h1 id="Plot-the-training-points"><a href="#Plot-the-training-points" class="headerlink" title="Plot the training points"></a>Plot the training points</h1><p>for i, color in zip(range(n_classes), plot_colors):<br>    idx &#x3D; np.where(y &#x3D;&#x3D; i)<br>    plt.scatter(X[idx, 0], X[idx, 1], c&#x3D;color, label&#x3D;iris.target_names[i],<br>                cmap&#x3D;plt.cm.RdYlBu, edgecolor&#x3D;’black’, s&#x3D;15)<br></code></pre></p>
+<p>plt.suptitle(“Decision surface of a decision tree using paired features”)<br/>plt.legend(loc=’lower right’, borderpad=0, handletextpad=0)<br/>plt.axis(“tight”)<br/>plt.show()<br/></p></code></pre>
+<p> <img alt="iris树" src="https://scikit-learn.org/stable/_images/sphx_glr_plot_iris_0011.png"/></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py" rel="noopener" target="_blank">https://scikit-learn.org/stable/auto_examples/tree/plot_iris.html#sphx-glr-auto-examples-tree-plot-iris-py</a></p>
+<h2 id="决策树回归"><a class="headerlink" href="#决策树回归" title="决策树回归"></a>决策树回归</h2><p>max_depth：图的深度，值太大会导致过拟合</p>
+<pre><code># Import the necessary modules and libraries
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+import matplotlib.pyplot as plt
+
+<h1 id="Create-a-random-dataset"><a class="headerlink" href="#Create-a-random-dataset" title="Create a random dataset"></a>Create a random dataset</h1><p>rng = np.random.RandomState(1)<br/>X = np.sort(5 * rng.rand(80, 1), axis=0)<br/>y = np.sin(X).ravel() #学习sin曲线<br/>y[::5] += 3 * (0.5 - rng.rand(16)) #干扰值</p>
+<h1 id="Fit-regression-model"><a class="headerlink" href="#Fit-regression-model" title="Fit regression model"></a>Fit regression model</h1><p>regr_1 = DecisionTreeRegressor(max_depth=2)<br/>regr_2 = DecisionTreeRegressor(max_depth=5)<br/>regr_1.fit(X, y)<br/>regr_2.fit(X, y)</p>
+<h1 id="Predict"><a class="headerlink" href="#Predict" title="Predict"></a>Predict</h1><p>X_test = np.arange(0.0, 5.0, 0.01)[:, np.newaxis]<br/>y_1 = regr_1.predict(X_test)<br/>y_2 = regr_2.predict(X_test)</p>
+<h1 id="Plot-the-results"><a class="headerlink" href="#Plot-the-results" title="Plot the results"></a>Plot the results</h1><p>plt.figure()<br/>plt.scatter(X, y, s=20, edgecolor=”black”,<br/>            c=”darkorange”, label=”data”)<br/>plt.plot(X_test, y_1, color=”cornflowerblue”,<br/>         label=”max_depth=2”, linewidth=2)<br/>plt.plot(X_test, y_2, color=”yellowgreen”, label=”max_depth=5”, linewidth=2)<br/>plt.xlabel(“data”)<br/>plt.ylabel(“target”)<br/>plt.title(“Decision Tree Regression”)<br/>plt.legend()<br/>plt.show()<br/></p></code></pre>
+<p><img alt="iris树" src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_001.png"/></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py" rel="noopener" target="_blank">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py</a></p>
+<h2 id="多输出问题"><a class="headerlink" href="#多输出问题" title="多输出问题"></a>多输出问题</h2><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeRegressor
+
+<h1 id="Create-a-random-dataset-1"><a class="headerlink" href="#Create-a-random-dataset-1" title="Create a random dataset"></a>Create a random dataset</h1><p>rng = np.random.RandomState(1)<br/>X = np.sort(200 * rng.rand(100, 1) - 100, axis=0)<br/>y = np.array([np.pi * np.sin(X).ravel(), np.pi * np.cos(X).ravel()]).T #输出X正弦 余弦<br/>y[::5, :] += (0.5 - rng.rand(20, 2)) #干扰</p>
+<h1 id="Fit-regression-model-1"><a class="headerlink" href="#Fit-regression-model-1" title="Fit regression model"></a>Fit regression model</h1><p>regr_1 = DecisionTreeRegressor(max_depth=2)<br/>regr_2 = DecisionTreeRegressor(max_depth=5)<br/>regr_3 = DecisionTreeRegressor(max_depth=8)<br/>regr_1.fit(X, y)<br/>regr_2.fit(X, y)<br/>regr_3.fit(X, y)</p>
+<h1 id="Predict-1"><a class="headerlink" href="#Predict-1" title="Predict"></a>Predict</h1><p>X_test = np.arange(-100.0, 100.0, 0.01)[:, np.newaxis]<br/>y_1 = regr_1.predict(X_test)<br/>y_2 = regr_2.predict(X_test)<br/>y_3 = regr_3.predict(X_test)</p>
+<h1 id="Plot-the-results-1"><a class="headerlink" href="#Plot-the-results-1" title="Plot the results"></a>Plot the results</h1><p>plt.figure()<br/>s = 25<br/>plt.scatter(y[:, 0], y[:, 1], c=”navy”, s=s,<br/>            edgecolor=”black”, label=”data”)<br/>plt.scatter(y_1[:, 0], y_1[:, 1], c=”cornflowerblue”, s=s,<br/>            edgecolor=”black”, label=”max_depth=2”)<br/>plt.scatter(y_2[:, 0], y_2[:, 1], c=”red”, s=s,<br/>            edgecolor=”black”, label=”max_depth=5”)<br/>plt.scatter(y_3[:, 0], y_3[:, 1], c=”orange”, s=s,<br/>            edgecolor=”black”, label=”max_depth=8”)<br/>plt.xlim([-6, 6])<br/>plt.ylim([-6, 6])<br/>plt.xlabel(“target 1”)<br/>plt.ylabel(“target 2”)<br/>plt.title(“Multi-output Decision Tree Regression”)<br/>plt.legend(loc=”best”)<br/>plt.show()<br/></p></code></pre>
+<p><img alt="iris树" src="https://scikit-learn.org/stable/_images/sphx_glr_plot_tree_regression_multioutput_001.png"/></p>
+<p>链接：<a href="https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py" rel="noopener" target="_blank">https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py</a>
+</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/5656.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/5656.html" class="post-title-link" itemprop="url">信息熵</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>不确定性程度的物理量</p>
+<p>自封闭系统的运动向均匀分布—熵总是增加的</p>
+<p>信息熵（Entropy）是一种用于衡量随机变量不确定性的度量。在信息论中，熵表示一个随机变量的不确定性或信息量。对于分类问题，熵越高，表示随机变量的不确定性越大，即数据分布越均匀。</p>
+<p>信息熵的计算公式如下：</p>
+<p>[ H(X) = -\sum_{i=1}^{n} P(x_i) \cdot \log_2(P(x_i)) ]</p>
+<p>其中，( n ) 是类别数，( P(x_i) ) 是随机变量 ( X ) 取值为 ( x_i ) 的概率。</p>
+<p>以下是一个使用Python实现信息熵计算的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">entropy</span>(<span class="params">probabilities</span>):</span><br/><span class="line">    <span class="comment"># 避免概率为0时取对数导致无限大</span></span><br/><span class="line">    epsilon = <span class="number">1e-15</span></span><br/><span class="line">    probabilities = np.clip(probabilities, epsilon, <span class="number">1</span> - epsilon)</span><br/><span class="line">    entropy = -np.<span class="built_in">sum</span>(probabilities * np.log2(probabilities))</span><br/><span class="line">    <span class="keyword">return</span> entropy</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 示例概率分布</span></span><br/><span class="line">probabilities = np.array([<span class="number">0.2</span>, <span class="number">0.3</span>, <span class="number">0.5</span>])</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算信息熵</span></span><br/><span class="line">entropy_value = entropy(probabilities)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Entropy:"</span>, entropy_value)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们定义了一个<code>entropy</code>函数，接受概率分布作为输入，并计算信息熵。为了避免取对数时出现无限大，我们使用了一个小的epsilon值进行裁剪。然后，通过对概率分布与对数化后的概率分布进行元素级相乘，最后取负数并求和，得到信息熵值。</p>
+<p>信息熵可以用于决策树等算法中，用于选择合适的特征进行数据分割，从而达到更好的分类效果。</p>
+<h2 id="联合熵"><a class="headerlink" href="#联合熵" title="联合熵"></a>联合熵</h2><h2 id="条件熵"><a class="headerlink" href="#条件熵" title="条件熵"></a>条件熵</h2><h2 id="信息增益"><a class="headerlink" href="#信息增益" title="信息增益"></a>信息增益</h2><p>ID3</p>
+<h2 id="信息增益率"><a class="headerlink" href="#信息增益率" title="信息增益率"></a>信息增益率</h2><p>C4.5</p>
+<h2 id="gini系数"><a class="headerlink" href="#gini系数" title="gini系数"></a>gini系数</h2><p>CART</p>
+<h2 id="互信息"><a class="headerlink" href="#互信息" title="互信息"></a>互信息</h2>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/54780.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/54780.html" class="post-title-link" itemprop="url">交叉验证</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>交叉验证（Cross-Validation）是一种评估机器学习模型性能的方法，通过将数据集分成训练集和验证集来进行多次训练和测试。它有助于更准确地估计模型在未见过数据上的性能，并避免对单一验证集的过度拟合。</p>
+<p>常见的交叉验证方法包括K折交叉验证和留一交叉验证。其中，K折交叉验证将数据集分成K个子集，依次将每个子集作为验证集，其余作为训练集，重复K次；留一交叉验证是K折交叉验证的特例，其中K等于数据集大小。交叉验证的结果通常是各次验证的平均性能。</p>
+<p>以下是一个使用Python实现K折交叉验证的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score</span><br/><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建SVM分类器</span></span><br/><span class="line">svm_model = SVC(kernel=<span class="string">'linear'</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 进行5折交叉验证</span></span><br/><span class="line">scores = cross_val_score(svm_model, X, y, cv=<span class="number">5</span>)  <span class="comment"># cv参数指定折数</span></span><br/><span class="line"></span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Cross-Validation Scores:"</span>, scores)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Mean Score:"</span>, scores.mean())</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用<code>load_iris</code>函数加载鸢尾花数据集，并创建了一个线性SVM分类器。然后，使用<code>cross_val_score</code>函数进行5折交叉验证，得到每次验证的性能分数。最后，我们打印出各次分数和平均分数。</p>
+<p>通过交叉验证，可以更准确地估计模型的性能，并对模型进行调参。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37871.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/37871.html" class="post-title-link" itemprop="url">交叉熵</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>交叉熵（Cross-Entropy）是一种常用的损失函数，用于衡量实际概率分布与预测概率分布之间的差异。在分类问题中，交叉熵可以用于衡量模型预测结果与真实标签之间的距离，从而进行模型的优化。</p>
+<p>以下是一个使用Python实现交叉熵计算的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy</span>(<span class="params">y_true, y_pred</span>):</span><br/><span class="line">    epsilon = <span class="number">1e-15</span>  <span class="comment"># 用于避免取对数时出现无限大</span></span><br/><span class="line">    y_pred = np.clip(y_pred, epsilon, <span class="number">1</span> - epsilon)  <span class="comment"># 对预测结果进行裁剪</span></span><br/><span class="line">    ce = -np.<span class="built_in">sum</span>(y_true * np.log(y_pred))</span><br/><span class="line">    <span class="keyword">return</span> ce</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 真实标签和预测概率分布</span></span><br/><span class="line">y_true = np.array([<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br/><span class="line">y_pred = np.array([<span class="number">0.1</span>, <span class="number">0.6</span>, <span class="number">0.2</span>, <span class="number">0.1</span>])</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算交叉熵</span></span><br/><span class="line">ce = cross_entropy(y_true, y_pred)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Cross-Entropy:"</span>, ce)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们定义了一个<code>cross_entropy</code>函数，接受真实标签和预测概率分布作为输入，并计算交叉熵。为了避免取对数时出现无限大，我们使用了一个小的epsilon值进行裁剪。然后，通过对真实标签与对数化后的预测概率分布进行元素级相乘，最后对结果取负数并求和，得到交叉熵值。</p>
+<p>请注意，上述代码示例只是一个简单的交叉熵计算实现。在实际应用中，您可能需要处理更多情况，例如多类别问题、批量计算等。在深度学习中，交叉熵常作为损失函数，在优化过程中用于衡量预测结果与真实标签之间的误差。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/742.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Qi">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/742.html" class="post-title-link" itemprop="url">中文分词</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="分类"><a class="headerlink" href="#分类" title="分类"></a>分类</h2><ul>
+<li>基于字典、词库匹配</li>
+<li>基于词频度统计</li>
+<li>基于知识理解</li>
+</ul>
+<h2 id="字典、词库匹配"><a class="headerlink" href="#字典、词库匹配" title="字典、词库匹配"></a>字典、词库匹配</h2><p>中文复杂、丰富，词典、词库匹配无法有效处理大规模文本分词处理</p>
 <ol>
-<li><p><strong>Lambda 表达式</strong>：Lambda 表达式是一种更简洁的方法来表示匿名函数。它们可以用于替代需要单一抽象方法的接口实现。Lambda 表达式的语法如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line">(parameters) -&gt; expression</span><br/><span class="line">或</span><br/><span class="line">(parameters) -&gt; { statements; }</span><br/></pre></td></tr></table></figure>
+<li>逐词遍历法：全字典遍历一遍，效率低，不适用于大系统</li>
+<li>机械分词法</li>
+</ol>
+<h3 id="最大正向匹配法"><a class="headerlink" href="#最大正向匹配法" title="最大正向匹配法"></a>最大正向匹配法</h3><p>假定词典词最大长度为i,被处理文档的当前字串中的前i个字作为匹配字段，匹配成功，则切分出来，匹配失败，则i-1，继续匹配，若成功则i+1，知道文档处理完成</p>
+<h3 id="逆向最大匹配法"><a class="headerlink" href="#逆向最大匹配法" title="逆向最大匹配法"></a>逆向最大匹配法</h3><p>文档逆序处理，通过逆序词典匹配，汉语中偏正结构较多，若从后向前匹配，可以适当提高精确度，逆向最大匹配法比正向最大匹配法的误差要小</p>
+<h3 id="最少切分法"><a class="headerlink" href="#最少切分法" title="最少切分法"></a>最少切分法</h3><p>使每一句中切出的词数最小</p>
+<h3 id="双向匹配法"><a class="headerlink" href="#双向匹配法" title="双向匹配法"></a>双向匹配法</h3><p>将正向最大匹配法与逆向最大匹配法组合，如果两种分词方法得到的匹配结果相同，则认为分词正确，否则，按最小集处理</p>
+<h2 id="词频统计"><a class="headerlink" href="#词频统计" title="词频统计"></a>词频统计</h2><p>考虑到相邻字词关系、词频、共现信息，有较好的实用性</p>
+<h3 id="全切分和基于词的频度统计的分词方法"><a class="headerlink" href="#全切分和基于词的频度统计的分词方法" title="全切分和基于词的频度统计的分词方法"></a>全切分和基于词的频度统计的分词方法</h3><p>基于词的频度统计的分词方法是一种全切分方法</p>
+<p>全切分要求获得输入序列的所有可接受的切分形式，而部分切分只取得一种或几种可接受的切分形式，由于部分切分忽略了可能的其他切分形式，所以建立在部分切分基础上的分词方法不管采取何种歧义纠正策略，都可能会遗漏正确的切分，造成分词错误或失败。而建立在全切分基础上的分词方法，由于全切分取得了所有可能的切分形式，因而从根本上避免了可能切分形式的遗漏，克服了部分切分方法的缺陷。</p>
+<p>问题：</p>
+<ol>
+<li><p>全切分算法只是能获得正确分词的前提，因为全切分不具有歧义检测功能，最终分词结果的正确性和完全性依赖于独立的歧义处理方法，如果评测有误，也会造成错误的结果。</p>
 </li>
-<li><p><strong>函数式接口</strong>：函数式接口是只包含一个抽象方法的接口。Java 8 中的 Lambda 表达式常常与函数式接口一起使用。例如，<code>Runnable</code> 和 <code>Callable</code> 接口就是函数式接口的例子。</p>
-</li>
-<li><p><strong>Stream API</strong>：Stream 是一种处理集合数据的新方式，它提供了一种流式处理元素的方法。Stream API 可以极大地简化集合操作，例如过滤、映射、聚合等。以下是一个使用 Stream 进行过滤的例子：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br/><span class="line">List&lt;Integer&gt; evenNumbers = numbers.stream()</span><br/><span class="line">                                   .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>)</span><br/><span class="line">                                   .collect(Collectors.toList());</span><br/></pre></td></tr></table></figure>
-</li>
-<li><p><strong>方法引用</strong>：方法引用是一种更简洁地调用已存在方法的方式，可以使代码更易读。方法引用可以用于静态方法、实例方法以及构造函数。以下是一些方法引用的例子：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态方法引用</span></span><br/><span class="line">Function&lt;String, Integer&gt; parseInt = Integer::parseInt;</span><br/><span class="line"></span><br/><span class="line"><span class="comment">// 实例方法引用</span></span><br/><span class="line">List&lt;String&gt; names = Arrays.asList(<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"Charlie"</span>);</span><br/><span class="line">names.forEach(System.out::println);</span><br/><span class="line"></span><br/><span class="line"><span class="comment">// 构造函数引用</span></span><br/><span class="line">Supplier&lt;List&lt;String&gt;&gt; listSupplier = ArrayList::<span class="keyword">new</span>;</span><br/></pre></td></tr></table></figure>
-</li>
-<li><p><strong>默认方法和静态方法</strong>：Java 8 允许在接口中定义默认方法和静态方法。默认方法允许在不破坏实现类的情况下向接口添加新方法。静态方法可以直接通过接口名调用。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">MyInterface</span> {</span><br/><span class="line">    <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span>;</span><br/><span class="line">    </span><br/><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">doSomethingElse</span><span class="params">()</span> {</span><br/><span class="line">        <span class="comment">// 默认实现</span></span><br/><span class="line">    }</span><br/><span class="line">    </span><br/><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">staticMethod</span><span class="params">()</span> {</span><br/><span class="line">        <span class="comment">// 静态方法实现</span></span><br/><span class="line">    }</span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Optional 类</strong>：Optional 是一个容器类，可以用来处理可能为空的值，避免空指针异常。它鼓励程序员显式处理可能为空的情况。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; optionalValue = Optional.ofNullable(getValue());</span><br/><span class="line"><span class="keyword">if</span> (optionalValue.isPresent()) {</span><br/><span class="line">    <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> optionalValue.get();</span><br/><span class="line">} <span class="keyword">else</span> {</span><br/><span class="line">    <span class="comment">// 值为空的处理</span></span><br/><span class="line">}</span><br/></pre></td></tr></table></figure>
-</li>
-<li><p><strong>新的日期和时间 API</strong>：Java 8 引入了新的日期和时间 API，解决了旧的 <code>Date</code> 和 <code>Calendar</code> 类的问题。新的 API 提供了更好的可读性和易用性。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now</span> <span class="operator">=</span> LocalDateTime.now();</span><br/><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">formatter</span> <span class="operator">=</span> DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br/><span class="line"><span class="type">String</span> <span class="variable">formattedDateTime</span> <span class="operator">=</span> now.format(formatter);</span><br/></pre></td></tr></table></figure>
-</li>
-<li><p><strong>默认方法的解决冲突</strong>：当一个类实现了多个接口，这些接口有相同的默认方法时，编译器会要求显示指定调用哪个接口的方法，或者在实现类中重写该方法。</p>
+<li><p>全切分的切分结果个数随句子长度的增长呈指数增长，一方面将导致庞大的无用数据充斥于存储数据库；另一方面当句长达到一定长度后，由于切分形式过多,造成分词效率严重下降。</p>
 </li>
 </ol>
-<p>这些是 Java 8 中的一些重要语法特性。它们使得代码更加简洁、可读性更高，并且提供了更多的灵活性和功能。在使用这些特性时，要注意充分了解它们的用法和适用场景，以便编写出高质量的代码。</p>
+<p>解决方案：</p>
+<p>基于词的频度统计的分词方法：</p>
+<p>这是一种全切分方法。它不依靠词典,而是将文章中任意两个字同时出现的频率进行统计,次数越高的就可能是一个词。它首先切分出与词表匹配的所有可能的词,运用统计语言模型和决策算法决定最优的切分结果。它的优点在于可以发现所有的切分歧义并且容易将新词提取出来。</p>
+<h2 id="基于知识理解"><a class="headerlink" href="#基于知识理解" title="基于知识理解"></a>基于知识理解</h2><p>基于句法、语法分析，并结合语义分析，通过对上下文内容所提供信息的分析对词进行定界，它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断。这类方法试图让机器具有人类的理解能力，需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式。因此目前基于知识的分词系统还处在试验阶段。</p>
+<h2 id="并行分词方法"><a class="headerlink" href="#并行分词方法" title="并行分词方法"></a>并行分词方法</h2><p>并行分词方法：这种分词方法借助于一个含有分词词库的管道进行 ,比较匹配过程是分步进行的 ,每一步可以对进入管道中的词同时与词库中相应的词进行比较 ,由于同时有多个词进行比较匹配 ,因而分词速度可以大幅度提高。这种方法涉及到多级内码理论和管道的词典数据结构。（详细算法可以参考吴胜远的《并行分词方法的研究》。）</p>
+<p>在Python中，有许多库可以用于中文分词，其中最常用的是<code>jieba</code>库。以下是一个使用<code>jieba</code>库进行中文分词的示例代码：</p>
+<p>首先，确保已安装 <code>jieba</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install jieba</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 输入文本</span></span><br/><span class="line">text = <span class="string">"今天天气不错，适合出去玩。"</span></span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 使用jieba分词</span></span><br/><span class="line">seg_list = jieba.cut(text, cut_all=<span class="literal">False</span>)  <span class="comment"># cut_all=False表示精确模式分词</span></span><br/><span class="line">seg_result = <span class="string">" "</span>.join(seg_list)</span><br/><span class="line"></span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"分词结果:"</span>, seg_result)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用了<code>jieba.cut</code>函数对输入文本进行中文分词。设置<code>cut_all=False</code>表示使用精确模式进行分词。然后，将分词结果用空格连接起来并打印出来。</p>
+<p><code>jieba</code>库支持更多的分词模式、自定义词典、停用词过滤等功能，以及支持并行分词，适用于不同的应用场景。在实际应用中，您可以根据需求对分词结果进行后续处理，比如进行文本分析、情感分析等。</p>
 
       
     </div>
@@ -331,7 +730,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/43300.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/50689.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -349,7 +748,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/43300.html" class="post-title-link" itemprop="url">JAVA-rbac权限管理</a>
+          <a href="/posts/50689.html" class="post-title-link" itemprop="url">xgboost</a>
         </h2>
 
         <div class="post-meta-container">
@@ -360,7 +759,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -368,7 +767,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -382,12 +781,16 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>RBAC : 基于角色的权限访问控制（Role-Based Access Control）通过角色绑定权限，然后给用户划分角色。在web应用中，可以将权限理解为url，一个权限对应一个url。</p>
-<h2 id="表设计"><a class="headerlink" href="#表设计" title="表设计"></a>表设计</h2><p>用户，角色，权限，权限组，菜单</p>
-<p>用户和角色，多对多<br/>角色和权限，多对多<br/>权限和权限组，多对一<br/>权限组和菜单，多对一<br/>菜单和菜单，自引用</p>
-<h2 id="系统"><a class="headerlink" href="#系统" title="系统"></a>系统</h2><p>用户登录后，取出其权限及所属菜单信息，写入session中</p>
-<p>自定义中间件，检查用户权限，进行访问控制</p>
-<p>参考：<a href="https://www.jianshu.com/p/f45b54768aa9" rel="noopener" target="_blank">https://www.jianshu.com/p/f45b54768aa9</a></p>
+          <p>XGBoost（eXtreme Gradient Boosting）是一种梯度提升树算法，被广泛应用于机器学习竞赛和实际项目中。它在GBDT的基础上进行了改进，引入了正则化项、并行处理、稀疏数据优化等特性，以提高模型的性能和泛化能力。</p>
+<p>以下是一个使用Python的<code>xgboost</code>库实现XGBoost的示例代码：</p>
+<p>首先，确保已安装 <code>xgboost</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install xgboost</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> xgboost <span class="keyword">as</span> xgb</span><br/><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 构建XGBoost分类器</span></span><br/><span class="line">xgb_model = xgb.XGBClassifier(objective=<span class="string">'multi:softmax'</span>, num_class=<span class="number">3</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">xgb_model.fit(X_train, y_train)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = xgb_model.predict(X_test)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"XGBoost Accuracy:"</span>, accuracy)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用了<code>load_iris</code>函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个XGBoost分类器（<code>XGBClassifier</code>），并使用<code>fit</code>方法训练模型。接着，我们在测试集上进行预测并计算准确率。</p>
+<p>XGBoost有很多参数可以调整，包括树的深度、学习率、子样本比例、正则化项等。您可以根据实际问题进行调参，以达到更好的性能。请注意，XGBoost还支持回归问题，以及对稀疏数据和缺失值的处理。</p>
+<p>参考: [博客 xgboost原理]( <a href="https://www.cnblogs.com/zhouxiaohui888/p/6008368.html" rel="noopener" target="_blank">https://www.cnblogs.com/zhouxiaohui888/p/6008368.html</a> “xgboost”）</p>
+<p>参考: <a href="https://github.com/dmlc/xgboost" rel="noopener" target="_blank" title="xgboost">github xgboost学习</a></p>
 
       
     </div>
@@ -414,7 +817,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/1252.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22038.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -432,7 +835,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/1252.html" class="post-title-link" itemprop="url">JAVA-JVM内存模型</a>
+          <a href="/posts/22038.html" class="post-title-link" itemprop="url">svm</a>
         </h2>
 
         <div class="post-meta-container">
@@ -443,7 +846,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -451,7 +854,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -465,27 +868,23 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="基本内容"><a class="headerlink" href="#基本内容" title="基本内容"></a>基本内容</h1><p><img alt="JVM内存模型" src="/img/jvm_memory_20221229161909.png"/></p>
-<h2 id="指令重排-编译器、运行时"><a class="headerlink" href="#指令重排-编译器、运行时" title="指令重排(编译器、运行时)"></a>指令重排(编译器、运行时)</h2><p>从java源代码到最终实际执行的指令序列，会分别经历下面三种重排序：</p>
-<pre><code>编译器优化重排序
-指令级并行重排序
-内存系统重排序
-</code></pre>
-<h2 id="编译器优化重排序"><a class="headerlink" href="#编译器优化重排序" title="编译器优化重排序"></a>编译器优化重排序</h2><p>在执行程序时，为了提高性能，编译器和处理器会对指令做重排序。但是，JMM确保在不同的编译器和不同的处理器平台之上，通过插入特定类型的Memory Barrier来禁止特定类型的编译器重排序和处理器重排序，为上层提供一致的内存可见性保证。</p>
-<h2 id="指令级并行重排序"><a class="headerlink" href="#指令级并行重排序" title="指令级并行重排序"></a>指令级并行重排序</h2><p>编译器优化重排序：编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。<br/>指令级并行的重排序：现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</p>
-<h2 id="内存系统重排序"><a class="headerlink" href="#内存系统重排序" title="内存系统重排序"></a>内存系统重排序</h2><p>内存系统的重排序：处理器使用缓存和读写缓冲区，这使得加载和存储操作看上去可能是在乱序执行(强调的是内存缓存)。<br/>在虚拟机层面，为了尽可能减少内存操作速度远慢于CPU运行速度所带来的CPU空置的影响，虚拟机会按照自己的一些规则将程序编写顺序打乱——即写在后面的代码在时间顺序上可能会先执行，而写在前面的代码会后执行——以尽可能充分地利用CPU</p>
-<h2 id="内存屏障"><a class="headerlink" href="#内存屏障" title="内存屏障"></a>内存屏障</h2><h3 id="内存屏障类型"><a class="headerlink" href="#内存屏障类型" title="内存屏障类型"></a>内存屏障类型</h3><ul>
-<li>LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。</li>
-<li>StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。</li>
-<li>LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li>
-<li>StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。它的开销是四种屏障中最大的。在大多数处理器的实现中，这个屏障是个万能屏障，兼具其它三种内存屏障的功能</li>
+          <p>在特征空间上找到最佳的分离超平面使得训练集上正负样本间隔最大</p>
+<p>用来解决二分类问题的有监督学习算法</p>
+<p>引入了核方法之后SVM也可以用来解决非线性问题</p>
+<h2 id="类型"><a class="headerlink" href="#类型" title="类型"></a>类型</h2><ul>
+<li>硬间隔支持向量机（线性可分支持向量机）：当训练数据线性可分时，可通过硬间隔最大化学得一个线性可分支持向量机。</li>
+<li>软间隔支持向量机：当训练数据近似线性可分时，可通过软间隔最大化学得一个线性支持向量机。</li>
+<li>非线性支持向量机：当训练数据线性不可分时，可通过核方法以及软间隔最大化学得一个非线性支持向量机。</li>
 </ul>
-<h3 id="基于保守策略的JMM内存屏障插入策略："><a class="headerlink" href="#基于保守策略的JMM内存屏障插入策略：" title="基于保守策略的JMM内存屏障插入策略："></a>基于保守策略的JMM内存屏障插入策略：</h3><ul>
-<li>在每个volatile写操作的前面插入一个StoreStore屏障</li>
-<li>在每个volatile写操作的后面插入一个StoreLoad屏障</li>
-<li>在每个volatile读操作的后面插入一个LoadLoad屏障</li>
-<li>在每个volatile读操作的后面插入一个LoadStore屏障</li>
-</ul>
+<p>支持向量机（Support Vector Machine，SVM）是一种常用的机器学习算法，主要用于分类和回归问题。SVM的核心思想是通过找到一个超平面（或者更一般地说，一个线性决策边界），将不同类别的数据点尽可能分开，同时最大化支持向量与超平面的距离（即间隔）。在分类问题中，SVM的目标是找到一个最优的超平面，使得不同类别的数据点都尽可能远离这个超平面。</p>
+<p>以下是一个使用Python和<code>scikit-learn</code>库实现SVM的示例代码：</p>
+<p>首先，确保已安装 <code>scikit-learn</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> datasets</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = datasets.load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 创建SVM分类器</span></span><br/><span class="line">svm_model = SVC(kernel=<span class="string">'linear'</span>, C=<span class="number">1.0</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">svm_model.fit(X_train, y_train)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = svm_model.predict(X_test)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"SVM Accuracy:"</span>, accuracy)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用了<code>datasets.load_iris</code>函数加载鸢尾花数据集，并将数据集划分为训练集和测试集。然后，我们创建了一个线性SVM分类器（<code>SVC</code>），使用<code>fit</code>方法训练模型。接着，我们在测试集上进行预测并计算准确率。</p>
+<p>您可以通过调整参数（例如核函数、惩罚参数C等）来进一步优化SVM模型的性能。注意，SVM算法不仅适用于二元分类问题，还可以扩展到多类别分类和回归问题。</p>
+<p>参考: <a href="https://blog.csdn.net/liugan528/article/details/79448379" rel="noopener" target="_blank" title="svm">svm</a></p>
 
       
     </div>
@@ -512,7 +911,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/37039.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/27391.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -530,7 +929,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/37039.html" class="post-title-link" itemprop="url">JAVA-JDK动态代理或CGLIB</a>
+          <a href="/posts/27391.html" class="post-title-link" itemprop="url">softmax回归</a>
         </h2>
 
         <div class="post-meta-container">
@@ -541,7 +940,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -549,7 +948,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -563,14 +962,14 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="使用JDK动态代理"><a class="headerlink" href="#使用JDK动态代理" title="使用JDK动态代理"></a>使用JDK动态代理</h1><p>Spring AOP默认使用JDK动态代理（基于接口的代理）。</p>
-<p>如果被代理的目标对象已经实现了接口，则使用JDK动态代理。如果目标对象未实现任何接口，则会创建CGLIB代理。</p>
-<h1 id="使用CGLIB代理注意"><a class="headerlink" href="#使用CGLIB代理注意" title="使用CGLIB代理注意"></a>使用CGLIB代理注意</h1><ul>
-<li>final方法不建议使用，因为它们无法被覆盖。</li>
-<li>除非强制使用CGLIB，需要将元素 <code>&lt;</code>aop:config<code>&gt;</code> 的属性proxy-target-class值设置为true。</li>
-<li>需要CGLIB库，找不到CGLIB库类时，Spring会发出警告。</li>
-<li>代理对象的构造函数将被调用两次。这是因为CGLIB代理会为每个代理对象生成子类。构造函数中只做赋值和初始化，不能实现其他的逻辑。</li>
-</ul>
+          <p>Softmax回归是一种用于多类别分类的线性模型。它在输出层使用了Softmax函数，将线性组合的原始分数转化为类别的概率分布，从而进行多类别分类。Softmax回归常用于机器学习中的分类任务，尤其是在神经网络中作为输出层来处理多类别分类问题。</p>
+<p>以下是一个使用Python和TensorFlow库实现Softmax回归的简单示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br/><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br/><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br/><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris</span><br/><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 加载鸢尾花数据集</span></span><br/><span class="line">iris = load_iris()</span><br/><span class="line">X, y = iris.data, iris.target</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 数据预处理</span></span><br/><span class="line">scaler = StandardScaler()</span><br/><span class="line">X = scaler.fit_transform(X)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 划分训练集和测试集</span></span><br/><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 构建Softmax回归模型</span></span><br/><span class="line">model = tf.keras.models.Sequential([</span><br/><span class="line">    tf.keras.layers.Input(shape=(<span class="number">4</span>,)),  <span class="comment"># 输入层</span></span><br/><span class="line">    tf.keras.layers.Dense(<span class="number">3</span>, activation=<span class="string">'softmax'</span>)  <span class="comment"># 输出层，3个类别</span></span><br/><span class="line">])</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 编译模型</span></span><br/><span class="line">model.<span class="built_in">compile</span>(optimizer=<span class="string">'adam'</span>, loss=<span class="string">'sparse_categorical_crossentropy'</span>, metrics=[<span class="string">'accuracy'</span>])</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 训练模型</span></span><br/><span class="line">model.fit(X_train, y_train, epochs=<span class="number">100</span>, batch_size=<span class="number">16</span>, verbose=<span class="number">1</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 在测试集上进行预测</span></span><br/><span class="line">y_pred = model.predict(X_test)</span><br/><span class="line">y_pred_classes = y_pred.argmax(axis=<span class="number">1</span>)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 计算准确率</span></span><br/><span class="line">accuracy = accuracy_score(y_test, y_pred_classes)</span><br/><span class="line"><span class="built_in">print</span>(<span class="string">"Accuracy:"</span>, accuracy)</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们使用<code>load_iris</code>函数加载鸢尾花数据集，并进行数据预处理。然后，我们构建了一个包含输入层和输出层的Softmax回归模型。通过<code>compile</code>方法来指定优化器和损失函数。接着，使用<code>fit</code>方法来训练模型。最后，我们在测试集上进行预测并计算准确率。</p>
+<p>请注意，这只是一个简单的Softmax回归实现示例。在实际应用中，您可能需要考虑更复杂的模型结构、超参数调整以及更多的优化。</p>
 
       
     </div>
@@ -597,7 +996,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/22405.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/28677.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -615,7 +1014,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/22405.html" class="post-title-link" itemprop="url">Java-java8语法</a>
+          <a href="/posts/28677.html" class="post-title-link" itemprop="url">机器学习-ResNet</a>
         </h2>
 
         <div class="post-meta-container">
@@ -626,7 +1025,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -634,7 +1033,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -648,34 +1047,16 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="Lambda表达式"><a class="headerlink" href="#Lambda表达式" title="Lambda表达式"></a>Lambda表达式</h2><h3 id="stream-forEach-循环处理"><a class="headerlink" href="#stream-forEach-循环处理" title="stream().forEach()循环处理"></a>stream().forEach()循环处理</h3><pre><code>List&lt;String&gt; list = com.google.common.collect.Lists.newArrayList();
-list.add("1");
-list.add("2");
-list.add("3");
-
-<p>list.stream().forEach(string -&gt;{<br/>    System.out.println(string);<br/>});<br/></p></code></pre>
-<h3 id="stream-map-处理集合，collect-Collectors-toList-结果输出为List"><a class="headerlink" href="#stream-map-处理集合，collect-Collectors-toList-结果输出为List" title="stream().map()处理集合，collect(Collectors.toList())结果输出为List"></a>stream().map()处理集合，collect(Collectors.toList())结果输出为List</h3><pre><code>List&lt;String&gt; list1 = Lists.newArrayList();
-list1.add("1");
-list1.add("2");
-list1.add("3");
-
-<p>List&lt;String&gt; list2 = list1.stream().map(string -&gt; {<br/>    return “stream().map()处理之后：” + string;<br/>}).collect(Collectors.toList());</p>
-<p>System.out.println(list2.toString());<br/></p></code></pre>
-<h3 id="stream-filter-过滤集合"><a class="headerlink" href="#stream-filter-过滤集合" title="stream().filter()过滤集合"></a>stream().filter()过滤集合</h3><pre><code>List&lt;String&gt; list1 = Lists.newArrayList();
-list1.add("1");
-list1.add("1");
-list1.add("2");
-list1.add("3");
-
-<p>List&lt;String&gt; list2 = list1.stream().filter(s -&gt; !s.equals(“1”)).collect(Collectors.toList());<br/>System.out.println(list2.toString());<br/></p></code></pre>
-<h3 id="函数接口"><a class="headerlink" href="#函数接口" title="函数接口"></a>函数接口</h3><p>一个只包含一个方法的接口,可以使用Lambda表达式作为参数</p>
-<pre><code>new Thread(() -&gt; System.out.println("Hello World!"));
-
-<p>public interface Interface1 {<br/>     void test();<br/>}</p>
-<p>private void func(Interface1 interface1) {<br/>    interface1.test();<br/>}</p>
-<p>func(() -&gt; System.out.println(“Hello World”));</p>
-<p>//有参数，参数知名类型更规范<br/>func((Integer x) -&gt; System.out.println(“Hello World” + x));</p>
-<p>//有参数，有返回值<br/>func((Integer x) -&gt; {<br/>    System.out.println(“Hello World” + x);<br/>    return true;<br/>});<br/></p></code></pre>
+          <p>ResNet（Residual Network）是一个深度卷积神经网络架构，由Kaiming He等人在2015年提出。它通过使用残差块（Residual Block）来解决深层网络的退化问题，允许在训练更深的神经网络时仍然能够获得更好的性能。</p>
+<p>ResNet引入了”跳跃连接”或”残差连接”的概念，即通过将前一层的输出直接添加到后续层的输出中，以便网络能够学习残差（剩余部分）。这种结构有助于避免梯度消失和梯度爆炸问题，使网络更容易优化。ResNet的核心思想是：通过层与层之间的直接捷径，网络可以学习原始输入和残差之间的映射，从而更轻松地适应更深的层次。</p>
+<p>深度网络的退化问题至少说明深度网络不容易训练。但是我们考虑这样一个事实：现在你有一个浅层网络，你想通过向上堆积新层来建立深层网络，一个极端情况是这些增加的层什么也不学习，仅仅复制浅层网络的特征，即这样新层是恒等映射（Identity mapping）。在这种情况下，深层网络应该至少和浅层网络性能一样，也不应该出现退化现象。好吧，你不得不承认肯定是目前的训练方法有问题，才使得深层网络很难去找到一个好的参数。</p>
+<p>这个有趣的假设让何博士灵感爆发，他提出了残差学习来解决退化问题。对于一个堆积层结构（几层堆积而成）当输入为时其学习到的特征记为，现在我们希望其可以学习到残差，这样其实原始的学习特征是。之所以这样是因为残差学习相比原始特征直接学习更容易。当残差为0时，此时堆积层仅仅做了恒等映射，至少网络性能不会下降，实际上残差不会为0，这也会使得堆积层在输入特征基础上学习到新的特征，从而拥有更好的性能。残差学习的结构如图4所示。这有点类似与电路中的“短路”，所以是一种短路连接（shortcutconnection）。</p>
+<p>以下是一个使用Python和TensorFlow库实现ResNet的简化版本的示例代码：</p>
+<p>首先，确保已安装 <code>tensorflow</code> 库，可以通过以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">pip install tensorflow</span><br/></pre></td></tr></table></figure>
+<p>接下来，使用下面的代码示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/><span class="line">4</span><br/><span class="line">5</span><br/><span class="line">6</span><br/><span class="line">7</span><br/><span class="line">8</span><br/><span class="line">9</span><br/><span class="line">10</span><br/><span class="line">11</span><br/><span class="line">12</span><br/><span class="line">13</span><br/><span class="line">14</span><br/><span class="line">15</span><br/><span class="line">16</span><br/><span class="line">17</span><br/><span class="line">18</span><br/><span class="line">19</span><br/><span class="line">20</span><br/><span class="line">21</span><br/><span class="line">22</span><br/><span class="line">23</span><br/><span class="line">24</span><br/><span class="line">25</span><br/><span class="line">26</span><br/><span class="line">27</span><br/><span class="line">28</span><br/><span class="line">29</span><br/><span class="line">30</span><br/><span class="line">31</span><br/><span class="line">32</span><br/><span class="line">33</span><br/><span class="line">34</span><br/><span class="line">35</span><br/><span class="line">36</span><br/><span class="line">37</span><br/><span class="line">38</span><br/><span class="line">39</span><br/><span class="line">40</span><br/><span class="line">41</span><br/><span class="line">42</span><br/><span class="line">43</span><br/><span class="line">44</span><br/><span class="line">45</span><br/><span class="line">46</span><br/></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br/><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Input, Conv2D, BatchNormalization, ReLU, Add, GlobalAveragePooling2D, Dense</span><br/><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Model</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">residual_block</span>(<span class="params">x, filters, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span></span>):</span><br/><span class="line">    shortcut = x</span><br/><span class="line">    <span class="comment"># 第一个卷积层</span></span><br/><span class="line">    x = Conv2D(filters, kernel_size, strides=stride, padding=<span class="string">'same'</span>)(x)</span><br/><span class="line">    x = BatchNormalization()(x)</span><br/><span class="line">    x = ReLU()(x)</span><br/><span class="line">    <span class="comment"># 第二个卷积层</span></span><br/><span class="line">    x = Conv2D(filters, kernel_size, strides=<span class="number">1</span>, padding=<span class="string">'same'</span>)(x)</span><br/><span class="line">    x = BatchNormalization()(x)</span><br/><span class="line">    <span class="comment"># 添加残差连接</span></span><br/><span class="line">    <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> shortcut.shape[-<span class="number">1</span>] != filters:</span><br/><span class="line">        shortcut = Conv2D(filters, kernel_size=<span class="number">1</span>, strides=stride, padding=<span class="string">'valid'</span>)(shortcut)</span><br/><span class="line">        shortcut = BatchNormalization()(shortcut)</span><br/><span class="line">    x = Add()([x, shortcut])</span><br/><span class="line">    x = ReLU()(x)</span><br/><span class="line">    <span class="keyword">return</span> x</span><br/><span class="line"></span><br/><span class="line"><span class="keyword">def</span> <span class="title function_">build_resnet</span>(<span class="params">input_shape, num_classes, num_blocks_list</span>):</span><br/><span class="line">    input_layer = Input(shape=input_shape)</span><br/><span class="line">    x = Conv2D(<span class="number">64</span>, <span class="number">7</span>, strides=<span class="number">2</span>, padding=<span class="string">'same'</span>)(input_layer)</span><br/><span class="line">    x = BatchNormalization()(x)</span><br/><span class="line">    x = ReLU()(x)</span><br/><span class="line">    x = tf.keras.layers.MaxPooling2D(pool_size=<span class="number">3</span>, strides=<span class="number">2</span>, padding=<span class="string">'same'</span>)(x)</span><br/><span class="line"></span><br/><span class="line">    <span class="keyword">for</span> num_blocks <span class="keyword">in</span> num_blocks_list:</span><br/><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(num_blocks):</span><br/><span class="line">            x = residual_block(x, <span class="number">64</span>)</span><br/><span class="line">    </span><br/><span class="line">    x = GlobalAveragePooling2D()(x)</span><br/><span class="line">    x = Dense(num_classes, activation=<span class="string">'softmax'</span>)(x)</span><br/><span class="line">    </span><br/><span class="line">    model = Model(inputs=input_layer, outputs=x)</span><br/><span class="line">    <span class="keyword">return</span> model</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 构建ResNet模型</span></span><br/><span class="line">input_shape = (<span class="number">224</span>, <span class="number">224</span>, <span class="number">3</span>)  <span class="comment"># 输入图像大小</span></span><br/><span class="line">num_classes = <span class="number">1000</span>  <span class="comment"># 分类类别数</span></span><br/><span class="line">num_blocks_list = [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>]  <span class="comment"># 每个stage的残差块数量</span></span><br/><span class="line">resnet_model = build_resnet(input_shape, num_classes, num_blocks_list)</span><br/><span class="line"></span><br/><span class="line"><span class="comment"># 打印模型结构</span></span><br/><span class="line">resnet_model.summary()</span><br/></pre></td></tr></table></figure>
+<p>在上述代码中，我们定义了一个<code>residual_block</code>函数来实现残差块的构建，然后使用<code>build_resnet</code>函数来构建简化版本的ResNet模型。通过设置不同的<code>num_blocks_list</code>，可以调整每个stage中的残差块数量。最终，我们打印出ResNet模型的结构概要。</p>
 
       
     </div>
@@ -702,7 +1083,7 @@ list1.add("3");
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/21202.html">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6463.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -720,7 +1101,7 @@ list1.add("3");
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/21202.html" class="post-title-link" itemprop="url">JAVA-EL-Spring 表达式语言</a>
+          <a href="/posts/6463.html" class="post-title-link" itemprop="url">hinge损失函数</a>
         </h2>
 
         <div class="post-meta-container">
@@ -731,7 +1112,7 @@ list1.add("3");
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-12-27 01:31:26" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:26+08:00">2022-12-27</time>
+      <time title="创建时间：2022-12-27 01:31:27" itemprop="dateCreated datePublished" datetime="2022-12-27T01:31:27+08:00">2022-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -739,7 +1120,7 @@ list1.add("3");
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
         </span>
     </span>
 
@@ -753,342 +1134,7 @@ list1.add("3");
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>EL-Spring 表达式语言，支持xml和注解中使用表达式，类似JSP 的EL 表达式，可以实现普通文件、网址、配置文件、系统环境变量的注入</p>
-<h2 id="示例"><a class="headerlink" href="#示例" title="示例"></a>示例</h2><pre><code>@PropertySource("classpath:application.properties")
-
-<p>@Value(“This is common string”) // 注入普通字符串<br/>private String normal;</p>
-<p>@Value(“#{systemProperties[‘os.name’]}”) // 注入操作系统属性<br/>private String osName;</p>
-<p>@Value(“#{T(java.lang.Math).random()*100.0}”) // 注入表达式结果<br/>private double randomNumber;</p>
-<p>@Value(“#{anotherService.property}”) // 注入其他Bean属性<br/>private String propfromAnother;</p>
-<p>@Value(“#{T(com.demo.el.spring_el_demo.DemoService).getCalc()*100}”) // 注入类static方法结果,支持运算处理<br/>private double result;</p>
-<p>@Value(“classpath:test.txt”) // 注入文件资源<br/>private Resource testFile;</p>
-<p>@Value(“<a href="http://www.baidu.com/" rel="noopener" target="_blank">http://www.baidu.com</a>“) // 注入网址资源<br/>private Resource testUrl;</p>
-<p>@Value(“${book.name}”) // 注入配置文件<br/>private String bookName;</p>
-<p>@Autowired<br/>private Environment environment;<br/></p></code></pre>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/343ed70.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/343ed70.html" class="post-title-link" itemprop="url">node常见错误处理</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-26 03:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T03:06:24+08:00">2021-09-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/node/" itemprop="url" rel="index"><span itemprop="name">node</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="npm-ERR-Refusing-to-delete"><a class="headerlink" href="#npm-ERR-Refusing-to-delete" title="npm ERR! Refusing to delete"></a>npm ERR! Refusing to delete</h2><p>删除node_modules,重新执行npm install</p>
-<h2 id="SyntaxError-Unexpected-token"><a class="headerlink" href="#SyntaxError-Unexpected-token" title="SyntaxError: Unexpected token"></a>SyntaxError: Unexpected token</h2><p>版本问题，找到匹配的版本</p>
-<h2 id="node-与-npm-版本不匹配"><a class="headerlink" href="#node-与-npm-版本不匹配" title="node 与 npm 版本不匹配"></a>node 与 npm 版本不匹配</h2><p><a href="https://nodejs.org/zh-cn/download/releases/" rel="noopener" target="_blank">https://nodejs.org/zh-cn/download/releases/</a></p>
-<h2 id="下载包超时问题"><a class="headerlink" href="#下载包超时问题" title="下载包超时问题"></a>下载包超时问题</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">npm config set registry https://registry.npm.taobao.org</span><br/></pre></td></tr></table></figure>
-<h2 id="npm-ERR-notsup-Unsupported-platform-for-x66-115-101-x76-101-x6e-x74-x73-x40-x31-x2e-48-x2e-x31-x34-wanted-“os”-“darwin”-“arch”-“any”"><a class="headerlink" href="#npm-ERR-notsup-Unsupported-platform-for-x66-115-101-x76-101-x6e-x74-x73-x40-x31-x2e-48-x2e-x31-x34-wanted-“os”-“darwin”-“arch”-“any”" title="npm ERR! notsup Unsupported platform for fsevents@1.0.14: wanted {“os”:“darwin”,“arch”:“any”}"></a>npm ERR! notsup Unsupported platform for <a href="mailto:fsevents@1.0.14">fsevents@1.0.14</a>: wanted {“os”:“darwin”,“arch”:“any”}</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/></pre></td><td class="code"><pre><span class="line">方法一 npm install-g npm@3.10.7 (更高版本会强制在window下安装fsevent，而fsevent只会在mac系统上可用)</span><br/><span class="line">方法二 删除pafsevent依赖</span><br/></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/4107aa29.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/4107aa29.html" class="post-title-link" itemprop="url">谷歌账号停用</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-26 03:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T03:06:24+08:00">2021-09-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/records/" itemprop="url" rel="index"><span itemprop="name">records</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="停用原因"><a class="headerlink" href="#停用原因" title="停用原因"></a>停用原因</h2><p>使用了代理，频繁的切换IP地区</p>
-<h2 id="申诉方法"><a class="headerlink" href="#申诉方法" title="申诉方法"></a>申诉方法</h2><p>登陆账号，按照提示申诉</p>
-<p>申诉模板</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/></pre></td><td class="code"><pre><span class="line">您好我的账户是xxxxx@gmail.com。我是中国区用户，必需使用vpn代理才能使用谷歌产品，可能由于vpn的不稳定和频繁切换造成账号异常被停用，这个账号对我很重要，希望您可以帮我解决一下，非常感谢。</span><br/><span class="line">Hello my account is xxxxx@gmail.com. I am a user in China, must use VPN proxy to use Google products, may be due to VPN instability and frequent switching caused by abnormal account deactivation, this account is very important to me, I hope you can help me solve it, thank you very much.</span><br/></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/6e63a28a.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/6e63a28a.html" class="post-title-link" itemprop="url">设置代理</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-26 03:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T03:06:24+08:00">2021-09-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="设置代理"><a class="headerlink" href="#设置代理" title="设置代理"></a>设置代理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line">git config --global http.proxy socks://127.0.0.1:10808</span><br/><span class="line">git config --global http.proxy http://127.0.0.1:10809</span><br/><span class="line">git config --global http.proxy https://127.0.0.1:10808</span><br/></pre></td></tr></table></figure>
-<h2 id="取消代理"><a class="headerlink" href="#取消代理" title="取消代理"></a>取消代理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">git config --global --unset http.proxy</span><br/></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/81df75d5.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Meng Qi">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Qi">
-      <meta itemprop="description" content="recording">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Qi">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/81df75d5.html" class="post-title-link" itemprop="url">Permission denied publickey</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-26 03:06:24" itemprop="dateCreated datePublished" datetime="2021-09-26T03:06:24+08:00">2021-09-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="查看全局配置"><a class="headerlink" href="#查看全局配置" title="查看全局配置"></a>查看全局配置</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line">git config --global --list</span><br/><span class="line">git config --global user.name "yourname"</span><br/><span class="line">git config --global user.email "email@email.com"</span><br/></pre></td></tr></table></figure>
-<h2 id="生成密钥"><a class="headerlink" href="#生成密钥" title="生成密钥"></a>生成密钥</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/><span class="line">2</span><br/><span class="line">3</span><br/></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C "email@email.com"</span><br/><span class="line"><span class="meta prompt_"></span></span><br/><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt; <span class="built_in">cat</span> /c/Users/Alan/.ssh/id_rsa.pub</span></span><br/></pre></td></tr></table></figure>
-<h2 id="配置github授权"><a class="headerlink" href="#配置github授权" title="配置github授权"></a>配置github授权</h2><p>GitHub—&gt;setting—&gt;SSH and GPG keys—&gt;SSH keys </p>
-<h2 id="测试是否生效"><a class="headerlink" href="#测试是否生效" title="测试是否生效"></a>测试是否生效</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br/></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br/></pre></td></tr></table></figure>
-
+          
       
     </div>
 
@@ -1107,7 +1153,7 @@ list1.add("3");
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/39/">39</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/17/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/46/">46</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/17/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

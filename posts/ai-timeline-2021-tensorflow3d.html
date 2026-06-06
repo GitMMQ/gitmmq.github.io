@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2021 年 Google TensorFlow3D 成为 3D 深度学习标准库：点云渲染、体素网格、NeRF 可微渲染。架构、自动驾驶应用与开源生态中英文详解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 AI 编年史：TensorFlow3D 点云与自动驾驶 3D 深度学习">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2021-tensorflow3d.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2021 年 Google TensorFlow3D 成为 3D 深度学习标准库：点云渲染、体素网格、NeRF 可微渲染。架构、自动驾驶应用与开源生态中英文详解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-08T02:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-08T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="3D Deep Learning">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="Autonomous Driving">
+<meta property="article:tag" content="Point Cloud">
+<meta property="article:tag" content="TensorFlow3D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2021-tensorflow3d.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2021-tensorflow3d.html","path":"posts/ai-timeline-2021-tensorflow3d.html","title":"2021 AI 编年史：TensorFlow3D 点云与自动驾驶 3D 深度学习"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2021 AI 编年史：TensorFlow3D 点云与自动驾驶 3D 深度学习 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2021-AI-%E7%BC%96%E5%B9%B4%E5%8F%B2%EF%BC%9ATensorFlow3D-TensorFlow3D-in-2021"><span class="nav-number">1.</span> <span class="nav-text">2021 AI 编年史：TensorFlow3D | TensorFlow3D in 2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A6%82%E8%BF%B0%E4%B8%8E%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86-Overview-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、概述与背景知识 | Overview &amp; Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、技术架构 | Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-TensorFlow3D-%E6%A8%A1%E5%9D%97%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 TensorFlow3D 模块架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%82%B9%E4%BA%91%E5%A4%84%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 点云处理流水线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%8F%AF%E5%BE%AE%E6%B8%B2%E6%9F%93%E6%A0%88"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 可微渲染栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%B8%8E-PyTorch3D-%E5%AF%B9%E6%AF%94"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 与 PyTorch3D 对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8F%91%E5%B1%95%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、发展趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9%E5%88%86%E6%9E%90-Pros-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点分析 | Pros &amp; Cons</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E4%B8%8E%E5%B7%A5%E5%85%B7-Open-Source-Tools"><span class="nav-number">1.6.</span> <span class="nav-text">六、开源项目与工具 | Open Source &amp; Tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE-References"><span class="nav-number">1.7.</span> <span class="nav-text">七、参考文献 | References</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2021-tensorflow3d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2021 AI 编年史：TensorFlow3D 点云与自动驾驶 3D 深度学习 | Qi">
+      <meta itemprop="description" content="2021 年 Google TensorFlow3D 成为 3D 深度学习标准库：点云渲染、体素网格、NeRF 可微渲染。架构、自动驾驶应用与开源生态中英文详解。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 AI 编年史：TensorFlow3D 点云与自动驾驶 3D 深度学习
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-08 10:00:00" itemprop="dateCreated datePublished" datetime="2021-08-08T10:00:00+08:00">2021-08-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2021 年 Google TensorFlow3D 成为 3D 深度学习标准库：点云渲染、体素网格、NeRF 可微渲染。架构、自动驾驶应用与开源生态中英文详解。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="2021-AI-编年史：TensorFlow3D-TensorFlow3D-in-2021"><a href="#2021-AI-编年史：TensorFlow3D-TensorFlow3D-in-2021" class="headerlink" title="2021 AI 编年史：TensorFlow3D | TensorFlow3D in 2021"></a>2021 AI 编年史：TensorFlow3D | TensorFlow3D in 2021</h1><hr>
+<h2 id="一、概述与背景知识-Overview-Background"><a href="#一、概述与背景知识-Overview-Background" class="headerlink" title="一、概述与背景知识 | Overview &amp; Background"></a>一、概述与背景知识 | Overview &amp; Background</h2><p><strong>English</strong></p>
+<p><strong>TensorFlow3D (TF3D)</strong> is Google Research’s open-source library for <strong>3D deep learning</strong> built on <strong>TensorFlow 2.x</strong>. Released and actively developed through 2020–2021, TF3D provides unified APIs for:</p>
+<ul>
+<li><strong>Point cloud</strong> processing (classification, segmentation)</li>
+<li><strong>Voxel grids</strong> and <strong>sparse 3D convolutions</strong></li>
+<li><strong>Mesh</strong> operations (sampling, normals, IO)</li>
+<li><strong>Differentiable rendering</strong> — bridging 3D geometry and 2D supervision</li>
+<li><strong>NeRF-style</strong> volumetric rendering primitives</li>
+</ul>
+<p>In 2021, TF3D became a <strong>reference implementation</strong> for autonomous driving research at Google&#x2F;Waymo and the broader 3D vision community — complementing <strong>PyTorch3D</strong> on the PyTorch side.</p>
+<p><strong>Key terms:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Differentiable rendering</strong></td>
+<td>Gradients flow through projection&#x2F;rasterization for end-to-end 3D learning</td>
+</tr>
+<tr>
+<td><strong>Voxel grid</strong></td>
+<td>3D occupancy grid discretizing space</td>
+</tr>
+<tr>
+<td><strong>Sparse tensor</strong></td>
+<td>Efficient representation storing only occupied voxels</td>
+</tr>
+<tr>
+<td><strong>Point cloud encoder</strong></td>
+<td>Network mapping unordered points to global features</td>
+</tr>
+<tr>
+<td><strong>Chamfer distance</strong></td>
+<td>Metric comparing two point sets</td>
+</tr>
+<tr>
+<td><strong>Waymo Open Dataset</strong></td>
+<td>Large-scale autonomous driving dataset (LiDAR + cameras)</td>
+</tr>
+<tr>
+<td><strong>TF2 eager execution</strong></td>
+<td>TensorFlow 2’s imperative mode matching PyTorch ergonomics</td>
+</tr>
+</tbody></table>
+<p><strong>中文</strong></p>
+<p><strong>TensorFlow3D（TF3D）</strong> 是 Google Research 基于 <strong>TensorFlow 2.x</strong> 的 <strong>3D 深度学习</strong> 开源库。2020–2021 年持续开发，提供统一 API：</p>
+<ul>
+<li><strong>点云</strong> 处理（分类、分割）</li>
+<li><strong>体素网格</strong> 与 <strong>稀疏 3D 卷积</strong></li>
+<li><strong>网格</strong> 操作（采样、法线、IO）</li>
+<li><strong>可微渲染</strong> — 连接 3D 几何与 2D 监督</li>
+<li><strong>NeRF 风格</strong> 体渲染原语</li>
+</ul>
+<p>2021 年 TF3D 成为 Google&#x2F;Waymo 及 3D 视觉社区的 <strong>参考实现</strong> — 与 PyTorch 生态的 <strong>PyTorch3D</strong> 形成对照。</p>
+<p><strong>核心术语：</strong></p>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>可微渲染</strong></td>
+<td>梯度穿过投影&#x2F;光栅化，实现端到端 3D 学习</td>
+</tr>
+<tr>
+<td><strong>体素网格</strong></td>
+<td>离散化空间的 3D 占据网格</td>
+</tr>
+<tr>
+<td><strong>稀疏张量</strong></td>
+<td>仅存储非空体素的高效表示</td>
+</tr>
+<tr>
+<td><strong>点云编码器</strong></td>
+<td>将无序点映射为全局特征的网络</td>
+</tr>
+<tr>
+<td><strong>Chamfer 距离</strong></td>
+<td>比较两个点集的 metric</td>
+</tr>
+<tr>
+<td><strong>Waymo Open Dataset</strong></td>
+<td>大规模自动驾驶数据集（LiDAR + 相机）</td>
+</tr>
+<tr>
+<td><strong>TF2 Eager 执行</strong></td>
+<td>TensorFlow 2 命令式模式，接近 PyTorch 体验</td>
+</tr>
+</tbody></table>
+<p>TF3D 降低 3D 深度学习 <strong>工程门槛</strong> — 研究者无需手写 CUDA 光栅化即可实验可微渲染 pipeline。</p>
+<hr>
+<h2 id="二、技术架构-Architecture"><a href="#二、技术架构-Architecture" class="headerlink" title="二、技术架构 | Architecture"></a>二、技术架构 | Architecture</h2><h3 id="2-1-TensorFlow3D-模块架构"><a href="#2-1-TensorFlow3D-模块架构" class="headerlink" title="2.1 TensorFlow3D 模块架构"></a>2.1 TensorFlow3D 模块架构</h3><pre><code class="highlight mermaid">flowchart TB
+  subgraph IO[&quot;3D IO Layer&quot;]
+    PC[PointCloud]
+    MS[Mesh]
+    VX[VoxelGrid]
+  end
+  subgraph Ops[&quot;Geometry Ops&quot;]
+    SM[Sampling]
+    NR[Normals]
+    NN[Nearest Neighbor]
+  end
+  subgraph Render[&quot;Differentiable Rendering&quot;]
+    RC[Rasterization]
+    RC2[Ray Casting]
+    NR2[NeRF Volume Rendering]
+  end
+  subgraph Models[&quot;Model Zoo&quot;]
+    PN[PointNet Encoders]
+    SC[Sparse 3D Conv UNet]
+    DR[Deep Implicit Functions]
+  end
+  subgraph Loss[&quot;Losses &amp; Metrics&quot;]
+    CD[Chamfer Distance]
+    EMD[Earth Mover Distance]
+  end
+  PC --&gt; SM
+  MS --&gt; NR
+  VX --&gt; SC
+  SM --&gt; PN
+  RC --&gt; DR
+  PN --&gt; CD
+  SC --&gt; Models</code></pre>
+
+<h3 id="2-2-点云处理流水线"><a href="#2-2-点云处理流水线" class="headerlink" title="2.2 点云处理流水线"></a>2.2 点云处理流水线</h3><p><strong>English</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Raw LiDAR (N × 3+)</span><br><span class="line">      ↓</span><br><span class="line">tf3d.utils.pointcloud.preprocess (normalize, subsample)</span><br><span class="line">      ↓</span><br><span class="line">PointNet / PointNet++ layer (tf3d.models)</span><br><span class="line">      ↓</span><br><span class="line">Global feature vector OR per-point features</span><br><span class="line">      ↓</span><br><span class="line">Task head: classification / semantic segmentation / detection</span><br></pre></td></tr></table></figure>
+
+<p>TF3D implements <strong>farthest point sampling</strong>, <strong>ball query grouping</strong>, and <strong>interpolated feature propagation</strong> — the PointNet++ hierarchy — as reusable TF layers with GPU acceleration.</p>
+<p><strong>中文</strong></p>
+<p>TF3D 将 <strong>最远点采样</strong>、<strong>球查询分组</strong>、<strong>插值特征传播</strong> 等 PointNet++ 层次实现为可复用 TF GPU 加速层。</p>
+<h3 id="2-3-可微渲染栈"><a href="#2-3-可微渲染栈" class="headerlink" title="2.3 可微渲染栈"></a>2.3 可微渲染栈</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">3D Scene Representation</span><br><span class="line">  ├── Mesh + Textures</span><br><span class="line">  ├── Point Cloud + Colors</span><br><span class="line">  └── Neural Field (NeRF)</span><br><span class="line">         ↓</span><br><span class="line">Camera Parameters (extrinsics, intrinsics)</span><br><span class="line">         ↓</span><br><span class="line">tf3d.renderer (differentiable)</span><br><span class="line">         ↓</span><br><span class="line">Rendered RGB / Depth / Silhouette</span><br><span class="line">         ↓</span><br><span class="line">Loss vs. Ground Truth Images (2D supervision for 3D learning)</span><br></pre></td></tr></table></figure>
+
+<p><strong>English</strong></p>
+<p>Differentiable rendering enables <strong>inverse graphics</strong> — optimize 3D shape&#x2F;appearance to match 2D observations — foundational for <strong>multi-view 3D reconstruction</strong> and <strong>autonomous driving simulation</strong>.</p>
+<p><strong>中文</strong></p>
+<p>可微渲染实现 <strong>逆图形学</strong> — 优化 3D 形状&#x2F;外观以匹配 2D 观测 — 是多视图 3D 重建与 <strong>自动驾驶仿真</strong> 的基础。</p>
+<h3 id="2-4-与-PyTorch3D-对比"><a href="#2-4-与-PyTorch3D-对比" class="headerlink" title="2.4 与 PyTorch3D 对比"></a>2.4 与 PyTorch3D 对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>TensorFlow3D</th>
+<th>PyTorch3D</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>后端</td>
+<td>TensorFlow 2.x</td>
+<td>PyTorch</td>
+</tr>
+<tr>
+<td>主要用户</td>
+<td>Google&#x2F;Waymo, TF 生态</td>
+<td>Meta, 学术界</td>
+</tr>
+<tr>
+<td>稀疏 3D 卷积</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>可微渲染</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>TF Lite 部署</td>
+<td>天然集成</td>
+<td>需转换</td>
+</tr>
+<tr>
+<td>2021 活跃度</td>
+<td>高</td>
+<td>高</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、发展趋势-Trends"><a href="#三、发展趋势-Trends" class="headerlink" title="三、发展趋势 | Trends"></a>三、发展趋势 | Trends</h2><p><strong>English</strong></p>
+<ol>
+<li><strong>3D as first-class DL modality</strong>: TF3D + PyTorch3D normalized 3D ops alongside Conv2D and Linear.</li>
+<li><strong>Autonomous driving integration</strong>: Waymo models used TF3D for <strong>LiDAR segmentation</strong> and <strong>3D object detection</strong> research.</li>
+<li><strong>NeRF explosion (2020–2021)</strong>: TF3D volumetric rendering utilities accelerated NeRF reproductions.</li>
+<li><strong>Simulation-to-real</strong>: Differentiable rendering for <strong>synthetic data</strong> generation with gradient-based domain adaptation.</li>
+<li><strong>Sparse convolution standardization</strong>: MinkowskiEngine-style ops wrapped in TF3D APIs.</li>
+<li><strong>Cross-framework competition</strong>: Healthy duplication with PyTorch3D drove rapid feature parity.</li>
+</ol>
+<p><strong>中文</strong></p>
+<ol>
+<li><strong>3D 成为一等 DL 模态</strong>：TF3D + PyTorch3D 将 3D 算子与 Conv2D、Linear 并列标准化。</li>
+<li><strong>自动驾驶集成</strong>：Waymo 用 TF3D 做 <strong>LiDAR 分割</strong> 与 <strong>3D 检测</strong> 研究。</li>
+<li><strong>NeRF 爆发</strong>：TF3D 体渲染工具加速 NeRF 复现。</li>
+<li><strong>仿真到真实</strong>：可微渲染生成 <strong>合成数据</strong> 并梯度域适配。</li>
+<li><strong>稀疏卷积标准化</strong>：MinkowskiEngine 风格算子封装进 TF3D API。</li>
+<li><strong>跨框架竞争</strong>：与 PyTorch3D 良性重复推动功能快速对齐。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点分析-Pros-Cons"><a href="#四、优缺点分析-Pros-Cons" class="headerlink" title="四、优缺点分析 | Pros &amp; Cons"></a>四、优缺点分析 | Pros &amp; Cons</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>优点 Advantages</th>
+<th>缺点 Disadvantages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>统一 API</strong></td>
+<td>点云&#x2F;网格&#x2F;体素&#x2F;渲染一体</td>
+<td>API 表面积大学习成本高</td>
+</tr>
+<tr>
+<td><strong>Google 背书</strong></td>
+<td>Waymo 级工程验证</td>
+<td>社区小于 PyTorch3D</td>
+</tr>
+<tr>
+<td><strong>TF 生态</strong></td>
+<td>TPU 训练、TF Lite 部署</td>
+<td>TF2 整体市场份额下降</td>
+</tr>
+<tr>
+<td><strong>可微渲染</strong></td>
+<td>研究友好</td>
+<td>性能低于专用 CUDA 渲染器</td>
+</tr>
+<tr>
+<td><strong>文档</strong></td>
+<td>官方 Colab 教程丰富</td>
+<td>复杂 pipeline 示例不足</td>
+</tr>
+<tr>
+<td><strong>维护</strong></td>
+<td>2021 活跃更新</td>
+<td>后续 PyTorch 主导 3D 研究</td>
+</tr>
+<tr>
+<td><strong>扩展</strong></td>
+<td>模块化 geometry ops</td>
+<td>自定义 op 需 C++ 绑定</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LiDAR 语义分割</strong></td>
+<td>自动驾驶点云逐点分类</td>
+</tr>
+<tr>
+<td><strong>3D 目标检测</strong></td>
+<td>从点云预测 3D bounding box</td>
+</tr>
+<tr>
+<td><strong>NeRF 重建</strong></td>
+<td>多视图新视角合成</td>
+</tr>
+<tr>
+<td><strong>机器人仿真</strong></td>
+<td>可微渲染优化 grasp pose</td>
+</tr>
+<tr>
+<td><strong>医学影像</strong></td>
+<td>CT&#x2F;MRI 体数据分割</td>
+</tr>
+<tr>
+<td><strong>AR 物体重建</strong></td>
+<td>手机多视图 mesh 优化</td>
+</tr>
+<tr>
+<td><strong>合成数据</strong></td>
+<td>仿真场景渲染训练数据</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、开源项目与工具-Open-Source-Tools"><a href="#六、开源项目与工具-Open-Source-Tools" class="headerlink" title="六、开源项目与工具 | Open Source &amp; Tools"></a>六、开源项目与工具 | Open Source &amp; Tools</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>tensorflow3d</strong></td>
+<td>Google 官方 TF3D 库</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/google-research/tensorflow3d">https://github.com/google-research/tensorflow3d</a></td>
+</tr>
+<tr>
+<td><strong>PyTorch3D</strong></td>
+<td>Meta 对标 3D 库</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/facebookresearch/pytorch3d">https://github.com/facebookresearch/pytorch3d</a></td>
+</tr>
+<tr>
+<td><strong>Open3D</strong></td>
+<td>通用 3D 数据处理</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/isl-org/Open3D">https://github.com/isl-org/Open3D</a></td>
+</tr>
+<tr>
+<td><strong>Waymo Open Dataset</strong></td>
+<td>自动驾驶 benchmark</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/waymo-research/waymo-open-dataset">https://github.com/waymo-research/waymo-open-dataset</a></td>
+</tr>
+<tr>
+<td><strong>MinkowskiEngine</strong></td>
+<td>稀疏 3D 卷积</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NVIDIA/MinkowskiEngine">https://github.com/NVIDIA/MinkowskiEngine</a></td>
+</tr>
+<tr>
+<td><strong>TensorFlow</strong></td>
+<td>TF2 核心框架</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/tensorflow/tensorflow">https://github.com/tensorflow/tensorflow</a></td>
+</tr>
+<tr>
+<td><strong>nerf-master</strong></td>
+<td>NeRF 原始实现（参考）</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/bmild/nerf">https://github.com/bmild/nerf</a></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、参考文献-References"><a href="#七、参考文献-References" class="headerlink" title="七、参考文献 | References"></a>七、参考文献 | References</h2><ol>
+<li>Google Research. <strong>TensorFlow3D Documentation.</strong> <a target="_blank" rel="noopener" href="https://www.tensorflow.org/graphics/tf3d">https://www.tensorflow.org/graphics/tf3d</a></li>
+<li>Mildenhall, B., et al. <strong>“NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis.”</strong> ECCV 2020. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2003.08934">https://arxiv.org/abs/2003.08934</a></li>
+<li>Qi, C.R., et al. <strong>“PointNet++: Deep Hierarchical Feature Learning on Point Sets.”</strong> NeurIPS 2017. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.02413">https://arxiv.org/abs/1706.02413</a></li>
+<li>Sun, P., et al. <strong>“Scalability in Perception for Autonomous Driving: Waymo Open Dataset.”</strong> CVPR 2020. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1912.04838">https://arxiv.org/abs/1912.04838</a></li>
+<li>Loper, M., &amp; Black, M.J. <strong>“OpenDR: An Approximate Differentiable Renderer.”</strong> ECCV 2014. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1405.0308">https://arxiv.org/abs/1405.0308</a></li>
+<li>Ravi, N., et al. <strong>“PyTorch3D: A Library for Deep Learning with 3D Data.”</strong> arXiv:2007.08501. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2007.08501">https://arxiv.org/abs/2007.08501</a></li>
+<li>TensorFlow 3D GitHub Repository. <a target="_blank" rel="noopener" href="https://github.com/google-research/tensorflow3d">https://github.com/google-research/tensorflow3d</a></li>
+</ol>
+<hr>
+<p><strong>English Summary</strong>: TensorFlow3D in 2021 standardized 3D deep learning on TensorFlow — providing point cloud, voxel, and differentiable rendering primitives that powered autonomous driving research and NeRF-era 3D vision.</p>
+<p><strong>中文总结</strong>：2021 年 TensorFlow3D 在 TensorFlow 上标准化 3D 深度学习 — 提供点云、体素与可微渲染原语，支撑自动驾驶研究与 NeRF 时代 3D 视觉。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Point-Cloud/" rel="tag"># Point Cloud</a>
+              <a href="/tags/TensorFlow3D/" rel="tag"># TensorFlow3D</a>
+              <a href="/tags/3D-Deep-Learning/" rel="tag"># 3D Deep Learning</a>
+              <a href="/tags/Autonomous-Driving/" rel="tag"># Autonomous Driving</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2021-pytorch-1-10.html" rel="prev" title="2021 AI 编年史：PyTorch 1.10 生态（TorchRec、FSDP、编译器前端）">
+                  <i class="fa fa-angle-left"></i> 2021 AI 编年史：PyTorch 1.10 生态（TorchRec、FSDP、编译器前端）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2021-paddlehelix-bio.html" rel="next" title="2021 AI 编年史：PaddleHelix 生物计算（蛋白质、药物发现、基因组）">
+                  2021 AI 编年史：PaddleHelix 生物计算（蛋白质、药物发现、基因组） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

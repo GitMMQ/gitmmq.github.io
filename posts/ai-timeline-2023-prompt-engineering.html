@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2023 年 AI 编年史：提示工程从暗知识变为显式方法论，涵盖 Zero-Shot、Few-Shot、CoT、角色设定与 Prompt 模板设计，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 AI 编年史：提示工程 Prompt Engineering">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2023-prompt-engineering.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2023 年 AI 编年史：提示工程从暗知识变为显式方法论，涵盖 Zero-Shot、Few-Shot、CoT、角色设定与 Prompt 模板设计，中英文对照。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-02-10T02:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-10T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="Chain-of-Thought">
+<meta property="article:tag" content="Few-Shot">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="Prompt Engineering">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2023-prompt-engineering.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2023-prompt-engineering.html","path":"posts/ai-timeline-2023-prompt-engineering.html","title":"2023 AI 编年史：提示工程 Prompt Engineering"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2023 AI 编年史：提示工程 Prompt Engineering | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2023-AI-%E7%BC%96%E5%B9%B4%E5%8F%B2%EF%BC%9A%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B-AI-Timeline-2023-Prompt-Engineering"><span class="nav-number">1.</span> <span class="nav-text">2023 AI 编年史：提示工程 | AI Timeline 2023: Prompt Engineering</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景 | Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、架构 | Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Prompt-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%9E%8B-Prompt-Structure-Model"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 Prompt 结构模型 | Prompt Structure Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A0%B8%E5%BF%83-Prompt-%E6%A8%A1%E5%BC%8F-Core-Prompt-Patterns"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 核心 Prompt 模式 | Core Prompt Patterns</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Prompt-%E5%B7%A5%E7%A8%8B%E5%B7%A5%E5%85%B7%E9%93%BE-Prompt-Engineering-Toolchain"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Prompt 工程工具链 | Prompt Engineering Toolchain</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9-Pros-and-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点 | Pros and Cons</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%BC%98%E7%82%B9-Advantages"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 优点 | Advantages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E7%BC%BA%E7%82%B9-Disadvantages"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 缺点 | Disadvantages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81GitHub-%E4%B8%8E%E5%BC%80%E6%BA%90%E7%94%9F%E6%80%81-GitHub-and-Open-Source"><span class="nav-number">1.6.</span> <span class="nav-text">六、GitHub 与开源生态 | GitHub and Open Source</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93-Summary"><span class="nav-number">1.7.</span> <span class="nav-text">七、总结 | Summary</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2023-prompt-engineering.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2023 AI 编年史：提示工程 Prompt Engineering | Qi">
+      <meta itemprop="description" content="2023 年 AI 编年史：提示工程从暗知识变为显式方法论，涵盖 Zero-Shot、Few-Shot、CoT、角色设定与 Prompt 模板设计，中英文对照。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2023 AI 编年史：提示工程 Prompt Engineering
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-10 10:00:00" itemprop="dateCreated datePublished" datetime="2023-02-10T10:00:00+08:00">2023-02-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/framework/" itemprop="url" rel="index"><span itemprop="name">framework</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2023 年 AI 编年史：提示工程从暗知识变为显式方法论，涵盖 Zero-Shot、Few-Shot、CoT、角色设定与 Prompt 模板设计，中英文对照。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="2023-AI-编年史：提示工程-AI-Timeline-2023-Prompt-Engineering"><a href="#2023-AI-编年史：提示工程-AI-Timeline-2023-Prompt-Engineering" class="headerlink" title="2023 AI 编年史：提示工程 | AI Timeline 2023: Prompt Engineering"></a>2023 AI 编年史：提示工程 | AI Timeline 2023: Prompt Engineering</h1><hr>
+<h2 id="一、背景-Background"><a href="#一、背景-Background" class="headerlink" title="一、背景 | Background"></a>一、背景 | Background</h2><p><strong>English</strong></p>
+<p>In <strong>February 2023</strong>, as millions experimented with ChatGPT, a new discipline crystallized: <strong>Prompt Engineering</strong> — the art and science of crafting inputs to elicit desired outputs from LLMs without changing model weights.</p>
+<p>Before prompt engineering, interacting with GPT-3 required ML expertise. ChatGPT democratized access, but users quickly discovered that vague prompts yield vague answers. By February, “prompt engineer” job postings appeared on LinkedIn, prompt marketplaces like PromptBase launched, and researchers published systematic studies on prompt design patterns.</p>
+<p>Key terms:</p>
+<ul>
+<li><strong>Prompt</strong>: The input text (instruction + context + examples) sent to an LLM.</li>
+<li><strong>Zero-Shot</strong>: Asking the model to perform a task with no examples — relying entirely on pretraining knowledge.</li>
+<li><strong>Few-Shot (In-Context Learning)</strong>: Providing 1–5 input-output examples in the prompt to guide behavior.</li>
+<li><strong>System Prompt</strong>: A persistent instruction that sets the model’s role, tone, and constraints.</li>
+<li><strong>Temperature</strong>: A sampling parameter controlling randomness (0 &#x3D; deterministic, 1 &#x3D; creative).</li>
+</ul>
+<p><strong>中文</strong></p>
+<p><strong>2023 年 2 月</strong>，当数百万人试用 ChatGPT 时，一门新学科结晶为 <strong>提示工程（Prompt Engineering）</strong>——在不改变模型权重的前提下，通过精心设计输入来引导 LLM 输出期望结果的艺术与科学。</p>
+<p>在提示工程出现之前，使用 GPT-3 需要 ML 专业知识。ChatGPT 降低了门槛，但用户很快发现模糊提示只会得到模糊回答。到 2 月，LinkedIn 上出现「提示工程师」招聘，PromptBase 等提示词市场上线，研究者发表系统性 Prompt 设计模式研究。</p>
+<p>关键词解释：</p>
+<ul>
+<li><strong>Prompt（提示词）</strong>：发送给 LLM 的输入文本（指令 + 上下文 + 示例）。</li>
+<li><strong>Zero-Shot（零样本）</strong>：不提供示例，完全依赖预训练知识完成任务。</li>
+<li><strong>Few-Shot（少样本&#x2F;上下文学习）</strong>：在 Prompt 中提供 1–5 个输入-输出示例引导行为。</li>
+<li><strong>System Prompt（系统提示）</strong>：设定模型角色、语气与约束的持久指令。</li>
+<li><strong>Temperature（温度）</strong>：控制采样随机性的参数（0 &#x3D; 确定性，1 &#x3D; 创造性）。</li>
+</ul>
+<hr>
+<h2 id="二、架构-Architecture"><a href="#二、架构-Architecture" class="headerlink" title="二、架构 | Architecture"></a>二、架构 | Architecture</h2><h3 id="2-1-Prompt-结构模型-Prompt-Structure-Model"><a href="#2-1-Prompt-结构模型-Prompt-Structure-Model" class="headerlink" title="2.1 Prompt 结构模型 | Prompt Structure Model"></a>2.1 Prompt 结构模型 | Prompt Structure Model</h3><p><strong>English</strong></p>
+<p>A well-engineered prompt follows a layered architecture:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  System Prompt（角色 / 约束 / 格式）   │</span><br><span class="line">├─────────────────────────────────────┤</span><br><span class="line">│  Context（背景知识 / RAG 检索结果）    │</span><br><span class="line">├─────────────────────────────────────┤</span><br><span class="line">│  Few-Shot Examples（可选示例）        │</span><br><span class="line">├─────────────────────────────────────┤</span><br><span class="line">│  User Query（用户实际问题）           │</span><br><span class="line">├─────────────────────────────────────┤</span><br><span class="line">│  Output Format Spec（JSON / Markdown）│</span><br><span class="line">└─────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>Design principles</strong>:</p>
+<ol>
+<li><strong>Be specific</strong>: “Summarize in 3 bullet points” beats “Summarize this.”</li>
+<li><strong>Assign a role</strong>: “You are a senior Python developer reviewing code.”</li>
+<li><strong>Specify format</strong>: “Return JSON with keys: title, summary, tags.”</li>
+<li><strong>Use delimiters</strong>: <code>&quot;&quot;&quot;</code>, <code>###</code>, XML tags to separate sections.</li>
+<li><strong>Chain prompts</strong>: Break complex tasks into sequential steps.</li>
+</ol>
+<p><strong>中文</strong></p>
+<p>精心设计的 Prompt 遵循分层架构：最上层为 <strong>System Prompt</strong>（角色&#x2F;约束&#x2F;格式），其下为 <strong>Context</strong>（背景知识或 RAG 检索结果），再下为可选 <strong>Few-Shot 示例</strong>，然后是 <strong>User Query</strong>，最底层指定 <strong>Output Format</strong>（JSON&#x2F;Markdown 等）。</p>
+<p>设计原则：① <strong>具体明确</strong>——「用 3 个要点总结」优于「总结」；② <strong>赋予角色</strong>——「你是资深 Python 开发者」；③ <strong>指定格式</strong>——「返回 JSON，键为 title、summary、tags」；④ <strong>使用分隔符</strong>——<code>&quot;&quot;&quot;</code>、<code>###</code>、XML 标签；⑤ <strong>链式 Prompt</strong>——复杂任务拆为顺序步骤。</p>
+<h3 id="2-2-核心-Prompt-模式-Core-Prompt-Patterns"><a href="#2-2-核心-Prompt-模式-Core-Prompt-Patterns" class="headerlink" title="2.2 核心 Prompt 模式 | Core Prompt Patterns"></a>2.2 核心 Prompt 模式 | Core Prompt Patterns</h3><table>
+<thead>
+<tr>
+<th>模式 Pattern</th>
+<th>说明 Description</th>
+<th>示例 Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Zero-Shot</strong></td>
+<td>无示例，直接指令</td>
+<td>“Translate to French: Hello”</td>
+</tr>
+<tr>
+<td><strong>Few-Shot</strong></td>
+<td>提供输入-输出对</td>
+<td>“English→Chinese: cat→猫, dog→?”</td>
+</tr>
+<tr>
+<td><strong>CoT</strong></td>
+<td>要求逐步推理</td>
+<td>“Let’s think step by step”</td>
+</tr>
+<tr>
+<td><strong>Role Prompting</strong></td>
+<td>设定专家角色</td>
+<td>“You are a patent attorney…”</td>
+</tr>
+<tr>
+<td><strong>Self-Consistency</strong></td>
+<td>多次采样取多数</td>
+<td>Generate 5 answers, pick most common</td>
+</tr>
+<tr>
+<td><strong>ReAct</strong></td>
+<td>推理 + 行动交替</td>
+<td>Thought → Action → Observation</td>
+</tr>
+<tr>
+<td><strong>Tree of Thoughts</strong></td>
+<td>分支探索多条路径</td>
+<td>Evaluate multiple reasoning branches</td>
+</tr>
+</tbody></table>
+<h3 id="2-3-Prompt-工程工具链-Prompt-Engineering-Toolchain"><a href="#2-3-Prompt-工程工具链-Prompt-Engineering-Toolchain" class="headerlink" title="2.3 Prompt 工程工具链 | Prompt Engineering Toolchain"></a>2.3 Prompt 工程工具链 | Prompt Engineering Toolchain</h3><p><strong>English</strong></p>
+<p>By mid-2023, a toolchain emerged around prompt development:</p>
+<ul>
+<li><strong>Playground UIs</strong>: OpenAI Playground, Anthropic Console for iterative testing</li>
+<li><strong>Prompt libraries</strong>: LangChain PromptTemplate, Guidance, LMQL</li>
+<li><strong>Evaluation</strong>: PromptBench, HELM benchmark for comparing prompt strategies</li>
+<li><strong>Version control</strong>: PromptLayer, Humanloop for tracking prompt versions in production</li>
+</ul>
+<p><strong>中文</strong></p>
+<p>到 2023 年中，围绕 Prompt 开发的工具链成型：OpenAI Playground 等 <strong>Playground UI</strong> 用于迭代测试；LangChain PromptTemplate 等 <strong>Prompt 库</strong> 提供模板化；PromptBench 等 <strong>评估框架</strong> 对比策略；PromptLayer 等 <strong>版本管理</strong> 工具追踪生产环境 Prompt 变更。</p>
+<hr>
+<h2 id="三、趋势-Trends"><a href="#三、趋势-Trends" class="headerlink" title="三、趋势 | Trends"></a>三、趋势 | Trends</h2><p><strong>English</strong></p>
+<p>February–March 2023 trends in prompt engineering:</p>
+<ol>
+<li><strong>Prompt as API design</strong>: Developers realized prompts are the new “API contracts” for LLM applications.</li>
+<li><strong>Structured output demand</strong>: JSON mode, function calling, and schema-constrained generation became essential.</li>
+<li><strong>Prompt injection awareness</strong>: Security researchers exposed how malicious inputs could override system prompts.</li>
+<li><strong>Multilingual prompting</strong>: Techniques for consistent quality across Chinese, English, Japanese, etc.</li>
+<li><strong>Automated prompt optimization</strong>: Tools like DSPy (Stanford) began automating prompt search.</li>
+</ol>
+<p><strong>中文</strong></p>
+<p>2023 年 2–3 月提示工程趋势：</p>
+<ol>
+<li><strong>Prompt 即 API 设计</strong>：开发者意识到 Prompt 是 LLM 应用的「新 API 契约」。</li>
+<li><strong>结构化输出需求</strong>：JSON 模式、Function Calling、Schema 约束生成成为刚需。</li>
+<li><strong>Prompt 注入意识</strong>：安全研究者揭示恶意输入可覆盖 System Prompt。</li>
+<li><strong>多语言 Prompt</strong>：跨中、英、日等语言保持一致质量的技术。</li>
+<li><strong>自动化 Prompt 优化</strong>：DSPy（Stanford）等工具开始自动化 Prompt 搜索。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点-Pros-and-Cons"><a href="#四、优缺点-Pros-and-Cons" class="headerlink" title="四、优缺点 | Pros and Cons"></a>四、优缺点 | Pros and Cons</h2><h3 id="4-1-优点-Advantages"><a href="#4-1-优点-Advantages" class="headerlink" title="4.1 优点 | Advantages"></a>4.1 优点 | Advantages</h3><ol>
+<li><strong>零成本适配</strong> — 无需微调即可改变模型行为 &#x2F; <strong>Zero-cost adaptation</strong> without fine-tuning</li>
+<li><strong>即时迭代</strong> — 修改 Prompt 秒级生效 &#x2F; <strong>Instant iteration</strong> — changes take effect immediately</li>
+<li><strong>可解释</strong> — Prompt 文本即文档 &#x2F; <strong>Interpretable</strong> — prompt text serves as documentation</li>
+<li><strong>可组合</strong> — 模块化 Prompt 模板可复用 &#x2F; <strong>Composable</strong> — modular templates reusable</li>
+<li><strong>低门槛</strong> — 非 ML 背景人员可上手 &#x2F; <strong>Low barrier</strong> — accessible to non-ML practitioners</li>
+</ol>
+<h3 id="4-2-缺点-Disadvantages"><a href="#4-2-缺点-Disadvantages" class="headerlink" title="4.2 缺点 | Disadvantages"></a>4.2 缺点 | Disadvantages</h3><ol>
+<li><strong>不稳定</strong> — 微小措辞变化导致输出剧变 &#x2F; <strong>Fragile</strong> — tiny wording changes cause output shifts</li>
+<li><strong>无版本保证</strong> — 模型更新可能破坏现有 Prompt &#x2F; <strong>No versioning guarantee</strong> — model updates break prompts</li>
+<li><strong>上下文浪费</strong> — Few-Shot 示例占用 token 预算 &#x2F; <strong>Context waste</strong> — examples consume token budget</li>
+<li><strong>难以规模化</strong> — 手工 Prompt 无法覆盖数百场景 &#x2F; <strong>Hard to scale</strong> — manual prompts don’t cover hundreds of scenarios</li>
+<li><strong>安全漏洞</strong> — Prompt 注入、越狱攻击 &#x2F; <strong>Security holes</strong> — injection and jailbreak attacks</li>
+<li><strong>天花板明显</strong> — 复杂推理仍需微调或 RAG &#x2F; <strong>Ceiling effect</strong> — complex reasoning needs fine-tuning or RAG</li>
+</ol>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>场景 Scenario</th>
+<th>Prompt 策略 Strategy</th>
+<th>中文说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代码生成</td>
+<td>Role + Format + Few-Shot</td>
+<td>设定开发者角色，指定语言与风格</td>
+</tr>
+<tr>
+<td>数据分析</td>
+<td>CoT + Structured Output</td>
+<td>逐步推理，输出 JSON 表格</td>
+</tr>
+<tr>
+<td>客服对话</td>
+<td>System Prompt + Context</td>
+<td>角色设定 + 产品知识注入</td>
+</tr>
+<tr>
+<td>内容审核</td>
+<td>Classification Prompt</td>
+<td>零样本分类：安全&#x2F;不安全</td>
+</tr>
+<tr>
+<td>文档摘要</td>
+<td>Zero-Shot + Length Constraint</td>
+<td>限制字数与要点数量</td>
+</tr>
+<tr>
+<td>多轮对话</td>
+<td>Memory + System Prompt</td>
+<td>上下文记忆 + 持久角色</td>
+</tr>
+<tr>
+<td>A&#x2F;B 测试</td>
+<td>Prompt Versioning</td>
+<td>对比不同 Prompt 版本的转化率</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、GitHub-与开源生态-GitHub-and-Open-Source"><a href="#六、GitHub-与开源生态-GitHub-and-Open-Source" class="headerlink" title="六、GitHub 与开源生态 | GitHub and Open Source"></a>六、GitHub 与开源生态 | GitHub and Open Source</h2><table>
+<thead>
+<tr>
+<th>项目 Project</th>
+<th>说明 Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain">langchain-ai&#x2F;langchain</a></td>
+<td>PromptTemplate、Few-Shot、Output Parser</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/guidance-ai/guidance">guidance-ai&#x2F;guidance</a></td>
+<td>约束生成语法，精确控制输出格式</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/stanfordnlp/dspy">stanfordnlp&#x2F;dspy</a></td>
+<td>声明式 Prompt 优化框架</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/microsoft/promptflow">microsoft&#x2F;promptflow</a></td>
+<td>可视化 Prompt 编排与评估</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/openai/openai-cookbook">openai&#x2F;openai-cookbook</a></td>
+<td>OpenAI 官方 Prompt 最佳实践</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、总结-Summary"><a href="#七、总结-Summary" class="headerlink" title="七、总结 | Summary"></a>七、总结 | Summary</h2><p><strong>中文</strong>：2023 年 2 月，提示工程从 ChatGPT 用户的「暗知识」上升为 LLM 应用开发的核心方法论。Zero-Shot、Few-Shot、CoT 等模式构成 Prompt 设计的基础工具箱，但脆弱性、安全漏洞与规模化难题也推动行业向 RAG、微调和 Agent 框架演进。</p>
+<p><strong>English</strong>: In February 2023, prompt engineering evolved from ChatGPT users’ tacit knowledge into a core methodology for LLM application development. Zero-Shot, Few-Shot, and CoT patterns form the foundational toolkit, but fragility, security vulnerabilities, and scaling challenges drove the industry toward RAG, fine-tuning, and Agent frameworks.</p>
+<hr>
+<p><strong>参考链接 | References</strong></p>
+<ul>
+<li>OpenAI: <a target="_blank" rel="noopener" href="https://platform.openai.com/docs/guides/prompt-engineering">Prompt Engineering Guide</a></li>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners (GPT-3)</a></li>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2201.11903">Chain-of-Thought Prompting</a></li>
+<li>Learn Prompting: <a target="_blank" rel="noopener" href="https://learnprompting.org/">learnprompting.org</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/Prompt-Engineering/" rel="tag"># Prompt Engineering</a>
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Few-Shot/" rel="tag"># Few-Shot</a>
+              <a href="/tags/Chain-of-Thought/" rel="tag"># Chain-of-Thought</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2023-llm-rlhf.html" rel="prev" title="2023 AI 编年史：ChatGPT 与 RLHF 三阶段对齐">
+                  <i class="fa fa-angle-left"></i> 2023 AI 编年史：ChatGPT 与 RLHF 三阶段对齐
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2023-long-context-window.html" rel="next" title="2023 AI 编年史：超长上下文窗口 128k+">
+                  2023 AI 编年史：超长上下文窗口 128k+ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

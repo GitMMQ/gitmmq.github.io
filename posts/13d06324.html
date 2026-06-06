@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison 中文 技能（Skills）是两个框架扩展 Agent「程序性记忆」的核心机制，但学习与治理路径截然不同：    维度 OpenClaw（龙虾） Hermes Agent     标准格式 agentskills.io 兼容 SKILL.md 同标准，">
+    <meta name="description" content="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析Agent Hermes &amp; OpenClaw: Skills System and Learning Loop — A Deep Dive 最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison中文 技能（Skills）是两个">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/13d06324.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison 中文 技能（Skills）是两个框架扩展 Agent「程序性记忆」的核心机制，但学习与治理路径截然不同：    维度 OpenClaw（龙虾） Hermes Agent     标准格式 agentskills.io 兼容 SKILL.md 同标准，">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析Agent Hermes &amp; OpenClaw: Skills System and Learning Loop — A Deep Dive 最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison中文 技能（Skills）是两个">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-05T18:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-05T18:00:00.000Z">
+<meta property="article:published_time" content="2026-06-06T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T02:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Hermes">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、SKILL.md 开放标准 | The agentskills.io Standard</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Deploy-to-Kubernetes"><span class="nav-number">3.</span> <span class="nav-text">Deploy to Kubernetes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#When-to-Use"><span class="nav-number">3.1.</span> <span class="nav-text">When to Use</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Procedure"><span class="nav-number">3.2.</span> <span class="nav-text">Procedure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text">三、OpenClaw 技能加载与优先级 | OpenClaw Skill Loading &amp; Precedence</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.4.</span> <span class="nav-text">四、ClawHub 与 Skill Workshop | ClawHub &amp; Skill Workshop</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.4.1.</span> <span class="nav-text">4.1 ClawHub 公共注册表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.4.2.</span> <span class="nav-text">4.2 Skill Workshop 提案队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.5.</span> <span class="nav-text">五、OpenClaw 技能 Token 成本公式 | OpenClaw Skill Token Cost Formula</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.6.</span> <span class="nav-text">六、Hermes 渐进式披露 | Hermes Progressive Disclosure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.7.</span> <span class="nav-text">七、Hermes 闭环学习（skill_manage）| Hermes Closed Learning Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.7.1.</span> <span class="nav-text">7.1 自动创建触发条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.7.2.</span> <span class="nav-text">7.2 skill_manage 工具操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.7.3.</span> <span class="nav-text">7.3 与记忆系统的协同</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.8.</span> <span class="nav-text">八、Skills Hub 与供应链安全 | Skills Hub &amp; Supply Chain Security</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.8.1.</span> <span class="nav-text">8.1 Hermes Skills Hub 来源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.8.2.</span> <span class="nav-text">8.2 信任等级与安全扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.8.3.</span> <span class="nav-text">8.3 Hermes Skill Bundles</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.9.</span> <span class="nav-text">九、学习路径对比与选型 | Learning Path Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.10.</span> <span class="nav-text">十、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.10.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.10.2.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.11.</span> <span class="nav-text">十一、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.12.</span> <span class="nav-text">十二、结语 | Conclusion</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw-%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E4%B8%8E%E5%AD%A6%E4%B9%A0%E9%97%AD%E7%8E%AF%E5%85%A8%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-OpenClaw-Skills-System-and-Learning-Loop-%E2%80%94-A-Deep-Dive"><span class="nav-number">2.</span> <span class="nav-text">Agent Hermes &amp; OpenClaw: Skills System and Learning Loop — A Deep Dive</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E5%AF%B9%E6%AF%94-Design-Philosophy-Comparison"><span class="nav-number">2.1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81SKILL-md-%E5%BC%80%E6%94%BE%E6%A0%87%E5%87%86-The-agentskills-io-Standard"><span class="nav-number">2.2.</span> <span class="nav-text">二、SKILL.md 开放标准 | The agentskills.io Standard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81OpenClaw-%E6%8A%80%E8%83%BD%E5%8A%A0%E8%BD%BD%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7-OpenClaw-Skill-Loading-Precedence"><span class="nav-number">2.3.</span> <span class="nav-text">三、OpenClaw 技能加载与优先级 | OpenClaw Skill Loading &amp; Precedence</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81ClawHub-%E4%B8%8E-Skill-Workshop-ClawHub-Skill-Workshop"><span class="nav-number">2.4.</span> <span class="nav-text">四、ClawHub 与 Skill Workshop | ClawHub &amp; Skill Workshop</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-ClawHub-%E5%85%AC%E5%85%B1%E6%B3%A8%E5%86%8C%E8%A1%A8"><span class="nav-number">2.4.1.</span> <span class="nav-text">4.1 ClawHub 公共注册表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Skill-Workshop-%E6%8F%90%E6%A1%88%E9%98%9F%E5%88%97"><span class="nav-number">2.4.2.</span> <span class="nav-text">4.2 Skill Workshop 提案队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81OpenClaw-%E6%8A%80%E8%83%BD-Token-%E6%88%90%E6%9C%AC%E5%85%AC%E5%BC%8F-OpenClaw-Skill-Token-Cost-Formula"><span class="nav-number">2.5.</span> <span class="nav-text">五、OpenClaw 技能 Token 成本公式 | OpenClaw Skill Token Cost Formula</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Hermes-%E6%B8%90%E8%BF%9B%E5%BC%8F%E6%8A%AB%E9%9C%B2-Hermes-Progressive-Disclosure"><span class="nav-number">2.6.</span> <span class="nav-text">六、Hermes 渐进式披露 | Hermes Progressive Disclosure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81Hermes-%E9%97%AD%E7%8E%AF%E5%AD%A6%E4%B9%A0%EF%BC%88skill-manage%EF%BC%89-Hermes-Closed-Learning-Loop"><span class="nav-number">2.7.</span> <span class="nav-text">七、Hermes 闭环学习（skill_manage）| Hermes Closed Learning Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E8%87%AA%E5%8A%A8%E5%88%9B%E5%BB%BA%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.7.1.</span> <span class="nav-text">7.1 自动创建触发条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-skill-manage-%E5%B7%A5%E5%85%B7%E6%93%8D%E4%BD%9C"><span class="nav-number">2.7.2.</span> <span class="nav-text">7.2 skill_manage 工具操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E4%B8%8E%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%8D%8F%E5%90%8C"><span class="nav-number">2.7.3.</span> <span class="nav-text">7.3 与记忆系统的协同</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81Skills-Hub-%E4%B8%8E%E4%BE%9B%E5%BA%94%E9%93%BE%E5%AE%89%E5%85%A8-Skills-Hub-Supply-Chain-Security"><span class="nav-number">2.8.</span> <span class="nav-text">八、Skills Hub 与供应链安全 | Skills Hub &amp; Supply Chain Security</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-Hermes-Skills-Hub-%E6%9D%A5%E6%BA%90"><span class="nav-number">2.8.1.</span> <span class="nav-text">8.1 Hermes Skills Hub 来源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-%E4%BF%A1%E4%BB%BB%E7%AD%89%E7%BA%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%89%AB%E6%8F%8F"><span class="nav-number">2.8.2.</span> <span class="nav-text">8.2 信任等级与安全扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-Hermes-Skill-Bundles"><span class="nav-number">2.8.3.</span> <span class="nav-text">8.3 Hermes Skill Bundles</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%AD%A6%E4%B9%A0%E8%B7%AF%E5%BE%84%E5%AF%B9%E6%AF%94%E4%B8%8E%E9%80%89%E5%9E%8B-Learning-Path-Comparison"><span class="nav-number">2.9.</span> <span class="nav-text">九、学习路径对比与选型 | Learning Path Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-Best-Practices"><span class="nav-number">2.10.</span> <span class="nav-text">十、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw"><span class="nav-number">2.10.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes-Agent"><span class="nav-number">2.10.2.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB-Further-Reading"><span class="nav-number">2.11.</span> <span class="nav-text">十一、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.12.</span> <span class="nav-text">十二、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 02:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T02:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 10:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T10:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,12 +292,11 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw-技能系统与学习闭环全解析"><a href="#Agent-Hermes-与-OpenClaw-技能系统与学习闭环全解析" class="headerlink" title="Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析"></a>Agent Hermes 与 OpenClaw 技能系统与学习闭环全解析</h1><h1 id="Agent-Hermes-OpenClaw-Skills-System-and-Learning-Loop-—-A-Deep-Dive"><a href="#Agent-Hermes-OpenClaw-Skills-System-and-Learning-Loop-—-A-Deep-Dive" class="headerlink" title="Agent Hermes &amp; OpenClaw: Skills System and Learning Loop — A Deep Dive"></a>Agent Hermes &amp; OpenClaw: Skills System and Learning Loop — A Deep Dive</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr/>
-<h2>一、设计哲学对比 | Design Philosophy Comparison</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="一、设计哲学对比-Design-Philosophy-Comparison"><a href="#一、设计哲学对比-Design-Philosophy-Comparison" class="headerlink" title="一、设计哲学对比 | Design Philosophy Comparison"></a>一、设计哲学对比 | Design Philosophy Comparison</h2><p><strong>中文</strong></p>
 <p>技能（Skills）是两个框架扩展 Agent「程序性记忆」的核心机制，但学习与治理路径截然不同：</p>
 <table>
 <thead>
@@ -307,15 +306,14 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>标准格式</td>
-<td><a target="_blank" rel="noopener" href="https://agentskills.io">agentskills.io</a> 兼容 <code>SKILL.md</code></td>
+<td><a target="_blank" rel="noopener" href="https://agentskills.io/">agentskills.io</a> 兼容 <code>SKILL.md</code></td>
 <td>同标准，外加 Hermes 扩展 metadata</td>
 </tr>
 <tr>
 <td>技能来源</td>
-<td>用户/社区/ClawHub 手动安装</td>
+<td>用户&#x2F;社区&#x2F;ClawHub 手动安装</td>
 <td>自动生成 + Skills Hub + 手动</td>
 </tr>
 <tr>
@@ -338,8 +336,7 @@
 <td>无原生 bundle</td>
 <td><code>skill-bundles/</code> YAML 组合</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Skills are the core mechanism for procedural memory in both frameworks, but learning and governance paths diverge sharply:</p>
 <table>
@@ -350,15 +347,14 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Standard format</td>
-<td><a target="_blank" rel="noopener" href="https://agentskills.io">agentskills.io</a>-compatible <code>SKILL.md</code></td>
+<td><a target="_blank" rel="noopener" href="https://agentskills.io/">agentskills.io</a>-compatible <code>SKILL.md</code></td>
 <td>Same standard + Hermes metadata extensions</td>
 </tr>
 <tr>
 <td>Skill sources</td>
-<td>User/community/ClawHub manual install</td>
+<td>User&#x2F;community&#x2F;ClawHub manual install</td>
 <td>Auto-generate + Skills Hub + manual</td>
 </tr>
 <tr>
@@ -381,26 +377,12 @@
 <td>No native bundle</td>
 <td><code>skill-bundles/</code> YAML groups</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>二、SKILL.md 开放标准 | The agentskills.io Standard</h2>
-<p><strong>中文</strong></p>
+</tbody></table>
+<hr>
+<h2 id="二、SKILL-md-开放标准-The-agentskills-io-Standard"><a href="#二、SKILL-md-开放标准-The-agentskills-io-Standard" class="headerlink" title="二、SKILL.md 开放标准 | The agentskills.io Standard"></a>二、SKILL.md 开放标准 | The agentskills.io Standard</h2><p><strong>中文</strong></p>
 <p>两个框架均遵循 <strong>Agent Skills</strong> 开放标准：每个技能是一个目录，内含带 YAML frontmatter 的 <code>SKILL.md</code> 正文。</p>
-<pre><code class="language-markdown">---
-name: deploy-k8s
-description: Deploy services to Kubernetes with rollout verification
-version: 1.0.0
-metadata:
-  {"openclaw": {"requires": {"bins": ["kubectl"], "env": ["KUBECONFIG"]}}}
----
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">name: deploy-k8s</span><br><span class="line">description: Deploy services to Kubernetes with rollout verification</span><br><span class="line">version: 1.0.0</span><br><span class="line">metadata:</span><br><span class="line"><span class="section">  &#123;&quot;openclaw&quot;: &#123;&quot;requires&quot;: &#123;&quot;bins&quot;: [&quot;kubectl&quot;], &quot;env&quot;: [&quot;KUBECONFIG&quot;]&#125;&#125;&#125;</span></span><br><span class="line"><span class="section">---</span></span><br><span class="line"></span><br><span class="line"><span class="section"># Deploy to Kubernetes</span></span><br><span class="line"></span><br><span class="line"><span class="section">## When to Use</span></span><br><span class="line">User asks to deploy, roll out, or verify a K8s service.</span><br><span class="line"></span><br><span class="line"><span class="section">## Procedure</span></span><br><span class="line"><span class="bullet">1.</span> Validate manifest with <span class="code">`kubectl apply --dry-run=client`</span></span><br><span class="line"><span class="bullet">2.</span> Apply and watch rollout status</span><br><span class="line"><span class="bullet">3.</span> Run smoke checks against the service endpoint</span><br></pre></td></tr></table></figure>
 
-<h1 id="Deploy-to-Kubernetes"><a href="#Deploy-to-Kubernetes" class="headerlink" title="Deploy to Kubernetes"></a>Deploy to Kubernetes</h1><h2 id="When-to-Use"><a href="#When-to-Use" class="headerlink" title="When to Use"></a>When to Use</h2><p>User asks to deploy, roll out, or verify a K8s service.</p>
-<h2 id="Procedure"><a href="#Procedure" class="headerlink" title="Procedure"></a>Procedure</h2><ol>
-<li>Validate manifest with <code>kubectl apply --dry-run=client</code></li>
-<li>Apply and watch rollout status</li>
-<li>Run smoke checks against the service endpoint<br></code></pre></li>
-</ol>
 <p><strong>关键约定</strong>：</p>
 <table>
 <thead>
@@ -410,8 +392,7 @@ metadata:
 <th>作用</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>name</code></td>
 <td>✅</td>
 <td>技能标识、斜杠命令、allowlist 键</td>
@@ -424,33 +405,32 @@ metadata:
 <tr>
 <td><code>metadata.openclaw</code></td>
 <td>可选</td>
-<td>OpenClaw 门控（bins/env/config/os）</td>
+<td>OpenClaw 门控（bins&#x2F;env&#x2F;config&#x2F;os）</td>
 </tr>
 <tr>
 <td><code>metadata.hermes</code></td>
 <td>可选</td>
 <td>Hermes 分类、条件激活、config 设置</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>OpenClaw frontmatter 解析器仅支持<strong>单行键</strong>；<code>metadata</code> 必须是单行 JSON。Hermes 额外支持 <code>platforms</code>、<code>required_environment_variables</code>、<code>fallback_for_toolsets</code> 等扩展。</p>
 <p><strong>English</strong></p>
 <p>Both frameworks follow the <strong>Agent Skills</strong> open standard: each skill is a directory containing <code>SKILL.md</code> with YAML frontmatter and a markdown body.</p>
-<p>Key conventions: <code>name</code> and <code>description</code> are required; <code>metadata.openclaw</code> gates skills by bins/env/config/OS on OpenClaw; Hermes adds <code>platforms</code>, <code>required_environment_variables</code>, and conditional activation fields. OpenClaw's parser accepts single-line keys only; <code>metadata</code> must be a single-line JSON object.</p>
-<hr/>
-<h2>三、OpenClaw 技能加载与优先级 | OpenClaw Skill Loading &amp; Precedence</h2>
-<p><strong>中文</strong></p>
+<p>Key conventions: <code>name</code> and <code>description</code> are required; <code>metadata.openclaw</code> gates skills by bins&#x2F;env&#x2F;config&#x2F;OS on OpenClaw; Hermes adds <code>platforms</code>, <code>required_environment_variables</code>, and conditional activation fields. OpenClaw’s parser accepts single-line keys only; <code>metadata</code> must be a single-line JSON object.</p>
+<hr>
+<h2 id="三、OpenClaw-技能加载与优先级-OpenClaw-Skill-Loading-Precedence"><a href="#三、OpenClaw-技能加载与优先级-OpenClaw-Skill-Loading-Precedence" class="headerlink" title="三、OpenClaw 技能加载与优先级 | OpenClaw Skill Loading &amp; Precedence"></a>三、OpenClaw 技能加载与优先级 | OpenClaw Skill Loading &amp; Precedence</h2><p><strong>中文</strong></p>
 <p>OpenClaw 从多个根目录发现技能，<strong>同名技能以高优先级来源覆盖低优先级</strong>：</p>
-<pre><code class="mermaid">flowchart TB
-    subgraph Priority["加载优先级（高 → 低）"]
-        W["1. workspace/skills"]
-        P["2. workspace/.agents/skills"]
-        A["3. ~/.agents/skills"]
-        M["4. ~/.openclaw/skills"]
-        B["5. bundled skills"]
-        E["6. skills.load.extraDirs + 插件"]
+<pre><code class="highlight mermaid">flowchart TB
+    subgraph Priority[&quot;加载优先级（高 → 低）&quot;]
+        W[&quot;1. workspace/skills&quot;]
+        P[&quot;2. workspace/.agents/skills&quot;]
+        A[&quot;3. ~/.agents/skills&quot;]
+        M[&quot;4. ~/.openclaw/skills&quot;]
+        B[&quot;5. bundled skills&quot;]
+        E[&quot;6. skills.load.extraDirs + 插件&quot;]
     end
     W --&gt; P --&gt; A --&gt; M --&gt; B --&gt; E</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -460,8 +440,7 @@ metadata:
 <th>可见范围</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>1（最高）</td>
 <td>Workspace</td>
 <td><code>&lt;workspace&gt;/skills</code></td>
@@ -481,7 +460,7 @@ metadata:
 </tr>
 <tr>
 <td>4</td>
-<td>Managed/local</td>
+<td>Managed&#x2F;local</td>
 <td><code>~/.openclaw/skills</code></td>
 <td>本机所有 Agent</td>
 </tr>
@@ -497,22 +476,17 @@ metadata:
 <td><code>skills.load.extraDirs</code></td>
 <td>可配置</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>安装命令</strong>：</p>
-<pre><code class="language-bash">openclaw skills install &lt;slug&gt;              # 安装到当前 workspace/skills/
-openclaw skills install &lt;slug&gt; --global     # 安装到 ~/.openclaw/skills/
-openclaw skills update --all                # 更新 ClawHub 来源技能
-</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openclaw skills install &lt;slug&gt;              <span class="comment"># 安装到当前 workspace/skills/</span></span><br><span class="line">openclaw skills install &lt;slug&gt; --global     <span class="comment"># 安装到 ~/.openclaw/skills/</span></span><br><span class="line">openclaw skills update --all                <span class="comment"># 更新 ClawHub 来源技能</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>门控（Gating）</strong>：加载时根据 <code>metadata.openclaw.requires</code> 过滤——缺失二进制、环境变量或配置项的技能不会进入 eligible 列表。<code>always: true</code> 可跳过所有门控。</p>
 <p><strong>会话快照</strong>：会话启动时对 eligible 技能拍快照，同会话后续轮次复用；<code>skills.load.watch: true</code> 时 <code>SKILL.md</code> 变更会在下一轮刷新。</p>
 <p><strong>English</strong></p>
-<p>OpenClaw discovers skills from multiple roots; same-named skills are overridden by higher-precedence sources. Priority: workspace → project <code>.agents/skills</code> → <code>~/.agents/skills</code> → <code>~/.openclaw/skills</code> → bundled → <code>extraDirs</code> + plugins. Install with <code>openclaw skills install</code>; use <code>--global</code> for shared managed dir. Gating filters by bins/env/config at load time. Session snapshots reuse the eligible list until refresh on new session or watcher bump.</p>
-<hr/>
-<h2>四、ClawHub 与 Skill Workshop | ClawHub &amp; Skill Workshop</h2>
-<p><strong>中文</strong></p>
-<h3>4.1 ClawHub 公共注册表</h3>
-<p><a target="_blank" rel="noopener" href="https://clawhub.ai">ClawHub</a> 是 OpenClaw 的公共技能市场：</p>
+<p>OpenClaw discovers skills from multiple roots; same-named skills are overridden by higher-precedence sources. Priority: workspace → project <code>.agents/skills</code> → <code>~/.agents/skills</code> → <code>~/.openclaw/skills</code> → bundled → <code>extraDirs</code> + plugins. Install with <code>openclaw skills install</code>; use <code>--global</code> for shared managed dir. Gating filters by bins&#x2F;env&#x2F;config at load time. Session snapshots reuse the eligible list until refresh on new session or watcher bump.</p>
+<hr>
+<h2 id="四、ClawHub-与-Skill-Workshop-ClawHub-Skill-Workshop"><a href="#四、ClawHub-与-Skill-Workshop-ClawHub-Skill-Workshop" class="headerlink" title="四、ClawHub 与 Skill Workshop | ClawHub &amp; Skill Workshop"></a>四、ClawHub 与 Skill Workshop | ClawHub &amp; Skill Workshop</h2><p><strong>中文</strong></p>
+<h3 id="4-1-ClawHub-公共注册表"><a href="#4-1-ClawHub-公共注册表" class="headerlink" title="4.1 ClawHub 公共注册表"></a>4.1 ClawHub 公共注册表</h3><p><a target="_blank" rel="noopener" href="https://clawhub.ai/">ClawHub</a> 是 OpenClaw 的公共技能市场：</p>
 <table>
 <thead>
 <tr>
@@ -520,8 +494,7 @@ openclaw skills update --all                # 更新 ClawHub 来源技能
 <th>命令</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>安装到工作区</td>
 <td><code>openclaw skills install &lt;slug&gt;</code></td>
 </tr>
@@ -534,15 +507,13 @@ openclaw skills update --all                # 更新 ClawHub 来源技能
 <td><code>openclaw skills verify &lt;slug&gt;</code></td>
 </tr>
 <tr>
-<td>发布/同步</td>
+<td>发布&#x2F;同步</td>
 <td><code>clawhub sync --all</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>ClawHub 技能页展示 VirusTotal、ClawScan、静态分析等安全扫描状态。安装时记录 <code>.clawhub/origin.json</code> 用于后续 verify。</p>
-<h3>4.2 Skill Workshop 提案队列</h3>
-<p>OpenClaw 的<strong>治理型学习路径</strong>：Agent 不直接写活跃 <code>SKILL.md</code>，而是先创建 <code>PROPOSAL.md</code> 提案。</p>
-<pre><code class="mermaid">stateDiagram-v2
+<h3 id="4-2-Skill-Workshop-提案队列"><a href="#4-2-Skill-Workshop-提案队列" class="headerlink" title="4.2 Skill Workshop 提案队列"></a>4.2 Skill Workshop 提案队列</h3><p>OpenClaw 的<strong>治理型学习路径</strong>：Agent 不直接写活跃 <code>SKILL.md</code>，而是先创建 <code>PROPOSAL.md</code> 提案。</p>
+<pre><code class="highlight mermaid">stateDiagram-v2
     [*] --&gt; pending: Agent 起草提案
     pending --&gt; applied: 人工/策略 apply
     pending --&gt; rejected: reject
@@ -551,28 +522,25 @@ openclaw skills update --all                # 更新 ClawHub 来源技能
     applied --&gt; [*]: 写入 SKILL.md
     rejected --&gt; [*]
     quarantined --&gt; [*]</code></pre>
+
 <p><strong>核心规则</strong>：</p>
 <ul>
 <li><strong>提案优先</strong>：生成内容存为 <code>PROPOSAL.md</code>，非 <code>SKILL.md</code></li>
-<li><strong>Apply 是唯一活写</strong>：create/update/revise 不改动活跃技能</li>
+<li><strong>Apply 是唯一活写</strong>：create&#x2F;update&#x2F;revise 不改动活跃技能</li>
 <li><strong>Hash 绑定</strong>：update 提案绑定目标技能当前 hash，过期变 stale</li>
 <li><strong>扫描门控</strong>：apply 前重新运行安全扫描</li>
-<li><strong>审批策略</strong>：默认 <code>approvalPolicy: "pending"</code>；<code>"auto"</code> 跳过人工确认</li>
+<li><strong>审批策略</strong>：默认 <code>approvalPolicy: &quot;pending&quot;</code>；<code>&quot;auto&quot;</code> 跳过人工确认</li>
 </ul>
-<pre><code class="language-bash">openclaw skills workshop list
-openclaw skills workshop inspect &lt;proposal-id&gt;
-openclaw skills workshop apply &lt;proposal-id&gt;
-openclaw skills workshop reject &lt;proposal-id&gt; --reason "Not reusable"
-</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">openclaw skills workshop list</span><br><span class="line">openclaw skills workshop inspect &lt;proposal-id&gt;</span><br><span class="line">openclaw skills workshop apply &lt;proposal-id&gt;</span><br><span class="line">openclaw skills workshop reject &lt;proposal-id&gt; --reason <span class="string">&quot;Not reusable&quot;</span></span><br></pre></td></tr></table></figure>
+
 <p><code>skills.workshop.autonomous.enabled: false</code>（默认）控制是否在成功回合后自动起草提案。</p>
 <p><strong>English</strong></p>
-<p>ClawHub is OpenClaw's public skill registry with install, verify, and publish flows. Skill Workshop is the governed learning path: agents draft <code>PROPOSAL.md</code> instead of writing live <code>SKILL.md</code>. Lifecycle: pending → applied/rejected/quarantined/stale. Apply is the only live write; hash binding and scanner gating protect integrity. CLI: <code>openclaw skills workshop list/inspect/apply/reject</code>.</p>
-<hr/>
-<h2>五、OpenClaw 技能 Token 成本公式 | OpenClaw Skill Token Cost Formula</h2>
-<p><strong>中文</strong></p>
+<p>ClawHub is OpenClaw’s public skill registry with install, verify, and publish flows. Skill Workshop is the governed learning path: agents draft <code>PROPOSAL.md</code> instead of writing live <code>SKILL.md</code>. Lifecycle: pending → applied&#x2F;rejected&#x2F;quarantined&#x2F;stale. Apply is the only live write; hash binding and scanner gating protect integrity. CLI: <code>openclaw skills workshop list/inspect/apply/reject</code>.</p>
+<hr>
+<h2 id="五、OpenClaw-技能-Token-成本公式-OpenClaw-Skill-Token-Cost-Formula"><a href="#五、OpenClaw-技能-Token-成本公式-OpenClaw-Skill-Token-Cost-Formula" class="headerlink" title="五、OpenClaw 技能 Token 成本公式 | OpenClaw Skill Token Cost Formula"></a>五、OpenClaw 技能 Token 成本公式 | OpenClaw Skill Token Cost Formula</h2><p><strong>中文</strong></p>
 <p>OpenClaw 将 eligible 技能编译为紧凑 <strong>XML 块</strong>注入系统提示词（仅元数据，全文通过 <code>read</code> 按需加载）：</p>
-<pre><code class="language-text">total_chars = 195 + Σ (97 + len(name) + len(description) + len(filepath))
-</code></pre>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total_chars = 195 + Σ (97 + len(name) + len(description) + len(filepath))</span><br></pre></td></tr></table></figure>
+
 <table>
 <thead>
 <tr>
@@ -580,8 +548,7 @@ openclaw skills workshop reject &lt;proposal-id&gt; --reason "Not reusable"
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>基础开销 195</td>
 <td>仅当 ≥1 个技能时计入</td>
 </tr>
@@ -595,13 +562,12 @@ openclaw skills workshop reject &lt;proposal-id&gt; --reason "Not reusable"
 </tr>
 <tr>
 <td>Token 估算</td>
-<td>~4 字符/token → 每技能约 24 tokens + 字段长度</td>
+<td>~4 字符&#x2F;token → 每技能约 24 tokens + 字段长度</td>
 </tr>
-</tbody>
-</table>
-<p><strong>示例</strong>：50 个技能，平均 name=12、description=80、filepath=40：</p>
-<pre><code class="language-text">total ≈ 195 + 50 × (97 + 12 + 80 + 40) = 195 + 11,450 ≈ 11,645 字符 ≈ ~2,900 tokens
-</code></pre>
+</tbody></table>
+<p><strong>示例</strong>：50 个技能，平均 name&#x3D;12、description&#x3D;80、filepath&#x3D;40：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total ≈ 195 + 50 × (97 + 12 + 80 + 40) = 195 + 11,450 ≈ 11,645 字符 ≈ ~2,900 tokens</span><br></pre></td></tr></table></figure>
+
 <p><strong>优化建议</strong>：</p>
 <ul>
 <li>保持 <code>description</code> 简短（影响每技能成本）</li>
@@ -611,16 +577,13 @@ openclaw skills workshop reject &lt;proposal-id&gt; --reason "Not reusable"
 <li>禁用不需要的 bundled 技能：<code>skills.entries.&lt;name&gt;.enabled: false</code></li>
 </ul>
 <p><strong>English</strong></p>
-<p>Eligible skills compile into a compact XML block in the system prompt (metadata only; full instructions loaded on demand via <code>read</code>). Formula: <code>total = 195 + Σ(97 + len(name) + len(description) + len(filepath))</code>. Base 195 chars when ≥1 skill; ~97 chars wrapper per skill plus field lengths. At ~4 chars/token, expect ~24 tokens/skill before fields. Trim descriptions, use allowlists, set <code>maxSkillsPromptChars</code>, and run <code>/context detail</code> to diagnose.</p>
-<hr/>
-<h2>六、Hermes 渐进式披露 | Hermes Progressive Disclosure</h2>
-<p><strong>中文</strong></p>
+<p>Eligible skills compile into a compact XML block in the system prompt (metadata only; full instructions loaded on demand via <code>read</code>). Formula: <code>total = 195 + Σ(97 + len(name) + len(description) + len(filepath))</code>. Base 195 chars when ≥1 skill; ~97 chars wrapper per skill plus field lengths. At ~4 chars&#x2F;token, expect ~24 tokens&#x2F;skill before fields. Trim descriptions, use allowlists, set <code>maxSkillsPromptChars</code>, and run <code>/context detail</code> to diagnose.</p>
+<hr>
+<h2 id="六、Hermes-渐进式披露-Hermes-Progressive-Disclosure"><a href="#六、Hermes-渐进式披露-Hermes-Progressive-Disclosure" class="headerlink" title="六、Hermes 渐进式披露 | Hermes Progressive Disclosure"></a>六、Hermes 渐进式披露 | Hermes Progressive Disclosure</h2><p><strong>中文</strong></p>
 <p>Hermes 将技能作为<strong>第四层程序性记忆</strong>，采用三级渐进式披露控制 Token：</p>
-<pre><code class="language-text">Level 0: skills_list()           → [{name, description, category}]   (~3k tokens)
-Level 1: skill_view(name)        → 完整 SKILL.md + metadata            (按需)
-Level 2: skill_view(name, path)  → references/ 等附属文件              (按需)
-</code></pre>
-<pre><code class="mermaid">sequenceDiagram
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Level 0: skills_list()           → [&#123;name, description, category&#125;]   (~3k tokens)</span><br><span class="line">Level 1: skill_view(name)        → 完整 SKILL.md + metadata            (按需)</span><br><span class="line">Level 2: skill_view(name, path)  → references/ 等附属文件              (按需)</span><br></pre></td></tr></table></figure>
+
+<pre><code class="highlight mermaid">sequenceDiagram
     participant U as 用户
     participant A as AIAgent
     participant S as Skill Index
@@ -634,24 +597,22 @@ Level 2: skill_view(name, path)  → references/ 等附属文件              (�
         A-&gt;&gt;F: skill_view(name, path) — Level 2
     end
     A-&gt;&gt;U: 按技能指引执行</code></pre>
-<p><strong>效果</strong>：技能库从 40 个增长到 200 个，Level 0 成本几乎不变（~3k tokens）；仅实际使用的技能产生 Level 1/2 开销。</p>
+
+<p><strong>效果</strong>：技能库从 40 个增长到 200 个，Level 0 成本几乎不变（~3k tokens）；仅实际使用的技能产生 Level 1&#x2F;2 开销。</p>
 <p>技能索引属于 Prompt <strong>stable tier</strong>（与 SOUL、工具指引同层），保证前缀缓存友好；全文加载通过工具调用注入对话，不污染系统提示词前缀。</p>
 <p><strong>English</strong></p>
 <p>Hermes treats skills as fourth-layer procedural memory with three disclosure levels: Level 0 index (~3k tokens at session start), Level 1 full <code>SKILL.md</code> on demand, Level 2 reference files on demand. Libraries can grow from 40 to 200 skills with near-flat Level 0 cost. The index lives in the stable prompt tier; full content loads via tool calls without mutating the cached prefix.</p>
-<hr/>
-<h2>七、Hermes 闭环学习（skill_manage）| Hermes Closed Learning Loop</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="七、Hermes-闭环学习（skill-manage）-Hermes-Closed-Learning-Loop"><a href="#七、Hermes-闭环学习（skill-manage）-Hermes-Closed-Learning-Loop" class="headerlink" title="七、Hermes 闭环学习（skill_manage）| Hermes Closed Learning Loop"></a>七、Hermes 闭环学习（skill_manage）| Hermes Closed Learning Loop</h2><p><strong>中文</strong></p>
 <p>Hermes 最核心的差异化能力：任务完成后 Agent 自主沉淀技能，无需人工编写。</p>
-<h3>7.1 自动创建触发条件</h3>
-<table>
+<h3 id="7-1-自动创建触发条件"><a href="#7-1-自动创建触发条件" class="headerlink" title="7.1 自动创建触发条件"></a>7.1 自动创建触发条件</h3><table>
 <thead>
 <tr>
 <th>场景</th>
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>复杂任务成功</td>
 <td>通常 5+ 次工具调用</td>
 </tr>
@@ -667,10 +628,8 @@ Level 2: skill_view(name, path)  → references/ 等附属文件              (�
 <td>发现非平凡工作流</td>
 <td>可复用的多步操作</td>
 </tr>
-</tbody>
-</table>
-<h3>7.2 skill_manage 工具操作</h3>
-<table>
+</tbody></table>
+<h3 id="7-2-skill-manage-工具操作"><a href="#7-2-skill-manage-工具操作" class="headerlink" title="7.2 skill_manage 工具操作"></a>7.2 skill_manage 工具操作</h3><table>
 <thead>
 <tr>
 <th>Action</th>
@@ -678,8 +637,7 @@ Level 2: skill_view(name, path)  → references/ 等附属文件              (�
 <th>关键参数</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>create</code></td>
 <td>从零创建</td>
 <td><code>name</code>, <code>content</code>（完整 SKILL.md）</td>
@@ -709,32 +667,23 @@ Level 2: skill_view(name, path)  → references/ 等附属文件              (�
 <td>删除附属文件</td>
 <td><code>name</code>, <code>file_path</code></td>
 </tr>
-</tbody>
-</table>
-<pre><code class="language-python"># 优先 patch — 比 edit 更省 Token
-skill_manage(
-    action="patch",
-    name="deploy-k8s",
-    old_string="kubectl apply -f manifest.yaml",
-    new_string="kubectl apply -f manifest.yaml --server-side"
-)
-</code></pre>
-<h3>7.3 与记忆系统的协同</h3>
-<pre><code class="mermaid">flowchart LR
+</tbody></table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 优先 patch — 比 edit 更省 Token</span></span><br><span class="line">skill_manage(</span><br><span class="line">    action=<span class="string">&quot;patch&quot;</span>,</span><br><span class="line">    name=<span class="string">&quot;deploy-k8s&quot;</span>,</span><br><span class="line">    old_string=<span class="string">&quot;kubectl apply -f manifest.yaml&quot;</span>,</span><br><span class="line">    new_string=<span class="string">&quot;kubectl apply -f manifest.yaml --server-side&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-3-与记忆系统的协同"><a href="#7-3-与记忆系统的协同" class="headerlink" title="7.3 与记忆系统的协同"></a>7.3 与记忆系统的协同</h3><pre><code class="highlight mermaid">flowchart LR
     T[任务完成] --&gt; M[memory 工具策划事实]
     T --&gt; S[skill_manage 沉淀流程]
     T --&gt; DB[SQLite FTS5 索引会话]
     S --&gt; N[下次同类任务]
     N --&gt; V[skill_view 按需加载]
     N --&gt; SS[session_search 历史召回]</code></pre>
+
 <p><strong>Periodic Nudge</strong>：会话间隙触发自我反思，可能更新 MEMORY.md 或 patch 现有技能。</p>
 <p><strong>English</strong></p>
-<p>Hermes's key differentiator: after tasks, the agent curates procedural memory via <code>skill_manage</code>. Triggers: 5+ tool calls, error recovery, user corrections, non-trivial workflows. Prefer <code>patch</code> over <code>edit</code> for token efficiency. Synergy with <code>memory</code> tool curation, FTS5 session indexing, and Periodic Nudge between sessions.</p>
-<hr/>
-<h2>八、Skills Hub 与供应链安全 | Skills Hub &amp; Supply Chain Security</h2>
-<p><strong>中文</strong></p>
-<h3>8.1 Hermes Skills Hub 来源</h3>
-<table>
+<p>Hermes’s key differentiator: after tasks, the agent curates procedural memory via <code>skill_manage</code>. Triggers: 5+ tool calls, error recovery, user corrections, non-trivial workflows. Prefer <code>patch</code> over <code>edit</code> for token efficiency. Synergy with <code>memory</code> tool curation, FTS5 session indexing, and Periodic Nudge between sessions.</p>
+<hr>
+<h2 id="八、Skills-Hub-与供应链安全-Skills-Hub-Supply-Chain-Security"><a href="#八、Skills-Hub-与供应链安全-Skills-Hub-Supply-Chain-Security" class="headerlink" title="八、Skills Hub 与供应链安全 | Skills Hub &amp; Supply Chain Security"></a>八、Skills Hub 与供应链安全 | Skills Hub &amp; Supply Chain Security</h2><p><strong>中文</strong></p>
+<h3 id="8-1-Hermes-Skills-Hub-来源"><a href="#8-1-Hermes-Skills-Hub-来源" class="headerlink" title="8.1 Hermes Skills Hub 来源"></a>8.1 Hermes Skills Hub 来源</h3><table>
 <thead>
 <tr>
 <th>来源 ID</th>
@@ -742,8 +691,7 @@ skill_manage(
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>official</code></td>
 <td><code>official/security/1password</code></td>
 <td>仓库 optional-skills，内置信任</td>
@@ -778,16 +726,10 @@ skill_manage(
 <td><code>https://example.com/SKILL.md</code></td>
 <td>单文件直链安装</td>
 </tr>
-</tbody>
-</table>
-<pre><code class="language-bash">hermes skills browse
-hermes skills search kubernetes --source skills-sh
-hermes skills install openai/skills/k8s        # 安全扫描后安装
-hermes skills install &lt;slug&gt; --force           # 覆盖 caution/warn，不可覆盖 dangerous
-hermes skills audit                            # 重扫已安装技能
-</code></pre>
-<h3>8.2 信任等级与安全扫描</h3>
-<table>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hermes skills browse</span><br><span class="line">hermes skills search kubernetes --<span class="built_in">source</span> skills-sh</span><br><span class="line">hermes skills install openai/skills/k8s        <span class="comment"># 安全扫描后安装</span></span><br><span class="line">hermes skills install &lt;slug&gt; --force           <span class="comment"># 覆盖 caution/warn，不可覆盖 dangerous</span></span><br><span class="line">hermes skills audit                            <span class="comment"># 重扫已安装技能</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-2-信任等级与安全扫描"><a href="#8-2-信任等级与安全扫描" class="headerlink" title="8.2 信任等级与安全扫描"></a>8.2 信任等级与安全扫描</h3><table>
 <thead>
 <tr>
 <th>等级</th>
@@ -795,8 +737,7 @@ hermes skills audit                            # 重扫已安装技能
 <th>策略</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>builtin</code></td>
 <td>Hermes 内置</td>
 <td>始终信任</td>
@@ -808,7 +749,7 @@ hermes skills audit                            # 重扫已安装技能
 </tr>
 <tr>
 <td><code>trusted</code></td>
-<td>openai/anthropics/NVIDIA 等</td>
+<td>openai&#x2F;anthropics&#x2F;NVIDIA 等</td>
 <td>宽松策略</td>
 </tr>
 <tr>
@@ -816,26 +757,16 @@ hermes skills audit                            # 重扫已安装技能
 <td>其他所有来源</td>
 <td><code>--force</code> 可覆盖非 dangerous 发现</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>扫描项：数据外泄、Prompt 注入、破坏性命令、供应链信号。<code>dangerous</code> 判定<strong>不可</strong>被 <code>--force</code> 覆盖。</p>
-<h3>8.3 Hermes Skill Bundles</h3>
-<p><code>~/.hermes/skill-bundles/*.yaml</code> 将多个技能组合为单一斜杠命令：</p>
-<pre><code class="language-yaml">name: backend-dev
-description: Backend feature work — review, test, PR
-skills:
-  - github-code-review
-  - test-driven-development
-  - github-pr-workflow
-instruction: |
-  Always start with failing tests, then implement.
-</code></pre>
+<h3 id="8-3-Hermes-Skill-Bundles"><a href="#8-3-Hermes-Skill-Bundles" class="headerlink" title="8.3 Hermes Skill Bundles"></a>8.3 Hermes Skill Bundles</h3><p><code>~/.hermes/skill-bundles/*.yaml</code> 将多个技能组合为单一斜杠命令：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">backend-dev</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Backend</span> <span class="string">feature</span> <span class="string">work</span> <span class="string">—</span> <span class="string">review,</span> <span class="string">test,</span> <span class="string">PR</span></span><br><span class="line"><span class="attr">skills:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">github-code-review</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test-driven-development</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">github-pr-workflow</span></span><br><span class="line"><span class="attr">instruction:</span> <span class="string">|</span></span><br><span class="line">  <span class="string">Always</span> <span class="string">start</span> <span class="string">with</span> <span class="string">failing</span> <span class="string">tests,</span> <span class="string">then</span> <span class="string">implement.</span></span><br></pre></td></tr></table></figure>
+
 <p><code>/backend-dev refactor auth middleware</code> 一次加载全部技能。Bundle 不修改系统提示词缓存，在调用时生成新 user message。</p>
 <p><strong>English</strong></p>
 <p>Hermes Skills Hub integrates official, skills-sh, well-known, GitHub, ClawHub, browse-sh, and direct URL sources. Trust levels: builtin &gt; official &gt; trusted &gt; community. Security scan blocks dangerous verdicts regardless of <code>--force</code>. Skill bundles group multiple skills under one slash command without invalidating the prompt cache.</p>
-<hr/>
-<h2>九、学习路径对比与选型 | Learning Path Comparison</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="九、学习路径对比与选型-Learning-Path-Comparison"><a href="#九、学习路径对比与选型-Learning-Path-Comparison" class="headerlink" title="九、学习路径对比与选型 | Learning Path Comparison"></a>九、学习路径对比与选型 | Learning Path Comparison</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -844,8 +775,7 @@ instruction: |
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>沉淀重复工作流</td>
 <td>手动写 SKILL.md 或 Skill Workshop 审批</td>
 <td>任务后 <code>skill_manage</code> 自动创建</td>
@@ -875,8 +805,7 @@ instruction: |
 <td>—</td>
 <td><code>hermes claw migrate</code> 导入技能</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>选型建议</strong>：</p>
 <ul>
 <li>重视<strong>人工审核与社区市场</strong> → OpenClaw + ClawHub + Skill Workshop</li>
@@ -892,8 +821,7 @@ instruction: |
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Capture repeated workflows</td>
 <td>Manual SKILL.md or Skill Workshop approval</td>
 <td>Auto <code>skill_manage</code> after tasks</td>
@@ -923,22 +851,18 @@ instruction: |
 <td>—</td>
 <td><code>hermes claw migrate</code> imports skills</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>Choose OpenClaw for human-reviewed community skills; choose Hermes for automatic evolution and token-efficient progressive disclosure.</p>
-<hr/>
-<h2>十、最佳实践 | Best Practices</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw</h3>
-<ol>
+<hr>
+<h2 id="十、最佳实践-Best-Practices"><a href="#十、最佳实践-Best-Practices" class="headerlink" title="十、最佳实践 | Best Practices"></a>十、最佳实践 | Best Practices</h2><p><strong>中文</strong></p>
+<h3 id="OpenClaw"><a href="#OpenClaw" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><ol>
 <li><strong>工作区优先</strong>：项目专属技能放 <code>workspace/skills/</code>，全局共享放 <code>~/.openclaw/skills/</code></li>
 <li><strong>简短描述</strong>：直接影响 Token 公式中的 <code>len(description)</code></li>
-<li><strong>启用 Workshop</strong>：生产环境保持 <code>approvalPolicy: "pending"</code></li>
+<li><strong>启用 Workshop</strong>：生产环境保持 <code>approvalPolicy: &quot;pending&quot;</code></li>
 <li><strong>定期 verify</strong>：<code>openclaw skills verify</code> 检查 ClawHub 信任信封</li>
 <li><strong>allowlist 收敛</strong>：多 Agent 场景用 <code>agents.list[].skills</code> 限制爆炸半径</li>
 </ol>
-<h3>Hermes Agent</h3>
-<ol>
+<h3 id="Hermes-Agent"><a href="#Hermes-Agent" class="headerlink" title="Hermes Agent"></a>Hermes Agent</h3><ol>
 <li><strong>信任闭环学习</strong>：复杂任务后让 Agent 自动 <code>skill_manage</code>，不必手写一切</li>
 <li><strong>优先 patch</strong>：小改动用 patch 而非 edit，节省 Token 与 diff 可读性</li>
 <li><strong>Hub 安装先 inspect</strong>：<code>hermes skills inspect</code> 预览后再 <code>install</code></li>
@@ -948,22 +872,20 @@ instruction: |
 <p><strong>English</strong></p>
 <p><strong>OpenClaw</strong>: workspace-first layout, short descriptions, Workshop with pending approval, periodic <code>verify</code>, per-agent allowlists.</p>
 <p><strong>Hermes</strong>: trust the learning loop, prefer <code>patch</code>, inspect before install, use bundles for recurring multi-skill tasks, make shared <code>external_dirs</code> read-only when needed.</p>
-<hr/>
-<h2>十一、延伸阅读 | Further Reading</h2>
-<ul>
+<hr>
+<h2 id="十一、延伸阅读-Further-Reading"><a href="#十一、延伸阅读-Further-Reading" class="headerlink" title="十一、延伸阅读 | Further Reading"></a>十一、延伸阅读 | Further Reading</h2><ul>
 <li><a href="./memory-system.md">记忆系统深度解析</a> — 技能作为第四层程序性记忆</li>
 <li><a href="./workspace-context-prompt.md">工作区文件与 Prompt 组装</a> — stable tier 中的技能索引</li>
 <li><a href="./security-model.md">安全模型深度解析</a> — Skills 供应链扫描</li>
-<li><a target="_blank" rel="noopener" href="https://agentskills.io">Agent Skills 开放标准</a></li>
+<li><a target="_blank" rel="noopener" href="https://agentskills.io/">Agent Skills 开放标准</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.openclaw.ai/tools/skills">OpenClaw Skills 文档</a></li>
 <li><a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/skills">Hermes Skills 文档</a></li>
 </ul>
-<hr/>
-<h2>十二、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="十二、结语-Conclusion"><a href="#十二、结语-Conclusion" class="headerlink" title="十二、结语 | Conclusion"></a>十二、结语 | Conclusion</h2><p><strong>中文</strong></p>
 <p>OpenClaw 的技能系统是 <strong>「连接生态 + 人工治理」</strong> — 通过 agentskills.io 标准、六级加载优先级、ClawHub 市场和 Skill Workshop 提案队列，让社区技能可发现、可审计、可控制爆炸半径。Hermes 的技能系统是 <strong>「进化引擎 + 渐进披露」</strong> — 通过 <code>skill_manage</code> 闭环学习、Level 0-2 披露和 Skills Hub 多源集成，让 Agent 从经验中自动沉淀程序性记忆，同时保持 Token 成本近乎平坦。二者共享同一文件格式，却服务不同的产品哲学：<strong>广度连接</strong> 与 <strong>深度进化</strong>。</p>
 <p><strong>English</strong></p>
-<p>OpenClaw's skill system is <strong>connectivity + human governance</strong> — agentskills.io standard, six-tier loading precedence, ClawHub marketplace, and Skill Workshop proposal queues for discoverable, auditable community skills. Hermes's skill system is <strong>evolution engine + progressive disclosure</strong> — <code>skill_manage</code> closed-loop learning, Level 0-2 disclosure, and multi-source Skills Hub for automatic procedural memory with near-flat token cost. Both share the same file format but serve different philosophies: <strong>connectivity breadth</strong> vs. <strong>evolutionary depth</strong>.</p>
+<p>OpenClaw’s skill system is <strong>connectivity + human governance</strong> — agentskills.io standard, six-tier loading precedence, ClawHub marketplace, and Skill Workshop proposal queues for discoverable, auditable community skills. Hermes’s skill system is <strong>evolution engine + progressive disclosure</strong> — <code>skill_manage</code> closed-loop learning, Level 0-2 disclosure, and multi-source Skills Hub for automatic procedural memory with near-flat token cost. Both share the same file format but serve different philosophies: <strong>connectivity breadth</strong> vs. <strong>evolutionary depth</strong>.</p>
 
     </div>
 
@@ -974,17 +896,17 @@ instruction: |
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/Skills/" rel="tag"># Skills</a>
               <a href="/tags/Hermes/" rel="tag"># Hermes</a>
               <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
-              <a href="/tags/Skills/" rel="tag"># Skills</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/d4d0ba84.html" rel="prev" title="AnythingLLM 全面介绍：架构设计、应用场景与优缺点">
-                  <i class="fa fa-angle-left"></i> AnythingLLM 全面介绍：架构设计、应用场景与优缺点
+                <a href="/posts/ai-timeline-INDEX.html" rel="prev" title="AI 技术编年史 2021–2026：索引与归档映射">
+                  <i class="fa fa-angle-left"></i> AI 技术编年史 2021–2026：索引与归档映射
                 </a>
             </div>
             <div class="post-nav-item">

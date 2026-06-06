@@ -2,6 +2,8 @@
 
 本目录收录 **Agent Hermes** 与 **OpenClaw（龙虾）** 的完整中英文对照技术文档（**12 篇 + 知识地图**）。
 
+> 文档总索引：[docs/README.md](../README.md) · 项目说明：[docs/PROJECT.md](../PROJECT.md) · AI 知识库：[docs/knowledge-base/INDEX.md](../knowledge-base/INDEX.md)
+
 完整知识点覆盖矩阵见 [knowledge-map.md](./knowledge-map.md)。
 
 ## 推荐阅读顺序 | Suggested Reading Order
@@ -28,10 +30,10 @@
 ## 发布 | Publishing
 
 ```bash
-python3 scripts/publish_ai_agent_posts.py
+cd blog-source && ./deploy-to-root.sh
 ```
 
-将 `docs/ai-agents/*.md`（除 README、knowledge-map）转为 Hexo 静态 HTML 并幂等更新站点索引。
+编辑 `docs/ai-agents/*.md` 后，由 `sync_docs.py` 同步到 Hexo 并统一构建。
 
 ## 参考资源 | References
 

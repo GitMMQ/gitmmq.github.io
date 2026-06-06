@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2026 年行业 AI MVP 标准化部署方法论：从 PoC 到生产的可复用模板与治理框架，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 技术编年史 2026：行业 AI MVP 标准化落地">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2026-industry-mvp-deployment.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2026 年行业 AI MVP 标准化部署方法论：从 PoC 到生产的可复用模板与治理框架，中英文对照。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-12T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-12T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="Enterprise AI">
+<meta property="article:tag" content="Industry LLM">
+<meta property="article:tag" content="MVP Deployment">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2026-industry-mvp-deployment.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2026-industry-mvp-deployment.html","path":"posts/ai-timeline-2026-industry-mvp-deployment.html","title":"AI 技术编年史 2026：行业 AI MVP 标准化落地"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>AI 技术编年史 2026：行业 AI MVP 标准化落地 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AI-%E6%8A%80%E6%9C%AF%E7%BC%96%E5%B9%B4%E5%8F%B2-2026%EF%BC%9A%E8%A1%8C%E4%B8%9A-AI-MVP-%E6%A0%87%E5%87%86%E5%8C%96%E8%90%BD%E5%9C%B0-Standardized-Industry-AI-MVP-Deployment"><span class="nav-number">1.</span> <span class="nav-text">AI 技术编年史 2026：行业 AI MVP 标准化落地 | Standardized Industry AI MVP Deployment</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景 | Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、架构 | Architecture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9-Pros-and-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点 | Pros and Cons</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81GitHub-%E7%94%9F%E6%80%81-GitHub-Ecosystem"><span class="nav-number">1.6.</span> <span class="nav-text">六、GitHub 生态 | GitHub Ecosystem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%B7%B1%E5%85%A5%E6%8E%A2%E8%AE%A8-Extended-Discussion"><span class="nav-number">1.7.</span> <span class="nav-text">七、深入探讨 | Extended Discussion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E6%A0%87%E5%87%86-MVP-%E6%B8%85%E5%8D%95-excerpt-Standard-Checklist-Excerpt"><span class="nav-number">1.7.1.</span> <span class="nav-text">7.1 标准 MVP 清单 excerpt | Standard Checklist Excerpt</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-References"><span class="nav-number">1.8.</span> <span class="nav-text">八、参考链接 | References</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2026-industry-mvp-deployment.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="AI 技术编年史 2026：行业 AI MVP 标准化落地 | Qi">
+      <meta itemprop="description" content="2026 年行业 AI MVP 标准化部署方法论：从 PoC 到生产的可复用模板与治理框架，中英文对照。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AI 技术编年史 2026：行业 AI MVP 标准化落地
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-12 10:00:00" itemprop="dateCreated datePublished" datetime="2026-07-12T10:00:00+08:00">2026-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mechine/" itemprop="url" rel="index"><span itemprop="name">mechine</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2026 年行业 AI MVP 标准化部署方法论：从 PoC 到生产的可复用模板与治理框架，中英文对照。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="AI-技术编年史-2026：行业-AI-MVP-标准化落地-Standardized-Industry-AI-MVP-Deployment"><a href="#AI-技术编年史-2026：行业-AI-MVP-标准化落地-Standardized-Industry-AI-MVP-Deployment" class="headerlink" title="AI 技术编年史 2026：行业 AI MVP 标准化落地 | Standardized Industry AI MVP Deployment"></a>AI 技术编年史 2026：行业 AI MVP 标准化落地 | Standardized Industry AI MVP Deployment</h1><hr>
+<h2 id="一、背景-Background"><a href="#一、背景-Background" class="headerlink" title="一、背景 | Background"></a>一、背景 | Background</h2><p><strong>English</strong></p>
+<p>Between 2023 and 2025, enterprises ran hundreds of <strong>AI proofs-of-concept</strong> but fewer than <strong>30% reached production</strong> (Gartner-style estimates cited across industry reports). Failure modes were repetitive: unclear success metrics, missing eval harnesses, no data governance, security review bottlenecks, and <strong>custom snowflake architectures</strong> that could not be replicated across business units.</p>
+<p>In 2026, <strong>Standardized AI MVP Deployment</strong> emerged as a <strong>repeatable playbook</strong> — template architectures, checklists, and reference implementations for verticals (banking, manufacturing, retail, healthcare). Cloud vendors and SIs packaged <strong>“MVP-in-a-box”</strong> stacks: RAG + agent + observability + policy gates + human review UI, deployable in <strong>2–6 weeks</strong> with predefined SLAs. The shift moved AI from <strong>innovation theater</strong> to <strong>factory-line delivery</strong>.</p>
+<p>Consulting firms published <strong>fixed-price MVP SKUs</strong> ($150k–$400k) with explicit eval thresholds — if golden set accuracy missed target by &gt;5 points, client paid only discovery phase. This <strong>outcome-linked pricing</strong> aligned vendor incentives with production success for the first time at scale.</p>
+<p><strong>中文</strong></p>
+<p>2023–2025 年企业开展大量 <strong>AI PoC</strong>，但 <strong>不足 30% 进入生产</strong>（多家行业报告援引的 Gartner 类估算）。失败模式高度重复：成功指标不清、缺评估 harness、无数据治理、安全审查瓶颈、<strong>不可复制的雪花架构</strong>。</p>
+<p>2026 年 <strong>行业 AI MVP 标准化落地</strong> 成为 <strong>可复用 playbook</strong> — 面向银行、制造、零售、医疗的模板架构、清单与参考实现。云厂商与 SI 打包 <strong>「MVP-in-a-box」</strong>：RAG + Agent + 可观测 + 策略门 + 人工复核 UI，<strong>2–6 周</strong> 部署并带预定义 SLA。AI 从 <strong>创新表演</strong> 转向 <strong>流水线交付</strong>。</p>
+<p>咨询公司发布 <strong>固定价 MVP SKU</strong>（15–40 万美元）与 explicit eval 阈值 — 若 golden set 准确率未达标 &gt;5 点，客户仅付 discovery 阶段。此 <strong>结果挂钩定价</strong> 首次规模化对齐厂商激励与生产成功。</p>
+<hr>
+<h2 id="二、架构-Architecture"><a href="#二、架构-Architecture" class="headerlink" title="二、架构 | Architecture"></a>二、架构 | Architecture</h2><p><strong>English</strong></p>
+<p><strong>Reference MVP architecture (2026 standard):</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Experience Layer</span><br><span class="line">  ├── Chat / copilot UI（embed or Teams/Slack）</span><br><span class="line">  └── Task-specific forms（structured intake）</span><br><span class="line"></span><br><span class="line">Orchestration Layer</span><br><span class="line">  ├── Agent framework（LangGraph / custom）</span><br><span class="line">  ├── Workflow engine（Temporal / cloud step functions）</span><br><span class="line">  └── Human-in-the-loop queues</span><br><span class="line"></span><br><span class="line">Intelligence Layer</span><br><span class="line">  ├── Foundation model router（cost/latency/policy）</span><br><span class="line">  ├── RAG pipeline（chunk, embed, retrieve, rerank）</span><br><span class="line">  ├── Fine-tuned vertical adapter（LoRA / full FT）</span><br><span class="line">  └── Eval runner（golden set, regression on every deploy）</span><br><span class="line"></span><br><span class="line">Data &amp; Governance Layer</span><br><span class="line">  ├── Vector DB + document ACL sync</span><br><span class="line">  ├── PII scanner / redaction</span><br><span class="line">  ├── Lineage + audit log（immutable）</span><br><span class="line">  └── Synthetic data augmenter（optional）</span><br><span class="line"></span><br><span class="line">Platform Layer</span><br><span class="line">  ├── K8s / serverless</span><br><span class="line">  ├── Secrets + KMS</span><br><span class="line">  ├── Observability（traces, costs, quality scores）</span><br><span class="line">  └── CI/CD with safety gates</span><br></pre></td></tr></table></figure>
+
+<p><strong>MVP delivery phases:</strong> <strong>Week 1</strong> — KPI workshop + data inventory; <strong>Week 2–3</strong> — template deploy + golden dataset; <strong>Week 4</strong> — UAT + red-team; <strong>Week 5–6</strong> — production hardening + runbook.</p>
+<p><strong>中文</strong></p>
+<p><strong>2026 参考 MVP 架构：</strong> 体验层 → 编排层（Agent+工作流+HITL）→ 智能层（模型路由、RAG、垂直 adapter、Eval）→ 数据治理层 → 平台层（K8s、密钥、可观测、带安全门的 CI&#x2F;CD）。</p>
+<p><strong>交付阶段：</strong> 第 1 周 KPI 与数据盘点；2–3 周模板部署与 golden set；第 4 周 UAT+红队；5–6 周生产加固与 runbook。</p>
+<hr>
+<h2 id="三、趋势-Trends"><a href="#三、趋势-Trends" class="headerlink" title="三、趋势 | Trends"></a>三、趋势 | Trends</h2><p><strong>English</strong></p>
+<ol>
+<li><strong>Vertical MVP catalogs</strong> — AWS&#x2F;Azure&#x2F;阿里云发布行业模板市场。</li>
+<li><strong>Eval-first sales</strong> — vendors demo on customer’s golden set before contract.</li>
+<li><strong>Composable modules</strong> — swap RAG for fine-tune-only MVP via config flags.</li>
+<li><strong>Regulatory templates</strong> — HIPAA&#x2F;等保 pre-mapped controls in IaC.</li>
+<li><strong>Internal AI platforms</strong> — Fortune 500 <strong>“MVP factory”</strong> teams ship 1 MVP&#x2F;month.</li>
+<li><strong>Post-MVP scale path</strong> — standardized promotion checklist to tier-1 SLA.</li>
+</ol>
+<p><strong>中文</strong></p>
+<ol>
+<li><strong>垂直 MVP 目录</strong> — 云厂商行业模板市场。</li>
+<li><strong>Eval 优先销售</strong> — 签约前在客户 golden set 上演示。</li>
+<li><strong>可组合模块</strong> — 配置切换 RAG&#x2F;仅微调 MVP。</li>
+<li><strong>合规模板</strong> — HIPAA&#x2F;等保控制预映射进 IaC。</li>
+<li><strong>内部 AI 平台</strong> — 财富 500 <strong>MVP 工厂</strong> 每月交付 1 个。</li>
+<li><strong>MVP 后扩展路径</strong> — 标准化升级 tier-1 SLA 清单。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点-Pros-and-Cons"><a href="#四、优缺点-Pros-and-Cons" class="headerlink" title="四、优缺点 | Pros and Cons"></a>四、优缺点 | Pros and Cons</h2><p><strong>English</strong></p>
+<p><strong>Pros:</strong> Predictable time&#x2F;cost; shared learning across BUs; built-in eval and safety; easier executive ROI reporting; faster vendor comparison (same template baseline).</p>
+<p><strong>Cons:</strong> <strong>Template rigidity</strong> — edge cases need custom work; <strong>false standardization</strong> if teams skip governance modules; <strong>vendor template lock-in</strong>; <strong>underfitting</strong> unique competitive workflows; <strong>maintenance</strong> of golden sets often neglected post-launch.</p>
+<p><strong>中文</strong></p>
+<p><strong>优点：</strong> 可预期时间&#x2F;成本；BU 间经验复用；内置 eval 与安全；ROI 汇报更易；厂商对比基线统一。</p>
+<p><strong>缺点：</strong> <strong>模板僵化</strong>；跳过治理模块的 <strong>伪标准化</strong>；厂商模板锁定；独特流程 <strong>欠拟合</strong>；golden set <strong>上线后维护 neglected</strong>。</p>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>垂直</th>
+<th>MVP 示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>银行</td>
+<td>信贷文档问答 + 政策 cite + 人工复核大额建议</td>
+</tr>
+<tr>
+<td>制造</td>
+<td>设备手册 RAG + 工单创建 Agent</td>
+</tr>
+<tr>
+<td>零售</td>
+<td>库存&#x2F;促销 copilot + ERP 工具调用</td>
+</tr>
+<tr>
+<td>医疗</td>
+<td>临床指南检索（非诊断）+ 低置信度 escalation</td>
+</tr>
+<tr>
+<td>法律</td>
+<td>合同 clause 检索 + 风险 flag 结构化输出</td>
+</tr>
+<tr>
+<td>政务</td>
+<td>政策公众问答 + 固定话术与审计</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、GitHub-生态-GitHub-Ecosystem"><a href="#六、GitHub-生态-GitHub-Ecosystem" class="headerlink" title="六、GitHub 生态 | GitHub Ecosystem"></a>六、GitHub 生态 | GitHub Ecosystem</h2><table>
+<thead>
+<tr>
+<th>Repository</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/anthropics/claude-code">anthropics&#x2F;claude-code</a></td>
+<td>Agent MVP prototyping in terminal</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/getcursor/cursor">getcursor&#x2F;cursor</a></td>
+<td>IDE-accelerated template customization</td>
+</tr>
+<tr>
+<td>LangChain &#x2F; LangGraph templates</td>
+<td>Reference orchestration graphs</td>
+</tr>
+<tr>
+<td>LlamaIndex RAG templates</td>
+<td>Standard ingest + query pipelines</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/pytorch/pytorch">pytorch&#x2F;pytorch</a></td>
+<td>Fine-tune scripts in vertical boxes</td>
+</tr>
+<tr>
+<td>Dify &#x2F; FastGPT forks</td>
+<td>Low-code MVP UI layers</td>
+</tr>
+</tbody></table>
+<p><strong>Enterprise pattern:</strong> Monorepo with <code>mvp-template/</code>, <code>eval/golden.json</code>, <code>policies/opa/</code>, deployed via <code>./deploy-mvp.sh</code> — mirrored in this blog’s <code>deploy-to-root.sh</code> philosophy.</p>
+<hr>
+<h2 id="七、深入探讨-Extended-Discussion"><a href="#七、深入探讨-Extended-Discussion" class="headerlink" title="七、深入探讨 | Extended Discussion"></a>七、深入探讨 | Extended Discussion</h2><p><strong>English</strong></p>
+<p>The <strong>MVP factory</strong> model treats AI delivery like <strong>microservices platform teams</strong>: central platform owns templates, security baselines, and observability; business units inject <strong>domain golden sets</strong> and <strong>SME reviewers</strong>. A typical <strong>6-week MVP</strong> breaks down: Week 1 KPI workshop defines <strong>task completion rate target</strong> (not vanity DAU); Week 2 data ACL sync proves <strong>no cross-BU leakage</strong>; Week 3–4 template deploy + eval regression green; Week 5 red-team + legal; Week 6 production SLO + runbook handoff to ops.</p>
+<p><strong>Vendor selection</strong> shifted to <strong>eval RFPs</strong>: customers supply 200–500 real (redacted) tasks; vendors run on standard template; <strong>score &#x3D; 0.5·accuracy + 0.3·latency + 0.2·cost</strong> with minimum safety gate. Snowflake architectures rejected in favor of <strong>config-driven vertical packs</strong> — swap <code>vertical=banking</code> in Helm values.</p>
+<p><strong>Post-MVP promotion</strong> requires <strong>30-day production metrics</strong>: task success ≥ target, zero P0 safety incidents, cost per task within budget, golden set regression on every release. Failed promotion rolls back to <strong>read-only Q&amp;A mode</strong> — a pattern that reduced <strong>“demo forever”</strong> anti-pattern.</p>
+<p><strong>中文</strong></p>
+<p><strong>MVP 工厂</strong> 将 AI 交付类比 <strong>微服务平台团队</strong>：中央平台拥有模板、安全基线、可观测；业务单元注入 <strong>领域 golden set</strong> 与 <strong>SME 审查者</strong>。典型 <strong>6 周 MVP</strong>：第 1 周 KPI  workshop 定 <strong>任务完成率目标</strong>（非 vanity DAU）；第 2 周数据 ACL 同步证明 <strong>无跨 BU 泄漏</strong>；3–4 周模板部署+eval 回归绿；第 5 周红队+法务；第 6 周生产 SLO+runbook 移交运维。</p>
+<p><strong>厂商选型</strong> 转向 <strong>eval RFP</strong>：客户提供 200–500 真实（脱敏）任务；厂商在标准模板上跑分；<strong>得分&#x3D;0.5·准确+0.3·延迟+0.2·成本</strong> 且过最低安全门。拒绝雪花架构， favor <strong>配置驱动 vertical pack</strong> — Helm values 改 <code>vertical=banking</code> 即可。</p>
+<p><strong>MVP 后升级</strong> 需 <strong>30 天生产指标</strong>：任务成功率达标、零 P0 安全事件、单任务成本在预算内、每次发布 golden 回归。未通过则回退 <strong>只读 Q&amp;A</strong> — 减少 <strong>「永远 demo」</strong> 反模式。</p>
+<h3 id="7-1-标准-MVP-清单-excerpt-Standard-Checklist-Excerpt"><a href="#7-1-标准-MVP-清单-excerpt-Standard-Checklist-Excerpt" class="headerlink" title="7.1 标准 MVP 清单 excerpt | Standard Checklist Excerpt"></a>7.1 标准 MVP 清单 excerpt | Standard Checklist Excerpt</h3><ul>
+<li><input disabled="" type="checkbox"> Golden set ≥200 tasks with human labels</li>
+<li><input disabled="" type="checkbox"> OPA policies for every write tool</li>
+<li><input disabled="" type="checkbox"> PII scanner on ingest pipeline</li>
+<li><input disabled="" type="checkbox"> Trace + cost dashboard per task type</li>
+<li><input disabled="" type="checkbox"> Rollback procedure documented (&lt;15 min RTO)</li>
+</ul>
+<hr>
+<h2 id="八、参考链接-References"><a href="#八、参考链接-References" class="headerlink" title="八、参考链接 | References"></a>八、参考链接 | References</h2><ul>
+<li>Gartner AI productionization surveys (2025–2026)</li>
+<li>McKinsey “Scaling gen AI in the enterprise” playbooks</li>
+<li>Cloud vendor industry MVP documentation</li>
+<li>本系列：<a href="/posts/ai-timeline-2024-rag-enterprise.html">ai-timeline-2024-rag-enterprise</a></li>
+</ul>
+<hr>
+<p><strong>Summary | 总结</strong></p>
+<p>2026 industrializes AI delivery: <strong>standard MVP stacks + eval gates + governance-by-default</strong> turn PoCs into a factory discipline, not artisanal one-offs.</p>
+<p>2026 将 AI 交付 <strong>工业化</strong>：标准 MVP 栈 + 评估门 + 默认治理，使 PoC 成为工厂纪律而非手工孤例。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Industry-LLM/" rel="tag"># Industry LLM</a>
+              <a href="/tags/MVP-Deployment/" rel="tag"># MVP Deployment</a>
+              <a href="/tags/Enterprise-AI/" rel="tag"># Enterprise AI</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/f10df97a.html" rel="prev" title="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南">
+                  <i class="fa fa-angle-left"></i> Agent Hermes 与 OpenClaw 部署迁移与运维实战指南
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2026-enterprise-task-agent.html" rel="next" title="AI 技术编年史 2026：40% 企业软件集成任务型 Agent">
+                  AI 技术编年史 2026：40% 企业软件集成任务型 Agent <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

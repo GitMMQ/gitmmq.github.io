@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、部署模式总览 | Deployment Patterns Overview 中文 个人 Agent 常见四种部署拓扑： flowchart TB     subgraph A[&quot;模式 A：本地 Loopback&quot;]         LAP[笔记本 localhost]         LAP --&gt; GW1[Gatew">
+    <meta name="description" content="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南Deployment, Migration &amp; Operations Guide for Agent Hermes &amp; OpenClaw 最后更新 | Last updated: 2026-06-06   一、部署模式总览 | Deployment Patterns Overview中文 个人 Agent 常见四">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南">
 <meta property="og:url" content="https://www.fastolf.com/posts/f10df97a.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、部署模式总览 | Deployment Patterns Overview 中文 个人 Agent 常见四种部署拓扑： flowchart TB     subgraph A[&quot;模式 A：本地 Loopback&quot;]         LAP[笔记本 localhost]         LAP --&gt; GW1[Gatew">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南Deployment, Migration &amp; Operations Guide for Agent Hermes &amp; OpenClaw 最后更新 | Last updated: 2026-06-06   一、部署模式总览 | Deployment Patterns Overview中文 个人 Agent 常见四">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-06T01:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-06T01:00:00.000Z">
+<meta property="article:published_time" content="2026-06-06T09:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T09:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Deploy">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、部署模式总览 | Deployment Patterns Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、Hermes 安装 | Hermes Installation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 一键安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 安装器做了什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 安装布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 非 root &#x2F; systemd 服务用户</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%94%A8%E6%88%B7"><span class="nav-number">3.</span> <span class="nav-text">服务用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%96%E8%B7%B3%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%EF%BC%9Abash-s-%E2%80%93-%E2%80%93skip-browser"><span class="nav-number">4.</span> <span class="nav-text">或跳过浏览器：bash -s – –skip-browser</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A1%AE%E4%BF%9D-PATH-%E5%90%AB-local-bin-hermes"><span class="nav-number">5.</span> <span class="nav-text">确保 PATH 含 ~&#x2F;.local&#x2F;bin&#x2F;hermes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.1.</span> <span class="nav-text">三、OpenClaw 安装 | OpenClaw Installation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.2.</span> <span class="nav-text">四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.2.1.</span> <span class="nav-text">4.1 Hermes Telegram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.2.2.</span> <span class="nav-text">4.2 OpenClaw Telegram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.2.3.</span> <span class="nav-text">4.3 渠道对比速查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.3.</span> <span class="nav-text">五、Gateway 系统服务 | Gateway as System Service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.3.1.</span> <span class="nav-text">5.1 Hermes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.3.2.</span> <span class="nav-text">5.2 OpenClaw</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.4.</span> <span class="nav-text">六、hermes claw migrate 迁移 | Migrating from OpenClaw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.5.</span> <span class="nav-text">七、诊断与审计 | Diagnostics &amp; Auditing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.5.1.</span> <span class="nav-text">7.1 hermes doctor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.5.2.</span> <span class="nav-text">7.2 openclaw security audit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.5.3.</span> <span class="nav-text">7.3 对照表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.6.</span> <span class="nav-text">八、ACP IDE 集成 | ACP IDE Integration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.7.</span> <span class="nav-text">九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.8.</span> <span class="nav-text">十、移动端 Nodes（OpenClaw）| iOS&#x2F;Android Nodes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.9.</span> <span class="nav-text">十一、分离式 Gateway&#x2F;执行（SSH 模式）| Split Gateway &#x2F; Execution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.10.</span> <span class="nav-text">十二、运维清单 | Operations Checklist</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.11.</span> <span class="nav-text">十三、故障排查 | Troubleshooting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.12.</span> <span class="nav-text">十四、快速命令对照 | Quick Command Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.13.</span> <span class="nav-text">十五、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.14.</span> <span class="nav-text">十六、结语 | Conclusion</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw-%E9%83%A8%E7%BD%B2%E8%BF%81%E7%A7%BB%E4%B8%8E%E8%BF%90%E7%BB%B4%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw 部署迁移与运维实战指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Deployment-Migration-Operations-Guide-for-Agent-Hermes-OpenClaw"><span class="nav-number">2.</span> <span class="nav-text">Deployment, Migration &amp; Operations Guide for Agent Hermes &amp; OpenClaw</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F%E6%80%BB%E8%A7%88-Deployment-Patterns-Overview"><span class="nav-number">2.1.</span> <span class="nav-text">一、部署模式总览 | Deployment Patterns Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Hermes-%E5%AE%89%E8%A3%85-Hermes-Installation"><span class="nav-number">2.2.</span> <span class="nav-text">二、Hermes 安装 | Hermes Installation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 一键安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%AE%89%E8%A3%85%E5%99%A8%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 安装器做了什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%AE%89%E8%A3%85%E5%B8%83%E5%B1%80"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 安装布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.4 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E9%9D%9E-root-systemd-%E6%9C%8D%E5%8A%A1%E7%94%A8%E6%88%B7"><span class="nav-number">2.2.5.</span> <span class="nav-text">2.5 非 root &#x2F; systemd 服务用户</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81OpenClaw-%E5%AE%89%E8%A3%85-OpenClaw-Installation"><span class="nav-number">2.3.</span> <span class="nav-text">三、OpenClaw 安装 | OpenClaw Installation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%B8%A0%E9%81%93%E9%85%8D%E7%BD%AE%EF%BC%9ATelegram-%E6%9C%80%E5%BF%AB%E8%B7%AF%E5%BE%84-Channel-Setup-Telegram-Fastest-Path"><span class="nav-number">2.4.</span> <span class="nav-text">四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Hermes-Telegram"><span class="nav-number">2.4.1.</span> <span class="nav-text">4.1 Hermes Telegram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-OpenClaw-Telegram"><span class="nav-number">2.4.2.</span> <span class="nav-text">4.2 OpenClaw Telegram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%B8%A0%E9%81%93%E5%AF%B9%E6%AF%94%E9%80%9F%E6%9F%A5"><span class="nav-number">2.4.3.</span> <span class="nav-text">4.3 渠道对比速查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Gateway-%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1-Gateway-as-System-Service"><span class="nav-number">2.5.</span> <span class="nav-text">五、Gateway 系统服务 | Gateway as System Service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Hermes"><span class="nav-number">2.5.1.</span> <span class="nav-text">5.1 Hermes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-OpenClaw"><span class="nav-number">2.5.2.</span> <span class="nav-text">5.2 OpenClaw</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81hermes-claw-migrate-%E8%BF%81%E7%A7%BB-Migrating-from-OpenClaw"><span class="nav-number">2.6.</span> <span class="nav-text">六、hermes claw migrate 迁移 | Migrating from OpenClaw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E8%AF%8A%E6%96%AD%E4%B8%8E%E5%AE%A1%E8%AE%A1-Diagnostics-Auditing"><span class="nav-number">2.7.</span> <span class="nav-text">七、诊断与审计 | Diagnostics &amp; Auditing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-hermes-doctor"><span class="nav-number">2.7.1.</span> <span class="nav-text">7.1 hermes doctor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-openclaw-security-audit"><span class="nav-number">2.7.2.</span> <span class="nav-text">7.2 openclaw security audit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E5%AF%B9%E7%85%A7%E8%A1%A8"><span class="nav-number">2.7.3.</span> <span class="nav-text">7.3 对照表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81ACP-IDE-%E9%9B%86%E6%88%90-ACP-IDE-Integration"><span class="nav-number">2.8.</span> <span class="nav-text">八、ACP IDE 集成 | ACP IDE Integration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E8%BD%A8%E8%BF%B9%E5%AF%BC%E5%87%BA%E4%B8%8E-RL-%E7%A0%94%E7%A9%B6-Trajectories-RL-Research"><span class="nav-number">2.9.</span> <span class="nav-text">九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E7%A7%BB%E5%8A%A8%E7%AB%AF-Nodes%EF%BC%88OpenClaw%EF%BC%89-iOS-Android-Nodes"><span class="nav-number">2.10.</span> <span class="nav-text">十、移动端 Nodes（OpenClaw）| iOS&#x2F;Android Nodes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E5%88%86%E7%A6%BB%E5%BC%8F-Gateway-%E6%89%A7%E8%A1%8C%EF%BC%88SSH-%E6%A8%A1%E5%BC%8F%EF%BC%89-Split-Gateway-Execution"><span class="nav-number">2.11.</span> <span class="nav-text">十一、分离式 Gateway&#x2F;执行（SSH 模式）| Split Gateway &#x2F; Execution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E8%BF%90%E7%BB%B4%E6%B8%85%E5%8D%95-Operations-Checklist"><span class="nav-number">2.12.</span> <span class="nav-text">十二、运维清单 | Operations Checklist</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5-Troubleshooting"><span class="nav-number">2.13.</span> <span class="nav-text">十三、故障排查 | Troubleshooting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E5%9B%9B%E3%80%81%E5%BF%AB%E9%80%9F%E5%91%BD%E4%BB%A4%E5%AF%B9%E7%85%A7-Quick-Command-Reference"><span class="nav-number">2.14.</span> <span class="nav-text">十四、快速命令对照 | Quick Command Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%BA%94%E3%80%81%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB-Further-Reading"><span class="nav-number">2.15.</span> <span class="nav-text">十五、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E5%85%AD%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.16.</span> <span class="nav-text">十六、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 09:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T09:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 17:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T17:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,33 +292,33 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw-部署迁移与运维实战指南"><a href="#Agent-Hermes-与-OpenClaw-部署迁移与运维实战指南" class="headerlink" title="Agent Hermes 与 OpenClaw 部署迁移与运维实战指南"></a>Agent Hermes 与 OpenClaw 部署迁移与运维实战指南</h1><h1 id="Deployment-Migration-Operations-Guide-for-Agent-Hermes-OpenClaw"><a href="#Deployment-Migration-Operations-Guide-for-Agent-Hermes-OpenClaw" class="headerlink" title="Deployment, Migration &amp; Operations Guide for Agent Hermes &amp; OpenClaw"></a>Deployment, Migration &amp; Operations Guide for Agent Hermes &amp; OpenClaw</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr/>
-<h2>一、部署模式总览 | Deployment Patterns Overview</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="一、部署模式总览-Deployment-Patterns-Overview"><a href="#一、部署模式总览-Deployment-Patterns-Overview" class="headerlink" title="一、部署模式总览 | Deployment Patterns Overview"></a>一、部署模式总览 | Deployment Patterns Overview</h2><p><strong>中文</strong></p>
 <p>个人 Agent 常见四种部署拓扑：</p>
-<pre><code class="mermaid">flowchart TB
-    subgraph A["模式 A：本地 Loopback"]
+<pre><code class="highlight mermaid">flowchart TB
+    subgraph A[&quot;模式 A：本地 Loopback&quot;]
         LAP[笔记本 localhost]
         LAP --&gt; GW1[Gateway 仅本机]
     end
-    subgraph B["模式 B：VPS + 消息平台"]
+    subgraph B[&quot;模式 B：VPS + 消息平台&quot;]
         VPS[$5 VPS 长驻]
         PHONE[手机 Telegram/WhatsApp]
         PHONE --&gt; VPS
     end
-    subgraph C["模式 C：分离式 Gateway/执行"]
+    subgraph C[&quot;模式 C：分离式 Gateway/执行&quot;]
         GWM[Gateway 机 — 仅消息]
         EXE[执行机 — Docker/SSH]
         GWM --&gt;|SSH| EXE
     end
-    subgraph D["模式 D：Serverless（Hermes）"]
+    subgraph D[&quot;模式 D：Serverless（Hermes）&quot;]
         GWH[Hermes Gateway]
         MOD[Modal / Daytona]
         GWH --&gt; MOD
     end</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -328,8 +328,7 @@
 <th>适用</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>A 本地</td>
 <td><code>gateway.bind: loopback</code></td>
 <td>Gateway 默认不暴露 HTTP</td>
@@ -350,36 +349,30 @@
 <tr>
 <td>D Serverless</td>
 <td>—</td>
-<td>Modal/Daytona 后端</td>
+<td>Modal&#x2F;Daytona 后端</td>
 <td>低闲置成本</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
-<p>Four deployment patterns: local loopback (safest dev), VPS + messaging (most common prod), split gateway/execution (high security), serverless backends (Hermes Modal/Daytona for near-zero idle cost).</p>
-<hr/>
-<h2>二、Hermes 安装 | Hermes Installation</h2>
-<p><strong>中文</strong></p>
-<h3>2.1 一键安装</h3>
-<p><strong>Linux / macOS / WSL2 / Android (Termux)：</strong></p>
-<pre><code class="language-bash">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
-source ~/.bashrc   # 或 source ~/.zshrc
-</code></pre>
+<p>Four deployment patterns: local loopback (safest dev), VPS + messaging (most common prod), split gateway&#x2F;execution (high security), serverless backends (Hermes Modal&#x2F;Daytona for near-zero idle cost).</p>
+<hr>
+<h2 id="二、Hermes-安装-Hermes-Installation"><a href="#二、Hermes-安装-Hermes-Installation" class="headerlink" title="二、Hermes 安装 | Hermes Installation"></a>二、Hermes 安装 | Hermes Installation</h2><p><strong>中文</strong></p>
+<h3 id="2-1-一键安装"><a href="#2-1-一键安装" class="headerlink" title="2.1 一键安装"></a>2.1 一键安装</h3><p><strong>Linux &#x2F; macOS &#x2F; WSL2 &#x2F; Android (Termux)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc   <span class="comment"># 或 source ~/.zshrc</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>Windows 原生（PowerShell）：</strong></p>
-<pre><code class="language-powershell">iex (irm https://hermes-agent.nousresearch.com/install.ps1)
-</code></pre>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">iex</span> (<span class="built_in">irm</span> https://hermes<span class="literal">-agent</span>.nousresearch.com/install.ps1)</span><br></pre></td></tr></table></figure>
+
 <p><strong>Windows 推荐路径</strong>：WSL2 内运行 bash 安装脚本 — 与 Linux 生产环境一致。</p>
 <p><strong>Termux（Android）</strong>：直接在手机上运行 Agent，适合轻量 Gateway + Telegram Bot。注意电量与后台进程限制。</p>
-<h3>2.2 安装器做了什么</h3>
-<table>
+<h3 id="2-2-安装器做了什么"><a href="#2-2-安装器做了什么" class="headerlink" title="2.2 安装器做了什么"></a>2.2 安装器做了什么</h3><table>
 <thead>
 <tr>
 <th>组件</th>
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>uv</td>
 <td>Python 包管理</td>
 </tr>
@@ -407,10 +400,8 @@ source ~/.bashrc   # 或 source ~/.zshrc
 <td>全局命令</td>
 <td><code>~/.local/bin/hermes</code></td>
 </tr>
-</tbody>
-</table>
-<h3>2.3 安装布局</h3>
-<table>
+</tbody></table>
+<h3 id="2-3-安装布局"><a href="#2-3-安装布局" class="headerlink" title="2.3 安装布局"></a>2.3 安装布局</h3><table>
 <thead>
 <tr>
 <th>方式</th>
@@ -418,8 +409,7 @@ source ~/.bashrc   # 或 source ~/.zshrc
 <th>数据目录</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Git 安装器（用户）</td>
 <td><code>~/.hermes/hermes-agent/</code></td>
 <td><code>~/.hermes/</code></td>
@@ -434,33 +424,20 @@ source ~/.bashrc   # 或 source ~/.zshrc
 <td><code>/usr/local/lib/hermes-agent/</code></td>
 <td>每用户 <code>~/.hermes/</code> 或 <code>$HERMES_HOME</code></td>
 </tr>
-</tbody>
-</table>
-<h3>2.4 初始化</h3>
-<pre><code class="language-bash">hermes setup              # 完整配置向导
-hermes setup --portal     # 推荐：OAuth + Tool Gateway 一步完成
-hermes model              # 选择 Provider 与模型
-hermes tools              # 配置 toolsets
-hermes gateway setup      # 配置消息平台
-</code></pre>
+</tbody></table>
+<h3 id="2-4-初始化"><a href="#2-4-初始化" class="headerlink" title="2.4 初始化"></a>2.4 初始化</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hermes setup              <span class="comment"># 完整配置向导</span></span><br><span class="line">hermes setup --portal     <span class="comment"># 推荐：OAuth + Tool Gateway 一步完成</span></span><br><span class="line">hermes model              <span class="comment"># 选择 Provider 与模型</span></span><br><span class="line">hermes tools              <span class="comment"># 配置 toolsets</span></span><br><span class="line">hermes gateway setup      <span class="comment"># 配置消息平台</span></span><br></pre></td></tr></table></figure>
+
 <p><code>hermes setup --portal</code> 覆盖：模型 Provider + web search + image gen + TTS + cloud browser — <strong>最低摩擦无人值守路径</strong>。</p>
 <p><strong>English</strong></p>
-<p>Install via curl script (Linux/macOS/WSL2/Termux) or PowerShell (native Windows; WSL2 preferred). Installer bundles Python, Node, ripgrep, ffmpeg. Run <code>hermes setup --portal</code> for fastest OAuth + Tool Gateway setup.</p>
-<h3>2.5 非 root / systemd 服务用户</h3>
-<pre><code class="language-bash"># 管理员一次性（Debian/Ubuntu）
-sudo npx playwright install-deps chromium
+<p>Install via curl script (Linux&#x2F;macOS&#x2F;WSL2&#x2F;Termux) or PowerShell (native Windows; WSL2 preferred). Installer bundles Python, Node, ripgrep, ffmpeg. Run <code>hermes setup --portal</code> for fastest OAuth + Tool Gateway setup.</p>
+<h3 id="2-5-非-root-systemd-服务用户"><a href="#2-5-非-root-systemd-服务用户" class="headerlink" title="2.5 非 root &#x2F; systemd 服务用户"></a>2.5 非 root &#x2F; systemd 服务用户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 管理员一次性（Debian/Ubuntu）</span></span><br><span class="line"><span class="built_in">sudo</span> npx playwright install-deps chromium</span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务用户</span></span><br><span class="line">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</span><br><span class="line"><span class="comment"># 或跳过浏览器：bash -s -- --skip-browser</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 确保 PATH 含 ~/.local/bin/hermes</span></span><br><span class="line">hermes doctor</span><br></pre></td></tr></table></figure>
 
-<h1 id="服务用户"><a href="#服务用户" class="headerlink" title="服务用户"></a>服务用户</h1><p>curl -fsSL <a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/install.sh">https://hermes-agent.nousresearch.com/install.sh</a> | bash</p>
-<h1 id="或跳过浏览器：bash-s-–-–skip-browser"><a href="#或跳过浏览器：bash-s-–-–skip-browser" class="headerlink" title="或跳过浏览器：bash -s – –skip-browser"></a>或跳过浏览器：bash -s – –skip-browser</h1><h1 id="确保-PATH-含-local-bin-hermes"><a href="#确保-PATH-含-local-bin-hermes" class="headerlink" title="确保 PATH 含 ~&#x2F;.local&#x2F;bin&#x2F;hermes"></a>确保 PATH 含 ~&#x2F;.local&#x2F;bin&#x2F;hermes</h1><p>hermes doctor<br></code></pre></p>
 <p><strong>English</strong></p>
 <p>For systemd service accounts: admin installs Playwright system deps; service user runs installer with <code>--skip-browser</code> if headless only. Verify with <code>hermes doctor</code>.</p>
-<hr/>
-<h2>三、OpenClaw 安装 | OpenClaw Installation</h2>
-<p><strong>中文</strong></p>
-<pre><code class="language-bash">npm install -g openclaw@latest
-openclaw onboard --install-daemon
-openclaw dashboard
-</code></pre>
+<hr>
+<h2 id="三、OpenClaw-安装-OpenClaw-Installation"><a href="#三、OpenClaw-安装-OpenClaw-Installation" class="headerlink" title="三、OpenClaw 安装 | OpenClaw Installation"></a>三、OpenClaw 安装 | OpenClaw Installation</h2><p><strong>中文</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g openclaw@latest</span><br><span class="line">openclaw onboard --install-daemon</span><br><span class="line">openclaw dashboard</span><br></pre></td></tr></table></figure>
+
 <table>
 <thead>
 <tr>
@@ -468,56 +445,38 @@ openclaw dashboard
 <th>作用</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>npm install -g</code></td>
 <td>全局 CLI + Gateway</td>
 </tr>
 <tr>
 <td><code>onboard --install-daemon</code></td>
-<td>引导式配置 + 系统服务（launchd/systemd）</td>
+<td>引导式配置 + 系统服务（launchd&#x2F;systemd）</td>
 </tr>
 <tr>
 <td><code>dashboard</code></td>
 <td>浏览器控制台 <code>http://127.0.0.1:18789/</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>工作区默认：<code>~/.openclaw/workspace/</code>（SOUL.md、AGENTS.md 等）</p>
 <p>主配置：<code>~/.openclaw/openclaw.json</code></p>
 <p><strong>English</strong></p>
 <p><code>npm install -g openclaw@latest</code>, then <code>openclaw onboard --install-daemon</code> for guided setup and daemon install. Control UI at <code>http://127.0.0.1:18789/</code>. Workspace at <code>~/.openclaw/workspace/</code>.</p>
-<hr/>
-<h2>四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="四、渠道配置：Telegram-最快路径-Channel-Setup-Telegram-Fastest-Path"><a href="#四、渠道配置：Telegram-最快路径-Channel-Setup-Telegram-Fastest-Path" class="headerlink" title="四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path"></a>四、渠道配置：Telegram 最快路径 | Channel Setup: Telegram Fastest Path</h2><p><strong>中文</strong></p>
 <p>Telegram 是两框架 <strong>上手最快</strong> 的渠道之一：Bot Token 申请简单、无需企业资质、长轮询即可运行。</p>
-<h3>4.1 Hermes Telegram</h3>
-<pre><code class="language-bash">hermes gateway setup
-# 或编辑 ~/.hermes/.env：
-# TELEGRAM_BOT_TOKEN=...
-# TELEGRAM_ALLOWED_USERS=123456789
-hermes gateway start
-</code></pre>
+<h3 id="4-1-Hermes-Telegram"><a href="#4-1-Hermes-Telegram" class="headerlink" title="4.1 Hermes Telegram"></a>4.1 Hermes Telegram</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hermes gateway setup</span><br><span class="line"><span class="comment"># 或编辑 ~/.hermes/.env：</span></span><br><span class="line"><span class="comment"># TELEGRAM_BOT_TOKEN=...</span></span><br><span class="line"><span class="comment"># TELEGRAM_ALLOWED_USERS=123456789</span></span><br><span class="line">hermes gateway start</span><br></pre></td></tr></table></figure>
+
 <p>生产建议：</p>
 <ul>
 <li>配置 <code>TELEGRAM_ALLOWED_USERS</code> 或启用 DM pairing</li>
 <li><code>terminal.backend: docker</code></li>
 <li>可选 <code>TELEGRAM_HOME_CHANNEL</code> 用于 Cron 投递</li>
 </ul>
-<h3>4.2 OpenClaw Telegram</h3>
-<pre><code class="language-json5">{
-  channels: {
-    telegram: {
-      botToken: "...",
-      dmPolicy: "pairing",
-      groups: { "*": { requireMention: true } },
-    },
-  },
-}
-</code></pre>
+<h3 id="4-2-OpenClaw-Telegram"><a href="#4-2-OpenClaw-Telegram" class="headerlink" title="4.2 OpenClaw Telegram"></a>4.2 OpenClaw Telegram</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  channels: &#123;</span><br><span class="line">    telegram: &#123;</span><br><span class="line">      botToken: &quot;...&quot;,</span><br><span class="line">      dmPolicy: &quot;pairing&quot;,</span><br><span class="line">      groups: &#123; &quot;*&quot;: &#123; requireMention: true &#125; &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>通过 <code>openclaw dashboard</code> 或 onboard 向导配置。</p>
-<h3>4.3 渠道对比速查</h3>
-<table>
+<h3 id="4-3-渠道对比速查"><a href="#4-3-渠道对比速查" class="headerlink" title="4.3 渠道对比速查"></a>4.3 渠道对比速查</h3><table>
 <thead>
 <tr>
 <th>渠道</th>
@@ -526,8 +485,7 @@ hermes gateway start
 <th>OpenClaw</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Telegram</td>
 <td>★☆☆</td>
 <td>内置 Adapter</td>
@@ -542,7 +500,7 @@ hermes gateway start
 <tr>
 <td>WhatsApp</td>
 <td>★★★</td>
-<td>Cloud API / Baileys</td>
+<td>Cloud API &#x2F; Baileys</td>
 <td>内置 bridge</td>
 </tr>
 <tr>
@@ -552,45 +510,30 @@ hermes gateway start
 <td>内置 + Nodes</td>
 </tr>
 <tr>
-<td>企业微信/飞书</td>
+<td>企业微信&#x2F;飞书</td>
 <td>★★★</td>
 <td>内置</td>
 <td>插件</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
-<p>Telegram is the fastest channel for both frameworks. Hermes: <code>hermes gateway setup</code> + allowlist/pairing. OpenClaw: <code>channels.telegram</code> in <code>openclaw.json</code> with <code>dmPolicy: pairing</code>.</p>
-<hr/>
-<h2>五、Gateway 系统服务 | Gateway as System Service</h2>
-<p><strong>中文</strong></p>
-<h3>5.1 Hermes</h3>
-<pre><code class="language-bash">hermes gateway install              # 用户级 systemd/launchd
-sudo hermes gateway install --system  # Linux 开机系统服务
-hermes gateway start
-hermes gateway stop
-hermes gateway stop --all           # 更新前停止所有 Profile
-</code></pre>
+<p>Telegram is the fastest channel for both frameworks. Hermes: <code>hermes gateway setup</code> + allowlist&#x2F;pairing. OpenClaw: <code>channels.telegram</code> in <code>openclaw.json</code> with <code>dmPolicy: pairing</code>.</p>
+<hr>
+<h2 id="五、Gateway-系统服务-Gateway-as-System-Service"><a href="#五、Gateway-系统服务-Gateway-as-System-Service" class="headerlink" title="五、Gateway 系统服务 | Gateway as System Service"></a>五、Gateway 系统服务 | Gateway as System Service</h2><p><strong>中文</strong></p>
+<h3 id="5-1-Hermes"><a href="#5-1-Hermes" class="headerlink" title="5.1 Hermes"></a>5.1 Hermes</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hermes gateway install              <span class="comment"># 用户级 systemd/launchd</span></span><br><span class="line"><span class="built_in">sudo</span> hermes gateway install --system  <span class="comment"># Linux 开机系统服务</span></span><br><span class="line">hermes gateway start</span><br><span class="line">hermes gateway stop</span><br><span class="line">hermes gateway stop --all           <span class="comment"># 更新前停止所有 Profile</span></span><br></pre></td></tr></table></figure>
+
 <p>PID 文件：<code>~/.hermes/gateway.pid</code>（Profile 作用域）</p>
 <p>后台任务并行运行：Cron 调度（60s tick）、会话过期、记忆 flush、Provider 缓存刷新。</p>
-<h3>5.2 OpenClaw</h3>
-<p><code>openclaw onboard --install-daemon</code> 安装 launchd/systemd 服务。</p>
-<pre><code class="language-json5">{
-  gateway: {
-    mode: "local",
-    bind: "loopback",           // 生产：loopback 或 auth
-    auth: { mode: "token", token: "long-random-token" },
-  },
-}
-</code></pre>
+<h3 id="5-2-OpenClaw"><a href="#5-2-OpenClaw" class="headerlink" title="5.2 OpenClaw"></a>5.2 OpenClaw</h3><p><code>openclaw onboard --install-daemon</code> 安装 launchd&#x2F;systemd 服务。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  gateway: &#123;</span><br><span class="line">    mode: &quot;local&quot;,</span><br><span class="line">    bind: &quot;loopback&quot;,           // 生产：loopback 或 auth</span><br><span class="line">    auth: &#123; mode: &quot;token&quot;, token: &quot;long-random-token&quot; &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>远程访问：Tailscale 或 SSH 隧道 — <strong>避免直接公网暴露 18789</strong>。</p>
 <p><strong>English</strong></p>
-<p>Hermes: <code>hermes gateway install</code> (user or <code>--system</code> service). OpenClaw: daemon via onboard. Bind loopback or enable auth; use Tailscale/SSH for remote access.</p>
-<hr/>
-<h2>六、hermes claw migrate 迁移 | Migrating from OpenClaw</h2>
-<p><strong>中文</strong></p>
-<pre><code class="language-bash">hermes claw migrate
-</code></pre>
+<p>Hermes: <code>hermes gateway install</code> (user or <code>--system</code> service). OpenClaw: daemon via onboard. Bind loopback or enable auth; use Tailscale&#x2F;SSH for remote access.</p>
+<hr>
+<h2 id="六、hermes-claw-migrate-迁移-Migrating-from-OpenClaw"><a href="#六、hermes-claw-migrate-迁移-Migrating-from-OpenClaw" class="headerlink" title="六、hermes claw migrate 迁移 | Migrating from OpenClaw"></a>六、hermes claw migrate 迁移 | Migrating from OpenClaw</h2><p><strong>中文</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hermes claw migrate</span><br></pre></td></tr></table></figure>
+
 <p>一键从 <code>~/.openclaw/</code> 导入：</p>
 <table>
 <thead>
@@ -599,17 +542,16 @@ hermes gateway stop --all           # 更新前停止所有 Profile
 <th>目标</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>SOUL.md</td>
-<td>Hermes 人格 / global SOUL</td>
+<td>Hermes 人格 &#x2F; global SOUL</td>
 </tr>
 <tr>
-<td>MEMORY.md / USER.md</td>
+<td>MEMORY.md &#x2F; USER.md</td>
 <td>持久记忆条目</td>
 </tr>
 <tr>
-<td>skills/</td>
+<td>skills&#x2F;</td>
 <td><code>~/.hermes/skills/</code></td>
 </tr>
 <tr>
@@ -617,42 +559,32 @@ hermes gateway stop --all           # 更新前停止所有 Profile
 <td><code>.env</code> 映射</td>
 </tr>
 <tr>
-<td>消息/Gateway 设置</td>
+<td>消息&#x2F;Gateway 设置</td>
 <td>Hermes 平台配置</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>迁移后仍需</strong>：</p>
-<pre><code class="language-bash">hermes model              # 确认 Provider
-hermes gateway setup      # 验证渠道 Token
-hermes doctor             # 健康检查
-</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hermes model              <span class="comment"># 确认 Provider</span></span><br><span class="line">hermes gateway setup      <span class="comment"># 验证渠道 Token</span></span><br><span class="line">hermes doctor             <span class="comment"># 健康检查</span></span><br></pre></td></tr></table></figure>
+
 <p>适用场景：已有龙虾部署、想叠加 Hermes 学习闭环，或社区 <strong>HermesClaw</strong> 双栈实验。</p>
 <p><strong>English</strong></p>
 <p><code>hermes claw migrate</code> imports SOUL, memory, skills, API keys, and messaging config from <code>~/.openclaw/</code>. Follow with <code>hermes model</code>, <code>hermes gateway setup</code>, and <code>hermes doctor</code>.</p>
-<hr/>
-<h2>七、诊断与审计 | Diagnostics &amp; Auditing</h2>
-<p><strong>中文</strong></p>
-<h3>7.1 hermes doctor</h3>
-<pre><code class="language-bash">hermes doctor
-hermes doctor --ack &lt;id&gt;    # 确认处置供应链告警
-</code></pre>
+<hr>
+<h2 id="七、诊断与审计-Diagnostics-Auditing"><a href="#七、诊断与审计-Diagnostics-Auditing" class="headerlink" title="七、诊断与审计 | Diagnostics &amp; Auditing"></a>七、诊断与审计 | Diagnostics &amp; Auditing</h2><p><strong>中文</strong></p>
+<h3 id="7-1-hermes-doctor"><a href="#7-1-hermes-doctor" class="headerlink" title="7.1 hermes doctor"></a>7.1 hermes doctor</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hermes doctor</span><br><span class="line">hermes doctor --ack &lt;<span class="built_in">id</span>&gt;    <span class="comment"># 确认处置供应链告警</span></span><br></pre></td></tr></table></figure>
+
 <p>检查项包括：</p>
 <ul>
 <li>Python venv 完整性</li>
 <li>已知妥协包版本（供应链蠕虫等）</li>
 <li>配置迁移状态</li>
-<li>安装方式检测（pip/git/Homebrew/Nix）</li>
+<li>安装方式检测（pip&#x2F;git&#x2F;Homebrew&#x2F;Nix）</li>
 <li>缺失依赖与修复建议</li>
 </ul>
-<h3>7.2 openclaw security audit</h3>
-<pre><code class="language-bash">openclaw security audit
-openclaw security audit --deep    # 含实时 Gateway 探测
-openclaw security audit --fix     # 自动修复常见问题
-</code></pre>
+<h3 id="7-2-openclaw-security-audit"><a href="#7-2-openclaw-security-audit" class="headerlink" title="7.2 openclaw security audit"></a>7.2 openclaw security audit</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openclaw security audit</span><br><span class="line">openclaw security audit --deep    <span class="comment"># 含实时 Gateway 探测</span></span><br><span class="line">openclaw security audit --fix     <span class="comment"># 自动修复常见问题</span></span><br></pre></td></tr></table></figure>
+
 <p>覆盖：入站访问、工具爆炸半径、网络暴露、文件权限、插件策略漂移。</p>
-<h3>7.3 对照表</h3>
-<table>
+<h3 id="7-3-对照表"><a href="#7-3-对照表" class="headerlink" title="7.3 对照表"></a>7.3 对照表</h3><table>
 <thead>
 <tr>
 <th>操作</th>
@@ -660,8 +592,7 @@ openclaw security audit --fix     # 自动修复常见问题
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>健康诊断</td>
 <td>Gateway 日志 + security audit</td>
 <td><code>hermes doctor</code></td>
@@ -679,18 +610,15 @@ openclaw security audit --fix     # 自动修复常见问题
 <tr>
 <td>配置检查</td>
 <td>手动编辑 openclaw.json</td>
-<td><code>hermes config check</code> / <code>migrate</code></td>
+<td><code>hermes config check</code> &#x2F; <code>migrate</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p><code>hermes doctor</code> for health and supply-chain advisories. <code>openclaw security audit [--deep] [--fix]</code> for OpenClaw hardening. <code>hermes update</code> auto-detects install method.</p>
-<hr/>
-<h2>八、ACP IDE 集成 | ACP IDE Integration</h2>
-<p><strong>中文</strong></p>
-<pre><code class="language-bash">pip install -e '.[acp]'    # 或在标准安装后
-hermes acp
-</code></pre>
+<hr>
+<h2 id="八、ACP-IDE-集成-ACP-IDE-Integration"><a href="#八、ACP-IDE-集成-ACP-IDE-Integration" class="headerlink" title="八、ACP IDE 集成 | ACP IDE Integration"></a>八、ACP IDE 集成 | ACP IDE Integration</h2><p><strong>中文</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install -e <span class="string">&#x27;.[acp]&#x27;</span>    <span class="comment"># 或在标准安装后</span></span><br><span class="line">hermes acp</span><br></pre></td></tr></table></figure>
+
 <table>
 <thead>
 <tr>
@@ -698,75 +626,59 @@ hermes acp
 <th>配置</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>VS Code</td>
 <td>ACP Client 扩展 → <code>acp.agents.Hermes Agent</code></td>
 </tr>
 <tr>
 <td>Zed</td>
-<td>ACP Registry → <code>uvx --from 'hermes-agent[acp]' hermes-acp</code></td>
+<td>ACP Registry → <code>uvx --from &#39;hermes-agent[acp]&#39; hermes-acp</code></td>
 </tr>
 <tr>
 <td>JetBrains</td>
 <td>指向 <code>acp_registry/</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>ACP 使用 <code>hermes-acp</code> 精选 toolset：文件、终端、web、memory、skills、<code>delegate_task</code> — <strong>不含</strong> cronjob、messaging delivery。</p>
-<p>审批选项：<code>allow_once</code> / <code>allow_session</code> / <code>allow_always</code> / <code>deny</code></p>
-<pre><code class="language-bash">hermes acp --setup-browser --yes   # 可选浏览器工具
-</code></pre>
+<p>审批选项：<code>allow_once</code> &#x2F; <code>allow_session</code> &#x2F; <code>allow_always</code> &#x2F; <code>deny</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hermes acp --setup-browser --<span class="built_in">yes</span>   <span class="comment"># 可选浏览器工具</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>English</strong></p>
 <p><code>hermes acp</code> for VS Code, Zed (via ACP Registry + uv), JetBrains. Curated toolset for editor workflows. Configure credentials first with <code>hermes model</code>.</p>
-<hr/>
-<h2>九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="九、轨迹导出与-RL-研究-Trajectories-RL-Research"><a href="#九、轨迹导出与-RL-研究-Trajectories-RL-Research" class="headerlink" title="九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research"></a>九、轨迹导出与 RL 研究 | Trajectories &amp; RL Research</h2><p><strong>中文</strong></p>
 <p>Hermes 提供 Batch Runner、ShareGPT 轨迹导出、Atropos RL 集成与断点续跑，面向工具调用模型微调。OpenClaw 会话存于 <code>sessions/*.jsonl</code>，可手动提取但无内置 RL 管线。</p>
 <p><strong>English</strong></p>
 <p>Hermes: batch runner, ShareGPT export, Atropos RL. OpenClaw: jsonl transcripts only — no built-in RL pipeline.</p>
-<hr/>
-<h2>十、移动端 Nodes（OpenClaw）| iOS/Android Nodes</h2>
-<p><strong>中文</strong></p>
-<p>OpenClaw 通过 Web Control UI 配对 iOS/Android <strong>Nodes</strong>（Canvas、相机、语音）。Hermes <strong>无原生 Node</strong>，以 Telegram/WhatsApp 等消息平台作「口袋助理」；Android 可用 Termux 自托管。需手机硬件深度集成选 OpenClaw Nodes；纯消息 + Cron 选 Hermes Gateway。</p>
+<hr>
+<h2 id="十、移动端-Nodes（OpenClaw）-iOS-Android-Nodes"><a href="#十、移动端-Nodes（OpenClaw）-iOS-Android-Nodes" class="headerlink" title="十、移动端 Nodes（OpenClaw）| iOS&#x2F;Android Nodes"></a>十、移动端 Nodes（OpenClaw）| iOS&#x2F;Android Nodes</h2><p><strong>中文</strong></p>
+<p>OpenClaw 通过 Web Control UI 配对 iOS&#x2F;Android <strong>Nodes</strong>（Canvas、相机、语音）。Hermes <strong>无原生 Node</strong>，以 Telegram&#x2F;WhatsApp 等消息平台作「口袋助理」；Android 可用 Termux 自托管。需手机硬件深度集成选 OpenClaw Nodes；纯消息 + Cron 选 Hermes Gateway。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw nodes: canvas, camera, voice via Control UI pairing. Hermes: messaging platforms or Termux on Android — no native mobile SDK.</p>
-<hr/>
-<h2>十一、分离式 Gateway/执行（SSH 模式）| Split Gateway / Execution</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="十一、分离式-Gateway-执行（SSH-模式）-Split-Gateway-Execution"><a href="#十一、分离式-Gateway-执行（SSH-模式）-Split-Gateway-Execution" class="headerlink" title="十一、分离式 Gateway&#x2F;执行（SSH 模式）| Split Gateway &#x2F; Execution"></a>十一、分离式 Gateway&#x2F;执行（SSH 模式）| Split Gateway &#x2F; Execution</h2><p><strong>中文</strong></p>
 <p>高安全生产拓扑：</p>
-<pre><code class="language-text">┌─────────────────────┐         SSH          ┌─────────────────────┐
-│  Gateway VPS        │ ──────────────────► │  执行 VPS           │
-│  - 仅消息 + 配对     │    terminal.backend  │  - Docker 沙箱      │
-│  - 无敏感代码仓库    │         : ssh          │  - GPU / 大磁盘     │
-└─────────────────────┘                      └─────────────────────┘
-</code></pre>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────┐         SSH          ┌─────────────────────┐</span><br><span class="line">│  Gateway VPS        │ ──────────────────► │  执行 VPS           │</span><br><span class="line">│  - 仅消息 + 配对     │    terminal.backend  │  - Docker 沙箱      │</span><br><span class="line">│  - 无敏感代码仓库    │         : ssh          │  - GPU / 大磁盘     │</span><br><span class="line">└─────────────────────┘                      └─────────────────────┘</span><br></pre></td></tr></table></figure>
+
 <p><strong>Hermes 配置：</strong></p>
-<pre><code class="language-yaml">terminal:
-  backend: ssh
-  ssh:
-    host: execution.internal
-    user: hermes
-    key_path: ~/.ssh/hermes_exec
-</code></pre>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">terminal:</span></span><br><span class="line">  <span class="attr">backend:</span> <span class="string">ssh</span></span><br><span class="line">  <span class="attr">ssh:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">execution.internal</span></span><br><span class="line">    <span class="attr">user:</span> <span class="string">hermes</span></span><br><span class="line">    <span class="attr">key_path:</span> <span class="string">~/.ssh/hermes_exec</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>OpenClaw</strong>：sandbox 配置 + remote node 模式。</p>
 <p><strong>English</strong></p>
-<p>Split trust: Gateway host for messaging only; execution host via SSH/Docker sandbox. Hermes: <code>terminal.backend: ssh</code>. OpenClaw: sandbox + remote nodes.</p>
-<hr/>
-<h2>十二、运维清单 | Operations Checklist</h2>
-<p><strong>中文</strong></p>
+<p>Split trust: Gateway host for messaging only; execution host via SSH&#x2F;Docker sandbox. Hermes: <code>terminal.backend: ssh</code>. OpenClaw: sandbox + remote nodes.</p>
+<hr>
+<h2 id="十二、运维清单-Operations-Checklist"><a href="#十二、运维清单-Operations-Checklist" class="headerlink" title="十二、运维清单 | Operations Checklist"></a>十二、运维清单 | Operations Checklist</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
-<th>频率 / 硬化项</th>
+<th>频率 &#x2F; 硬化项</th>
 <th>Hermes</th>
 <th>OpenClaw</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>每日</td>
-<td>Gateway 日志 / Cron 输出</td>
+<td>Gateway 日志 &#x2F; Cron 输出</td>
 <td>Dashboard 会话</td>
 </tr>
 <tr>
@@ -780,7 +692,7 @@ hermes acp
 <td>npm 更新、审计 Skills</td>
 </tr>
 <tr>
-<td>Allowlist / 配对</td>
+<td>Allowlist &#x2F; 配对</td>
 <td>平台 allowlist + DM pairing</td>
 <td><code>dmPolicy: pairing</code> + <code>dmScope</code></td>
 </tr>
@@ -800,17 +712,15 @@ hermes acp
 <td><code>security audit --deep --fix</code></td>
 </tr>
 <tr>
-<td>插件/供应链</td>
+<td>插件&#x2F;供应链</td>
 <td>Cron <code>enabled_toolsets</code></td>
 <td><code>plugins.allow</code> + shrinkwrap</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
-<p>Routine ops: logs, weekly doctor/audit, monthly updates and key rotation. Production: allowlists, pairing, sandboxed execution, gateway services, and supply-chain checks for both frameworks.</p>
-<hr/>
-<h2>十三、故障排查 | Troubleshooting</h2>
-<p><strong>中文</strong></p>
+<p>Routine ops: logs, weekly doctor&#x2F;audit, monthly updates and key rotation. Production: allowlists, pairing, sandboxed execution, gateway services, and supply-chain checks for both frameworks.</p>
+<hr>
+<h2 id="十三、故障排查-Troubleshooting"><a href="#十三、故障排查-Troubleshooting" class="headerlink" title="十三、故障排查 | Troubleshooting"></a>十三、故障排查 | Troubleshooting</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -819,8 +729,7 @@ hermes acp
 <th>OpenClaw 解决</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>hermes: command not found</code></td>
 <td><code>source ~/.bashrc</code>；检查 <code>~/.local/bin</code></td>
 <td>检查 npm global bin PATH</td>
@@ -837,7 +746,7 @@ hermes acp
 </tr>
 <tr>
 <td>Telegram 无回复</td>
-<td>检查 allowlist / pairing</td>
+<td>检查 allowlist &#x2F; pairing</td>
 <td><code>dmPolicy</code>、bot token</td>
 </tr>
 <tr>
@@ -865,13 +774,11 @@ hermes acp
 <td><code>hermes doctor --ack</code></td>
 <td><code>security audit</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
-<p>Common fixes: PATH for <code>hermes</code>, credentials via <code>hermes model</code>/<code>setup --portal</code>, gateway restart, pairing/allowlists for Telegram, <code>config migrate</code> for Hermes, <code>security audit</code> for OpenClaw. Run <code>hermes doctor</code> / <code>hermes status</code> or <code>openclaw security audit --deep</code> for guided diagnosis.</p>
-<hr/>
-<h2>十四、快速命令对照 | Quick Command Reference</h2>
-<table>
+<p>Common fixes: PATH for <code>hermes</code>, credentials via <code>hermes model</code>&#x2F;<code>setup --portal</code>, gateway restart, pairing&#x2F;allowlists for Telegram, <code>config migrate</code> for Hermes, <code>security audit</code> for OpenClaw. Run <code>hermes doctor</code> &#x2F; <code>hermes status</code> or <code>openclaw security audit --deep</code> for guided diagnosis.</p>
+<hr>
+<h2 id="十四、快速命令对照-Quick-Command-Reference"><a href="#十四、快速命令对照-Quick-Command-Reference" class="headerlink" title="十四、快速命令对照 | Quick Command Reference"></a>十四、快速命令对照 | Quick Command Reference</h2><table>
 <thead>
 <tr>
 <th>操作</th>
@@ -879,16 +786,15 @@ hermes acp
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>安装</td>
 <td><code>npm install -g openclaw@latest</code></td>
-<td><code>curl -fsSL .../install.sh \| bash</code></td>
+<td><code>curl -fsSL .../install.sh | bash</code></td>
 </tr>
 <tr>
 <td>初始化</td>
 <td><code>openclaw onboard --install-daemon</code></td>
-<td><code>hermes setup</code> / <code>setup --portal</code></td>
+<td><code>hermes setup</code> &#x2F; <code>setup --portal</code></td>
 </tr>
 <tr>
 <td>控制 UI</td>
@@ -908,7 +814,7 @@ hermes acp
 <tr>
 <td>换模型</td>
 <td>Runtime 配置</td>
-<td><code>hermes model</code> / <code>/model</code></td>
+<td><code>hermes model</code> &#x2F; <code>/model</code></td>
 </tr>
 <tr>
 <td>安全审计</td>
@@ -935,24 +841,21 @@ hermes acp
 <td><code>npm update -g openclaw</code></td>
 <td><code>hermes update</code></td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>十五、延伸阅读 | Further Reading</h2>
-<ul>
+</tbody></table>
+<hr>
+<h2 id="十五、延伸阅读-Further-Reading"><a href="#十五、延伸阅读-Further-Reading" class="headerlink" title="十五、延伸阅读 | Further Reading"></a>十五、延伸阅读 | Further Reading</h2><ul>
 <li><a href="./gateway.md">Gateway 架构深度解析</a> — 部署模式与生产清单</li>
 <li><a href="./security-model.md">安全模型深度解析</a> — audit 与硬化基线</li>
 <li><a href="./model-provider-cost.md">模型 Provider 与成本</a> — Portal 与 Cron 成本</li>
 <li><a href="./plugins-mcp-ecosystem.md">插件体系与 MCP</a> — 扩展安装</li>
 <li>Hermes：<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/getting-started/installation">Installation</a>、<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/getting-started/termux">Termux</a>、<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/reference/faq">FAQ</a></li>
-<li>OpenClaw：https://docs.openclaw.ai/</li>
+<li>OpenClaw：<a target="_blank" rel="noopener" href="https://docs.openclaw.ai/">https://docs.openclaw.ai/</a></li>
 </ul>
-<hr/>
-<h2>十六、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
-<p>部署个人 Agent 的「最快路径」是：<strong>Hermes 用 <code>curl</code> + <code>setup --portal</code> + Telegram；OpenClaw 用 <code>npm</code> + <code>onboard</code> + Dashboard</strong>。生产环境无论选型，都应完成 <strong>配对/allowlist、执行沙箱、诊断审计、Gateway 系统服务</strong> 四件事。已有龙虾用户可通过 <code>hermes claw migrate</code> 平滑叠加学习闭环；高安全场景采用 <strong>SSH 分离 Gateway/执行</strong>。运维不是一次性安装 — <code>hermes doctor</code> 与 <code>openclaw security audit</code> 应纳入日常节奏。</p>
+<hr>
+<h2 id="十六、结语-Conclusion"><a href="#十六、结语-Conclusion" class="headerlink" title="十六、结语 | Conclusion"></a>十六、结语 | Conclusion</h2><p><strong>中文</strong></p>
+<p>部署个人 Agent 的「最快路径」是：<strong>Hermes 用 <code>curl</code> + <code>setup --portal</code> + Telegram；OpenClaw 用 <code>npm</code> + <code>onboard</code> + Dashboard</strong>。生产环境无论选型，都应完成 <strong>配对&#x2F;allowlist、执行沙箱、诊断审计、Gateway 系统服务</strong> 四件事。已有龙虾用户可通过 <code>hermes claw migrate</code> 平滑叠加学习闭环；高安全场景采用 <strong>SSH 分离 Gateway&#x2F;执行</strong>。运维不是一次性安装 — <code>hermes doctor</code> 与 <code>openclaw security audit</code> 应纳入日常节奏。</p>
 <p><strong>English</strong></p>
-<p>Fastest paths: Hermes <code>curl</code> + <code>setup --portal</code> + Telegram; OpenClaw <code>npm</code> + <code>onboard</code> + Dashboard. Production requires pairing/allowlists, execution sandboxing, diagnostics, and gateway services. Migrate from OpenClaw with <code>hermes claw migrate</code>. Split gateway/execution via SSH for high security. Treat <code>hermes doctor</code> and <code>security audit</code> as routine ops, not one-time setup.</p>
+<p>Fastest paths: Hermes <code>curl</code> + <code>setup --portal</code> + Telegram; OpenClaw <code>npm</code> + <code>onboard</code> + Dashboard. Production requires pairing&#x2F;allowlists, execution sandboxing, diagnostics, and gateway services. Migrate from OpenClaw with <code>hermes claw migrate</code>. Split gateway&#x2F;execution via SSH for high security. Treat <code>hermes doctor</code> and <code>security audit</code> as routine ops, not one-time setup.</p>
 
     </div>
 
@@ -977,6 +880,9 @@ hermes acp
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2026-industry-mvp-deployment.html" rel="next" title="AI 技术编年史 2026：行业 AI MVP 标准化落地">
+                  AI 技术编年史 2026：行业 AI MVP 标准化落地 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>

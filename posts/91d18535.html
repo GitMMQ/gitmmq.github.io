@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、为什么需要多 Agent | Why Multi-Agent? 中文 单一 Gateway 往往要同时服务：  个人 vs 工作人格 不同聊天渠道（Telegram 私聊 vs 工作群） 并行子任务（研究 A&#x2F;B&#x2F;C 同时进行） 团队共享 Bot vs 个人助理  两个框架都支持「一个控制平面、多个 Agent 脑」，但路由">
+    <meta name="description" content="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析Multi-Agent Routing &amp; Sub-Agent Delegation in Agent Hermes &amp; OpenClaw 最后更新 | Last updated: 2026-06-06   一、为什么需要多 Agent | Why Multi-Agent?中文 单一 Gatewa">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/91d18535.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、为什么需要多 Agent | Why Multi-Agent? 中文 单一 Gateway 往往要同时服务：  个人 vs 工作人格 不同聊天渠道（Telegram 私聊 vs 工作群） 并行子任务（研究 A&#x2F;B&#x2F;C 同时进行） 团队共享 Bot vs 个人助理  两个框架都支持「一个控制平面、多个 Agent 脑」，但路由">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析Multi-Agent Routing &amp; Sub-Agent Delegation in Agent Hermes &amp; OpenClaw 最后更新 | Last updated: 2026-06-06   一、为什么需要多 Agent | Why Multi-Agent?中文 单一 Gatewa">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-05T23:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-05T23:00:00.000Z">
+<meta property="article:published_time" content="2026-06-06T07:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T07:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Hermes">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、为什么需要多 Agent | Why Multi-Agent?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、OpenClaw 多 Agent 路由 | OpenClaw Multi-Agent Routing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 agents.list 与 bindings</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 session.dmScope 与 DM 隔离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 sessions_spawn 与 sessions_send</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 子代理精简 Bootstrap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 allowAgents 门禁（常见踩坑）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 团队 vs 个人 Agent 模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">三、Hermes 多 Agent 与 Profile 隔离 | Hermes Multi-Agent &amp; Profile Isolation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Session Key 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Profile 隔离（hermes -p）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 跨会话镜像与投递</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">四、Hermes delegate_task 委派 | Hermes delegate_task Delegation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 设计理念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 与 sessions_spawn 对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 隔离子代理（Isolated Subagents）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 并行工作流（Parallel Workstreams）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 成本优化：delegation.provider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 典型模式速查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">五、风险矩阵 | Risk Matrix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">六、OpenClaw 与 Hermes 选型 | When to Use Which</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">7.</span> <span class="nav-text">七、生产配置清单 | Production Checklist</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">7.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">7.2.</span> <span class="nav-text">Hermes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">8.</span> <span class="nav-text">八、命令对照 | Command Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">9.</span> <span class="nav-text">九、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">10.</span> <span class="nav-text">十、结语 | Conclusion</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw-%E5%A4%9A-Agent-%E8%B7%AF%E7%94%B1%E4%B8%8E%E5%AD%90%E4%BB%A3%E7%90%86%E5%A7%94%E6%B4%BE%E5%85%A8%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Multi-Agent-Routing-Sub-Agent-Delegation-in-Agent-Hermes-OpenClaw"><span class="nav-number">2.</span> <span class="nav-text">Multi-Agent Routing &amp; Sub-Agent Delegation in Agent Hermes &amp; OpenClaw</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%A4%9A-Agent-Why-Multi-Agent"><span class="nav-number">2.1.</span> <span class="nav-text">一、为什么需要多 Agent | Why Multi-Agent?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81OpenClaw-%E5%A4%9A-Agent-%E8%B7%AF%E7%94%B1-OpenClaw-Multi-Agent-Routing"><span class="nav-number">2.2.</span> <span class="nav-text">二、OpenClaw 多 Agent 路由 | OpenClaw Multi-Agent Routing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-agents-list-%E4%B8%8E-bindings"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 agents.list 与 bindings</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-session-dmScope-%E4%B8%8E-DM-%E9%9A%94%E7%A6%BB"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 session.dmScope 与 DM 隔离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-sessions-spawn-%E4%B8%8E-sessions-send"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.4 sessions_spawn 与 sessions_send</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%AD%90%E4%BB%A3%E7%90%86%E7%B2%BE%E7%AE%80-Bootstrap"><span class="nav-number">2.2.5.</span> <span class="nav-text">2.5 子代理精简 Bootstrap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-allowAgents-%E9%97%A8%E7%A6%81%EF%BC%88%E5%B8%B8%E8%A7%81%E8%B8%A9%E5%9D%91%EF%BC%89"><span class="nav-number">2.2.6.</span> <span class="nav-text">2.6 allowAgents 门禁（常见踩坑）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-%E5%9B%A2%E9%98%9F-vs-%E4%B8%AA%E4%BA%BA-Agent-%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.7.</span> <span class="nav-text">2.7 团队 vs 个人 Agent 模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Hermes-%E5%A4%9A-Agent-%E4%B8%8E-Profile-%E9%9A%94%E7%A6%BB-Hermes-Multi-Agent-Profile-Isolation"><span class="nav-number">2.3.</span> <span class="nav-text">三、Hermes 多 Agent 与 Profile 隔离 | Hermes Multi-Agent &amp; Profile Isolation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Session-Key-%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.3.1.</span> <span class="nav-text">3.1 Session Key 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Profile-%E9%9A%94%E7%A6%BB%EF%BC%88hermes-p%EF%BC%89"><span class="nav-number">2.3.2.</span> <span class="nav-text">3.2 Profile 隔离（hermes -p）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%B7%A8%E4%BC%9A%E8%AF%9D%E9%95%9C%E5%83%8F%E4%B8%8E%E6%8A%95%E9%80%92"><span class="nav-number">2.3.3.</span> <span class="nav-text">3.3 跨会话镜像与投递</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Hermes-delegate-task-%E5%A7%94%E6%B4%BE-Hermes-delegate-task-Delegation"><span class="nav-number">2.4.</span> <span class="nav-text">四、Hermes delegate_task 委派 | Hermes delegate_task Delegation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5"><span class="nav-number">2.4.1.</span> <span class="nav-text">4.1 设计理念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E4%B8%8E-sessions-spawn-%E5%AF%B9%E6%AF%94"><span class="nav-number">2.4.2.</span> <span class="nav-text">4.2 与 sessions_spawn 对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E9%9A%94%E7%A6%BB%E5%AD%90%E4%BB%A3%E7%90%86%EF%BC%88Isolated-Subagents%EF%BC%89"><span class="nav-number">2.4.3.</span> <span class="nav-text">4.3 隔离子代理（Isolated Subagents）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E5%B9%B6%E8%A1%8C%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%88Parallel-Workstreams%EF%BC%89"><span class="nav-number">2.4.4.</span> <span class="nav-text">4.4 并行工作流（Parallel Workstreams）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E6%88%90%E6%9C%AC%E4%BC%98%E5%8C%96%EF%BC%9Adelegation-provider"><span class="nav-number">2.4.5.</span> <span class="nav-text">4.5 成本优化：delegation.provider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-%E5%85%B8%E5%9E%8B%E6%A8%A1%E5%BC%8F%E9%80%9F%E6%9F%A5"><span class="nav-number">2.4.6.</span> <span class="nav-text">4.6 典型模式速查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%A3%8E%E9%99%A9%E7%9F%A9%E9%98%B5-Risk-Matrix"><span class="nav-number">2.5.</span> <span class="nav-text">五、风险矩阵 | Risk Matrix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81OpenClaw-%E4%B8%8E-Hermes-%E9%80%89%E5%9E%8B-When-to-Use-Which"><span class="nav-number">2.6.</span> <span class="nav-text">六、OpenClaw 与 Hermes 选型 | When to Use Which</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%94%9F%E4%BA%A7%E9%85%8D%E7%BD%AE%E6%B8%85%E5%8D%95-Production-Checklist"><span class="nav-number">2.7.</span> <span class="nav-text">七、生产配置清单 | Production Checklist</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw"><span class="nav-number">2.7.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes"><span class="nav-number">2.7.2.</span> <span class="nav-text">Hermes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%91%BD%E4%BB%A4%E5%AF%B9%E7%85%A7-Command-Reference"><span class="nav-number">2.8.</span> <span class="nav-text">八、命令对照 | Command Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB-Further-Reading"><span class="nav-number">2.9.</span> <span class="nav-text">九、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.10.</span> <span class="nav-text">十、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 07:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T07:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 15:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T15:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,17 +292,16 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw-多-Agent-路由与子代理委派全解析"><a href="#Agent-Hermes-与-OpenClaw-多-Agent-路由与子代理委派全解析" class="headerlink" title="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析"></a>Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析</h1><h1 id="Multi-Agent-Routing-Sub-Agent-Delegation-in-Agent-Hermes-OpenClaw"><a href="#Multi-Agent-Routing-Sub-Agent-Delegation-in-Agent-Hermes-OpenClaw" class="headerlink" title="Multi-Agent Routing &amp; Sub-Agent Delegation in Agent Hermes &amp; OpenClaw"></a>Multi-Agent Routing &amp; Sub-Agent Delegation in Agent Hermes &amp; OpenClaw</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr/>
-<h2>一、为什么需要多 Agent | Why Multi-Agent?</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="一、为什么需要多-Agent-Why-Multi-Agent"><a href="#一、为什么需要多-Agent-Why-Multi-Agent" class="headerlink" title="一、为什么需要多 Agent | Why Multi-Agent?"></a>一、为什么需要多 Agent | Why Multi-Agent?</h2><p><strong>中文</strong></p>
 <p>单一 Gateway 往往要同时服务：</p>
 <ul>
 <li>个人 vs 工作人格</li>
 <li>不同聊天渠道（Telegram 私聊 vs 工作群）</li>
-<li>并行子任务（研究 A/B/C 同时进行）</li>
+<li>并行子任务（研究 A&#x2F;B&#x2F;C 同时进行）</li>
 <li>团队共享 Bot vs 个人助理</li>
 </ul>
 <p>两个框架都支持「一个控制平面、多个 Agent 脑」，但路由机制与委派模型不同：</p>
@@ -314,8 +313,7 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>路由键</td>
 <td><code>sessionKey</code> + <code>bindings</code></td>
 <td><code>agent:main:platform:chat_type:chat_id</code></td>
@@ -327,7 +325,7 @@
 </tr>
 <tr>
 <td>子代理工具</td>
-<td><code>sessions_spawn</code> / <code>sessions_send</code></td>
+<td><code>sessions_spawn</code> &#x2F; <code>sessions_send</code></td>
 <td><code>delegate_task</code></td>
 </tr>
 <tr>
@@ -340,25 +338,22 @@
 <td>高（控制面工具）</td>
 <td>中（委派同步、可取消）</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>A single Gateway often serves multiple personas, channels, parallel workstreams, or team vs personal bots. Both frameworks support multiple agent brains on one control plane, but routing and delegation differ: OpenClaw uses <code>sessionKey</code> + <code>bindings</code> + <code>sessions_spawn</code>; Hermes uses structured session keys, profiles, and <code>delegate_task</code>.</p>
-<hr/>
-<h2>二、OpenClaw 多 Agent 路由 | OpenClaw Multi-Agent Routing</h2>
-<p><strong>中文</strong></p>
-<h3>2.1 核心概念</h3>
-<pre><code class="mermaid">flowchart TB
-    subgraph Inbound["入站消息"]
+<hr>
+<h2 id="二、OpenClaw-多-Agent-路由-OpenClaw-Multi-Agent-Routing"><a href="#二、OpenClaw-多-Agent-路由-OpenClaw-Multi-Agent-Routing" class="headerlink" title="二、OpenClaw 多 Agent 路由 | OpenClaw Multi-Agent Routing"></a>二、OpenClaw 多 Agent 路由 | OpenClaw Multi-Agent Routing</h2><p><strong>中文</strong></p>
+<h3 id="2-1-核心概念"><a href="#2-1-核心概念" class="headerlink" title="2.1 核心概念"></a>2.1 核心概念</h3><pre><code class="highlight mermaid">flowchart TB
+    subgraph Inbound[&quot;入站消息&quot;]
         WA[WhatsApp personal]
         WB[WhatsApp biz]
         TG[Telegram DM]
     end
-    subgraph GW["OpenClaw Gateway :18789"]
+    subgraph GW[&quot;OpenClaw Gateway :18789&quot;]
         BIND[bindings 确定性匹配]
         ROUTE[sessionKey 路由]
     end
-    subgraph Agents["agents.list"]
+    subgraph Agents[&quot;agents.list&quot;]
         A1[main — workspace-personal]
         A2[work — workspace-work]
         A3[family — workspace-family]
@@ -368,6 +363,7 @@
     TG --&gt; BIND
     BIND --&gt; ROUTE
     ROUTE --&gt; A1 &amp; A2 &amp; A3</code></pre>
+
 <p>每个 Agent 是完整信任边界：</p>
 <table>
 <thead>
@@ -376,10 +372,9 @@
 <th>隔离路径</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>工作区</td>
-<td><code>agents.list[].workspace</code> → SOUL/AGENTS/MEMORY/skills</td>
+<td><code>agents.list[].workspace</code> → SOUL&#x2F;AGENTS&#x2F;MEMORY&#x2F;skills</td>
 </tr>
 <tr>
 <td>状态目录</td>
@@ -393,59 +388,18 @@
 <td>认证配置</td>
 <td>per-agent auth profiles（<strong>不共享</strong>）</td>
 </tr>
-</tbody>
-</table>
-<h3>2.2 agents.list 与 bindings</h3>
-<pre><code class="language-json5">{
-  agents: {
-    list: [
-      {
-        id: "main",
-        name: "Personal",
-        workspace: "~/.openclaw/workspace",
-        tools: {
-          allow: ["group:fs", "group:sessions", "agents_list"],
-        },
-        subagents: {
-          allowAgents: ["coder", "research"],  // sessions_spawn 目标白名单
-        },
-      },
-      {
-        id: "coder",
-        workspace: "~/.openclaw/workspace-coder",
-        sandbox: { mode: "all", scope: "agent" },
-        tools: {
-          deny: ["gateway", "cron", "sessions_spawn"],
-        },
-      },
-    ],
-  },
-  bindings: [
-    {
-      agentId: "main",
-      match: { channel: "whatsapp", accountId: "personal" },
-    },
-    {
-      agentId: "main",
-      match: {
-        channel: "whatsapp",
-        peer: { kind: "group", id: "120363999999999@g.us" },
-      },
-    },
-  ],
-}
-</code></pre>
+</tbody></table>
+<h3 id="2-2-agents-list-与-bindings"><a href="#2-2-agents-list-与-bindings" class="headerlink" title="2.2 agents.list 与 bindings"></a>2.2 agents.list 与 bindings</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  agents: &#123;</span><br><span class="line">    list: [</span><br><span class="line">      &#123;</span><br><span class="line">        id: &quot;main&quot;,</span><br><span class="line">        name: &quot;Personal&quot;,</span><br><span class="line">        workspace: &quot;~/.openclaw/workspace&quot;,</span><br><span class="line">        tools: &#123;</span><br><span class="line">          allow: [&quot;group:fs&quot;, &quot;group:sessions&quot;, &quot;agents_list&quot;],</span><br><span class="line">        &#125;,</span><br><span class="line">        subagents: &#123;</span><br><span class="line">          allowAgents: [&quot;coder&quot;, &quot;research&quot;],  // sessions_spawn 目标白名单</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        id: &quot;coder&quot;,</span><br><span class="line">        workspace: &quot;~/.openclaw/workspace-coder&quot;,</span><br><span class="line">        sandbox: &#123; mode: &quot;all&quot;, scope: &quot;agent&quot; &#125;,</span><br><span class="line">        tools: &#123;</span><br><span class="line">          deny: [&quot;gateway&quot;, &quot;cron&quot;, &quot;sessions_spawn&quot;],</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  bindings: [</span><br><span class="line">    &#123;</span><br><span class="line">      agentId: &quot;main&quot;,</span><br><span class="line">      match: &#123; channel: &quot;whatsapp&quot;, accountId: &quot;personal&quot; &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      agentId: &quot;main&quot;,</span><br><span class="line">      match: &#123;</span><br><span class="line">        channel: &quot;whatsapp&quot;,</span><br><span class="line">        peer: &#123; kind: &quot;group&quot;, id: &quot;120363999999999@g.us&quot; &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><strong>路由规则</strong>：bindings 按 <code>(channel, accountId, peer, guild/team)</code> 确定性匹配，<strong>最具体规则优先</strong>。</p>
-<h3>2.3 session.dmScope 与 DM 隔离</h3>
-<table>
+<h3 id="2-3-session-dmScope-与-DM-隔离"><a href="#2-3-session-dmScope-与-DM-隔离" class="headerlink" title="2.3 session.dmScope 与 DM 隔离"></a>2.3 session.dmScope 与 DM 隔离</h3><table>
 <thead>
 <tr>
 <th>值</th>
 <th>行为</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>per-channel-peer</code></td>
 <td>每个发送者独立 DM 会话（<strong>多用户收件箱推荐</strong>）</td>
 </tr>
@@ -453,27 +407,15 @@
 <td><code>per-account-channel-peer</code></td>
 <td>多账号渠道下按账号+发送者隔离</td>
 </tr>
-</tbody>
-</table>
-<pre><code class="language-json5">{
-  session: { dmScope: "per-channel-peer" },
-  channels: {
-    whatsapp: { dmPolicy: "pairing" },
-  },
-}
-</code></pre>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  session: &#123; dmScope: &quot;per-channel-peer&quot; &#125;,</span><br><span class="line">  channels: &#123;</span><br><span class="line">    whatsapp: &#123; dmPolicy: &quot;pairing&quot; &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><code>sessionKey</code> 是<strong>路由选择器</strong>，不是认证令牌。与 <code>dmPolicy: pairing</code> 组合可硬化多用户场景。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw routes via <code>agents.list</code> (full per-agent workspace, state, sessions, auth) and deterministic <code>bindings</code>. Each agent is an isolated trust boundary. <code>session.dmScope</code> controls DM isolation; <code>sessionKey</code> routes sessions but does not authenticate users.</p>
-<h3>2.4 sessions_spawn 与 sessions_send</h3>
-<p><strong>sessions_spawn</strong> — 启动后台子代理：</p>
-<pre><code class="language-text">- 会话键：agent:&lt;agentId&gt;:subagent:&lt;uuid&gt;
-- deliver: false（结果以内部事件回传）
-- 完成后 announce 到请求者聊天渠道
-- 默认 maxConcurrent: 8
-- 可继承或覆盖 model/thinking
-- 默认 maxSpawnDepth: 1（子代理不能再 spawn）
-</code></pre>
+<h3 id="2-4-sessions-spawn-与-sessions-send"><a href="#2-4-sessions-spawn-与-sessions-send" class="headerlink" title="2.4 sessions_spawn 与 sessions_send"></a>2.4 sessions_spawn 与 sessions_send</h3><p><strong>sessions_spawn</strong> — 启动后台子代理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 会话键：agent:&lt;agentId&gt;:subagent:&lt;uuid&gt;</span><br><span class="line">- deliver: false（结果以内部事件回传）</span><br><span class="line">- 完成后 announce 到请求者聊天渠道</span><br><span class="line">- 默认 maxConcurrent: 8</span><br><span class="line">- 可继承或覆盖 model/thinking</span><br><span class="line">- 默认 maxSpawnDepth: 1（子代理不能再 spawn）</span><br></pre></td></tr></table></figure>
+
 <p><strong>sessions_send</strong> — 向另一会话发送消息（跨会话操作，高风险）。</p>
 <table>
 <thead>
@@ -484,8 +426,7 @@
 <th>能否 spawn</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>0</td>
 <td><code>agent:&lt;id&gt;:main</code></td>
 <td>主代理</td>
@@ -494,7 +435,7 @@
 <tr>
 <td>1</td>
 <td><code>agent:&lt;id&gt;:subagent:&lt;uuid&gt;</code></td>
-<td>子代理 / 编排者</td>
+<td>子代理 &#x2F; 编排者</td>
 <td>仅当 <code>maxSpawnDepth &gt;= 2</code></td>
 </tr>
 <tr>
@@ -503,43 +444,33 @@
 <td>叶子 worker</td>
 <td>永远不能</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>编排者模式</strong>（<code>maxSpawnDepth: 2</code>）：</p>
-<pre><code class="language-text">Main → Orchestrator sub-agent → Worker sub-sub-agents
-</code></pre>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Main → Orchestrator sub-agent → Worker sub-sub-agents</span><br></pre></td></tr></table></figure>
+
 <p>深度 1 编排者保留 <code>sessions_spawn</code>、<code>subagents</code>、<code>sessions_list</code>；深度 2 worker <strong>无</strong> session 工具。</p>
-<h3>2.5 子代理精简 Bootstrap</h3>
-<p>子代理从目标 Agent 的 workspace 加载 bootstrap 文件（<code>AGENTS.md</code>、<code>TOOLS.md</code> 等），但 <strong>不继承</strong> 主会话完整历史。可选 <code>cwd</code> 指定子任务工作目录。</p>
+<h3 id="2-5-子代理精简-Bootstrap"><a href="#2-5-子代理精简-Bootstrap" class="headerlink" title="2.5 子代理精简 Bootstrap"></a>2.5 子代理精简 Bootstrap</h3><p>子代理从目标 Agent 的 workspace 加载 bootstrap 文件（<code>AGENTS.md</code>、<code>TOOLS.md</code> 等），但 <strong>不继承</strong> 主会话完整历史。可选 <code>cwd</code> 指定子任务工作目录。</p>
 <p>这与 Hermes <code>delegate_task</code>「仅 goal+context」哲学类似，但 OpenClaw 仍注入 workspace 级人格与工具指南。</p>
-<h3>2.6 allowAgents 门禁（常见踩坑）</h3>
-<p><code>sessions_spawn</code> 有两层门禁：</p>
+<h3 id="2-6-allowAgents-门禁（常见踩坑）"><a href="#2-6-allowAgents-门禁（常见踩坑）" class="headerlink" title="2.6 allowAgents 门禁（常见踩坑）"></a>2.6 allowAgents 门禁（常见踩坑）</h3><p><code>sessions_spawn</code> 有两层门禁：</p>
 <ol>
 <li><strong>工具 allowlist</strong> — 必须包含 <code>sessions_spawn</code>（或 <code>group:sessions</code>）</li>
 <li><strong>跨 Agent spawn</strong> — 调用方 <code>agents.list[].subagents.allowAgents</code> 必须列出目标 <code>agentId</code></li>
 </ol>
-<pre><code class="language-json5">// 正确：allowAgents 与 tools 同级，不在 tools 下
-{
-  id: "main",
-  tools: { allow: ["group:sessions", "agents_list"] },
-  subagents: { allowAgents: ["finance"] },  // 或 ["*"]
-}
-</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 正确：allowAgents 与 tools 同级，不在 tools 下</span><br><span class="line">&#123;</span><br><span class="line">  id: &quot;main&quot;,</span><br><span class="line">  tools: &#123; allow: [&quot;group:sessions&quot;, &quot;agents_list&quot;] &#125;,</span><br><span class="line">  subagents: &#123; allowAgents: [&quot;finance&quot;] &#125;,  // 或 [&quot;*&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>用 <code>agents_list</code> 工具验证可 spawn 的目标列表。</p>
 <p><strong>English</strong></p>
 <p><code>sessions_spawn</code> starts background sub-agents with reduced bootstrap from the target workspace. Cross-agent spawning requires <code>subagents.allowAgents</code> on the caller — separate from <code>tools.allow</code>. <code>sessions_send</code> is a high-risk cross-session primitive; deny by default on untrusted surfaces.</p>
-<h3>2.7 团队 vs 个人 Agent 模式</h3>
-<table>
+<h3 id="2-7-团队-vs-个人-Agent-模式"><a href="#2-7-团队-vs-个人-Agent-模式" class="headerlink" title="2.7 团队 vs 个人 Agent 模式"></a>2.7 团队 vs 个人 Agent 模式</h3><table>
 <thead>
 <tr>
 <th>模式</th>
 <th>配置要点</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>个人多人格</td>
-<td>多 workspace + bindings 按 accountId/peer</td>
+<td>多 workspace + bindings 按 accountId&#x2F;peer</td>
 </tr>
 <tr>
 <td>团队共享 Bot</td>
@@ -553,17 +484,14 @@
 <td>agentToAgent</td>
 <td><code>tools.agentToAgent.enabled</code> + <code>allow: [ids]</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>硬化基线应对不可信面 deny：<code>gateway</code>、<code>cron</code>、<code>sessions_spawn</code>、<code>sessions_send</code>。</p>
 <p><strong>English</strong></p>
 <p>Patterns: personal multi-persona via bindings, team bots with <code>per-channel-peer</code> + pairing, orchestrator-specialist with sandboxed worker agents. Harden untrusted surfaces by denying control-plane tools.</p>
-<hr/>
-<h2>三、Hermes 多 Agent 与 Profile 隔离 | Hermes Multi-Agent &amp; Profile Isolation</h2>
-<p><strong>中文</strong></p>
-<h3>3.1 Session Key 格式</h3>
-<pre><code class="language-text">agent:main:{platform}:{chat_type}:{chat_id}
-</code></pre>
+<hr>
+<h2 id="三、Hermes-多-Agent-与-Profile-隔离-Hermes-Multi-Agent-Profile-Isolation"><a href="#三、Hermes-多-Agent-与-Profile-隔离-Hermes-Multi-Agent-Profile-Isolation" class="headerlink" title="三、Hermes 多 Agent 与 Profile 隔离 | Hermes Multi-Agent &amp; Profile Isolation"></a>三、Hermes 多 Agent 与 Profile 隔离 | Hermes Multi-Agent &amp; Profile Isolation</h2><p><strong>中文</strong></p>
+<h3 id="3-1-Session-Key-格式"><a href="#3-1-Session-Key-格式" class="headerlink" title="3.1 Session Key 格式"></a>3.1 Session Key 格式</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent:main:&#123;platform&#125;:&#123;chat_type&#125;:&#123;chat_id&#125;</span><br></pre></td></tr></table></figure>
+
 <p>示例：<code>agent:main:telegram:private:123456789</code></p>
 <table>
 <thead>
@@ -572,30 +500,26 @@
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>agent:main</code></td>
 <td>主 Agent 实例（未来可扩展多 agent id）</td>
 </tr>
 <tr>
 <td><code>platform</code></td>
-<td>telegram / discord / slack / cli 等</td>
+<td>telegram &#x2F; discord &#x2F; slack &#x2F; cli 等</td>
 </tr>
 <tr>
 <td><code>chat_type</code></td>
-<td>private / group / channel</td>
+<td>private &#x2F; group &#x2F; channel</td>
 </tr>
 <tr>
 <td><code>chat_id</code></td>
 <td>平台原生 ID；线程型平台含 thread ID</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>禁止手动拼接</strong> — 使用 <code>build_session_key()</code>。详见 <a href="./gateway.md">Gateway 架构</a>。</p>
-<h3>3.2 Profile 隔离（hermes -p）</h3>
-<pre><code class="language-bash">hermes -p work gateway start
-hermes -p personal chat
-</code></pre>
+<h3 id="3-2-Profile-隔离（hermes-p）"><a href="#3-2-Profile-隔离（hermes-p）" class="headerlink" title="3.2 Profile 隔离（hermes -p）"></a>3.2 Profile 隔离（hermes -p）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hermes -p work gateway start</span><br><span class="line">hermes -p personal chat</span><br></pre></td></tr></table></figure>
+
 <p>每个 Profile 拥有独立：</p>
 <table>
 <thead>
@@ -604,13 +528,12 @@ hermes -p personal chat
 <th>路径</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>HERMES_HOME</td>
 <td><code>~/.hermes-profiles/&lt;name&gt;/</code> 或自定义</td>
 </tr>
 <tr>
-<td>config.yaml / .env</td>
+<td>config.yaml &#x2F; .env</td>
 <td>Profile 作用域</td>
 </tr>
 <tr>
@@ -625,20 +548,16 @@ hermes -p personal chat
 <td>Bot Token 锁</td>
 <td><code>acquire_scoped_lock()</code> 防多 Profile 抢同一 Token</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>团队 vs 个人</strong>：团队 Bot 用 <code>work</code> Profile + 平台 allowlist；个人进化用 <code>default</code> Profile + 学习闭环。</p>
 <p><strong>English</strong></p>
 <p>Hermes session keys follow <code>agent:main:{platform}:{chat_type}:{chat_id}</code>. Profiles (<code>hermes -p &lt;name&gt;</code>) fully isolate config, sessions, gateway, and token locks — the primary multi-agent pattern on Hermes.</p>
-<h3>3.3 跨会话镜像与投递</h3>
-<p>Hermes Gateway 的 <code>delivery.py</code> 支持跨平台投递，但 <strong>Cron 投递不镜像</strong>进 Gateway 会话历史（避免消息交替违规）。这与 OpenClaw <code>sessions_send</code> 的跨会话写入是不同层面的能力。</p>
+<h3 id="3-3-跨会话镜像与投递"><a href="#3-3-跨会话镜像与投递" class="headerlink" title="3.3 跨会话镜像与投递"></a>3.3 跨会话镜像与投递</h3><p>Hermes Gateway 的 <code>delivery.py</code> 支持跨平台投递，但 <strong>Cron 投递不镜像</strong>进 Gateway 会话历史（避免消息交替违规）。这与 OpenClaw <code>sessions_send</code> 的跨会话写入是不同层面的能力。</p>
 <p><strong>English</strong></p>
 <p>Cross-platform delivery exists via <code>delivery.py</code>, but cron deliveries are excluded from gateway session history to preserve message ordering invariants.</p>
-<hr/>
-<h2>四、Hermes delegate_task 委派 | Hermes delegate_task Delegation</h2>
-<p><strong>中文</strong></p>
-<h3>4.1 设计理念</h3>
-<pre><code class="mermaid">flowchart LR
+<hr>
+<h2 id="四、Hermes-delegate-task-委派-Hermes-delegate-task-Delegation"><a href="#四、Hermes-delegate-task-委派-Hermes-delegate-task-Delegation" class="headerlink" title="四、Hermes delegate_task 委派 | Hermes delegate_task Delegation"></a>四、Hermes delegate_task 委派 | Hermes delegate_task Delegation</h2><p><strong>中文</strong></p>
+<h3 id="4-1-设计理念"><a href="#4-1-设计理念" class="headerlink" title="4.1 设计理念"></a>4.1 设计理念</h3><pre><code class="highlight mermaid">flowchart LR
     PARENT[父 AIAgent] --&gt;|delegate_task| C1[子代理 1]
     PARENT --&gt;|delegate_task| C2[子代理 2]
     PARENT --&gt;|delegate_task| C3[子代理 3]
@@ -646,26 +565,15 @@ hermes -p personal chat
     C2 --&gt; S2[摘要回注]
     C3 --&gt; S3[摘要回注]
     S1 &amp; S2 &amp; S3 --&gt; PARENT</code></pre>
+
 <ul>
 <li>每个子代理：<strong>独立会话、独立终端、可选独立 toolsets</strong></li>
 <li>中间工具调用 <strong>不进入</strong> 父上下文 — 仅最终摘要返回</li>
 <li><strong>同步</strong>执行于父轮次内；父中断则子任务取消</li>
 </ul>
-<pre><code class="language-python">delegate_task(tasks=[
-    {
-        "goal": "Research WebAssembly edge deployments",
-        "context": "Focus on Wasmtime, Wasmer, WASI 2025 progress",
-        "toolsets": ["web"],
-    },
-    {
-        "goal": "Review src/auth/ for security issues",
-        "context": "Project at /home/user/app. Run: pytest tests/auth/ -v",
-        "toolsets": ["terminal", "file"],
-    },
-])
-</code></pre>
-<h3>4.2 与 sessions_spawn 对比</h3>
-<table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">delegate_task(tasks=[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;goal&quot;</span>: <span class="string">&quot;Research WebAssembly edge deployments&quot;</span>,</span><br><span class="line">        <span class="string">&quot;context&quot;</span>: <span class="string">&quot;Focus on Wasmtime, Wasmer, WASI 2025 progress&quot;</span>,</span><br><span class="line">        <span class="string">&quot;toolsets&quot;</span>: [<span class="string">&quot;web&quot;</span>],</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;goal&quot;</span>: <span class="string">&quot;Review src/auth/ for security issues&quot;</span>,</span><br><span class="line">        <span class="string">&quot;context&quot;</span>: <span class="string">&quot;Project at /home/user/app. Run: pytest tests/auth/ -v&quot;</span>,</span><br><span class="line">        <span class="string">&quot;toolsets&quot;</span>: [<span class="string">&quot;terminal&quot;</span>, <span class="string">&quot;file&quot;</span>],</span><br><span class="line">    &#125;,</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-与-sessions-spawn-对比"><a href="#4-2-与-sessions-spawn-对比" class="headerlink" title="4.2 与 sessions_spawn 对比"></a>4.2 与 sessions_spawn 对比</h3><table>
 <thead>
 <tr>
 <th>维度</th>
@@ -673,8 +581,7 @@ hermes -p personal chat
 <th>Hermes delegate_task</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>执行模型</td>
 <td>后台非阻塞，announce 回聊天</td>
 <td>父轮次内同步等待摘要</td>
@@ -709,10 +616,8 @@ hermes -p personal chat
 <td>per-agent 配置</td>
 <td>继承父 fallback_providers</td>
 </tr>
-</tbody>
-</table>
-<h3>4.3 隔离子代理（Isolated Subagents）</h3>
-<p>子代理 <strong>不知道</strong> 父对话任何内容。「修复我们刚讨论的 bug」会失败 — 必须在 <code>context</code> 中写明路径、错误信息、约束。</p>
+</tbody></table>
+<h3 id="4-3-隔离子代理（Isolated-Subagents）"><a href="#4-3-隔离子代理（Isolated-Subagents）" class="headerlink" title="4.3 隔离子代理（Isolated Subagents）"></a>4.3 隔离子代理（Isolated Subagents）</h3><p>子代理 <strong>不知道</strong> 父对话任何内容。「修复我们刚讨论的 bug」会失败 — 必须在 <code>context</code> 中写明路径、错误信息、约束。</p>
 <table>
 <thead>
 <tr>
@@ -720,8 +625,7 @@ hermes -p personal chat
 <th>不应假设</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>绝对路径、项目根</td>
 <td>父会话中的指代</td>
 </tr>
@@ -733,14 +637,9 @@ hermes -p personal chat
 <td>明确目标与验收标准</td>
 <td>父代理已读过的文件内容</td>
 </tr>
-</tbody>
-</table>
-<h3>4.4 并行工作流（Parallel Workstreams）</h3>
-<pre><code class="language-yaml">delegation:
-  max_concurrent_children: 3    # 默认每批 3 并行，可提高到 30+
-  max_spawn_depth: 1            # 默认叶子子代理
-  orchestrator_enabled: true
-</code></pre>
+</tbody></table>
+<h3 id="4-4-并行工作流（Parallel-Workstreams）"><a href="#4-4-并行工作流（Parallel-Workstreams）" class="headerlink" title="4.4 并行工作流（Parallel Workstreams）"></a>4.4 并行工作流（Parallel Workstreams）</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">delegation:</span></span><br><span class="line">  <span class="attr">max_concurrent_children:</span> <span class="number">3</span>    <span class="comment"># 默认每批 3 并行，可提高到 30+</span></span><br><span class="line">  <span class="attr">max_spawn_depth:</span> <span class="number">1</span>            <span class="comment"># 默认叶子子代理</span></span><br><span class="line">  <span class="attr">orchestrator_enabled:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
 <table>
 <thead>
 <tr>
@@ -749,8 +648,7 @@ hermes -p personal chat
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>max_concurrent_children</code></td>
 <td>3</td>
 <td>单批 <code>delegate_task</code> 并行上限</td>
@@ -765,33 +663,27 @@ hermes -p personal chat
 <td>true</td>
 <td>false 全局禁用嵌套</td>
 </tr>
-</tbody>
-</table>
-<p><strong>编排者子代理</strong>（<code>role="orchestrator"</code>）可保留 <code>delegate_task</code>；叶子子代理默认 <strong>禁止</strong> <code>delegate_task</code>、<code>clarify</code>、<code>memory</code>、<code>send_message</code>、<code>execute_code</code>。</p>
-<h3>4.5 成本优化：delegation.provider</h3>
-<pre><code class="language-yaml">delegation:
-  provider: openrouter
-  model: google/gemini-3-flash-preview
-</code></pre>
-<p>子代理使用廉价模型跑并行研究，父代理用强模型综合 — 常见 <strong>质量/成本</strong> 平衡点。</p>
+</tbody></table>
+<p><strong>编排者子代理</strong>（<code>role=&quot;orchestrator&quot;</code>）可保留 <code>delegate_task</code>；叶子子代理默认 <strong>禁止</strong> <code>delegate_task</code>、<code>clarify</code>、<code>memory</code>、<code>send_message</code>、<code>execute_code</code>。</p>
+<h3 id="4-5-成本优化：delegation-provider"><a href="#4-5-成本优化：delegation-provider" class="headerlink" title="4.5 成本优化：delegation.provider"></a>4.5 成本优化：delegation.provider</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">delegation:</span></span><br><span class="line">  <span class="attr">provider:</span> <span class="string">openrouter</span></span><br><span class="line">  <span class="attr">model:</span> <span class="string">google/gemini-3-flash-preview</span></span><br></pre></td></tr></table></figure>
+
+<p>子代理使用廉价模型跑并行研究，父代理用强模型综合 — 常见 <strong>质量&#x2F;成本</strong> 平衡点。</p>
 <p><strong>English</strong></p>
 <p><code>delegate_task</code> spawns isolated children with separate sessions and toolsets; only summaries return to the parent. Synchronous within the parent turn — interrupted parents cancel children. Pass explicit <code>goal</code> + <code>context</code>; children have zero conversation history. Override <code>delegation.provider/model</code> for cost optimization.</p>
-<h3>4.6 典型模式速查</h3>
-<table>
+<h3 id="4-6-典型模式速查"><a href="#4-6-典型模式速查" class="headerlink" title="4.6 典型模式速查"></a>4.6 典型模式速查</h3><table>
 <thead>
 <tr>
 <th>模式</th>
 <th>工具选择</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>并行研究</td>
-<td><code>toolsets: ["web"]</code></td>
+<td><code>toolsets: [&quot;web&quot;]</code></td>
 </tr>
 <tr>
 <td>代码审查</td>
-<td><code>toolsets: ["terminal", "file"]</code></td>
+<td><code>toolsets: [&quot;terminal&quot;, &quot;file&quot;]</code></td>
 </tr>
 <tr>
 <td>多文件重构</td>
@@ -801,13 +693,11 @@ hermes -p personal chat
 <td>收集 + 分析</td>
 <td><code>execute_code</code> 机械收集 → <code>delegate_task</code> 推理分析</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Patterns: parallel research (<code>web</code>), code review (<code>terminal</code>+<code>file</code>), gather-then-analyze (<code>execute_code</code> then <code>delegate_task</code>).</p>
-<hr/>
-<h2>五、风险矩阵 | Risk Matrix</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="五、风险矩阵-Risk-Matrix"><a href="#五、风险矩阵-Risk-Matrix" class="headerlink" title="五、风险矩阵 | Risk Matrix"></a>五、风险矩阵 | Risk Matrix</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -817,24 +707,23 @@ hermes -p personal chat
 <th>Hermes 缓解</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>sessions_spawn</td>
 <td>跨 Agent 越权 spawn</td>
 <td><code>allowAgents</code> 白名单</td>
-<td>N/A（不同工具）</td>
+<td>N&#x2F;A（不同工具）</td>
 </tr>
 <tr>
 <td>sessions_send</td>
-<td>跨会话注入/泄露</td>
+<td>跨会话注入&#x2F;泄露</td>
 <td>deny + tools.profile</td>
 <td>无对等一等工具</td>
 </tr>
 <tr>
 <td>delegate_task</td>
 <td>父中断丢工作</td>
-<td>N/A</td>
-<td>用 cron / background terminal</td>
+<td>N&#x2F;A</td>
+<td>用 cron &#x2F; background terminal</td>
 </tr>
 <tr>
 <td>多用户 DM</td>
@@ -854,21 +743,20 @@ hermes -p personal chat
 <td>maxChildrenPerAgent</td>
 <td>max_concurrent_children</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Risk matrix: cross-agent spawn gates (<code>allowAgents</code>), deny <code>sessions_send</code> on untrusted surfaces, use cron for durable work instead of delegation, isolate DMs with <code>per-channel-peer</code> and pairing.</p>
-<hr/>
-<h2>六、OpenClaw 与 Hermes 选型 | When to Use Which</h2>
-<p><strong>中文</strong></p>
-<pre><code class="mermaid">flowchart TD
-    Q[需要多 Agent？] --&gt; OC{要后台长期子任务&lt;br/&gt;+ 聊天 announce？}
+<hr>
+<h2 id="六、OpenClaw-与-Hermes-选型-When-to-Use-Which"><a href="#六、OpenClaw-与-Hermes-选型-When-to-Use-Which" class="headerlink" title="六、OpenClaw 与 Hermes 选型 | When to Use Which"></a>六、OpenClaw 与 Hermes 选型 | When to Use Which</h2><p><strong>中文</strong></p>
+<pre><code class="highlight mermaid">flowchart TD
+    Q[需要多 Agent？] --&gt; OC&#123;要后台长期子任务&lt;br/&gt;+ 聊天 announce？&#125;
     OC --&gt;|是| OC1[OpenClaw sessions_spawn]
-    OC --&gt;|否| HM{要并行摘要&lt;br/&gt;+ 父上下文隔离？}
+    OC --&gt;|否| HM&#123;要并行摘要&lt;br/&gt;+ 父上下文隔离？&#125;
     HM --&gt;|是| HM1[Hermes delegate_task]
-    HM --&gt;|否| PR{要完全隔离配置&lt;br/&gt;+ 凭证？}
+    HM --&gt;|否| PR&#123;要完全隔离配置&lt;br/&gt;+ 凭证？&#125;
     PR --&gt;|OpenClaw| OC2[agents.list 多 workspace]
     PR --&gt;|Hermes| HM2[hermes -p profiles]</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -876,14 +764,13 @@ hermes -p personal chat
 <th>推荐</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>WhatsApp 双账号 → 双人格</td>
 <td>OpenClaw bindings + agents.list</td>
 </tr>
 <tr>
 <td>Telegram 团队 Bot + 个人 CLI</td>
-<td>Hermes <code>-p work</code> / <code>-p personal</code></td>
+<td>Hermes <code>-p work</code> &#x2F; <code>-p personal</code></td>
 </tr>
 <tr>
 <td>三路并行网络调研</td>
@@ -901,36 +788,31 @@ hermes -p personal chat
 <td>IDE 内并行子任务</td>
 <td>Hermes ACP 含 delegate_task</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Use OpenClaw <code>sessions_spawn</code> for background announced sub-runs and multi-workspace routing via <code>bindings</code>. Use Hermes <code>delegate_task</code> for parallel in-turn summaries and <code>hermes -p</code> for full profile isolation.</p>
-<hr/>
-<h2>七、生产配置清单 | Production Checklist</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw</h3>
-<ul>
-<li>[ ] <code>session.dmScope: "per-channel-peer"</code>（多用户）</li>
-<li>[ ] <code>dmPolicy: "pairing"</code></li>
-<li>[ ] <code>subagents.allowAgents</code> 显式列出可 spawn 目标（避免 <code>["*"]</code> 除非可信）</li>
-<li>[ ] 不可信面 deny <code>sessions_send</code>、<code>gateway</code>、<code>cron</code></li>
-<li>[ ] 专家 Agent 启用 <code>sandbox.mode: "all"</code></li>
-<li>[ ] <code>agents_list</code> 定期审计可 spawn 列表</li>
+<hr>
+<h2 id="七、生产配置清单-Production-Checklist"><a href="#七、生产配置清单-Production-Checklist" class="headerlink" title="七、生产配置清单 | Production Checklist"></a>七、生产配置清单 | Production Checklist</h2><p><strong>中文</strong></p>
+<h3 id="OpenClaw"><a href="#OpenClaw" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><ul>
+<li><input disabled="" type="checkbox"> <code>session.dmScope: &quot;per-channel-peer&quot;</code>（多用户）</li>
+<li><input disabled="" type="checkbox"> <code>dmPolicy: &quot;pairing&quot;</code></li>
+<li><input disabled="" type="checkbox"> <code>subagents.allowAgents</code> 显式列出可 spawn 目标（避免 <code>[&quot;*&quot;]</code> 除非可信）</li>
+<li><input disabled="" type="checkbox"> 不可信面 deny <code>sessions_send</code>、<code>gateway</code>、<code>cron</code></li>
+<li><input disabled="" type="checkbox"> 专家 Agent 启用 <code>sandbox.mode: &quot;all&quot;</code></li>
+<li><input disabled="" type="checkbox"> <code>agents_list</code> 定期审计可 spawn 列表</li>
 </ul>
-<h3>Hermes</h3>
-<ul>
-<li>[ ] 团队 Bot 配置平台 allowlist，禁用 <code>GATEWAY_ALLOW_ALL_USERS</code></li>
-<li>[ ] 并行委派设置 <code>delegation.max_concurrent_children</code> 防止 API 风暴</li>
-<li>[ ] 子任务用 <code>delegation.provider</code> 指向 Flash 模型</li>
-<li>[ ] 持久任务用 <code>cronjob</code> 而非 <code>delegate_task</code></li>
-<li>[ ] 多 Profile 时确认 Token 锁无冲突</li>
-<li>[ ] 子代理 <code>context</code> 含绝对路径与验收标准</li>
+<h3 id="Hermes"><a href="#Hermes" class="headerlink" title="Hermes"></a>Hermes</h3><ul>
+<li><input disabled="" type="checkbox"> 团队 Bot 配置平台 allowlist，禁用 <code>GATEWAY_ALLOW_ALL_USERS</code></li>
+<li><input disabled="" type="checkbox"> 并行委派设置 <code>delegation.max_concurrent_children</code> 防止 API 风暴</li>
+<li><input disabled="" type="checkbox"> 子任务用 <code>delegation.provider</code> 指向 Flash 模型</li>
+<li><input disabled="" type="checkbox"> 持久任务用 <code>cronjob</code> 而非 <code>delegate_task</code></li>
+<li><input disabled="" type="checkbox"> 多 Profile 时确认 Token 锁无冲突</li>
+<li><input disabled="" type="checkbox"> 子代理 <code>context</code> 含绝对路径与验收标准</li>
 </ul>
 <p><strong>English</strong></p>
 <p>OpenClaw: per-channel-peer, pairing, explicit <code>allowAgents</code>, deny risky tools, sandbox specialists. Hermes: allowlists, cap concurrent children, cheap delegation models, cron for durable work, explicit subagent context.</p>
-<hr/>
-<h2>八、命令对照 | Command Reference</h2>
-<table>
+<hr>
+<h2 id="八、命令对照-Command-Reference"><a href="#八、命令对照-Command-Reference" class="headerlink" title="八、命令对照 | Command Reference"></a>八、命令对照 | Command Reference</h2><table>
 <thead>
 <tr>
 <th>操作</th>
@@ -938,11 +820,10 @@ hermes -p personal chat
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>列出可 spawn Agent</td>
 <td><code>agents_list</code> 工具</td>
-<td>N/A</td>
+<td>N&#x2F;A</td>
 </tr>
 <tr>
 <td>启动子代理</td>
@@ -974,23 +855,20 @@ hermes -p personal chat
 <td><code>session.dmScope</code></td>
 <td>平台 allowlist + pairing</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>九、延伸阅读 | Further Reading</h2>
-<ul>
+</tbody></table>
+<hr>
+<h2 id="九、延伸阅读-Further-Reading"><a href="#九、延伸阅读-Further-Reading" class="headerlink" title="九、延伸阅读 | Further Reading"></a>九、延伸阅读 | Further Reading</h2><ul>
 <li><a href="./gateway.md">Gateway 架构深度解析</a> — sessionKey、dmScope、Profile 隔离</li>
 <li><a href="./security-model.md">安全模型深度解析</a> — sessions_spawn deny 基线</li>
 <li><a href="./model-provider-cost.md">模型 Provider 与成本</a> — delegation.provider 成本优化</li>
 <li>OpenClaw：<a target="_blank" rel="noopener" href="https://docs.openclaw.ai/concepts/multi-agent">Multi-agent routing</a>、<a target="_blank" rel="noopener" href="https://docs.openclaw.ai/tools/subagents">Sub-agents</a></li>
 <li>Hermes：<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation">Delegation</a>、<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/guides/delegation-patterns">Delegation Patterns</a></li>
 </ul>
-<hr/>
-<h2>十、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
-<p>OpenClaw 的多 Agent 哲学是 <strong>bindings 路由多个完整 workspace 脑</strong>，用 <code>sessions_spawn</code> 做后台 announce 式子任务，适合「一个 Gateway 服务多渠道、多人格、编排者-专家」拓扑。Hermes 的多 Agent 哲学是 <strong>Profile 隔离 + 同步 delegate_task 并行</strong>，用极简 context 换父上下文清洁，适合「并行研究/审查 + 强模型综合 + 学习闭环沉淀」。二者可经 <code>hermes claw migrate</code> 迁移人格与技能，但路由与委派语义不可直接互换 — 选型应取决于你需要 <strong>后台会话 announce</strong> 还是 <strong>轮内并行摘要</strong>。</p>
+<hr>
+<h2 id="十、结语-Conclusion"><a href="#十、结语-Conclusion" class="headerlink" title="十、结语 | Conclusion"></a>十、结语 | Conclusion</h2><p><strong>中文</strong></p>
+<p>OpenClaw 的多 Agent 哲学是 <strong>bindings 路由多个完整 workspace 脑</strong>，用 <code>sessions_spawn</code> 做后台 announce 式子任务，适合「一个 Gateway 服务多渠道、多人格、编排者-专家」拓扑。Hermes 的多 Agent 哲学是 <strong>Profile 隔离 + 同步 delegate_task 并行</strong>，用极简 context 换父上下文清洁，适合「并行研究&#x2F;审查 + 强模型综合 + 学习闭环沉淀」。二者可经 <code>hermes claw migrate</code> 迁移人格与技能，但路由与委派语义不可直接互换 — 选型应取决于你需要 <strong>后台会话 announce</strong> 还是 <strong>轮内并行摘要</strong>。</p>
 <p><strong>English</strong></p>
-<p>OpenClaw routes multiple full workspace brains via <code>bindings</code>, with background <code>sessions_spawn</code> sub-runs that announce back — ideal for multi-channel, multi-persona, orchestrator-worker topologies. Hermes isolates via profiles and parallel synchronous <code>delegate_task</code> with minimal context — ideal for in-turn research/review with a strong parent synthesizer. Choose based on whether you need background announced sessions or in-turn parallel summaries.</p>
+<p>OpenClaw routes multiple full workspace brains via <code>bindings</code>, with background <code>sessions_spawn</code> sub-runs that announce back — ideal for multi-channel, multi-persona, orchestrator-worker topologies. Hermes isolates via profiles and parallel synchronous <code>delegate_task</code> with minimal context — ideal for in-turn research&#x2F;review with a strong parent synthesizer. Choose based on whether you need background announced sessions or in-turn parallel summaries.</p>
 
     </div>
 

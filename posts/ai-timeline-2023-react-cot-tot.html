@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="2023 年 AI 编年史：Chain-of-Thought（CoT）、ReAct（推理+行动）、Tree of Thoughts（ToT）三大 LLM 推理范式的技术原理与应用，中英文对照。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 AI 编年史：ReAct、CoT 与 ToT 推理范式">
+<meta property="og:url" content="https://www.fastolf.com/posts/ai-timeline-2023-react-cot-tot.html">
+<meta property="og:site_name" content="Qi">
+<meta property="og:description" content="2023 年 AI 编年史：Chain-of-Thought（CoT）、ReAct（推理+行动）、Tree of Thoughts（ToT）三大 LLM 推理范式的技术原理与应用，中英文对照。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-10T02:00:00.000Z">
+<meta property="article:modified_time" content="2023-05-10T02:00:00.000Z">
+<meta property="article:author" content="Meng Qi">
+<meta property="article:tag" content="AI Timeline">
+<meta property="article:tag" content="Chain-of-Thought">
+<meta property="article:tag" content="ReAct">
+<meta property="article:tag" content="Reasoning">
+<meta property="article:tag" content="Tree of Thoughts">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://www.fastolf.com/posts/ai-timeline-2023-react-cot-tot.html">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://www.fastolf.com/posts/ai-timeline-2023-react-cot-tot.html","path":"posts/ai-timeline-2023-react-cot-tot.html","title":"2023 AI 编年史：ReAct、CoT 与 ToT 推理范式"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2023 AI 编年史：ReAct、CoT 与 ToT 推理范式 | Qi</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" />
+<link rel="preload" as="style" href="/css/injector/light.css" />
+<link rel="preload" as="style" href="/css/injector/dark.css" />
+<script>
+(function () {
+  var build = 'nex8-20260606-mermaid-text';
+  document.querySelectorAll('script[src]').forEach(function (el) {
+    var src = el.getAttribute('src');
+    if (!src || (src.indexOf('/js/') === -1 && src.indexOf('/lib/') === -1)) return;
+    if (src.indexOf('v=') !== -1) return;
+    el.setAttribute('src', src + (src.indexOf('?') === -1 ? '?' : '&') + 'v=' + build);
+  });
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Qi</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Cogito ergo sum</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2023-AI-%E7%BC%96%E5%B9%B4%E5%8F%B2%EF%BC%9AReAct%E3%80%81CoT-%E4%B8%8E-ToT-%E6%8E%A8%E7%90%86%E8%8C%83%E5%BC%8F-AI-Timeline-2023-ReAct-CoT-and-ToT"><span class="nav-number">1.</span> <span class="nav-text">2023 AI 编年史：ReAct、CoT 与 ToT 推理范式 | AI Timeline 2023: ReAct, CoT, and ToT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF-Background"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景 | Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%9E%B6%E6%9E%84-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">二、架构 | Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Chain-of-Thought-CoT-%E6%80%9D%E7%BB%B4%E9%93%BE"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 Chain-of-Thought (CoT) | 思维链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-ReAct-Reasoning-Acting-%E6%8E%A8%E7%90%86%E4%B8%8E%E8%A1%8C%E5%8A%A8"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 ReAct (Reasoning + Acting) | 推理与行动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Tree-of-Thoughts-ToT-%E6%80%9D%E7%BB%B4%E6%A0%91"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Tree of Thoughts (ToT) | 思维树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%B8%89%E8%80%85%E5%85%B3%E7%B3%BB%E4%B8%8E%E9%80%89%E5%9E%8B-Relationship-and-Selection"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 三者关系与选型 | Relationship and Selection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%B6%8B%E5%8A%BF-Trends"><span class="nav-number">1.3.</span> <span class="nav-text">三、趋势 | Trends</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BC%98%E7%BC%BA%E7%82%B9-Pros-and-Cons"><span class="nav-number">1.4.</span> <span class="nav-text">四、优缺点 | Pros and Cons</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-CoT"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 CoT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-ReAct"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 ReAct</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-ToT"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 ToT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-Use-Cases"><span class="nav-number">1.5.</span> <span class="nav-text">五、应用场景 | Use Cases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81GitHub-%E4%B8%8E%E5%BC%80%E6%BA%90%E7%94%9F%E6%80%81-GitHub-and-Open-Source"><span class="nav-number">1.6.</span> <span class="nav-text">六、GitHub 与开源生态 | GitHub and Open Source</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93-Summary"><span class="nav-number">1.7.</span> <span class="nav-text">七、总结 | Summary</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Meng Qi"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Meng Qi</p>
+  <div class="site-description" itemprop="description">recording</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">454</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">288</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gitmmq" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gitmmq" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/ai-timeline-2023-react-cot-tot.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Meng Qi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qi">
+      <meta itemprop="description" content="recording">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2023 AI 编年史：ReAct、CoT 与 ToT 推理范式 | Qi">
+      <meta itemprop="description" content="2023 年 AI 编年史：Chain-of-Thought（CoT）、ReAct（推理+行动）、Tree of Thoughts（ToT）三大 LLM 推理范式的技术原理与应用，中英文对照。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2023 AI 编年史：ReAct、CoT 与 ToT 推理范式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-05-10 10:00:00" itemprop="dateCreated datePublished" datetime="2023-05-10T10:00:00+08:00">2023-05-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algrithom/" itemprop="url" rel="index"><span itemprop="name">algrithom</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+            <div class="post-description">2023 年 AI 编年史：Chain-of-Thought（CoT）、ReAct（推理+行动）、Tree of Thoughts（ToT）三大 LLM 推理范式的技术原理与应用，中英文对照。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="2023-AI-编年史：ReAct、CoT-与-ToT-推理范式-AI-Timeline-2023-ReAct-CoT-and-ToT"><a href="#2023-AI-编年史：ReAct、CoT-与-ToT-推理范式-AI-Timeline-2023-ReAct-CoT-and-ToT" class="headerlink" title="2023 AI 编年史：ReAct、CoT 与 ToT 推理范式 | AI Timeline 2023: ReAct, CoT, and ToT"></a>2023 AI 编年史：ReAct、CoT 与 ToT 推理范式 | AI Timeline 2023: ReAct, CoT, and ToT</h1><hr>
+<h2 id="一、背景-Background"><a href="#一、背景-Background" class="headerlink" title="一、背景 | Background"></a>一、背景 | Background</h2><p><strong>English</strong></p>
+<p>In <strong>May 2023</strong>, as LLM applications grew beyond simple Q&amp;A, three <strong>reasoning paradigms</strong> dominated research and engineering: <strong>Chain-of-Thought (CoT)</strong>, <strong>ReAct (Reasoning + Acting)</strong>, and <strong>Tree of Thoughts (ToT)</strong>. Together they transformed LLMs from pattern matchers into systems capable of multi-step reasoning, tool use, and deliberate search.</p>
+<p>These paradigms emerged because standard prompting fails on tasks requiring arithmetic, logical deduction, or external information retrieval. CoT (Wei et al., 2022) showed that asking models to “think step by step” dramatically improves accuracy. ReAct (Yao et al., 2022) interleaved reasoning with tool calls. ToT (Yao et al., 2023) added tree search over reasoning paths.</p>
+<p>Key terms:</p>
+<ul>
+<li><strong>CoT (Chain-of-Thought)</strong>: Prompting technique that elicits intermediate reasoning steps before the final answer.</li>
+<li><strong>ReAct</strong>: Framework alternating Thought → Action → Observation cycles with external tools.</li>
+<li><strong>ToT (Tree of Thoughts)</strong>: Search algorithm exploring multiple reasoning branches and backtracking.</li>
+<li><strong>Self-Consistency</strong>: Sampling multiple CoT paths and taking the majority vote.</li>
+<li><strong>Zero-Shot CoT</strong>: Adding “Let’s think step by step” without examples.</li>
+</ul>
+<p><strong>中文</strong></p>
+<p><strong>2023 年 5 月</strong>，随着 LLM 应用超越简单问答，三种 <strong>推理范式</strong> 主导研究与工程：<strong>思维链（CoT）</strong>、<strong>ReAct（推理+行动）</strong> 与 <strong>思维树（ToT）</strong>。它们将 LLM 从模式匹配器转变为具备多步推理、工具调用与审慎搜索能力的系统。</p>
+<p>这些范式出现是因为标准 Prompt 在需要算术、逻辑推导或外部信息检索的任务上失败。CoT（Wei 等，2022）表明让模型「逐步思考」可大幅提升准确率。ReAct（Yao 等，2022）将推理与工具调用交替进行。ToT（Yao 等，2023）在推理路径上加入树搜索。</p>
+<p>关键词解释：</p>
+<ul>
+<li><strong>CoT（思维链）</strong>：引导模型在最终答案前输出中间推理步骤的 Prompt 技术。</li>
+<li><strong>ReAct</strong>：Thought → Action → Observation 循环与外部工具交替的框架。</li>
+<li><strong>ToT（思维树）</strong>：探索多条推理分支并回溯的搜索算法。</li>
+<li><strong>Self-Consistency（自洽性）</strong>：采样多条 CoT 路径，取多数投票。</li>
+<li><strong>Zero-Shot CoT</strong>：无示例，仅添加「Let’s think step by step」。</li>
+</ul>
+<hr>
+<h2 id="二、架构-Architecture"><a href="#二、架构-Architecture" class="headerlink" title="二、架构 | Architecture"></a>二、架构 | Architecture</h2><h3 id="2-1-Chain-of-Thought-CoT-思维链"><a href="#2-1-Chain-of-Thought-CoT-思维链" class="headerlink" title="2.1 Chain-of-Thought (CoT) | 思维链"></a>2.1 Chain-of-Thought (CoT) | 思维链</h3><p><strong>English</strong></p>
+<p>CoT elicits a <strong>reasoning chain</strong> before the final answer:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Prompt: &quot;Roger has 5 tennis balls. He buys 2 cans of 3 balls each.</span><br><span class="line">         How many does he have? Let&#x27;s think step by step.&quot;</span><br><span class="line"></span><br><span class="line">Model Output:</span><br><span class="line">  Step 1: Roger starts with 5 balls.</span><br><span class="line">  Step 2: 2 cans × 3 balls = 6 new balls.</span><br><span class="line">  Step 3: 5 + 6 = 11 balls total.</span><br><span class="line">  Answer: 11</span><br></pre></td></tr></table></figure>
+
+<p><strong>Variants</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Mechanism</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Zero-Shot CoT</td>
+<td>“Let’s think step by step”</td>
+<td>Quick, no examples needed</td>
+</tr>
+<tr>
+<td>Few-Shot CoT</td>
+<td>Provide 2–8 solved examples</td>
+<td>Complex domains</td>
+</tr>
+<tr>
+<td>Auto-CoT</td>
+<td>LLM generates its own examples</td>
+<td>Scale without manual labeling</td>
+</tr>
+<tr>
+<td>Self-Consistency</td>
+<td>Sample N chains, majority vote</td>
+<td>High-stakes accuracy</td>
+</tr>
+</tbody></table>
+<p><strong>中文</strong></p>
+<p>CoT 在最终答案前引导 <strong>推理链</strong>：模型逐步列出中间步骤（Roger 有 5 个球 → 买 2 罐各 3 个 &#x3D; 6 个 → 5+6&#x3D;11）。变体包括 Zero-Shot CoT（无示例）、Few-Shot CoT（提供 2–8 个已解示例）、Auto-CoT（LLM 自生成示例）与 Self-Consistency（多条路径多数投票）。</p>
+<h3 id="2-2-ReAct-Reasoning-Acting-推理与行动"><a href="#2-2-ReAct-Reasoning-Acting-推理与行动" class="headerlink" title="2.2 ReAct (Reasoning + Acting) | 推理与行动"></a>2.2 ReAct (Reasoning + Acting) | 推理与行动</h3><p><strong>English</strong></p>
+<p>ReAct interleaves <strong>internal reasoning</strong> with <strong>external actions</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Question: &quot;What is the elevation of the city where the 2024 Olympics will be held?&quot;</span><br><span class="line"></span><br><span class="line">Thought 1: I need to find where the 2024 Olympics are held.</span><br><span class="line">Action 1: Search[&quot;2024 Olympics host city&quot;]</span><br><span class="line">Observation 1: Paris, France</span><br><span class="line"></span><br><span class="line">Thought 2: Now I need Paris&#x27;s elevation.</span><br><span class="line">Action 2: Search[&quot;Paris elevation meters&quot;]</span><br><span class="line">Observation 2: 35 meters above sea level</span><br><span class="line"></span><br><span class="line">Thought 3: I have the answer.</span><br><span class="line">Action 3: Finish[35 meters]</span><br></pre></td></tr></table></figure>
+
+<p><strong>Architecture components</strong>:</p>
+<ul>
+<li><strong>Thought</strong>: LLM’s internal reasoning (not sent to tools)</li>
+<li><strong>Action</strong>: Tool invocation (Search, Calculator, Code, API)</li>
+<li><strong>Observation</strong>: Tool output fed back into context</li>
+<li><strong>Loop</strong>: Repeat until Finish action or max steps</li>
+</ul>
+<p><strong>中文</strong></p>
+<p>ReAct 将 <strong>内部推理</strong> 与 <strong>外部行动</strong> 交替：Thought（LLM 内部推理，不发送给工具）→ Action（工具调用：Search、Calculator、Code、API）→ Observation（工具输出反馈到上下文）→ 循环直至 Finish 或达到最大步数。</p>
+<h3 id="2-3-Tree-of-Thoughts-ToT-思维树"><a href="#2-3-Tree-of-Thoughts-ToT-思维树" class="headerlink" title="2.3 Tree of Thoughts (ToT) | 思维树"></a>2.3 Tree of Thoughts (ToT) | 思维树</h3><p><strong>English</strong></p>
+<p>ToT treats reasoning as <strong>deliberate search</strong> over a tree:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">                    [Initial Problem]</span><br><span class="line">                   /        |        \</span><br><span class="line">            [Thought A]  [Thought B]  [Thought C]</span><br><span class="line">              /    \         |          |</span><br><span class="line">         [A1]   [A2]     [B1]        [C1]</span><br><span class="line">          ✗      ✓         ✗           ?</span><br><span class="line">                             </span><br><span class="line">Evaluation: Score each node → prune bad branches → expand promising ones</span><br><span class="line">Strategies: BFS (breadth-first) or DFS (depth-first) over thought nodes</span><br></pre></td></tr></table></figure>
+
+<p><strong>ToT pipeline</strong>:</p>
+<ol>
+<li><strong>Decompose</strong>: Break problem into thought steps</li>
+<li><strong>Generate</strong>: Propose multiple candidate thoughts per step</li>
+<li><strong>Evaluate</strong>: LLM or heuristic scores each candidate</li>
+<li><strong>Search</strong>: BFS&#x2F;DFS with backtracking on low-scoring branches</li>
+<li><strong>Answer</strong>: Return best complete reasoning path</li>
+</ol>
+<p><strong>中文</strong></p>
+<p>ToT 将推理视为对树的 <strong>审慎搜索</strong>：分解问题 → 每步生成多个候选思维 → LLM 或启发式评分 → BFS&#x2F;DFS 搜索并剪枝低分分支 → 回溯 → 返回最优完整推理路径。</p>
+<h3 id="2-4-三者关系与选型-Relationship-and-Selection"><a href="#2-4-三者关系与选型-Relationship-and-Selection" class="headerlink" title="2.4 三者关系与选型 | Relationship and Selection"></a>2.4 三者关系与选型 | Relationship and Selection</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CoT ──── 纯推理，无外部工具，适合数学/逻辑</span><br><span class="line">  │</span><br><span class="line">  ├── Self-Consistency ──── 提高 CoT 准确率</span><br><span class="line">  │</span><br><span class="line">ReAct ──── CoT + 工具调用，适合需要实时信息的任务</span><br><span class="line">  │</span><br><span class="line">ToT ──── CoT + 搜索，适合需要探索多条路径的复杂规划</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>范式</th>
+<th>外部工具</th>
+<th>搜索</th>
+<th>典型任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CoT</td>
+<td>❌</td>
+<td>❌</td>
+<td>数学、逻辑、常识</td>
+</tr>
+<tr>
+<td>ReAct</td>
+<td>✅</td>
+<td>❌</td>
+<td>问答、API 调用、代码</td>
+</tr>
+<tr>
+<td>ToT</td>
+<td>可选</td>
+<td>✅</td>
+<td>规划、创意、博弈</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、趋势-Trends"><a href="#三、趋势-Trends" class="headerlink" title="三、趋势 | Trends"></a>三、趋势 | Trends</h2><p><strong>English</strong></p>
+<p>May–August 2023 reasoning trends:</p>
+<ol>
+<li><strong>CoT becomes default</strong>: “Let’s think step by step” added to virtually every complex prompt.</li>
+<li><strong>ReAct → LangChain Agents</strong>: ReAct pattern became the foundation of LangChain Agent executors.</li>
+<li><strong>ToT too expensive</strong>: Tree search requires many LLM calls — practical deployments favored ReAct.</li>
+<li><strong>Process Reward Models</strong>: OpenAI o1 (2024 preview) trained models to internalize CoT natively.</li>
+<li><strong>Graph of Thoughts (GoT)</strong>: Extending ToT to arbitrary graph structures for merge&#x2F;refine operations.</li>
+</ol>
+<p><strong>中文</strong></p>
+<p>2023 年 5–8 月推理趋势：</p>
+<ol>
+<li><strong>CoT 成为默认</strong>：几乎每个复杂 Prompt 都加入「逐步思考」。</li>
+<li><strong>ReAct → LangChain Agent</strong>：ReAct 模式成为 LangChain Agent 执行器基础。</li>
+<li><strong>ToT 成本过高</strong>：树搜索需大量 LLM 调用——实际部署更倾向 ReAct。</li>
+<li><strong>过程奖励模型</strong>：OpenAI o1（2024 预览）训练模型内化 CoT。</li>
+<li><strong>Graph of Thoughts（GoT）</strong>：将 ToT 扩展为任意图结构以支持合并&#x2F;精炼操作。</li>
+</ol>
+<hr>
+<h2 id="四、优缺点-Pros-and-Cons"><a href="#四、优缺点-Pros-and-Cons" class="headerlink" title="四、优缺点 | Pros and Cons"></a>四、优缺点 | Pros and Cons</h2><h3 id="4-1-CoT"><a href="#4-1-CoT" class="headerlink" title="4.1 CoT"></a>4.1 CoT</h3><table>
+<thead>
+<tr>
+<th>优点 Advantages</th>
+<th>缺点 Disadvantages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>简单有效，一行 Prompt 即可</td>
+<td>增加输出 token 数与成本</td>
+</tr>
+<tr>
+<td>显著提升数学&#x2F;逻辑准确率</td>
+<td>推理步骤可能出错且传播</td>
+</tr>
+<tr>
+<td>可解释——可见推理过程</td>
+<td>对简单任务反而降低效率</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-ReAct"><a href="#4-2-ReAct" class="headerlink" title="4.2 ReAct"></a>4.2 ReAct</h3><table>
+<thead>
+<tr>
+<th>优点 Advantages</th>
+<th>缺点 Disadvantages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>结合 LLM 推理与实时信息</td>
+<td>工具调用失败导致级联错误</td>
+</tr>
+<tr>
+<td>可扩展——添加新工具即可</td>
+<td>循环次数难控制，可能死循环</td>
+</tr>
+<tr>
+<td>成为 Agent 框架标准模式</td>
+<td>延迟高——每步一次 LLM + 工具调用</td>
+</tr>
+</tbody></table>
+<h3 id="4-3-ToT"><a href="#4-3-ToT" class="headerlink" title="4.3 ToT"></a>4.3 ToT</h3><table>
+<thead>
+<tr>
+<th>优点 Advantages</th>
+<th>缺点 Disadvantages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>复杂规划任务准确率最高</td>
+<td>LLM 调用次数指数增长</td>
+</tr>
+<tr>
+<td>可回溯错误推理路径</td>
+<td>评估函数设计困难</td>
+</tr>
+<tr>
+<td>适合创意与多方案探索</td>
+<td>生产环境延迟不可接受</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、应用场景-Use-Cases"><a href="#五、应用场景-Use-Cases" class="headerlink" title="五、应用场景 | Use Cases"></a>五、应用场景 | Use Cases</h2><table>
+<thead>
+<tr>
+<th>场景 Scenario</th>
+<th>推荐范式 Paradigm</th>
+<th>中文说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小学数学应用题</td>
+<td>CoT + Self-Consistency</td>
+<td>逐步计算，多数投票</td>
+</tr>
+<tr>
+<td>实时新闻问答</td>
+<td>ReAct + Search</td>
+<td>搜索最新信息再回答</td>
+</tr>
+<tr>
+<td>旅行规划</td>
+<td>ToT</td>
+<td>探索多条路线，选最优</td>
+</tr>
+<tr>
+<td>代码 Debug</td>
+<td>ReAct + Code Interpreter</td>
+<td>写代码 → 执行 → 观察错误</td>
+</tr>
+<tr>
+<td>医疗诊断辅助</td>
+<td>CoT + 专业知识</td>
+<td>逐步分析症状</td>
+</tr>
+<tr>
+<td>游戏 AI（24点、数独）</td>
+<td>ToT + BFS</td>
+<td>搜索可行解空间</td>
+</tr>
+<tr>
+<td>企业数据分析</td>
+<td>ReAct + SQL&#x2F;Calculator</td>
+<td>查询数据库 → 计算 → 报告</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、GitHub-与开源生态-GitHub-and-Open-Source"><a href="#六、GitHub-与开源生态-GitHub-and-Open-Source" class="headerlink" title="六、GitHub 与开源生态 | GitHub and Open Source"></a>六、GitHub 与开源生态 | GitHub and Open Source</h2><table>
+<thead>
+<tr>
+<th>项目 Project</th>
+<th>说明 Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain">langchain-ai&#x2F;langchain</a></td>
+<td>ReAct Agent 执行器实现</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/princeton-nlp/tree-of-thought-llm">princeton-nlp&#x2F;tree-of-thought-llm</a></td>
+<td>ToT 官方实现（Princeton NLP）</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Significant-Gravitas/AutoGPT">Significant-Gravitas&#x2F;AutoGPT</a></td>
+<td>自主 Agent，ReAct 变体</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/microsoft/autogen">microsoft&#x2F;autogen</a></td>
+<td>多 Agent 推理框架</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/openai/openai-cookbook">openai&#x2F;openai-cookbook</a></td>
+<td>CoT 与 Function Calling 示例</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、总结-Summary"><a href="#七、总结-Summary" class="headerlink" title="七、总结 | Summary"></a>七、总结 | Summary</h2><p><strong>中文</strong>：2023 年 5 月，CoT、ReAct 与 ToT 三大推理范式定义了 LLM 从「问答机器」到「推理系统」的进化路径。CoT 提供可解释的逐步推理，ReAct 打通 LLM 与外部世界的桥梁，ToT 引入搜索与回溯的 deliberation 能力。它们共同构成 2023 年 AI Agent 与复杂应用的技术基石。</p>
+<p><strong>English</strong>: In May 2023, CoT, ReAct, and ToT defined LLM evolution from “Q&amp;A machines” to “reasoning systems.” CoT provides interpretable step-by-step reasoning, ReAct bridges LLMs to the external world, and ToT introduces search and backtracking deliberation. Together they form the technical foundation of 2023 AI Agents and complex applications.</p>
+<hr>
+<p><strong>参考链接 | References</strong></p>
+<ul>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2201.11903">Chain-of-Thought Prompting Elicits Reasoning</a></li>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2210.03629">ReAct: Synergizing Reasoning and Acting in Language Models</a></li>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2305.10601">Tree of Thoughts: Deliberate Problem Solving with LLMs</a></li>
+<li>论文: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2203.11171">Self-Consistency Improves Chain of Thought Reasoning</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Timeline/" rel="tag"># AI Timeline</a>
+              <a href="/tags/Chain-of-Thought/" rel="tag"># Chain-of-Thought</a>
+              <a href="/tags/ReAct/" rel="tag"># ReAct</a>
+              <a href="/tags/Tree-of-Thoughts/" rel="tag"># Tree of Thoughts</a>
+              <a href="/tags/Reasoning/" rel="tag"># Reasoning</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2023-moe-architecture.html" rel="prev" title="2023 AI 编年史：MoE 混合专家架构">
+                  <i class="fa fa-angle-left"></i> 2023 AI 编年史：MoE 混合专家架构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ai-timeline-2023-multimodal-gpt4v-sdxl.html" rel="next" title="2023 AI 编年史：GPT-4V 与 SDXL 多模态浪潮">
+                  2023 AI 编年史：GPT-4V 与 SDXL 多模态浪潮 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">true</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/gitmmq" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class="fas fa-ellipsis-v"></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div>
+<script src="/js/injector.js"></script>
+
+</body>
+</html>

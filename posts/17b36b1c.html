@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison 中文 工作区文件是「文件即配置」理念的核心：Agent 的人格、流程与知识外化为 Markdown，在会话启动时组装进系统提示词。    维度 OpenClaw（龙虾） Hermes Agent     配置文件数 8 个 bootstrap 文件">
+    <meta name="description" content="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析Agent Hermes &amp; OpenClaw: Workspace Files and Prompt Assembly — A Deep Dive 最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison中文 工作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/17b36b1c.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison 中文 工作区文件是「文件即配置」理念的核心：Agent 的人格、流程与知识外化为 Markdown，在会话启动时组装进系统提示词。    维度 OpenClaw（龙虾） Hermes Agent     配置文件数 8 个 bootstrap 文件">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析Agent Hermes &amp; OpenClaw: Workspace Files and Prompt Assembly — A Deep Dive 最后更新 | Last updated: 2026-06-06   一、设计哲学对比 | Design Philosophy Comparison中文 工作">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-05T20:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-05T20:00:00.000Z">
+<meta property="article:published_time" content="2026-06-06T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T04:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Hermes">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、OpenClaw 八文件 Bootstrap 体系 | OpenClaw Eight Bootstrap Files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 注入顺序与优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 体积控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 BOOTSTRAP.md 特殊行为</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">三、SOUL 与 AGENTS 职责分离 | SOUL vs AGENTS Separation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E2%9C%85-AGENTS-md-%E4%B8%AD%E5%86%99%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.</span> <span class="nav-text">✅ AGENTS.md 中写操作步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deploy-workflow"><span class="nav-number">4.1.</span> <span class="nav-text">Deploy workflow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.2.</span> <span class="nav-text">四、Hermes Prompt 三层架构 | Hermes Three-Tier Prompt Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.2.1.</span> <span class="nav-text">4.1 项目上下文发现顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.2.2.</span> <span class="nav-text">4.2 冻结记忆快照</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.3.</span> <span class="nav-text">五、Prompt 稳定性与前缀缓存 | Prompt Stability &amp; Prefix Caching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.3.1.</span> <span class="nav-text">5.1 Hermes Anthropic 缓存策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.3.2.</span> <span class="nav-text">5.2 已知缓存破坏点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.4.</span> <span class="nav-text">六、contextVisibility 与注入防护 | contextVisibility &amp; Injection Protection</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.4.1.</span> <span class="nav-text">6.1 OpenClaw contextVisibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.4.2.</span> <span class="nav-text">6.2 上下文文件安全扫描</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.5.</span> <span class="nav-text">七、Agent 循环与 Prompt 组装流程 | Agent Loop &amp; Prompt Assembly Flow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.6.</span> <span class="nav-text">八、子 Agent 与缩减上下文 | Sub-Agents &amp; Reduced Context</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.7.</span> <span class="nav-text">九、从 OpenClaw 迁移工作区上下文 | Migrating Workspace Context from OpenClaw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.8.</span> <span class="nav-text">十、OpenClaw 与 Hermes 记忆注入对比 | Memory Injection Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.9.</span> <span class="nav-text">十一、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.9.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.9.2.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.10.</span> <span class="nav-text">十二、快速对照表 | Quick Reference Table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.11.</span> <span class="nav-text">十三、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.12.</span> <span class="nav-text">十四、结语 | Conclusion</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw-%E5%B7%A5%E4%BD%9C%E5%8C%BA%E6%96%87%E4%BB%B6%E4%B8%8E-Prompt-%E7%BB%84%E8%A3%85%E5%85%A8%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-OpenClaw-Workspace-Files-and-Prompt-Assembly-%E2%80%94-A-Deep-Dive"><span class="nav-number">2.</span> <span class="nav-text">Agent Hermes &amp; OpenClaw: Workspace Files and Prompt Assembly — A Deep Dive</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E5%AF%B9%E6%AF%94-Design-Philosophy-Comparison"><span class="nav-number">2.1.</span> <span class="nav-text">一、设计哲学对比 | Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81OpenClaw-%E5%85%AB%E6%96%87%E4%BB%B6-Bootstrap-%E4%BD%93%E7%B3%BB-OpenClaw-Eight-Bootstrap-Files"><span class="nav-number">2.2.</span> <span class="nav-text">二、OpenClaw 八文件 Bootstrap 体系 | OpenClaw Eight Bootstrap Files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%B3%A8%E5%85%A5%E9%A1%BA%E5%BA%8F%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 注入顺序与优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%BD%93%E7%A7%AF%E6%8E%A7%E5%88%B6"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 体积控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-BOOTSTRAP-md-%E7%89%B9%E6%AE%8A%E8%A1%8C%E4%B8%BA"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 BOOTSTRAP.md 特殊行为</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81SOUL-%E4%B8%8E-AGENTS-%E8%81%8C%E8%B4%A3%E5%88%86%E7%A6%BB-SOUL-vs-AGENTS-Separation"><span class="nav-number">2.3.</span> <span class="nav-text">三、SOUL 与 AGENTS 职责分离 | SOUL vs AGENTS Separation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Hermes-Prompt-%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84-Hermes-Three-Tier-Prompt-Architecture"><span class="nav-number">2.4.</span> <span class="nav-text">四、Hermes Prompt 三层架构 | Hermes Three-Tier Prompt Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8F%91%E7%8E%B0%E9%A1%BA%E5%BA%8F"><span class="nav-number">2.4.1.</span> <span class="nav-text">4.1 项目上下文发现顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BF%86%E5%BF%AB%E7%85%A7"><span class="nav-number">2.4.2.</span> <span class="nav-text">4.2 冻结记忆快照</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Prompt-%E7%A8%B3%E5%AE%9A%E6%80%A7%E4%B8%8E%E5%89%8D%E7%BC%80%E7%BC%93%E5%AD%98-Prompt-Stability-Prefix-Caching"><span class="nav-number">2.5.</span> <span class="nav-text">五、Prompt 稳定性与前缀缓存 | Prompt Stability &amp; Prefix Caching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Hermes-Anthropic-%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5"><span class="nav-number">2.5.1.</span> <span class="nav-text">5.1 Hermes Anthropic 缓存策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%B7%B2%E7%9F%A5%E7%BC%93%E5%AD%98%E7%A0%B4%E5%9D%8F%E7%82%B9"><span class="nav-number">2.5.2.</span> <span class="nav-text">5.2 已知缓存破坏点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81contextVisibility-%E4%B8%8E%E6%B3%A8%E5%85%A5%E9%98%B2%E6%8A%A4-contextVisibility-Injection-Protection"><span class="nav-number">2.6.</span> <span class="nav-text">六、contextVisibility 与注入防护 | contextVisibility &amp; Injection Protection</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-OpenClaw-contextVisibility"><span class="nav-number">2.6.1.</span> <span class="nav-text">6.1 OpenClaw contextVisibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E4%B8%8A%E4%B8%8B%E6%96%87%E6%96%87%E4%BB%B6%E5%AE%89%E5%85%A8%E6%89%AB%E6%8F%8F"><span class="nav-number">2.6.2.</span> <span class="nav-text">6.2 上下文文件安全扫描</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81Agent-%E5%BE%AA%E7%8E%AF%E4%B8%8E-Prompt-%E7%BB%84%E8%A3%85%E6%B5%81%E7%A8%8B-Agent-Loop-Prompt-Assembly-Flow"><span class="nav-number">2.7.</span> <span class="nav-text">七、Agent 循环与 Prompt 组装流程 | Agent Loop &amp; Prompt Assembly Flow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AD%90-Agent-%E4%B8%8E%E7%BC%A9%E5%87%8F%E4%B8%8A%E4%B8%8B%E6%96%87-Sub-Agents-Reduced-Context"><span class="nav-number">2.8.</span> <span class="nav-text">八、子 Agent 与缩减上下文 | Sub-Agents &amp; Reduced Context</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E4%BB%8E-OpenClaw-%E8%BF%81%E7%A7%BB%E5%B7%A5%E4%BD%9C%E5%8C%BA%E4%B8%8A%E4%B8%8B%E6%96%87-Migrating-Workspace-Context-from-OpenClaw"><span class="nav-number">2.9.</span> <span class="nav-text">九、从 OpenClaw 迁移工作区上下文 | Migrating Workspace Context from OpenClaw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81OpenClaw-%E4%B8%8E-Hermes-%E8%AE%B0%E5%BF%86%E6%B3%A8%E5%85%A5%E5%AF%B9%E6%AF%94-Memory-Injection-Comparison"><span class="nav-number">2.10.</span> <span class="nav-text">十、OpenClaw 与 Hermes 记忆注入对比 | Memory Injection Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-Best-Practices"><span class="nav-number">2.11.</span> <span class="nav-text">十一、最佳实践 | Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw"><span class="nav-number">2.11.1.</span> <span class="nav-text">OpenClaw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes-Agent"><span class="nav-number">2.11.2.</span> <span class="nav-text">Hermes Agent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E5%BF%AB%E9%80%9F%E5%AF%B9%E7%85%A7%E8%A1%A8-Quick-Reference-Table"><span class="nav-number">2.12.</span> <span class="nav-text">十二、快速对照表 | Quick Reference Table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB-Further-Reading"><span class="nav-number">2.13.</span> <span class="nav-text">十三、延伸阅读 | Further Reading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E5%9B%9B%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.14.</span> <span class="nav-text">十四、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 04:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T04:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 12:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T12:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,12 +292,11 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw-工作区文件与-Prompt-组装全解析"><a href="#Agent-Hermes-与-OpenClaw-工作区文件与-Prompt-组装全解析" class="headerlink" title="Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析"></a>Agent Hermes 与 OpenClaw 工作区文件与 Prompt 组装全解析</h1><h1 id="Agent-Hermes-OpenClaw-Workspace-Files-and-Prompt-Assembly-—-A-Deep-Dive"><a href="#Agent-Hermes-OpenClaw-Workspace-Files-and-Prompt-Assembly-—-A-Deep-Dive" class="headerlink" title="Agent Hermes &amp; OpenClaw: Workspace Files and Prompt Assembly — A Deep Dive"></a>Agent Hermes &amp; OpenClaw: Workspace Files and Prompt Assembly — A Deep Dive</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr/>
-<h2>一、设计哲学对比 | Design Philosophy Comparison</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="一、设计哲学对比-Design-Philosophy-Comparison"><a href="#一、设计哲学对比-Design-Philosophy-Comparison" class="headerlink" title="一、设计哲学对比 | Design Philosophy Comparison"></a>一、设计哲学对比 | Design Philosophy Comparison</h2><p><strong>中文</strong></p>
 <p>工作区文件是「文件即配置」理念的核心：Agent 的人格、流程与知识外化为 Markdown，在会话启动时组装进系统提示词。</p>
 <table>
 <thead>
@@ -307,8 +306,7 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>配置文件数</td>
 <td>8 个 bootstrap 文件</td>
 <td>SOUL + 项目上下文 + 冻结记忆</td>
@@ -331,15 +329,14 @@
 <tr>
 <td>项目上下文</td>
 <td>workspace 内 AGENTS.md 等</td>
-<td>AGENTS.md / .cursorrules 等</td>
+<td>AGENTS.md &#x2F; .cursorrules 等</td>
 </tr>
 <tr>
 <td>子 Agent</td>
 <td>共享 workspace 文件</td>
 <td>缩减上下文 + 无完整历史</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Workspace files embody files-as-config: agent persona, procedures, and knowledge externalized as Markdown and assembled into the system prompt at session start.</p>
 <table>
@@ -350,8 +347,7 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Config files</td>
 <td>8 bootstrap files</td>
 <td>SOUL + project context + frozen memory</td>
@@ -374,35 +370,20 @@
 <tr>
 <td>Project context</td>
 <td>AGENTS.md etc. in workspace</td>
-<td>AGENTS.md / .cursorrules etc.</td>
+<td>AGENTS.md &#x2F; .cursorrules etc.</td>
 </tr>
 <tr>
 <td>Sub-agents</td>
 <td>Share workspace files</td>
 <td>Reduced context, no full history</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>二、OpenClaw 八文件 Bootstrap 体系 | OpenClaw Eight Bootstrap Files</h2>
-<p><strong>中文</strong></p>
+</tbody></table>
+<hr>
+<h2 id="二、OpenClaw-八文件-Bootstrap-体系-OpenClaw-Eight-Bootstrap-Files"><a href="#二、OpenClaw-八文件-Bootstrap-体系-OpenClaw-Eight-Bootstrap-Files" class="headerlink" title="二、OpenClaw 八文件 Bootstrap 体系 | OpenClaw Eight Bootstrap Files"></a>二、OpenClaw 八文件 Bootstrap 体系 | OpenClaw Eight Bootstrap Files</h2><p><strong>中文</strong></p>
 <p>OpenClaw 在 <code>agents.defaults.workspace</code>（默认 <code>~/.openclaw/workspace/</code>）中维护用户可编辑的 bootstrap 文件：</p>
-<pre><code class="language-text">~/.openclaw/workspace/
-├── SOUL.md           # 人格、语气、价值观、行为边界
-├── AGENTS.md         # 操作手册：工作流、记忆规则、多 Agent 协作
-├── USER.md           # 用户偏好与身份信息
-├── TOOLS.md          # 工具使用指南（不控制工具是否存在）
-├── IDENTITY.md       # Agent 名称、头像、元数据
-├── HEARTBEAT.md      # 主动巡检任务清单
-├── BOOTSTRAP.md      # 首次运行仪式（完成后删除）
-├── MEMORY.md         # 长期记忆（Agent 可更新）
-├── memory/           # 日记式记忆（按需，非自动注入）
-│   └── 2026-06-05.md
-└── skills/           # 技能目录（独立加载机制）
-    └── weather/SKILL.md
-</code></pre>
-<h3>2.1 注入顺序与优先级</h3>
-<p>新会话首轮流次，OpenClaw 将 bootstrap 文件注入 <strong>Project Context</strong>（系统提示词区块）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">~/.openclaw/workspace/</span><br><span class="line">├── SOUL.md           # 人格、语气、价值观、行为边界</span><br><span class="line">├── AGENTS.md         # 操作手册：工作流、记忆规则、多 Agent 协作</span><br><span class="line">├── USER.md           # 用户偏好与身份信息</span><br><span class="line">├── TOOLS.md          # 工具使用指南（不控制工具是否存在）</span><br><span class="line">├── IDENTITY.md       # Agent 名称、头像、元数据</span><br><span class="line">├── HEARTBEAT.md      # 主动巡检任务清单</span><br><span class="line">├── BOOTSTRAP.md      # 首次运行仪式（完成后删除）</span><br><span class="line">├── MEMORY.md         # 长期记忆（Agent 可更新）</span><br><span class="line">├── memory/           # 日记式记忆（按需，非自动注入）</span><br><span class="line">│   └── 2026-06-05.md</span><br><span class="line">└── skills/           # 技能目录（独立加载机制）</span><br><span class="line">    └── weather/SKILL.md</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-注入顺序与优先级"><a href="#2-1-注入顺序与优先级" class="headerlink" title="2.1 注入顺序与优先级"></a>2.1 注入顺序与优先级</h3><p>新会话首轮流次，OpenClaw 将 bootstrap 文件注入 <strong>Project Context</strong>（系统提示词区块）：</p>
 <table>
 <thead>
 <tr>
@@ -412,8 +393,7 @@
 <th>变化频率</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>1</td>
 <td><code>SOUL.md</code></td>
 <td>人格优先 — 影响模型注意力分配</td>
@@ -461,11 +441,9 @@
 <td>持久事实 — <strong>靠后注入</strong></td>
 <td>高</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>设计意图</strong>：稳定的人格指令先于易变的记忆内容，降低记忆更新对行为核心的干扰。</p>
-<h3>2.2 体积控制</h3>
-<table>
+<h3 id="2-2-体积控制"><a href="#2-2-体积控制" class="headerlink" title="2.2 体积控制"></a>2.2 体积控制</h3><table>
 <thead>
 <tr>
 <th>配置项</th>
@@ -473,8 +451,7 @@
 <th>作用</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>agents.defaults.bootstrapMaxChars</code></td>
 <td>20,000</td>
 <td>单文件截断上限</td>
@@ -484,11 +461,9 @@
 <td>150,000</td>
 <td>总注入上限</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>空白文件跳过；超大文件截断并附加标记，提示 Agent 用 <code>read</code> 获取全文。<code>memory/*.md</code> <strong>不</strong>自动注入，通过 memory 工具按需读取。</p>
-<h3>2.3 BOOTSTRAP.md 特殊行为</h3>
-<ul>
+<h3 id="2-3-BOOTSTRAP-md-特殊行为"><a href="#2-3-BOOTSTRAP-md-特殊行为" class="headerlink" title="2.3 BOOTSTRAP.md 特殊行为"></a>2.3 BOOTSTRAP.md 特殊行为</h3><ul>
 <li>仅当工作区无任何其他 bootstrap 文件时由 <code>openclaw setup</code> 创建</li>
 <li>存在期间保持在 Project Context，指导首次仪式</li>
 <li>完成后删除，<strong>不会</strong>在后续重启时重建</li>
@@ -496,9 +471,8 @@
 </ul>
 <p><strong>English</strong></p>
 <p>OpenClaw maintains eight bootstrap files under the workspace. Injection order: SOUL → IDENTITY → USER → AGENTS → TOOLS → HEARTBEAT → BOOTSTRAP → MEMORY (most volatile last). Blank files skipped; large files truncated per <code>bootstrapMaxChars</code> (20k) and <code>bootstrapTotalMaxChars</code> (150k). <code>memory/*.md</code> is on-demand only. BOOTSTRAP.md is one-time for brand-new workspaces.</p>
-<hr/>
-<h2>三、SOUL 与 AGENTS 职责分离 | SOUL vs AGENTS Separation</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="三、SOUL-与-AGENTS-职责分离-SOUL-vs-AGENTS-Separation"><a href="#三、SOUL-与-AGENTS-职责分离-SOUL-vs-AGENTS-Separation" class="headerlink" title="三、SOUL 与 AGENTS 职责分离 | SOUL vs AGENTS Separation"></a>三、SOUL 与 AGENTS 职责分离 | SOUL vs AGENTS Separation</h2><p><strong>中文</strong></p>
 <p>两个框架均推荐将<strong>人格</strong>与<strong>流程</strong>拆分到不同文件：</p>
 <table>
 <thead>
@@ -509,8 +483,7 @@
 <th>管理者</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>SOUL.md</code></td>
 <td>语气、价值观、边界、拒绝策略</td>
 <td>具体命令、API 步骤</td>
@@ -540,41 +513,35 @@
 <td>工具是否存在（由 Gateway 决定）</td>
 <td>用户</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>反模式示例</strong>：</p>
-<pre><code class="language-markdown"># ❌ SOUL.md 中写操作步骤
-When deploying, run kubectl apply -f deploy.yaml...
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># ❌ SOUL.md 中写操作步骤</span></span><br><span class="line">When deploying, run kubectl apply -f deploy.yaml...</span><br><span class="line"></span><br><span class="line"><span class="section"># ✅ AGENTS.md 中写操作步骤</span></span><br><span class="line"><span class="section">## Deploy workflow</span></span><br><span class="line"><span class="bullet">1.</span> Run tests first</span><br><span class="line"><span class="bullet">2.</span> kubectl apply with --server-side</span><br></pre></td></tr></table></figure>
 
-<h1 id="✅-AGENTS-md-中写操作步骤"><a href="#✅-AGENTS-md-中写操作步骤" class="headerlink" title="✅ AGENTS.md 中写操作步骤"></a>✅ AGENTS.md 中写操作步骤</h1><h2 id="Deploy-workflow"><a href="#Deploy-workflow" class="headerlink" title="Deploy workflow"></a>Deploy workflow</h2><ol>
-<li>Run tests first</li>
-<li>kubectl apply with –server-side<br></code></pre></li>
-</ol>
 <p><strong>English</strong></p>
 <p>Separate persona (SOUL.md: tone, values, boundaries) from procedures (AGENTS.md: workflows, memory rules, tool conventions). USER.md holds user profile; MEMORY.md holds facts; TOOLS.md guides tool usage without defining which tools exist. Version-control SOUL and AGENTS in Git; let the agent manage MEMORY.</p>
-<hr/>
-<h2>四、Hermes Prompt 三层架构 | Hermes Three-Tier Prompt Architecture</h2>
-<p><strong>中文</strong></p>
+<hr>
+<h2 id="四、Hermes-Prompt-三层架构-Hermes-Three-Tier-Prompt-Architecture"><a href="#四、Hermes-Prompt-三层架构-Hermes-Three-Tier-Prompt-Architecture" class="headerlink" title="四、Hermes Prompt 三层架构 | Hermes Three-Tier Prompt Architecture"></a>四、Hermes Prompt 三层架构 | Hermes Three-Tier Prompt Architecture</h2><p><strong>中文</strong></p>
 <p>Hermes 将系统提示词分为 <strong>stable → context → volatile</strong> 三层，优化前缀缓存命中率：</p>
-<pre><code class="mermaid">flowchart LR
-    subgraph Stable["stable tier（跨会话稳定）"]
+<pre><code class="highlight mermaid">flowchart LR
+    subgraph Stable[&quot;stable tier（跨会话稳定）&quot;]
         S1[SOUL.md / 身份]
         S2[工具与模型指引]
         S3[技能索引 Level 0]
         S4[平台 hints]
     end
-    subgraph Context["context tier（项目相关）"]
+    subgraph Context[&quot;context tier（项目相关）&quot;]
         C1[AGENTS.md]
         C2[.cursorrules]
         C3[CLAUDE.md / .hermes.md]
     end
-    subgraph Volatile["volatile tier（会话内冻结）"]
+    subgraph Volatile[&quot;volatile tier（会话内冻结）&quot;]
         V1[MEMORY.md 快照]
         V2[USER.md 快照]
         V3[外部记忆 Provider 块]
         V4[时间戳/会话元数据]
     end
     Stable --&gt; Context --&gt; Volatile</code></pre>
+
 <table>
 <thead>
 <tr>
@@ -583,10 +550,9 @@ When deploying, run kubectl apply -f deploy.yaml...
 <th>缓存特性</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><strong>stable</strong></td>
-<td>身份、skills 索引、环境/平台 hints</td>
+<td>身份、skills 索引、环境&#x2F;平台 hints</td>
 <td>跨会话 1h 前缀缓存（Anthropic）</td>
 </tr>
 <tr>
@@ -596,14 +562,12 @@ When deploying, run kubectl apply -f deploy.yaml...
 </tr>
 <tr>
 <td><strong>volatile</strong></td>
-<td>记忆/用户快照、时间戳</td>
+<td>记忆&#x2F;用户快照、时间戳</td>
 <td>会话启动时冻结，靠后放置</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>最终拼接</strong>：<code>stable</code> → <code>context</code> → <code>volatile</code></p>
-<h3>4.1 项目上下文发现顺序</h3>
-<p><code>build_context_files_prompt()</code> 按优先级加载<strong>仅一个</strong>项目上下文类型（首个匹配胜出）：</p>
+<h3 id="4-1-项目上下文发现顺序"><a href="#4-1-项目上下文发现顺序" class="headerlink" title="4.1 项目上下文发现顺序"></a>4.1 项目上下文发现顺序</h3><p><code>build_context_files_prompt()</code> 按优先级加载<strong>仅一个</strong>项目上下文类型（首个匹配胜出）：</p>
 <table>
 <thead>
 <tr>
@@ -611,8 +575,7 @@ When deploying, run kubectl apply -f deploy.yaml...
 <th>文件</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>1</td>
 <td><code>.hermes.md</code></td>
 </tr>
@@ -628,11 +591,9 @@ When deploying, run kubectl apply -f deploy.yaml...
 <td>4</td>
 <td><code>.cursorrules</code></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>Cron 任务可通过 <code>workdir</code> 参数钉在项目目录，注入该目录的上下文文件。</p>
-<h3>4.2 冻结记忆快照</h3>
-<table>
+<h3 id="4-2-冻结记忆快照"><a href="#4-2-冻结记忆快照" class="headerlink" title="4.2 冻结记忆快照"></a>4.2 冻结记忆快照</h3><table>
 <thead>
 <tr>
 <th>文件</th>
@@ -640,8 +601,7 @@ When deploying, run kubectl apply -f deploy.yaml...
 <th>上限</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>MEMORY.md</td>
 <td><code>~/.hermes/memories/MEMORY.md</code></td>
 <td>~2,200 字符</td>
@@ -651,14 +611,12 @@ When deploying, run kubectl apply -f deploy.yaml...
 <td><code>~/.hermes/memories/USER.md</code></td>
 <td>~1,375 字符</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>会话启动时渲染进 volatile tier 后<strong>不再变更</strong>（保护 LLM 前缀缓存）。会话中 <code>memory</code> 工具可增删改并立即落盘，但<strong>下次会话</strong>才进入 Prompt。</p>
 <p><strong>English</strong></p>
-<p>Hermes assembles the system prompt as stable → context → volatile. Stable: identity, skill index, platform hints (cross-session 1h cache on Anthropic). Context: first-match project file (.hermes.md &gt; AGENTS.md &gt; CLAUDE.md &gt; .cursorrules). Volatile: frozen MEMORY/USER snapshots, external memory block, timestamp — captured at session start, not mutated mid-session.</p>
-<hr/>
-<h2>五、Prompt 稳定性与前缀缓存 | Prompt Stability &amp; Prefix Caching</h2>
-<p><strong>中文</strong></p>
+<p>Hermes assembles the system prompt as stable → context → volatile. Stable: identity, skill index, platform hints (cross-session 1h cache on Anthropic). Context: first-match project file (.hermes.md &gt; AGENTS.md &gt; CLAUDE.md &gt; .cursorrules). Volatile: frozen MEMORY&#x2F;USER snapshots, external memory block, timestamp — captured at session start, not mutated mid-session.</p>
+<hr>
+<h2 id="五、Prompt-稳定性与前缀缓存-Prompt-Stability-Prefix-Caching"><a href="#五、Prompt-稳定性与前缀缓存-Prompt-Stability-Prefix-Caching" class="headerlink" title="五、Prompt 稳定性与前缀缓存 | Prompt Stability &amp; Prefix Caching"></a>五、Prompt 稳定性与前缀缓存 | Prompt Stability &amp; Prefix Caching</h2><p><strong>中文</strong></p>
 <p>两个框架均将 <strong>Prompt 稳定性</strong> 作为一等设计目标：</p>
 <table>
 <thead>
@@ -668,8 +626,7 @@ When deploying, run kubectl apply -f deploy.yaml...
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>会话中不突变</td>
 <td>bootstrap 快照复用</td>
 <td><code>_cached_system_prompt</code> 单次构建</td>
@@ -686,25 +643,17 @@ When deploying, run kubectl apply -f deploy.yaml...
 </tr>
 <tr>
 <td>Provider 缓存</td>
-<td>依赖模型/API</td>
+<td>依赖模型&#x2F;API</td>
 <td>Anthropic <code>system_and_3</code> 策略</td>
 </tr>
-</tbody>
-</table>
-<h3>5.1 Hermes Anthropic 缓存策略</h3>
-<pre><code class="language-text">Breakpoint 1: System prompt stable 前缀     → cache_control (1h 跨会话)
-Breakpoint 2: tools schema 末尾             → cache_control (1h)
-Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
-</code></pre>
+</tbody></table>
+<h3 id="5-1-Hermes-Anthropic-缓存策略"><a href="#5-1-Hermes-Anthropic-缓存策略" class="headerlink" title="5.1 Hermes Anthropic 缓存策略"></a>5.1 Hermes Anthropic 缓存策略</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Breakpoint 1: System prompt stable 前缀     → cache_control (1h 跨会话)</span><br><span class="line">Breakpoint 2: tools schema 末尾             → cache_control (1h)</span><br><span class="line">Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)</span><br></pre></td></tr></table></figure>
+
 <p>配置：</p>
-<pre><code class="language-yaml">prompt_caching:
-  cache_ttl: "5m"
-  long_lived_prefix: true    # 默认开启
-  long_lived_ttl: "1h"
-</code></pre>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">prompt_caching:</span></span><br><span class="line">  <span class="attr">cache_ttl:</span> <span class="string">&quot;5m&quot;</span></span><br><span class="line">  <span class="attr">long_lived_prefix:</span> <span class="literal">true</span>    <span class="comment"># 默认开启</span></span><br><span class="line">  <span class="attr">long_lived_ttl:</span> <span class="string">&quot;1h&quot;</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>压缩交互</strong>：上下文压缩后，stable 前缀缓存<strong>存活</strong>；仅压缩区域及之后的消息缓存失效，1-2 轮内滚动窗口重建。</p>
-<h3>5.2 已知缓存破坏点</h3>
-<table>
+<h3 id="5-2-已知缓存破坏点"><a href="#5-2-已知缓存破坏点" class="headerlink" title="5.2 已知缓存破坏点"></a>5.2 已知缓存破坏点</h3><table>
 <thead>
 <tr>
 <th>破坏点</th>
@@ -712,8 +661,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>缓解</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>时间戳每轮变化</td>
 <td>前缀 hash 变化</td>
 <td>时间戳放 volatile 末尾</td>
@@ -728,15 +676,12 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <td>stable tier 变化</td>
 <td>新会话或 <code>--now</code> 显式失效</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>Both frameworks prioritize prompt stability. OpenClaw reuses bootstrap snapshots; Hermes caches <code>_cached_system_prompt</code> once per session. Volatile content at the end preserves prefix cache. Hermes Anthropic strategy: 1h cache on stable prefix + tools schema, 5m rolling on last messages. Compression preserves stable prefix cache; only compressed region invalidates.</p>
-<hr/>
-<h2>六、contextVisibility 与注入防护 | contextVisibility &amp; Injection Protection</h2>
-<p><strong>中文</strong></p>
-<h3>6.1 OpenClaw contextVisibility</h3>
-<p>控制<strong>注入模型的补充上下文</strong>（引用回复、线程历史），与触发授权分离：</p>
+<hr>
+<h2 id="六、contextVisibility-与注入防护-contextVisibility-Injection-Protection"><a href="#六、contextVisibility-与注入防护-contextVisibility-Injection-Protection" class="headerlink" title="六、contextVisibility 与注入防护 | contextVisibility &amp; Injection Protection"></a>六、contextVisibility 与注入防护 | contextVisibility &amp; Injection Protection</h2><p><strong>中文</strong></p>
+<h3 id="6-1-OpenClaw-contextVisibility"><a href="#6-1-OpenClaw-contextVisibility" class="headerlink" title="6.1 OpenClaw contextVisibility"></a>6.1 OpenClaw contextVisibility</h3><p>控制<strong>注入模型的补充上下文</strong>（引用回复、线程历史），与触发授权分离：</p>
 <table>
 <thead>
 <tr>
@@ -744,8 +689,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>行为</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>all</code>（默认）</td>
 <td>保留所有补充上下文</td>
 </tr>
@@ -757,11 +701,9 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <td><code>allowlist_quote</code></td>
 <td>白名单过滤，但保留一条显式引用</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>这降低不可信发送者通过引用链注入 Prompt 的风险，<strong>不替代</strong> dmPolicy 身份认证。</p>
-<h3>6.2 上下文文件安全扫描</h3>
-<p>两个框架在注入前扫描工作区文件：</p>
+<h3 id="6-2-上下文文件安全扫描"><a href="#6-2-上下文文件安全扫描" class="headerlink" title="6.2 上下文文件安全扫描"></a>6.2 上下文文件安全扫描</h3><p>两个框架在注入前扫描工作区文件：</p>
 <table>
 <thead>
 <tr>
@@ -769,10 +711,9 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>示例</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>指令覆盖</td>
-<td>"Ignore previous instructions"</td>
+<td>“Ignore previous instructions”</td>
 </tr>
 <tr>
 <td>隐藏注释</td>
@@ -780,22 +721,20 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 </tr>
 <tr>
 <td>凭证外泄</td>
-<td>读取 <code>.env</code> / <code>id_rsa</code> 的尝试</td>
+<td>读取 <code>.env</code> &#x2F; <code>id_rsa</code> 的尝试</td>
 </tr>
 <tr>
 <td>不可见 Unicode</td>
 <td>零宽字符绕过</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>Hermes 阻断时显示：<code>[BLOCKED: AGENTS.md contained potential prompt injection]</code></p>
 <p>记忆写入（<code>memory</code> 工具）同样经过安全扫描后才进入下次会话快照。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw <code>contextVisibility</code> filters supplemental context (quotes, thread history) separately from auth: <code>all</code>, <code>allowlist</code>, <code>allowlist_quote</code>. Both frameworks scan workspace files before injection for prompt injection, hidden comments, credential exfiltration, and invisible Unicode. Hermes blocks with <code>[BLOCKED: ...]</code> markers; memory writes are scanned before entering the next session snapshot.</p>
-<hr/>
-<h2>七、Agent 循环与 Prompt 组装流程 | Agent Loop &amp; Prompt Assembly Flow</h2>
-<p><strong>中文</strong></p>
-<pre><code class="mermaid">sequenceDiagram
+<hr>
+<h2 id="七、Agent-循环与-Prompt-组装流程-Agent-Loop-Prompt-Assembly-Flow"><a href="#七、Agent-循环与-Prompt-组装流程-Agent-Loop-Prompt-Assembly-Flow" class="headerlink" title="七、Agent 循环与 Prompt 组装流程 | Agent Loop &amp; Prompt Assembly Flow"></a>七、Agent 循环与 Prompt 组装流程 | Agent Loop &amp; Prompt Assembly Flow</h2><p><strong>中文</strong></p>
+<pre><code class="highlight mermaid">sequenceDiagram
     participant C as 渠道/CLI
     participant G as Gateway/Runner
     participant P as Prompt Builder
@@ -813,6 +752,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
         L-&gt;&gt;T: 可能更多工具
     end
     L-&gt;&gt;C: 最终响应</code></pre>
+
 <p><strong>Hermes 设计原则</strong>：</p>
 <ul>
 <li><strong>提示词稳定性</strong> — 会话中不突变系统提示词</li>
@@ -821,10 +761,9 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 </ul>
 <p><strong>OpenClaw Steering</strong>：流式响应期间到达的消息默认 steer 进当前 run，在当前 assistant turn 的工具执行完成后、下一次 LLM 调用前注入。</p>
 <p><strong>English</strong></p>
-<p>Standard agent loop: user message → prompt build (bootstrap/skills/tools or stable/context/volatile) → LLM → tool calls → result injection → loop until done → response. Hermes principles: prompt stability, observable execution, interruptibility. OpenClaw supports mid-run steering of inbound messages.</p>
-<hr/>
-<h2>八、子 Agent 与缩减上下文 | Sub-Agents &amp; Reduced Context</h2>
-<p><strong>中文</strong></p>
+<p>Standard agent loop: user message → prompt build (bootstrap&#x2F;skills&#x2F;tools or stable&#x2F;context&#x2F;volatile) → LLM → tool calls → result injection → loop until done → response. Hermes principles: prompt stability, observable execution, interruptibility. OpenClaw supports mid-run steering of inbound messages.</p>
+<hr>
+<h2 id="八、子-Agent-与缩减上下文-Sub-Agents-Reduced-Context"><a href="#八、子-Agent-与缩减上下文-Sub-Agents-Reduced-Context" class="headerlink" title="八、子 Agent 与缩减上下文 | Sub-Agents &amp; Reduced Context"></a>八、子 Agent 与缩减上下文 | Sub-Agents &amp; Reduced Context</h2><p><strong>中文</strong></p>
 <p>多 Agent 场景下，子代理不应继承完整父会话上下文：</p>
 <table>
 <thead>
@@ -834,8 +773,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>子 Agent 生成</td>
 <td><code>sessions_spawn</code></td>
 <td><code>delegate_tool</code></td>
@@ -860,14 +798,12 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <td>可继承 profile 或单独配置</td>
 <td>继承 toolsets，cron 禁用</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>最佳实践</strong>：子 Agent 的 prompt 应自包含任务描述，不假设「上文已讨论过 X」。</p>
 <p><strong>English</strong></p>
-<p>Sub-agents should not inherit full parent context. OpenClaw: <code>sessions_spawn</code> with separate sessionKey/workspace. Hermes: <code>delegate_tool</code> with task description only, no chat history, shared Docker container, cron toolset disabled. Sub-agent prompts must be self-contained.</p>
-<hr/>
-<h2>九、从 OpenClaw 迁移工作区上下文 | Migrating Workspace Context from OpenClaw</h2>
-<p><strong>中文</strong></p>
+<p>Sub-agents should not inherit full parent context. OpenClaw: <code>sessions_spawn</code> with separate sessionKey&#x2F;workspace. Hermes: <code>delegate_tool</code> with task description only, no chat history, shared Docker container, cron toolset disabled. Sub-agent prompts must be self-contained.</p>
+<hr>
+<h2 id="九、从-OpenClaw-迁移工作区上下文-Migrating-Workspace-Context-from-OpenClaw"><a href="#九、从-OpenClaw-迁移工作区上下文-Migrating-Workspace-Context-from-OpenClaw" class="headerlink" title="九、从 OpenClaw 迁移工作区上下文 | Migrating Workspace Context from OpenClaw"></a>九、从 OpenClaw 迁移工作区上下文 | Migrating Workspace Context from OpenClaw</h2><p><strong>中文</strong></p>
 <p><code>hermes claw migrate</code> 可一键导入龙虾工作区的核心 bootstrap 文件：</p>
 <table>
 <thead>
@@ -877,10 +813,9 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>SOUL.md</code></td>
-<td>SOUL / personality</td>
+<td>SOUL &#x2F; personality</td>
 <td>进入 stable tier 身份块</td>
 </tr>
 <tr>
@@ -903,22 +838,20 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <td><code>~/.hermes/skills/</code></td>
 <td>技能目录结构兼容 agentskills.io</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>迁移后注意</strong>：</p>
 <ul>
-<li>Hermes 记忆有字符上限，超长 MEMORY/USER 需人工精简</li>
+<li>Hermes 记忆有字符上限，超长 MEMORY&#x2F;USER 需人工精简</li>
 <li>OpenClaw 全量 MEMORY 注入 → Hermes 冻结快照 + <code>session_search</code> 补历史</li>
 <li><code>HEARTBEAT.md</code> 不自动映射 — 需改写为 Hermes <code>cronjob</code> 或保留 OpenClaw Gateway 运行 heartbeat</li>
 <li>共享 <code>~/.agents/skills/</code> 可同时服务两个框架的技能发现</li>
 </ul>
-<pre><code class="language-bash">hermes claw migrate    # 交互式导入 SOUL、记忆、技能、API Key
-</code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hermes claw migrate    <span class="comment"># 交互式导入 SOUL、记忆、技能、API Key</span></span><br></pre></td></tr></table></figure>
+
 <p><strong>English</strong></p>
-<p><code>hermes claw migrate</code> imports OpenClaw bootstrap files: SOUL → stable tier identity, USER/MEMORY → frozen volatile snapshots (with char limits), AGENTS.md → context tier (pin via workdir), skills → <code>~/.hermes/skills/</code>. HEARTBEAT.md has no direct mapping — convert to Hermes cronjob or keep OpenClaw heartbeat. Shared <code>~/.agents/skills/</code> works for both frameworks.</p>
-<hr/>
-<h2>十、OpenClaw 与 Hermes 记忆注入对比 | Memory Injection Comparison</h2>
-<p><strong>中文</strong></p>
+<p><code>hermes claw migrate</code> imports OpenClaw bootstrap files: SOUL → stable tier identity, USER&#x2F;MEMORY → frozen volatile snapshots (with char limits), AGENTS.md → context tier (pin via workdir), skills → <code>~/.hermes/skills/</code>. HEARTBEAT.md has no direct mapping — convert to Hermes cronjob or keep OpenClaw heartbeat. Shared <code>~/.agents/skills/</code> works for both frameworks.</p>
+<hr>
+<h2 id="十、OpenClaw-与-Hermes-记忆注入对比-Memory-Injection-Comparison"><a href="#十、OpenClaw-与-Hermes-记忆注入对比-Memory-Injection-Comparison" class="headerlink" title="十、OpenClaw 与 Hermes 记忆注入对比 | Memory Injection Comparison"></a>十、OpenClaw 与 Hermes 记忆注入对比 | Memory Injection Comparison</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -927,8 +860,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>Hermes 冻结快照</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>容量</td>
 <td>无硬限（但全量进 Prompt）</td>
 <td>~2,200 + ~1,375 字符</td>
@@ -953,35 +885,30 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <td>—</td>
 <td><code>hermes claw migrate</code> 导入条目</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <p>OpenClaw MEMORY.md has no hard limit but full injection grows token cost linearly. Hermes frozen snapshots cap at ~2200 + ~1375 chars; historical detail via <code>session_search</code>. OpenClaw uses daily <code>memory/*.md</code> files; Hermes uses FTS5 on-demand recall.</p>
-<hr/>
-<h2>十一、最佳实践 | Best Practices</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw</h3>
-<ol>
+<hr>
+<h2 id="十一、最佳实践-Best-Practices"><a href="#十一、最佳实践-Best-Practices" class="headerlink" title="十一、最佳实践 | Best Practices"></a>十一、最佳实践 | Best Practices</h2><p><strong>中文</strong></p>
+<h3 id="OpenClaw"><a href="#OpenClaw" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><ol>
 <li><strong>Git 管理</strong> SOUL.md + AGENTS.md；MEMORY.md 可 Agent 自管</li>
 <li><strong>控制体积</strong>：定期审查 MEMORY.md，避免 bootstrap 总量触顶</li>
 <li><strong>HEARTBEAT 精简</strong>：保持巡检清单短小稳定</li>
 <li><strong>skipBootstrap</strong>：预置工作区时设 <code>agents.defaults.skipBootstrap: true</code></li>
-<li><strong>/context detail</strong>：诊断各文件 Token 贡献</li>
+<li><strong>&#x2F;context detail</strong>：诊断各文件 Token 贡献</li>
 </ol>
-<h3>Hermes Agent</h3>
-<ol>
+<h3 id="Hermes-Agent"><a href="#Hermes-Agent" class="headerlink" title="Hermes Agent"></a>Hermes Agent</h3><ol>
 <li><strong>职责分层</strong>：关键事实 → MEMORY.md；历史细节 → <code>session_search</code></li>
-<li><strong>项目钉扎</strong>：Cron/批处理用 <code>workdir</code> 注入正确 AGENTS.md</li>
+<li><strong>项目钉扎</strong>：Cron&#x2F;批处理用 <code>workdir</code> 注入正确 AGENTS.md</li>
 <li><strong>勿 mid-session 期待记忆更新</strong>：写入落盘但 volatile tier 不变</li>
 <li><strong>SOUL 迁移</strong>：<code>hermes claw migrate</code> 或 <code>/personality</code> 导入龙虾 SOUL</li>
 <li><strong>压缩后检查</strong>：确认 stable 前缀未被不必要重建</li>
 </ol>
 <p><strong>English</strong></p>
-<p><strong>OpenClaw</strong>: Git-manage SOUL/AGENTS, audit MEMORY size, keep HEARTBEAT concise, use <code>/context detail</code>, <code>skipBootstrap</code> for pre-seeded workspaces.</p>
-<p><strong>Hermes</strong>: layer facts in MEMORY vs history in session_search, pin cron <code>workdir</code>, don't expect mid-session memory in prompt, migrate SOUL from OpenClaw, verify stable prefix after compression.</p>
-<hr/>
-<h2>十二、快速对照表 | Quick Reference Table</h2>
-<table>
+<p><strong>OpenClaw</strong>: Git-manage SOUL&#x2F;AGENTS, audit MEMORY size, keep HEARTBEAT concise, use <code>/context detail</code>, <code>skipBootstrap</code> for pre-seeded workspaces.</p>
+<p><strong>Hermes</strong>: layer facts in MEMORY vs history in session_search, pin cron <code>workdir</code>, don’t expect mid-session memory in prompt, migrate SOUL from OpenClaw, verify stable prefix after compression.</p>
+<hr>
+<h2 id="十二、快速对照表-Quick-Reference-Table"><a href="#十二、快速对照表-Quick-Reference-Table" class="headerlink" title="十二、快速对照表 | Quick Reference Table"></a>十二、快速对照表 | Quick Reference Table</h2><table>
 <thead>
 <tr>
 <th>操作</th>
@@ -989,11 +916,10 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>编辑人格</td>
 <td><code>~/.openclaw/workspace/SOUL.md</code></td>
-<td>SOUL 迁移 / <code>/personality</code></td>
+<td>SOUL 迁移 &#x2F; <code>/personality</code></td>
 </tr>
 <tr>
 <td>编辑流程</td>
@@ -1003,7 +929,7 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <tr>
 <td>查看 Prompt 组成</td>
 <td><code>/context list</code> <code>/context detail</code></td>
-<td>开发者日志 / prompt 调试</td>
+<td>开发者日志 &#x2F; prompt 调试</td>
 </tr>
 <tr>
 <td>新会话生效</td>
@@ -1013,25 +939,22 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
 <tr>
 <td>禁用 bootstrap</td>
 <td><code>skipBootstrap: true</code></td>
-<td>N/A（分层构建）</td>
+<td>N&#x2F;A（分层构建）</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>十三、延伸阅读 | Further Reading</h2>
-<ul>
+</tbody></table>
+<hr>
+<h2 id="十三、延伸阅读-Further-Reading"><a href="#十三、延伸阅读-Further-Reading" class="headerlink" title="十三、延伸阅读 | Further Reading"></a>十三、延伸阅读 | Further Reading</h2><ul>
 <li><a href="./memory-system.md">记忆系统深度解析</a></li>
 <li><a href="./skills-learning-loop.md">技能系统与学习闭环</a></li>
 <li><a href="./automation-cron-heartbeat.md">自动化调度与主动巡检</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.openclaw.ai/concepts/agent">OpenClaw Agent Runtime</a></li>
 <li><a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/developer-guide/prompt-assembly">Hermes Prompt Assembly</a></li>
 </ul>
-<hr/>
-<h2>十四、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
-<p>工作区文件与 Prompt 组装是个人 Agent「是谁」和「怎么做」的根基。OpenClaw 以 <strong>八文件 Bootstrap + 固定注入顺序</strong> 提供透明、可 Git 管理、人类可读的配置面；Hermes 以 <strong>stable/context/volatile 三层 + 冻结记忆快照</strong> 在可控 Token 成本下最大化前缀缓存效率。掌握 SOUL/AGENTS 分离、注入顺序、稳定性策略和子 Agent 缩减上下文，是部署长期运行、高性价比 Agent 的必备知识。</p>
+<hr>
+<h2 id="十四、结语-Conclusion"><a href="#十四、结语-Conclusion" class="headerlink" title="十四、结语 | Conclusion"></a>十四、结语 | Conclusion</h2><p><strong>中文</strong></p>
+<p>工作区文件与 Prompt 组装是个人 Agent「是谁」和「怎么做」的根基。OpenClaw 以 <strong>八文件 Bootstrap + 固定注入顺序</strong> 提供透明、可 Git 管理、人类可读的配置面；Hermes 以 <strong>stable&#x2F;context&#x2F;volatile 三层 + 冻结记忆快照</strong> 在可控 Token 成本下最大化前缀缓存效率。掌握 SOUL&#x2F;AGENTS 分离、注入顺序、稳定性策略和子 Agent 缩减上下文，是部署长期运行、高性价比 Agent 的必备知识。</p>
 <p><strong>English</strong></p>
-<p>Workspace files and prompt assembly are the foundation of who an agent is and how it operates. OpenClaw offers <strong>eight bootstrap files with fixed injection order</strong> — transparent, Git-versionable, human-readable config. Hermes offers <strong>stable/context/volatile tiers with frozen memory snapshots</strong> — controlled token cost and maximal prefix-cache efficiency. Mastering SOUL/AGENTS separation, injection order, stability strategies, and sub-agent reduced context is essential for long-running, cost-effective agent deployments.</p>
+<p>Workspace files and prompt assembly are the foundation of who an agent is and how it operates. OpenClaw offers <strong>eight bootstrap files with fixed injection order</strong> — transparent, Git-versionable, human-readable config. Hermes offers <strong>stable&#x2F;context&#x2F;volatile tiers with frozen memory snapshots</strong> — controlled token cost and maximal prefix-cache efficiency. Mastering SOUL&#x2F;AGENTS separation, injection order, stability strategies, and sub-agent reduced context is essential for long-running, cost-effective agent deployments.</p>
 
     </div>
 
@@ -1042,9 +965,9 @@ Breakpoint 3-4: 最后 2 条非 system 消息      → cache_control (5m 滚动)
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
-              <a href="/tags/Prompt/" rel="tag"># Prompt</a>
               <a href="/tags/Hermes/" rel="tag"># Hermes</a>
               <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+              <a href="/tags/Prompt/" rel="tag"># Prompt</a>
           </div>
 
         

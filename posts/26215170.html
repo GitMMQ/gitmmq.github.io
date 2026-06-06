@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最后更新 | Last updated: 2026-06-05   一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model 中文 两个框架都面向 单用户&#x2F;单信任边界 的个人助理场景，而非 hostile multi-tenant（敌对多租户）隔离：    假设 含义     单操作者 一个 Gateway 对应一个信任的操">
+    <meta name="description" content="Agent Hermes 与 OpenClaw（龙虾）安全模型深度解析Security Models in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive 最后更新 | Last updated: 2026-06-05   一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Mo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 安全模型深度解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/26215170.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="最后更新 | Last updated: 2026-06-05   一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model 中文 两个框架都面向 单用户&#x2F;单信任边界 的个人助理场景，而非 hostile multi-tenant（敌对多租户）隔离：    假设 含义     单操作者 一个 Gateway 对应一个信任的操">
+<meta property="og:description" content="Agent Hermes 与 OpenClaw（龙虾）安全模型深度解析Security Models in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive 最后更新 | Last updated: 2026-06-05   一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Mo">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-04T22:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-04T22:00:00.000Z">
+<meta property="article:published_time" content="2026-06-05T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T06:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="Hermes">
@@ -179,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">二、安全设计哲学对比 | Security Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">三、OpenClaw 安全模型 | OpenClaw Security Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 威胁模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 信任边界矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 DM 访问模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 上下文可见性（contextVisibility）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 工具爆炸半径控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 Exec 审批模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 安全文件操作（@openclaw&#x2F;fs-safe）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.8.</span> <span class="nav-text">3.8 网络安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.9.</span> <span class="nav-text">3.9 插件与 Skills 供应链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.10.</span> <span class="nav-text">3.10 安全审计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.11.</span> <span class="nav-text">3.1 Threat Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.12.</span> <span class="nav-text">3.2 Trust Boundary Matrix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.13.</span> <span class="nav-text">3.3 DM Access Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.14.</span> <span class="nav-text">3.4 Context Visibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.15.</span> <span class="nav-text">3.5 Tool Blast Radius</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.16.</span> <span class="nav-text">3.6 Exec Approvals</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.17.</span> <span class="nav-text">3.7 Secure File Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.18.</span> <span class="nav-text">3.8 Network Security</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.19.</span> <span class="nav-text">3.9 Plugin &amp; Skills Supply Chain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.20.</span> <span class="nav-text">3.10 Security Audit</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">四、Hermes Agent 安全模型 | Hermes Agent Security Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 七层纵深防御</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 危险命令审批</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 Tirith 预执行扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 用户授权（Gateway）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 容器隔离（Docker 示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 终端后端安全对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.7.</span> <span class="nav-text">4.7 环境变量与凭证过滤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.8.</span> <span class="nav-text">4.8 SSRF 与网站访问策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.9.</span> <span class="nav-text">4.9 上下文文件注入防护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.10.</span> <span class="nav-text">4.10 记忆安全扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.11.</span> <span class="nav-text">4.11 Skills 供应链安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.12.</span> <span class="nav-text">4.12 供应链告警</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.13.</span> <span class="nav-text">4.1 Seven Defense Layers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.14.</span> <span class="nav-text">4.2 Dangerous Command Approval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.15.</span> <span class="nav-text">4.3 Tirith Pre-Exec Scanning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.16.</span> <span class="nav-text">4.4 User Authorization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.17.</span> <span class="nav-text">4.5 Container Isolation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.18.</span> <span class="nav-text">4.6 Terminal Backend Security</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.19.</span> <span class="nav-text">4.7 Credential Filtering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.20.</span> <span class="nav-text">4.8 SSRF &amp; Website Policy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.21.</span> <span class="nav-text">4.9 Context File Injection Protection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.22.</span> <span class="nav-text">4.10 Memory Security Scanning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.23.</span> <span class="nav-text">4.11 Skills Supply Chain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.24.</span> <span class="nav-text">4.12 Supply-Chain Advisories</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">五、安全模型对比矩阵 | Security Model Comparison Matrix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">六、共享收件箱场景 | Shared Inbox Scenarios</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">7.</span> <span class="nav-text">七、生产硬化清单 | Production Hardening Checklists</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">7.1.</span> <span class="nav-text">OpenClaw 生产清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">7.2.</span> <span class="nav-text">Hermes 生产清单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">8.</span> <span class="nav-text">八、结语 | Conclusion</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Agent-Hermes-%E4%B8%8E-OpenClaw%EF%BC%88%E9%BE%99%E8%99%BE%EF%BC%89%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Agent Hermes 与 OpenClaw（龙虾）安全模型深度解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Security-Models-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive"><span class="nav-number">2.</span> <span class="nav-text">Security Models in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%85%B1%E5%90%8C%E5%89%8D%E6%8F%90%EF%BC%9A%E4%B8%AA%E4%BA%BA%E5%8A%A9%E7%90%86%E4%BF%A1%E4%BB%BB%E6%A8%A1%E5%9E%8B-Shared-Premise-Personal-Assistant-Trust-Model"><span class="nav-number">2.1.</span> <span class="nav-text">一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%89%E5%85%A8%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E5%AF%B9%E6%AF%94-Security-Design-Philosophy-Comparison"><span class="nav-number">2.2.</span> <span class="nav-text">二、安全设计哲学对比 | Security Design Philosophy Comparison</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81OpenClaw-%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B-OpenClaw-Security-Model"><span class="nav-number">2.3.</span> <span class="nav-text">三、OpenClaw 安全模型 | OpenClaw Security Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%A8%81%E8%83%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text">3.1 威胁模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E4%BF%A1%E4%BB%BB%E8%BE%B9%E7%95%8C%E7%9F%A9%E9%98%B5"><span class="nav-number">2.3.2.</span> <span class="nav-text">3.2 信任边界矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-DM-%E8%AE%BF%E9%97%AE%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.3.</span> <span class="nav-text">3.3 DM 访问模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8F%AF%E8%A7%81%E6%80%A7%EF%BC%88contextVisibility%EF%BC%89"><span class="nav-number">2.3.4.</span> <span class="nav-text">3.4 上下文可见性（contextVisibility）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E5%B7%A5%E5%85%B7%E7%88%86%E7%82%B8%E5%8D%8A%E5%BE%84%E6%8E%A7%E5%88%B6"><span class="nav-number">2.3.5.</span> <span class="nav-text">3.5 工具爆炸半径控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-Exec-%E5%AE%A1%E6%89%B9%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.6.</span> <span class="nav-text">3.6 Exec 审批模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E5%AE%89%E5%85%A8%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%EF%BC%88-openclaw-fs-safe%EF%BC%89"><span class="nav-number">2.3.7.</span> <span class="nav-text">3.7 安全文件操作（@openclaw&#x2F;fs-safe）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8"><span class="nav-number">2.3.8.</span> <span class="nav-text">3.8 网络安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E6%8F%92%E4%BB%B6%E4%B8%8E-Skills-%E4%BE%9B%E5%BA%94%E9%93%BE"><span class="nav-number">2.3.9.</span> <span class="nav-text">3.9 插件与 Skills 供应链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-10-%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1"><span class="nav-number">2.3.10.</span> <span class="nav-text">3.10 安全审计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Threat-Model"><span class="nav-number">2.3.11.</span> <span class="nav-text">3.1 Threat Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Trust-Boundary-Matrix"><span class="nav-number">2.3.12.</span> <span class="nav-text">3.2 Trust Boundary Matrix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-DM-Access-Model"><span class="nav-number">2.3.13.</span> <span class="nav-text">3.3 DM Access Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Context-Visibility"><span class="nav-number">2.3.14.</span> <span class="nav-text">3.4 Context Visibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-Tool-Blast-Radius"><span class="nav-number">2.3.15.</span> <span class="nav-text">3.5 Tool Blast Radius</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-Exec-Approvals"><span class="nav-number">2.3.16.</span> <span class="nav-text">3.6 Exec Approvals</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-Secure-File-Operations"><span class="nav-number">2.3.17.</span> <span class="nav-text">3.7 Secure File Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-Network-Security"><span class="nav-number">2.3.18.</span> <span class="nav-text">3.8 Network Security</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-Plugin-Skills-Supply-Chain"><span class="nav-number">2.3.19.</span> <span class="nav-text">3.9 Plugin &amp; Skills Supply Chain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-10-Security-Audit"><span class="nav-number">2.3.20.</span> <span class="nav-text">3.10 Security Audit</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Hermes-Agent-%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B-Hermes-Agent-Security-Model"><span class="nav-number">2.4.</span> <span class="nav-text">四、Hermes Agent 安全模型 | Hermes Agent Security Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%B8%83%E5%B1%82%E7%BA%B5%E6%B7%B1%E9%98%B2%E5%BE%A1"><span class="nav-number">2.4.1.</span> <span class="nav-text">4.1 七层纵深防御</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%8D%B1%E9%99%A9%E5%91%BD%E4%BB%A4%E5%AE%A1%E6%89%B9"><span class="nav-number">2.4.2.</span> <span class="nav-text">4.2 危险命令审批</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Tirith-%E9%A2%84%E6%89%A7%E8%A1%8C%E6%89%AB%E6%8F%8F"><span class="nav-number">2.4.3.</span> <span class="nav-text">4.3 Tirith 预执行扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%94%A8%E6%88%B7%E6%8E%88%E6%9D%83%EF%BC%88Gateway%EF%BC%89"><span class="nav-number">2.4.4.</span> <span class="nav-text">4.4 用户授权（Gateway）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E5%AE%B9%E5%99%A8%E9%9A%94%E7%A6%BB%EF%BC%88Docker-%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">2.4.5.</span> <span class="nav-text">4.5 容器隔离（Docker 示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-%E7%BB%88%E7%AB%AF%E5%90%8E%E7%AB%AF%E5%AE%89%E5%85%A8%E5%AF%B9%E6%AF%94"><span class="nav-number">2.4.6.</span> <span class="nav-text">4.6 终端后端安全对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E5%87%AD%E8%AF%81%E8%BF%87%E6%BB%A4"><span class="nav-number">2.4.7.</span> <span class="nav-text">4.7 环境变量与凭证过滤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-SSRF-%E4%B8%8E%E7%BD%91%E7%AB%99%E8%AE%BF%E9%97%AE%E7%AD%96%E7%95%A5"><span class="nav-number">2.4.8.</span> <span class="nav-text">4.8 SSRF 与网站访问策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-%E4%B8%8A%E4%B8%8B%E6%96%87%E6%96%87%E4%BB%B6%E6%B3%A8%E5%85%A5%E9%98%B2%E6%8A%A4"><span class="nav-number">2.4.9.</span> <span class="nav-text">4.9 上下文文件注入防护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-10-%E8%AE%B0%E5%BF%86%E5%AE%89%E5%85%A8%E6%89%AB%E6%8F%8F"><span class="nav-number">2.4.10.</span> <span class="nav-text">4.10 记忆安全扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-11-Skills-%E4%BE%9B%E5%BA%94%E9%93%BE%E5%AE%89%E5%85%A8"><span class="nav-number">2.4.11.</span> <span class="nav-text">4.11 Skills 供应链安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-12-%E4%BE%9B%E5%BA%94%E9%93%BE%E5%91%8A%E8%AD%A6"><span class="nav-number">2.4.12.</span> <span class="nav-text">4.12 供应链告警</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Seven-Defense-Layers"><span class="nav-number">2.4.13.</span> <span class="nav-text">4.1 Seven Defense Layers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Dangerous-Command-Approval"><span class="nav-number">2.4.14.</span> <span class="nav-text">4.2 Dangerous Command Approval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Tirith-Pre-Exec-Scanning"><span class="nav-number">2.4.15.</span> <span class="nav-text">4.3 Tirith Pre-Exec Scanning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-User-Authorization"><span class="nav-number">2.4.16.</span> <span class="nav-text">4.4 User Authorization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Container-Isolation"><span class="nav-number">2.4.17.</span> <span class="nav-text">4.5 Container Isolation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-Terminal-Backend-Security"><span class="nav-number">2.4.18.</span> <span class="nav-text">4.6 Terminal Backend Security</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-Credential-Filtering"><span class="nav-number">2.4.19.</span> <span class="nav-text">4.7 Credential Filtering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-SSRF-Website-Policy"><span class="nav-number">2.4.20.</span> <span class="nav-text">4.8 SSRF &amp; Website Policy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-Context-File-Injection-Protection"><span class="nav-number">2.4.21.</span> <span class="nav-text">4.9 Context File Injection Protection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-10-Memory-Security-Scanning"><span class="nav-number">2.4.22.</span> <span class="nav-text">4.10 Memory Security Scanning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-11-Skills-Supply-Chain"><span class="nav-number">2.4.23.</span> <span class="nav-text">4.11 Skills Supply Chain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-12-Supply-Chain-Advisories"><span class="nav-number">2.4.24.</span> <span class="nav-text">4.12 Supply-Chain Advisories</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94%E7%9F%A9%E9%98%B5-Security-Model-Comparison-Matrix"><span class="nav-number">2.5.</span> <span class="nav-text">五、安全模型对比矩阵 | Security Model Comparison Matrix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%85%B1%E4%BA%AB%E6%94%B6%E4%BB%B6%E7%AE%B1%E5%9C%BA%E6%99%AF-Shared-Inbox-Scenarios"><span class="nav-number">2.6.</span> <span class="nav-text">六、共享收件箱场景 | Shared Inbox Scenarios</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%94%9F%E4%BA%A7%E7%A1%AC%E5%8C%96%E6%B8%85%E5%8D%95-Production-Hardening-Checklists"><span class="nav-number">2.7.</span> <span class="nav-text">七、生产硬化清单 | Production Hardening Checklists</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenClaw-%E7%94%9F%E4%BA%A7%E6%B8%85%E5%8D%95"><span class="nav-number">2.7.1.</span> <span class="nav-text">OpenClaw 生产清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hermes-%E7%94%9F%E4%BA%A7%E6%B8%85%E5%8D%95"><span class="nav-number">2.7.2.</span> <span class="nav-text">Hermes 生产清单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E7%BB%93%E8%AF%AD-Conclusion"><span class="nav-number">2.8.</span> <span class="nav-text">八、结语 | Conclusion</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">385</span>
+          <span class="site-state-item-count">454</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -203,7 +203,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">288</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -264,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-05 06:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T06:00:00+08:00">2026-06-05</time>
+      <time title="创建时间：2026-06-05 14:00:00" itemprop="dateCreated datePublished" datetime="2026-06-05T14:00:00+08:00">2026-06-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,13 +292,12 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><blockquote>
+    <div class="post-body" itemprop="articleBody"><h1 id="Agent-Hermes-与-OpenClaw（龙虾）安全模型深度解析"><a href="#Agent-Hermes-与-OpenClaw（龙虾）安全模型深度解析" class="headerlink" title="Agent Hermes 与 OpenClaw（龙虾）安全模型深度解析"></a>Agent Hermes 与 OpenClaw（龙虾）安全模型深度解析</h1><h1 id="Security-Models-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive"><a href="#Security-Models-in-Agent-Hermes-OpenClaw-Lobster-A-Deep-Dive" class="headerlink" title="Security Models in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive"></a>Security Models in Agent Hermes &amp; OpenClaw (Lobster): A Deep Dive</h1><blockquote>
 <p>最后更新 | Last updated: 2026-06-05</p>
 </blockquote>
-<hr/>
-<h2>一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model</h2>
-<p><strong>中文</strong></p>
-<p>两个框架都面向 <strong>单用户/单信任边界</strong> 的个人助理场景，而非 hostile multi-tenant（敌对多租户）隔离：</p>
+<hr>
+<h2 id="一、共同前提：个人助理信任模型-Shared-Premise-Personal-Assistant-Trust-Model"><a href="#一、共同前提：个人助理信任模型-Shared-Premise-Personal-Assistant-Trust-Model" class="headerlink" title="一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model"></a>一、共同前提：个人助理信任模型 | Shared Premise: Personal Assistant Trust Model</h2><p><strong>中文</strong></p>
+<p>两个框架都面向 <strong>单用户&#x2F;单信任边界</strong> 的个人助理场景，而非 hostile multi-tenant（敌对多租户）隔离：</p>
 <table>
 <thead>
 <tr>
@@ -306,8 +305,7 @@
 <th>含义</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>单操作者</td>
 <td>一个 Gateway 对应一个信任的操作者</td>
 </tr>
@@ -323,11 +321,10 @@
 <td>工具即权限</td>
 <td>能触发 Agent 的人 ≈ 能诱导 Agent 使用其工具权限</td>
 </tr>
-</tbody>
-</table>
-<p>若需敌对用户隔离，应 <strong>拆分信任边界</strong>：独立 Gateway + 独立凭证 + 理想情况下独立 OS 用户/主机。</p>
+</tbody></table>
+<p>若需敌对用户隔离，应 <strong>拆分信任边界</strong>：独立 Gateway + 独立凭证 + 理想情况下独立 OS 用户&#x2F;主机。</p>
 <p><strong>English</strong></p>
-<p>Both frameworks target <strong>single-user / single-trust-boundary</strong> personal assistant deployments, not hostile multi-tenant isolation:</p>
+<p>Both frameworks target <strong>single-user &#x2F; single-trust-boundary</strong> personal assistant deployments, not hostile multi-tenant isolation:</p>
 <table>
 <thead>
 <tr>
@@ -335,8 +332,7 @@
 <th>Meaning</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Single operator</td>
 <td>One Gateway per trusted operator</td>
 </tr>
@@ -349,15 +345,13 @@
 <td>Multiple mutually untrusted users on one Gateway is <strong>not</strong> a recommended setup</td>
 </tr>
 <tr>
-<td>Tools = authority</td>
-<td>Anyone who can trigger the agent can induce tool usage within the agent's policy</td>
+<td>Tools &#x3D; authority</td>
+<td>Anyone who can trigger the agent can induce tool usage within the agent’s policy</td>
 </tr>
-</tbody>
-</table>
-<p>For adversarial-user isolation, <strong>split trust boundaries</strong>: separate Gateways, credentials, and ideally OS users/hosts.</p>
-<hr/>
-<h2>二、安全设计哲学对比 | Security Design Philosophy Comparison</h2>
-<p><strong>中文</strong></p>
+</tbody></table>
+<p>For adversarial-user isolation, <strong>split trust boundaries</strong>: separate Gateways, credentials, and ideally OS users&#x2F;hosts.</p>
+<hr>
+<h2 id="二、安全设计哲学对比-Security-Design-Philosophy-Comparison"><a href="#二、安全设计哲学对比-Security-Design-Philosophy-Comparison" class="headerlink" title="二、安全设计哲学对比 | Security Design Philosophy Comparison"></a>二、安全设计哲学对比 | Security Design Philosophy Comparison</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -366,15 +360,14 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>核心理念</td>
 <td><strong>Access control before intelligence</strong> — 先控身份，再控范围，最后才信任模型</td>
 <td><strong>Defense in depth</strong> — 七层纵深防御</td>
 </tr>
 <tr>
 <td>默认姿态</td>
-<td>信任单操作者，<code>security="full"</code> 为个人助理默认</td>
+<td>信任单操作者，<code>security=&quot;full&quot;</code> 为个人助理默认</td>
 <td>默认 <code>manual</code> 审批危险命令</td>
 </tr>
 <tr>
@@ -397,8 +390,7 @@
 <td>npm shrinkwrap 锁定发布依赖</td>
 <td>tirith + Skills Guard + 懒安装隔离</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <table>
 <thead>
@@ -408,15 +400,14 @@
 <th>Hermes Agent</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Core idea</td>
 <td><strong>Access control before intelligence</strong> — identity, scope, then model</td>
 <td><strong>Defense in depth</strong> — seven layers</td>
 </tr>
 <tr>
 <td>Default posture</td>
-<td>Trusted single-operator; <code>security="full"</code> for personal use</td>
+<td>Trusted single-operator; <code>security=&quot;full&quot;</code> for personal use</td>
 <td>Default <code>manual</code> approval for dangerous commands</td>
 </tr>
 <tr>
@@ -439,17 +430,13 @@
 <td>npm shrinkwrap for published deps</td>
 <td>Tirith + Skills Guard + lazy install isolation</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>三、OpenClaw 安全模型 | OpenClaw Security Model</h2>
-<p><strong>中文</strong></p>
-<h3>3.1 威胁模型</h3>
-<p>Agent 可以：执行任意 Shell、读写文件、访问网络、代发消息。</p>
+</tbody></table>
+<hr>
+<h2 id="三、OpenClaw-安全模型-OpenClaw-Security-Model"><a href="#三、OpenClaw-安全模型-OpenClaw-Security-Model" class="headerlink" title="三、OpenClaw 安全模型 | OpenClaw Security Model"></a>三、OpenClaw 安全模型 | OpenClaw Security Model</h2><p><strong>中文</strong></p>
+<h3 id="3-1-威胁模型"><a href="#3-1-威胁模型" class="headerlink" title="3.1 威胁模型"></a>3.1 威胁模型</h3><p>Agent 可以：执行任意 Shell、读写文件、访问网络、代发消息。</p>
 <p>消息者可以：Prompt 注入、社会工程、探测基础设施。</p>
 <p>OpenClaw 的应对：<strong>先决定谁能说话，再决定 Agent 能在哪行动，最后假设模型可被操纵并限制爆炸半径。</strong></p>
-<h3>3.2 信任边界矩阵</h3>
-<table>
+<h3 id="3-2-信任边界矩阵"><a href="#3-2-信任边界矩阵" class="headerlink" title="3.2 信任边界矩阵"></a>3.2 信任边界矩阵</h3><table>
 <thead>
 <tr>
 <th>控制项</th>
@@ -457,8 +444,7 @@
 <th>常见误读</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>gateway.auth</code></td>
 <td>认证 Gateway API 调用者</td>
 <td>「每帧都需签名才安全」</td>
@@ -483,10 +469,8 @@
 <td>操作者意图护栏</td>
 <td>「非敌对多租户隔离」</td>
 </tr>
-</tbody>
-</table>
-<h3>3.3 DM 访问模型</h3>
-<p>所有支持 DM 的渠道均有 <code>dmPolicy</code>：</p>
+</tbody></table>
+<h3 id="3-3-DM-访问模型"><a href="#3-3-DM-访问模型" class="headerlink" title="3.3 DM 访问模型"></a>3.3 DM 访问模型</h3><p>所有支持 DM 的渠道均有 <code>dmPolicy</code>：</p>
 <table>
 <thead>
 <tr>
@@ -494,8 +478,7 @@
 <th>行为</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>pairing</code>（默认）</td>
 <td>未知发送者收到配对码，需管理员批准</td>
 </tr>
@@ -511,11 +494,9 @@
 <td><code>disabled</code></td>
 <td>禁用 DM</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>群组策略：<code>requireMention: true</code> 防止群内误触发。</p>
-<h3>3.4 上下文可见性（contextVisibility）</h3>
-<p>控制<strong>注入模型的补充上下文</strong>（引用回复、线程历史），与触发授权分离：</p>
+<h3 id="3-4-上下文可见性（contextVisibility）"><a href="#3-4-上下文可见性（contextVisibility）" class="headerlink" title="3.4 上下文可见性（contextVisibility）"></a>3.4 上下文可见性（contextVisibility）</h3><p>控制<strong>注入模型的补充上下文</strong>（引用回复、线程历史），与触发授权分离：</p>
 <table>
 <thead>
 <tr>
@@ -523,8 +504,7 @@
 <th>行为</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>all</code>（默认）</td>
 <td>保留所有补充上下文</td>
 </tr>
@@ -536,83 +516,54 @@
 <td><code>allowlist_quote</code></td>
 <td>白名单过滤，但保留一条显式引用</td>
 </tr>
-</tbody>
-</table>
-<h3>3.5 工具爆炸半径控制</h3>
-<p><strong>硬化基线配置</strong>（60 秒快速加固）：</p>
-<pre><code class="language-json5">{
-  gateway: {
-    mode: "local",
-    bind: "loopback",
-    auth: { mode: "token", token: "replace-with-long-random-token" },
-  },
-  session: { dmScope: "per-channel-peer" },
-  tools: {
-    profile: "messaging",
-    deny: ["group:automation", "group:runtime", "group:fs",
-           "sessions_spawn", "sessions_send"],
-    fs: { workspaceOnly: true },
-    exec: { security: "deny", ask: "always" },
-    elevated: { enabled: false },
-  },
-  channels: {
-    whatsapp: {
-      dmPolicy: "pairing",
-      groups: { "*": { requireMention: true } },
-    },
-  },
-}
-</code></pre>
+</tbody></table>
+<h3 id="3-5-工具爆炸半径控制"><a href="#3-5-工具爆炸半径控制" class="headerlink" title="3.5 工具爆炸半径控制"></a>3.5 工具爆炸半径控制</h3><p><strong>硬化基线配置</strong>（60 秒快速加固）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  gateway: &#123;</span><br><span class="line">    mode: &quot;local&quot;,</span><br><span class="line">    bind: &quot;loopback&quot;,</span><br><span class="line">    auth: &#123; mode: &quot;token&quot;, token: &quot;replace-with-long-random-token&quot; &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  session: &#123; dmScope: &quot;per-channel-peer&quot; &#125;,</span><br><span class="line">  tools: &#123;</span><br><span class="line">    profile: &quot;messaging&quot;,</span><br><span class="line">    deny: [&quot;group:automation&quot;, &quot;group:runtime&quot;, &quot;group:fs&quot;,</span><br><span class="line">           &quot;sessions_spawn&quot;, &quot;sessions_send&quot;],</span><br><span class="line">    fs: &#123; workspaceOnly: true &#125;,</span><br><span class="line">    exec: &#123; security: &quot;deny&quot;, ask: &quot;always&quot; &#125;,</span><br><span class="line">    elevated: &#123; enabled: false &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  channels: &#123;</span><br><span class="line">    whatsapp: &#123;</span><br><span class="line">      dmPolicy: &quot;pairing&quot;,</span><br><span class="line">      groups: &#123; &quot;*&quot;: &#123; requireMention: true &#125; &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><strong>高风险控制面工具</strong>（对不可信内容默认 deny）：</p>
 <ul>
 <li><code>gateway</code> — 可修改持久配置</li>
 <li><code>cron</code> — 可创建持久定时任务</li>
-<li><code>sessions_spawn</code> / <code>sessions_send</code> — 跨会话操作</li>
+<li><code>sessions_spawn</code> &#x2F; <code>sessions_send</code> — 跨会话操作</li>
 </ul>
-<h3>3.6 Exec 审批模型</h3>
-<table>
+<h3 id="3-6-Exec-审批模型"><a href="#3-6-Exec-审批模型" class="headerlink" title="3.6 Exec 审批模型"></a>3.6 Exec 审批模型</h3><table>
 <thead>
 <tr>
 <th>配置</th>
 <th>含义</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>tools.exec.security</code></td>
-<td><code>deny</code> / <code>allowlist</code> / <code>full</code></td>
+<td><code>deny</code> &#x2F; <code>allowlist</code> &#x2F; <code>full</code></td>
 </tr>
 <tr>
 <td><code>tools.exec.ask</code></td>
-<td><code>always</code> / <code>on-miss</code> / <code>off</code></td>
+<td><code>always</code> &#x2F; <code>on-miss</code> &#x2F; <code>off</code></td>
 </tr>
 <tr>
 <td><code>tools.exec.host</code></td>
-<td><code>sandbox</code> / <code>gateway</code> / <code>node</code> / <code>auto</code></td>
+<td><code>sandbox</code> &#x2F; <code>gateway</code> &#x2F; <code>node</code> &#x2F; <code>auto</code></td>
 </tr>
-</tbody>
-</table>
-<p>默认对个人助理：<code>security="full"</code>, <code>ask="off"</code> — 这是<strong>有意为之的 UX 默认</strong>，非漏洞。</p>
+</tbody></table>
+<p>默认对个人助理：<code>security=&quot;full&quot;</code>, <code>ask=&quot;off&quot;</code> — 这是<strong>有意为之的 UX 默认</strong>，非漏洞。</p>
 <p>审批绑定精确请求上下文；无法识别单一本地文件操作数的解释器命令会被拒绝。</p>
-<h3>3.7 安全文件操作（@openclaw/fs-safe）</h3>
-<ul>
+<h3 id="3-7-安全文件操作（-openclaw-fs-safe）"><a href="#3-7-安全文件操作（-openclaw-fs-safe）" class="headerlink" title="3.7 安全文件操作（@openclaw&#x2F;fs-safe）"></a>3.7 安全文件操作（@openclaw&#x2F;fs-safe）</h3><ul>
 <li>根目录边界文件访问</li>
 <li>原子写入</li>
 <li>安全归档解压</li>
 <li>密钥文件辅助函数</li>
 </ul>
-<h3>3.8 网络安全</h3>
-<table>
+<h3 id="3-8-网络安全"><a href="#3-8-网络安全" class="headerlink" title="3.8 网络安全"></a>3.8 网络安全</h3><table>
 <thead>
 <tr>
 <th>风险</th>
 <th>缓解</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Gateway 公网暴露</td>
-<td><code>bind: "loopback"</code> + Tailscale</td>
+<td><code>bind: &quot;loopback&quot;</code> + Tailscale</td>
 </tr>
 <tr>
 <td>反向代理认证绕过</td>
@@ -626,48 +577,31 @@
 <td>DNS 重绑定</td>
 <td>收紧 <code>trustedProxies</code>，避免直接公网暴露</td>
 </tr>
-</tbody>
-</table>
-<h3>3.9 插件与 Skills 供应链</h3>
-<ul>
+</tbody></table>
+<h3 id="3-9-插件与-Skills-供应链"><a href="#3-9-插件与-Skills-供应链" class="headerlink" title="3.9 插件与 Skills 供应链"></a>3.9 插件与 Skills 供应链</h3><ul>
 <li>插件在 Gateway <strong>进程内</strong>运行 — 视为可信代码</li>
 <li>推荐 <code>plugins.allow</code> 显式白名单</li>
 <li>Skills 目录视为可信代码，限制修改权限</li>
-<li><code>openclaw security audit --deep</code> 扫描 Skills/插件</li>
+<li><code>openclaw security audit --deep</code> 扫描 Skills&#x2F;插件</li>
 <li>发布包使用 <code>npm-shrinkwrap.json</code> 锁定依赖图</li>
 </ul>
-<h3>3.10 安全审计</h3>
-<pre><code class="language-bash">openclaw security audit          # 常规审计
-openclaw security audit --deep   # 含实时 Gateway 探测
-openclaw security audit --fix    # 自动修复常见问题
-</code></pre>
+<h3 id="3-10-安全审计"><a href="#3-10-安全审计" class="headerlink" title="3.10 安全审计"></a>3.10 安全审计</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openclaw security audit          <span class="comment"># 常规审计</span></span><br><span class="line">openclaw security audit --deep   <span class="comment"># 含实时 Gateway 探测</span></span><br><span class="line">openclaw security audit --fix    <span class="comment"># 自动修复常见问题</span></span><br></pre></td></tr></table></figure>
+
 <p>审计覆盖：入站访问、工具爆炸半径、网络暴露、浏览器控制、文件权限、插件、策略漂移。</p>
 <p><strong>English</strong></p>
-<h3>3.1 Threat Model</h3>
-<p>The agent can execute shell, read/write files, access network, send messages. Messengers can prompt-inject and social-engineer. Response: control who can talk, where the agent acts, assume the model is manipulable, limit blast radius.</p>
-<h3>3.2 Trust Boundary Matrix</h3>
-<p><code>gateway.auth</code> authenticates API callers; <code>sessionKey</code> routes sessions (not auth); exec approvals are operator guardrails, not multi-tenant isolation.</p>
-<h3>3.3 DM Access Model</h3>
-<p><code>dmPolicy</code>: pairing (default), allowlist, open (high risk), disabled. Group mention gates prevent accidental triggers.</p>
-<h3>3.4 Context Visibility</h3>
-<p>Separates trigger authorization from supplemental context injection (<code>all</code>, <code>allowlist</code>, <code>allowlist_quote</code>).</p>
-<h3>3.5 Tool Blast Radius</h3>
-<p>Hardened baseline denies automation/runtime/fs tools, enables workspace-only filesystem, denies exec by default. Deny <code>gateway</code>, <code>cron</code>, <code>sessions_spawn</code> for untrusted surfaces.</p>
-<h3>3.6 Exec Approvals</h3>
-<p><code>security</code> + <code>ask</code> + <code>host</code> configuration. Default <code>full</code>/<code>off</code> is intentional for trusted personal assistants.</p>
-<h3>3.7 Secure File Operations</h3>
-<p><code>@openclaw/fs-safe</code>: root-bounded access, atomic writes, safe archive extraction.</p>
-<h3>3.8 Network Security</h3>
-<p>Loopback bind, trusted proxy config, HTTPS for Control UI, no direct public exposure.</p>
-<h3>3.9 Plugin &amp; Skills Supply Chain</h3>
-<p>In-process plugins = trusted code. Explicit allowlists, shrinkwrapped npm deps, deep audit scanning.</p>
-<h3>3.10 Security Audit</h3>
-<p><code>openclaw security audit [--deep] [--fix]</code> covers inbound access, tool blast radius, network exposure, permissions, plugins, policy drift.</p>
-<hr/>
-<h2>四、Hermes Agent 安全模型 | Hermes Agent Security Model</h2>
-<p><strong>中文</strong></p>
-<h3>4.1 七层纵深防御</h3>
-<pre><code class="mermaid">flowchart TB
+<h3 id="3-1-Threat-Model"><a href="#3-1-Threat-Model" class="headerlink" title="3.1 Threat Model"></a>3.1 Threat Model</h3><p>The agent can execute shell, read&#x2F;write files, access network, send messages. Messengers can prompt-inject and social-engineer. Response: control who can talk, where the agent acts, assume the model is manipulable, limit blast radius.</p>
+<h3 id="3-2-Trust-Boundary-Matrix"><a href="#3-2-Trust-Boundary-Matrix" class="headerlink" title="3.2 Trust Boundary Matrix"></a>3.2 Trust Boundary Matrix</h3><p><code>gateway.auth</code> authenticates API callers; <code>sessionKey</code> routes sessions (not auth); exec approvals are operator guardrails, not multi-tenant isolation.</p>
+<h3 id="3-3-DM-Access-Model"><a href="#3-3-DM-Access-Model" class="headerlink" title="3.3 DM Access Model"></a>3.3 DM Access Model</h3><p><code>dmPolicy</code>: pairing (default), allowlist, open (high risk), disabled. Group mention gates prevent accidental triggers.</p>
+<h3 id="3-4-Context-Visibility"><a href="#3-4-Context-Visibility" class="headerlink" title="3.4 Context Visibility"></a>3.4 Context Visibility</h3><p>Separates trigger authorization from supplemental context injection (<code>all</code>, <code>allowlist</code>, <code>allowlist_quote</code>).</p>
+<h3 id="3-5-Tool-Blast-Radius"><a href="#3-5-Tool-Blast-Radius" class="headerlink" title="3.5 Tool Blast Radius"></a>3.5 Tool Blast Radius</h3><p>Hardened baseline denies automation&#x2F;runtime&#x2F;fs tools, enables workspace-only filesystem, denies exec by default. Deny <code>gateway</code>, <code>cron</code>, <code>sessions_spawn</code> for untrusted surfaces.</p>
+<h3 id="3-6-Exec-Approvals"><a href="#3-6-Exec-Approvals" class="headerlink" title="3.6 Exec Approvals"></a>3.6 Exec Approvals</h3><p><code>security</code> + <code>ask</code> + <code>host</code> configuration. Default <code>full</code>&#x2F;<code>off</code> is intentional for trusted personal assistants.</p>
+<h3 id="3-7-Secure-File-Operations"><a href="#3-7-Secure-File-Operations" class="headerlink" title="3.7 Secure File Operations"></a>3.7 Secure File Operations</h3><p><code>@openclaw/fs-safe</code>: root-bounded access, atomic writes, safe archive extraction.</p>
+<h3 id="3-8-Network-Security"><a href="#3-8-Network-Security" class="headerlink" title="3.8 Network Security"></a>3.8 Network Security</h3><p>Loopback bind, trusted proxy config, HTTPS for Control UI, no direct public exposure.</p>
+<h3 id="3-9-Plugin-Skills-Supply-Chain"><a href="#3-9-Plugin-Skills-Supply-Chain" class="headerlink" title="3.9 Plugin &amp; Skills Supply Chain"></a>3.9 Plugin &amp; Skills Supply Chain</h3><p>In-process plugins &#x3D; trusted code. Explicit allowlists, shrinkwrapped npm deps, deep audit scanning.</p>
+<h3 id="3-10-Security-Audit"><a href="#3-10-Security-Audit" class="headerlink" title="3.10 Security Audit"></a>3.10 Security Audit</h3><p><code>openclaw security audit [--deep] [--fix]</code> covers inbound access, tool blast radius, network exposure, permissions, plugins, policy drift.</p>
+<hr>
+<h2 id="四、Hermes-Agent-安全模型-Hermes-Agent-Security-Model"><a href="#四、Hermes-Agent-安全模型-Hermes-Agent-Security-Model" class="headerlink" title="四、Hermes Agent 安全模型 | Hermes Agent Security Model"></a>四、Hermes Agent 安全模型 | Hermes Agent Security Model</h2><p><strong>中文</strong></p>
+<h3 id="4-1-七层纵深防御"><a href="#4-1-七层纵深防御" class="headerlink" title="4.1 七层纵深防御"></a>4.1 七层纵深防御</h3><pre><code class="highlight mermaid">flowchart TB
     L1[1. 用户授权&lt;br/&gt;Allowlist + DM Pairing]
     L2[2. 危险命令审批&lt;br/&gt;Pattern + Tirith]
     L3[3. 容器隔离&lt;br/&gt;Docker/Modal/Daytona]
@@ -676,8 +610,8 @@ openclaw security audit --fix    # 自动修复常见问题
     L6[6. 跨会话隔离&lt;br/&gt;Cron 路径加固]
     L7[7. 输入净化&lt;br/&gt;工作目录 Allowlist]
     L1 --&gt; L2 --&gt; L3 --&gt; L4 --&gt; L5 --&gt; L6 --&gt; L7</code></pre>
-<h3>4.2 危险命令审批</h3>
-<p><strong>审批模式</strong>（<code>~/.hermes/config.yaml</code>）：</p>
+
+<h3 id="4-2-危险命令审批"><a href="#4-2-危险命令审批" class="headerlink" title="4.2 危险命令审批"></a>4.2 危险命令审批</h3><p><strong>审批模式</strong>（<code>~/.hermes/config.yaml</code>）：</p>
 <table>
 <thead>
 <tr>
@@ -685,8 +619,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>行为</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>manual</code>（默认）</td>
 <td>所有危险命令需用户明确批准</td>
 </tr>
@@ -698,12 +631,13 @@ openclaw security audit --fix    # 自动修复常见问题
 <td><code>off</code></td>
 <td>禁用所有审批（等同 <code>--yolo</code>）</td>
 </tr>
-</tbody>
-</table>
-<p><strong>YOLO 模式</strong>（<code>/yolo</code> 或 <code>hermes --yolo</code>）：<br/>
-- 绕过审批提示，但<strong>不绕过硬线黑名单</strong><br/>
-- 会话中显示红色 <code>⚠ YOLO</code> 状态栏提醒</p>
-<p><strong>硬线黑名单（Always-On Floor）</strong> — 无论 YOLO/off/approve 均拒绝：</p>
+</tbody></table>
+<p><strong>YOLO 模式</strong>（<code>/yolo</code> 或 <code>hermes --yolo</code>）：</p>
+<ul>
+<li>绕过审批提示，但<strong>不绕过硬线黑名单</strong></li>
+<li>会话中显示红色 <code>⚠ YOLO</code> 状态栏提醒</li>
+</ul>
+<p><strong>硬线黑名单（Always-On Floor）</strong> — 无论 YOLO&#x2F;off&#x2F;approve 均拒绝：</p>
 <table>
 <thead>
 <tr>
@@ -711,8 +645,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>原因</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>rm -rf /</code> 及变体</td>
 <td>擦除文件系统根</td>
 </tr>
@@ -732,34 +665,28 @@ openclaw security audit --fix    # 自动修复常见问题
 <td>管道不可信 URL 到 sh</td>
 <td>远程代码执行</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>触发审批的模式</strong>（部分）：</p>
 <ul>
-<li><code>rm -r</code> / <code>rm --recursive</code></li>
-<li><code>chmod 777</code> / <code>chmod -R</code> 不安全权限</li>
-<li><code>DROP TABLE</code> / <code>DELETE FROM</code> 无 WHERE / <code>TRUNCATE</code></li>
+<li><code>rm -r</code> &#x2F; <code>rm --recursive</code></li>
+<li><code>chmod 777</code> &#x2F; <code>chmod -R</code> 不安全权限</li>
+<li><code>DROP TABLE</code> &#x2F; <code>DELETE FROM</code> 无 WHERE &#x2F; <code>TRUNCATE</code></li>
 <li><code>systemctl stop/restart/disable</code></li>
-<li><code>bash -c</code> / <code>curl | sh</code> / <code>bash &lt;(curl ...)</code></li>
+<li><code>bash -c</code> &#x2F; <code>curl | sh</code> &#x2F; <code>bash &lt;(curl ...)</code></li>
 <li>覆写 <code>/etc/</code>、<code>~/.ssh/</code>、<code>~/.hermes/.env</code></li>
-<li><code>pkill</code>/<code>killall</code> hermes/gateway（防自终止）</li>
+<li><code>pkill</code>&#x2F;<code>killall</code> hermes&#x2F;gateway（防自终止）</li>
 </ul>
-<p><strong>容器绕过</strong>：Docker/Singularity/Modal/Daytona 后端跳过危险命令检查——容器本身是安全边界。</p>
-<h3>4.3 Tirith 预执行扫描</h3>
-<p>集成 tirith 进行内容级命令扫描，检测：</p>
+<p><strong>容器绕过</strong>：Docker&#x2F;Singularity&#x2F;Modal&#x2F;Daytona 后端跳过危险命令检查——容器本身是安全边界。</p>
+<h3 id="4-3-Tirith-预执行扫描"><a href="#4-3-Tirith-预执行扫描" class="headerlink" title="4.3 Tirith 预执行扫描"></a>4.3 Tirith 预执行扫描</h3><p>集成 tirith 进行内容级命令扫描，检测：</p>
 <ul>
 <li>同形字 URL 欺骗</li>
 <li>管道到解释器（<code>curl | bash</code>）</li>
 <li>终端注入攻击</li>
 </ul>
-<pre><code class="language-yaml">security:
-  tirith_enabled: true
-  tirith_timeout: 5
-  tirith_fail_open: true   # tirith 不可用时是否放行（高安全环境设为 false）
-</code></pre>
-<p>可疑/阻断命令触发审批流程，默认选择 deny。</p>
-<h3>4.4 用户授权（Gateway）</h3>
-<p>授权检查顺序：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">security:</span></span><br><span class="line">  <span class="attr">tirith_enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">tirith_timeout:</span> <span class="number">5</span></span><br><span class="line">  <span class="attr">tirith_fail_open:</span> <span class="literal">true</span>   <span class="comment"># tirith 不可用时是否放行（高安全环境设为 false）</span></span><br></pre></td></tr></table></figure>
+
+<p>可疑&#x2F;阻断命令触发审批流程，默认选择 deny。</p>
+<h3 id="4-4-用户授权（Gateway）"><a href="#4-4-用户授权（Gateway）" class="headerlink" title="4.4 用户授权（Gateway）"></a>4.4 用户授权（Gateway）</h3><p>授权检查顺序：</p>
 <ol>
 <li>平台 allow-all 标志</li>
 <li>DM 配对已批准列表</li>
@@ -776,8 +703,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>详情</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>码格式</td>
 <td>8 字符，32 字符无歧义字母表</td>
 </tr>
@@ -801,19 +727,12 @@ openclaw security audit --fix    # 自动修复常见问题
 <td>文件权限</td>
 <td><code>chmod 0600</code></td>
 </tr>
-</tbody>
-</table>
-<h3>4.5 容器隔离（Docker 示例）</h3>
-<p>每个容器强制安全参数：</p>
-<pre><code class="language-python">"--cap-drop", "ALL"
-"--security-opt", "no-new-privileges"
-"--pids-limit", "256"
-"--tmpfs", "/tmp:rw,nosuid,size=512m"
-"--tmpfs", "/var/tmp:rw,noexec,nosuid,size=256m"
-</code></pre>
-<p>可配置 CPU/内存/磁盘限制。持久模式 bind-mount <code>/workspace</code> 和 <code>/root</code>；临时模式使用 tmpfs。</p>
-<h3>4.6 终端后端安全对比</h3>
-<table>
+</tbody></table>
+<h3 id="4-5-容器隔离（Docker-示例）"><a href="#4-5-容器隔离（Docker-示例）" class="headerlink" title="4.5 容器隔离（Docker 示例）"></a>4.5 容器隔离（Docker 示例）</h3><p>每个容器强制安全参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;--cap-drop&quot;</span>, <span class="string">&quot;ALL&quot;</span></span><br><span class="line"><span class="string">&quot;--security-opt&quot;</span>, <span class="string">&quot;no-new-privileges&quot;</span></span><br><span class="line"><span class="string">&quot;--pids-limit&quot;</span>, <span class="string">&quot;256&quot;</span></span><br><span class="line"><span class="string">&quot;--tmpfs&quot;</span>, <span class="string">&quot;/tmp:rw,nosuid,size=512m&quot;</span></span><br><span class="line"><span class="string">&quot;--tmpfs&quot;</span>, <span class="string">&quot;/var/tmp:rw,noexec,nosuid,size=256m&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>可配置 CPU&#x2F;内存&#x2F;磁盘限制。持久模式 bind-mount <code>/workspace</code> 和 <code>/root</code>；临时模式使用 tmpfs。</p>
+<h3 id="4-6-终端后端安全对比"><a href="#4-6-终端后端安全对比" class="headerlink" title="4.6 终端后端安全对比"></a>4.6 终端后端安全对比</h3><table>
 <thead>
 <tr>
 <th>后端</th>
@@ -822,8 +741,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>适用场景</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>local</td>
 <td>无（宿主机）</td>
 <td>✅</td>
@@ -848,75 +766,51 @@ openclaw security audit --fix    # 自动修复常见问题
 <td>HPC</td>
 </tr>
 <tr>
-<td>modal / daytona</td>
+<td>modal &#x2F; daytona</td>
 <td>云沙箱</td>
 <td>❌</td>
 <td>Serverless 隔离</td>
 </tr>
-</tbody>
-</table>
-<h3>4.7 环境变量与凭证过滤</h3>
-<p><strong>execute_code / terminal</strong> 默认剥离敏感环境变量（含 KEY/TOKEN/SECRET/PASSWORD 等）。</p>
+</tbody></table>
+<h3 id="4-7-环境变量与凭证过滤"><a href="#4-7-环境变量与凭证过滤" class="headerlink" title="4.7 环境变量与凭证过滤"></a>4.7 环境变量与凭证过滤</h3><p><strong>execute_code &#x2F; terminal</strong> 默认剥离敏感环境变量（含 KEY&#x2F;TOKEN&#x2F;SECRET&#x2F;PASSWORD 等）。</p>
 <p><strong>Skill 声明式透传</strong>：Skill frontmatter 中 <code>required_environment_variables</code> 仅在 Skill 加载后透传对应变量。</p>
-<p><strong>MCP 子进程</strong>：仅传递 PATH/HOME/USER/LANG 等安全变量 + MCP 配置中显式声明的 <code>env</code>。</p>
+<p><strong>MCP 子进程</strong>：仅传递 PATH&#x2F;HOME&#x2F;USER&#x2F;LANG 等安全变量 + MCP 配置中显式声明的 <code>env</code>。</p>
 <p><strong>凭证脱敏</strong>：MCP 错误消息中 GitHub PAT、Bearer token 等替换为 <code>[REDACTED]</code>。</p>
-<h3>4.8 SSRF 与网站访问策略</h3>
-<p><strong>SSRF 防护</strong>（始终开启，面向公网）：</p>
+<h3 id="4-8-SSRF-与网站访问策略"><a href="#4-8-SSRF-与网站访问策略" class="headerlink" title="4.8 SSRF 与网站访问策略"></a>4.8 SSRF 与网站访问策略</h3><p><strong>SSRF 防护</strong>（始终开启，面向公网）：</p>
 <p>阻断 RFC 1918 私网、回环地址、链路本地（含 <code>169.254.169.254</code> 云元数据）、CGNAT、云元数据主机名。重定向链每跳重新验证。</p>
-<pre><code class="language-yaml">security:
-  allow_private_urls: false   # 仅内网场景设为 true
-  website_blocklist:
-    enabled: true
-    domains: ["*.internal.company.com"]
-</code></pre>
-<h3>4.9 上下文文件注入防护</h3>
-<p>注入系统提示词前扫描 AGENTS.md、SOUL.md、.cursorrules 等：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">security:</span></span><br><span class="line">  <span class="attr">allow_private_urls:</span> <span class="literal">false</span>   <span class="comment"># 仅内网场景设为 true</span></span><br><span class="line">  <span class="attr">website_blocklist:</span></span><br><span class="line">    <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">domains:</span> [<span class="string">&quot;*.internal.company.com&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-9-上下文文件注入防护"><a href="#4-9-上下文文件注入防护" class="headerlink" title="4.9 上下文文件注入防护"></a>4.9 上下文文件注入防护</h3><p>注入系统提示词前扫描 AGENTS.md、SOUL.md、.cursorrules 等：</p>
 <ul>
-<li>忽略/覆盖先前指令的注入</li>
+<li>忽略&#x2F;覆盖先前指令的注入</li>
 <li>隐藏 HTML 注释中的可疑关键词</li>
 <li>读取密钥文件的尝试</li>
 <li>不可见 Unicode 字符</li>
 </ul>
 <p>被阻断时显示：<code>[BLOCKED: AGENTS.md contained potential prompt injection]</code></p>
-<h3>4.10 记忆安全扫描</h3>
-<p><code>MEMORY.md</code> / <code>USER.md</code> 写入前检测 Prompt 注入、凭证外泄、SSH 后门、不可见 Unicode。</p>
-<h3>4.11 Skills 供应链安全</h3>
-<ul>
+<h3 id="4-10-记忆安全扫描"><a href="#4-10-记忆安全扫描" class="headerlink" title="4.10 记忆安全扫描"></a>4.10 记忆安全扫描</h3><p><code>MEMORY.md</code> &#x2F; <code>USER.md</code> 写入前检测 Prompt 注入、凭证外泄、SSH 后门、不可见 Unicode。</p>
+<h3 id="4-11-Skills-供应链安全"><a href="#4-11-Skills-供应链安全" class="headerlink" title="4.11 Skills 供应链安全"></a>4.11 Skills 供应链安全</h3><ul>
 <li>Skills Hub 安装经过安全扫描（数据外泄、注入、破坏性命令）</li>
-<li><code>--force</code> 可覆盖 caution/warn 级发现，<strong>不可</strong>覆盖 <code>dangerous</code> 判定</li>
+<li><code>--force</code> 可覆盖 caution&#x2F;warn 级发现，<strong>不可</strong>覆盖 <code>dangerous</code> 判定</li>
 <li>信任等级：<code>builtin</code> &gt; <code>official</code> &gt; <code>trusted</code> &gt; <code>community</code></li>
 <li>懒安装（<code>lazy_deps.py</code>）隔离可选依赖，防止一个毒化包拖垮全部功能</li>
 </ul>
-<h3>4.12 供应链告警</h3>
-<p><code>hermes doctor</code> 检查 Python venv 中已知妥协版本（如供应链蠕虫），可用 <code>hermes doctor --ack &lt;id&gt;</code> 确认处置。</p>
+<h3 id="4-12-供应链告警"><a href="#4-12-供应链告警" class="headerlink" title="4.12 供应链告警"></a>4.12 供应链告警</h3><p><code>hermes doctor</code> 检查 Python venv 中已知妥协版本（如供应链蠕虫），可用 <code>hermes doctor --ack &lt;id&gt;</code> 确认处置。</p>
 <p><strong>English</strong></p>
-<h3>4.1 Seven Defense Layers</h3>
-<p>User auth → dangerous command approval → container isolation → MCP credential filtering → context file scanning → cross-session isolation → input sanitization.</p>
-<h3>4.2 Dangerous Command Approval</h3>
-<p>Modes: <code>manual</code> (default), <code>smart</code> (auxiliary LLM risk assessment), <code>off</code> (YOLO). Hardline blocklist always blocks catastrophic commands regardless of YOLO. Container backends skip approval checks — the container is the boundary.</p>
-<h3>4.3 Tirith Pre-Exec Scanning</h3>
-<p>Content-level scanning for homograph spoofing, pipe-to-interpreter, terminal injection. Integrates with approval flow; default deny on suspicious verdicts.</p>
-<h3>4.4 User Authorization</h3>
-<p>Layered allowlists + DM pairing (cryptographic codes, TTL, rate limits, lockout). Default deny.</p>
-<h3>4.5 Container Isolation</h3>
-<p>Docker: cap-drop ALL, no-new-privileges, pids-limit, size-limited tmpfs. Configurable CPU/memory/disk.</p>
-<h3>4.6 Terminal Backend Security</h3>
-<p>local/ssh: approval checks on. docker/singularity/modal/daytona: container is boundary, checks skipped.</p>
-<h3>4.7 Credential Filtering</h3>
-<p>Strip sensitive env vars by default. Skill-declared passthrough only when skill is loaded. MCP gets filtered env + explicit config only. Error message redaction.</p>
-<h3>4.8 SSRF &amp; Website Policy</h3>
-<p>Block private/loopback/link-local/metadata addresses. Redirect re-validation. Optional <code>allow_private_urls</code> for LAN-only setups. Domain blocklist support.</p>
-<h3>4.9 Context File Injection Protection</h3>
-<p>Scan workspace files for injection patterns, hidden comments, secret exfiltration, invisible Unicode.</p>
-<h3>4.10 Memory Security Scanning</h3>
-<p>Scan memory entries before system-prompt injection.</p>
-<h3>4.11 Skills Supply Chain</h3>
-<p>Hub install security scan, trust levels, <code>--force</code> cannot override <code>dangerous</code> verdicts, lazy dep isolation.</p>
-<h3>4.12 Supply-Chain Advisories</h3>
-<p><code>hermes doctor</code> flags known compromised package versions.</p>
-<hr/>
-<h2>五、安全模型对比矩阵 | Security Model Comparison Matrix</h2>
-<p><strong>中文</strong></p>
+<h3 id="4-1-Seven-Defense-Layers"><a href="#4-1-Seven-Defense-Layers" class="headerlink" title="4.1 Seven Defense Layers"></a>4.1 Seven Defense Layers</h3><p>User auth → dangerous command approval → container isolation → MCP credential filtering → context file scanning → cross-session isolation → input sanitization.</p>
+<h3 id="4-2-Dangerous-Command-Approval"><a href="#4-2-Dangerous-Command-Approval" class="headerlink" title="4.2 Dangerous Command Approval"></a>4.2 Dangerous Command Approval</h3><p>Modes: <code>manual</code> (default), <code>smart</code> (auxiliary LLM risk assessment), <code>off</code> (YOLO). Hardline blocklist always blocks catastrophic commands regardless of YOLO. Container backends skip approval checks — the container is the boundary.</p>
+<h3 id="4-3-Tirith-Pre-Exec-Scanning"><a href="#4-3-Tirith-Pre-Exec-Scanning" class="headerlink" title="4.3 Tirith Pre-Exec Scanning"></a>4.3 Tirith Pre-Exec Scanning</h3><p>Content-level scanning for homograph spoofing, pipe-to-interpreter, terminal injection. Integrates with approval flow; default deny on suspicious verdicts.</p>
+<h3 id="4-4-User-Authorization"><a href="#4-4-User-Authorization" class="headerlink" title="4.4 User Authorization"></a>4.4 User Authorization</h3><p>Layered allowlists + DM pairing (cryptographic codes, TTL, rate limits, lockout). Default deny.</p>
+<h3 id="4-5-Container-Isolation"><a href="#4-5-Container-Isolation" class="headerlink" title="4.5 Container Isolation"></a>4.5 Container Isolation</h3><p>Docker: cap-drop ALL, no-new-privileges, pids-limit, size-limited tmpfs. Configurable CPU&#x2F;memory&#x2F;disk.</p>
+<h3 id="4-6-Terminal-Backend-Security"><a href="#4-6-Terminal-Backend-Security" class="headerlink" title="4.6 Terminal Backend Security"></a>4.6 Terminal Backend Security</h3><p>local&#x2F;ssh: approval checks on. docker&#x2F;singularity&#x2F;modal&#x2F;daytona: container is boundary, checks skipped.</p>
+<h3 id="4-7-Credential-Filtering"><a href="#4-7-Credential-Filtering" class="headerlink" title="4.7 Credential Filtering"></a>4.7 Credential Filtering</h3><p>Strip sensitive env vars by default. Skill-declared passthrough only when skill is loaded. MCP gets filtered env + explicit config only. Error message redaction.</p>
+<h3 id="4-8-SSRF-Website-Policy"><a href="#4-8-SSRF-Website-Policy" class="headerlink" title="4.8 SSRF &amp; Website Policy"></a>4.8 SSRF &amp; Website Policy</h3><p>Block private&#x2F;loopback&#x2F;link-local&#x2F;metadata addresses. Redirect re-validation. Optional <code>allow_private_urls</code> for LAN-only setups. Domain blocklist support.</p>
+<h3 id="4-9-Context-File-Injection-Protection"><a href="#4-9-Context-File-Injection-Protection" class="headerlink" title="4.9 Context File Injection Protection"></a>4.9 Context File Injection Protection</h3><p>Scan workspace files for injection patterns, hidden comments, secret exfiltration, invisible Unicode.</p>
+<h3 id="4-10-Memory-Security-Scanning"><a href="#4-10-Memory-Security-Scanning" class="headerlink" title="4.10 Memory Security Scanning"></a>4.10 Memory Security Scanning</h3><p>Scan memory entries before system-prompt injection.</p>
+<h3 id="4-11-Skills-Supply-Chain"><a href="#4-11-Skills-Supply-Chain" class="headerlink" title="4.11 Skills Supply Chain"></a>4.11 Skills Supply Chain</h3><p>Hub install security scan, trust levels, <code>--force</code> cannot override <code>dangerous</code> verdicts, lazy dep isolation.</p>
+<h3 id="4-12-Supply-Chain-Advisories"><a href="#4-12-Supply-Chain-Advisories" class="headerlink" title="4.12 Supply-Chain Advisories"></a>4.12 Supply-Chain Advisories</h3><p><code>hermes doctor</code> flags known compromised package versions.</p>
+<hr>
+<h2 id="五、安全模型对比矩阵-Security-Model-Comparison-Matrix"><a href="#五、安全模型对比矩阵-Security-Model-Comparison-Matrix" class="headerlink" title="五、安全模型对比矩阵 | Security Model Comparison Matrix"></a>五、安全模型对比矩阵 | Security Model Comparison Matrix</h2><p><strong>中文</strong></p>
 <table>
 <thead>
 <tr>
@@ -925,8 +819,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>身份优先</td>
 <td>✅ dmPolicy + allowlist</td>
 <td>✅ 多层 allowlist + pairing</td>
@@ -948,7 +841,7 @@ openclaw security audit --fix    # 自动修复常见问题
 </tr>
 <tr>
 <td>文件安全</td>
-<td>@openclaw/fs-safe 根边界</td>
+<td>@openclaw&#x2F;fs-safe 根边界</td>
 <td>工作目录 allowlist + 上下文扫描</td>
 </tr>
 <tr>
@@ -983,11 +876,10 @@ openclaw security audit --fix    # 自动修复常见问题
 </tr>
 <tr>
 <td>硬化基线</td>
-<td>audit --fix 一键加固</td>
+<td>audit –fix 一键加固</td>
 <td>生产清单（Docker + allowlist）</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p><strong>English</strong></p>
 <table>
 <thead>
@@ -997,8 +889,7 @@ openclaw security audit --fix    # 自动修复常见问题
 <th>Hermes</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Identity-first</td>
 <td>✅ dmPolicy + allowlist</td>
 <td>✅ layered allowlist + pairing</td>
@@ -1020,7 +911,7 @@ openclaw security audit --fix    # 自动修复常见问题
 </tr>
 <tr>
 <td>File safety</td>
-<td>@openclaw/fs-safe root bounds</td>
+<td>@openclaw&#x2F;fs-safe root bounds</td>
 <td>cwd allowlist + context scanning</td>
 </tr>
 <tr>
@@ -1055,54 +946,53 @@ openclaw security audit --fix    # 自动修复常见问题
 </tr>
 <tr>
 <td>Hardening baseline</td>
-<td>audit --fix</td>
+<td>audit –fix</td>
 <td>Production checklist (Docker + allowlist)</td>
 </tr>
-</tbody>
-</table>
-<hr/>
-<h2>六、共享收件箱场景 | Shared Inbox Scenarios</h2>
-<p><strong>中文</strong></p>
+</tbody></table>
+<hr>
+<h2 id="六、共享收件箱场景-Shared-Inbox-Scenarios"><a href="#六、共享收件箱场景-Shared-Inbox-Scenarios" class="headerlink" title="六、共享收件箱场景 | Shared Inbox Scenarios"></a>六、共享收件箱场景 | Shared Inbox Scenarios</h2><p><strong>中文</strong></p>
 <p>若多人可 DM 你的 Bot，核心风险是 <strong>委派工具权限</strong>：</p>
 <ul>
-<li>任一允许发送者可诱导 <code>exec</code>、浏览器、网络/文件工具</li>
-<li>一个发送者的 Prompt 注入可影响共享状态/设备/输出</li>
+<li>任一允许发送者可诱导 <code>exec</code>、浏览器、网络&#x2F;文件工具</li>
+<li>一个发送者的 Prompt 注入可影响共享状态&#x2F;设备&#x2F;输出</li>
 <li>若 Agent 持有敏感凭证，任何允许发送者都可能驱动外泄</li>
 </ul>
-<p><strong>OpenClaw 建议</strong>：<br/>
-- <code>session.dmScope: "per-channel-peer"</code><br/>
-- <code>dmPolicy: "pairing"</code> 或严格 allowlist<br/>
-- 不要对共享 DM 开放广泛工具访问<br/>
-- 团队工作流用独立 Agent/Gateway，最小工具集</p>
-<p><strong>Hermes 建议</strong>：<br/>
-- 配置平台 allowlist，禁用 <code>GATEWAY_ALLOW_ALL_USERS</code><br/>
-- 生产环境 <code>terminal.backend: docker</code><br/>
-- Cron 任务设 <code>cron_mode: deny</code>（遇危险命令拒绝而非自动批准）</p>
+<p><strong>OpenClaw 建议</strong>：</p>
+<ul>
+<li><code>session.dmScope: &quot;per-channel-peer&quot;</code></li>
+<li><code>dmPolicy: &quot;pairing&quot;</code> 或严格 allowlist</li>
+<li>不要对共享 DM 开放广泛工具访问</li>
+<li>团队工作流用独立 Agent&#x2F;Gateway，最小工具集</li>
+</ul>
+<p><strong>Hermes 建议</strong>：</p>
+<ul>
+<li>配置平台 allowlist，禁用 <code>GATEWAY_ALLOW_ALL_USERS</code></li>
+<li>生产环境 <code>terminal.backend: docker</code></li>
+<li>Cron 任务设 <code>cron_mode: deny</code>（遇危险命令拒绝而非自动批准）</li>
+</ul>
 <p><strong>English</strong></p>
-<p>If multiple people can DM your bot, the core risk is <strong>delegated tool authority</strong>. Any allowed sender can induce exec/browser/network tools; prompt injection from one sender affects shared state.</p>
-<p><strong>OpenClaw</strong>: per-channel-peer DM scope, pairing/allowlist, no broad tools on shared DMs, separate agents for team workflows.</p>
+<p>If multiple people can DM your bot, the core risk is <strong>delegated tool authority</strong>. Any allowed sender can induce exec&#x2F;browser&#x2F;network tools; prompt injection from one sender affects shared state.</p>
+<p><strong>OpenClaw</strong>: per-channel-peer DM scope, pairing&#x2F;allowlist, no broad tools on shared DMs, separate agents for team workflows.</p>
 <p><strong>Hermes</strong>: platform allowlists, Docker backend in production, <code>cron_mode: deny</code> for headless jobs.</p>
-<hr/>
-<h2>七、生产硬化清单 | Production Hardening Checklists</h2>
-<p><strong>中文</strong></p>
-<h3>OpenClaw 生产清单</h3>
-<ol>
+<hr>
+<h2 id="七、生产硬化清单-Production-Hardening-Checklists"><a href="#七、生产硬化清单-Production-Hardening-Checklists" class="headerlink" title="七、生产硬化清单 | Production Hardening Checklists"></a>七、生产硬化清单 | Production Hardening Checklists</h2><p><strong>中文</strong></p>
+<h3 id="OpenClaw-生产清单"><a href="#OpenClaw-生产清单" class="headerlink" title="OpenClaw 生产清单"></a>OpenClaw 生产清单</h3><ol>
 <li><code>openclaw security audit --deep --fix</code></li>
-<li><code>gateway.bind: "loopback"</code> + 强随机 <code>gateway.auth.token</code></li>
-<li><code>dmPolicy: "pairing"</code> + <code>session.dmScope: "per-channel-peer"</code></li>
-<li>收紧 <code>tools.profile</code>，deny <code>gateway</code>/<code>cron</code>/<code>sessions_spawn</code></li>
-<li><code>tools.exec.security: "deny"</code> 或 <code>"allowlist"</code> + <code>ask: "always"</code></li>
+<li><code>gateway.bind: &quot;loopback&quot;</code> + 强随机 <code>gateway.auth.token</code></li>
+<li><code>dmPolicy: &quot;pairing&quot;</code> + <code>session.dmScope: &quot;per-channel-peer&quot;</code></li>
+<li>收紧 <code>tools.profile</code>，deny <code>gateway</code>&#x2F;<code>cron</code>&#x2F;<code>sessions_spawn</code></li>
+<li><code>tools.exec.security: &quot;deny&quot;</code> 或 <code>&quot;allowlist&quot;</code> + <code>ask: &quot;always&quot;</code></li>
 <li><code>tools.fs.workspaceOnly: true</code></li>
 <li><code>chmod 700 ~/.openclaw</code>，凭证文件 <code>600</code></li>
 <li><code>plugins.allow</code> 显式白名单</li>
 <li>反向代理配置 <code>trustedProxies</code></li>
 <li>定期审查 Skills 目录修改权限</li>
 </ol>
-<h3>Hermes 生产清单</h3>
-<ol>
+<h3 id="Hermes-生产清单"><a href="#Hermes-生产清单" class="headerlink" title="Hermes 生产清单"></a>Hermes 生产清单</h3><ol>
 <li>配置 <code>TELEGRAM_ALLOWED_USERS</code> 等，<strong>禁用</strong> <code>GATEWAY_ALLOW_ALL_USERS</code></li>
-<li><code>terminal.backend: docker</code>（或 modal/daytona）</li>
-<li>设置容器 CPU/内存/磁盘限制</li>
+<li><code>terminal.backend: docker</code>（或 modal&#x2F;daytona）</li>
+<li>设置容器 CPU&#x2F;内存&#x2F;磁盘限制</li>
 <li><code>chmod 600 ~/.hermes/.env</code></li>
 <li>启用 DM pairing，<code>unauthorized_dm_behavior: pair</code></li>
 <li><code>approvals.mode: manual</code>（或 <code>smart</code>）</li>
@@ -1114,14 +1004,13 @@ openclaw security audit --fix    # 自动修复常见问题
 <li>网络隔离：Gateway 与执行分离（<code>terminal.backend: ssh</code>）</li>
 </ol>
 <p><strong>English</strong></p>
-<p><strong>OpenClaw production</strong>: security audit --deep --fix, loopback bind + auth token, pairing DM policy, tighten tool profile, deny/limit exec, workspace-only fs, lock permissions, plugin allowlist, trusted proxies, audit skills directory.</p>
-<p><strong>Hermes production</strong>: platform allowlists (no allow-all), Docker/modal backend, container limits, secure .env, DM pairing, manual/smart approvals, tirith fail-closed, no private URLs, audit command allowlist, hermes doctor + update, non-root gateway, split gateway/execution via SSH.</p>
-<hr/>
-<h2>八、结语 | Conclusion</h2>
-<p><strong>中文</strong></p>
+<p><strong>OpenClaw production</strong>: security audit –deep –fix, loopback bind + auth token, pairing DM policy, tighten tool profile, deny&#x2F;limit exec, workspace-only fs, lock permissions, plugin allowlist, trusted proxies, audit skills directory.</p>
+<p><strong>Hermes production</strong>: platform allowlists (no allow-all), Docker&#x2F;modal backend, container limits, secure .env, DM pairing, manual&#x2F;smart approvals, tirith fail-closed, no private URLs, audit command allowlist, hermes doctor + update, non-root gateway, split gateway&#x2F;execution via SSH.</p>
+<hr>
+<h2 id="八、结语-Conclusion"><a href="#八、结语-Conclusion" class="headerlink" title="八、结语 | Conclusion"></a>八、结语 | Conclusion</h2><p><strong>中文</strong></p>
 <p>OpenClaw 的安全模型是 <strong>「身份先行、范围次之、模型最后」</strong> — 用 Gateway 认证、DM 策略、工具 Profile 和 Exec 审批控制爆炸半径，默认信任单操作者，适合快速搭建个人助理并通过 <code>security audit</code> 渐进加固。Hermes 的安全模型是 <strong>「七层纵深、默认审慎」</strong> — 危险命令人工审批、硬线黑名单、Tirith 扫描、容器隔离、凭证过滤环环相扣，适合对命令执行安全有更高要求的长期运行场景。两者都不是敌对多租户沙箱；若需此类隔离，唯一可靠方案是 <strong>拆分信任边界</strong>，而非在单一 Gateway 上叠加更多审批规则。</p>
 <p><strong>English</strong></p>
-<p>OpenClaw's security model is <strong>identity first, scope second, model last</strong> — Gateway auth, DM policies, tool profiles, and exec approvals control blast radius, defaulting to trusted single-operator UX, hardened progressively via <code>security audit</code>. Hermes's model is <strong>seven-layer defense-in-depth with cautious defaults</strong> — manual approval, hardline blocklist, Tirith scanning, container isolation, and credential filtering for higher-assurance long-running deployments. Neither is a hostile multi-tenant sandbox; for that, the only reliable approach is <strong>splitting trust boundaries</strong>, not piling more approval rules onto one Gateway.</p>
+<p>OpenClaw’s security model is <strong>identity first, scope second, model last</strong> — Gateway auth, DM policies, tool profiles, and exec approvals control blast radius, defaulting to trusted single-operator UX, hardened progressively via <code>security audit</code>. Hermes’s model is <strong>seven-layer defense-in-depth with cautious defaults</strong> — manual approval, hardline blocklist, Tirith scanning, container isolation, and credential filtering for higher-assurance long-running deployments. Neither is a hostile multi-tenant sandbox; for that, the only reliable approach is <strong>splitting trust boundaries</strong>, not piling more approval rules onto one Gateway.</p>
 
     </div>
 
@@ -1146,8 +1035,8 @@ openclaw security audit --fix    # 自动修复常见问题
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/lora-finetune-novel-writing-qwen-llamafactory.html" rel="next" title="LoRA 微调小说写作小模型：Qwen-1.8B-Chat + LLaMA Factory 同款文风续写">
-                  LoRA 微调小说写作小模型：Qwen-1.8B-Chat + LLaMA Factory 同款文风续写 <i class="fa fa-angle-right"></i>
+                <a href="/posts/llm-agent-architecture-langchain-guide.html" rel="next" title="LLM Agent 架构全景：LangChain 生态设计与实践（中英文对照）">
+                  LLM Agent 架构全景：LangChain 生态设计与实践（中英文对照） <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
