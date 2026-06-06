@@ -18,21 +18,21 @@
 <link rel="stylesheet" href="/lib/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
   <link rel="stylesheet" href="/lib/animate.css/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false},"mermaid":{"js":"/lib/mermaid/dist/mermaid.min.js","theme":{"light":"default","dark":"dark"}}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"www.fastolf.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="18+ Provider 配置、fallback、credential pool、Prompt 缓存与上下文压缩的成本优化策略，中英文对照。">
+    <meta name="description" content="最后更新 | Last updated: 2026-06-06   一、成本问题的本质 | The Nature of Agent Cost 中文 个人 AI Agent 的运行成本主要来自三类 Token 消耗：    成本来源 说明 谁更敏感     主模型推理 每轮对话 + 工具循环的输入&#x2F;输出 Token 两者皆然   系统提示词前缀 SOUL&#x2F;AGENTS&#x2F;MEMORY&#x2F;Skills">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Hermes 与 OpenClaw 模型 Provider 与 Token 成本优化全解析">
 <meta property="og:url" content="https://www.fastolf.com/posts/7df1e50a.html">
 <meta property="og:site_name" content="Qi">
-<meta property="og:description" content="18+ Provider 配置、fallback、credential pool、Prompt 缓存与上下文压缩的成本优化策略，中英文对照。">
+<meta property="og:description" content="最后更新 | Last updated: 2026-06-06   一、成本问题的本质 | The Nature of Agent Cost 中文 个人 AI Agent 的运行成本主要来自三类 Token 消耗：    成本来源 说明 谁更敏感     主模型推理 每轮对话 + 工具循环的输入&#x2F;输出 Token 两者皆然   系统提示词前缀 SOUL&#x2F;AGENTS&#x2F;MEMORY&#x2F;Skills">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-06-06T06:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-06T06:00:00.000Z">
+<meta property="article:published_time" content="2026-06-05T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-05T22:00:00.000Z">
 <meta property="article:author" content="Meng Qi">
 <meta property="article:tag" content="AI Agent">
-<meta property="article:tag" content="Model">
 <meta property="article:tag" content="Hermes">
+<meta property="article:tag" content="Model">
 <meta property="article:tag" content="OpenClaw">
 <meta name="twitter:card" content="summary">
 
@@ -44,6 +44,7 @@
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Agent Hermes 与 OpenClaw 模型 Provider 与 Token 成本优化全解析 | Qi</title>
+  
 
 
 
@@ -52,21 +53,22 @@
 
 
 
-
-
+  
   <script src="/lib/animejs/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/third-party/tags/mermaid.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   <script src="/lib/hexo-generator-searchdb/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
 
 
 
 
 
-
+  
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -160,8 +162,8 @@
   </div>
 
 </header>
-
-
+        
+  
   <aside class="sidebar">
 
     <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
@@ -192,7 +194,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">372</span>
+          <span class="site-state-item-count">385</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -216,7 +218,7 @@
       </div>
     </div>
 
-
+    
   </aside>
 
 
@@ -225,12 +227,12 @@
     <div class="main-inner post posts-expand">
 
 
-
+  
 
 
 <div class="post-block">
-
-
+  
+  
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.fastolf.com/posts/7df1e50a.html">
@@ -262,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-06-06 14:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T14:00:00+08:00">2026-06-06</time>
+      <time title="创建时间：2026-06-06 06:00:00" itemprop="dateCreated datePublished" datetime="2026-06-06T06:00:00+08:00">2026-06-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -274,7 +276,7 @@
         </span>
     </span>
 
-
+  
     <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
@@ -287,15 +289,13 @@
         </div>
       </header>
 
-
-
-
-    <div class="post-body" itemprop="articleBody">
-
-        <blockquote>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
 <p>最后更新 | Last updated: 2026-06-06</p>
 </blockquote>
-<hr />
+<hr/>
 <h2>一、成本问题的本质 | The Nature of Agent Cost</h2>
 <p><strong>中文</strong></p>
 <p>个人 AI Agent 的运行成本主要来自三类 Token 消耗：</p>
@@ -355,7 +355,7 @@
 </tbody>
 </table>
 <p>OpenClaw model choice is typically tied to Gateway config or external runtimes; cost control focuses on <strong>workspace slimming</strong> and <strong>tool blast radius</strong>. Hermes unifies provider resolution, credential rotation, fallback, auxiliary models, prompt caching, and context compression in <code>runtime_provider.py</code> and the <code>AIAgent</code> loop — ideal for <strong>model-agnostic</strong> and <strong>unattended cron</strong> deployments.</p>
-<hr />
+<hr/>
 <h2>二、Hermes Provider 体系（18+）| Hermes Provider Ecosystem (18+)</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 通过 <code>plugins/model-providers/</code> 插件注册推理后端，用户插件可覆盖同名内置 Provider。核心解析链：</p>
@@ -366,7 +366,6 @@
     MAIN --&gt;|失败| FB[fallback_providers]
     MAIN --&gt; AUX[auxiliary.* 侧任务]
     AUX --&gt; COMP[compression / vision / approval]</code></pre>
-
 <h3>2.1 主模型槽位（Main Model）</h3>
 <p>配置位于 <code>~/.hermes/config.yaml</code> 的 <code>model:</code> 段：</p>
 <pre><code class="language-yaml">model:
@@ -468,7 +467,7 @@ hermes portal info       # 查看已接入能力
 <p>避免「配置了 OpenRouter 却把 OpenAI Key 泄漏到自定义 localhost」的常见踩坑。</p>
 <p><strong>English</strong></p>
 <p>API keys are scoped to their base URLs. <code>OPENROUTER_API_KEY</code> never leaks to custom endpoints; <code>provider: custom</code> supports local and third-party OpenAI-compatible servers.</p>
-<hr />
+<hr/>
 <h2>三、凭证池轮换（Credential Pool）| Credential Pool Rotation</h2>
 <p><strong>中文</strong></p>
 <p>凭证池处理 <strong>同 Provider 多 Key 轮换</strong>；<code>fallback_providers</code> 处理 <strong>跨 Provider 故障转移</strong>。执行顺序：<strong>先池，后 fallback</strong>。</p>
@@ -491,7 +490,7 @@ hermes auth list                                # ← 标记当前选中凭证
 <p>凭证池使用线程锁保护 <code>select()</code> / <code>mark_exhausted_and_rotate()</code>，多 Telegram/Discord 会话并发时安全。子代理通过 <code>delegate_task</code> _spawn 时 <strong>继承父代理凭证池</strong>，同 Provider 子任务可共享轮换能力。</p>
 <p><strong>English</strong></p>
 <p>Credential pools rotate multiple keys for the same provider before cross-provider fallback kicks in. Strategies: <code>fill_first</code>, <code>round_robin</code>, <code>least_used</code>, <code>random</code>. Thread-safe for concurrent gateway sessions; subagents inherit the parent's pool.</p>
-<hr />
+<hr/>
 <h2>四、主模型 Fallback 链 | Primary Model Fallback Chain</h2>
 <p><strong>中文</strong></p>
 <pre><code class="language-yaml">fallback_providers:
@@ -536,14 +535,14 @@ hermes auth list                                # ← 标记当前选中凭证
     participant P as 主 Provider
     participant F as fallback_providers
 
-    U-&gt;&gt;A: 新轮次开始
-    A-&gt;&gt;P: 调用主模型
-    P--&gt;&gt;A: 429 / 503
-    A-&gt;&gt;F: _try_activate_fallback()
-    F--&gt;&gt;A: 切换 provider+client+api_mode
-    A-&gt;&gt;F: 继续本轮回话
-    Note over A: 下一轮消息重新尝试主模型</code></pre>
-
+<pre><code>U-&amp;gt;&amp;gt;A: 新轮次开始
+A-&amp;gt;&amp;gt;P: 调用主模型
+P--&amp;gt;&amp;gt;A: 429 / 503
+A-&amp;gt;&amp;gt;F: _try_activate_fallback()
+F--&amp;gt;&amp;gt;A: 切换 provider+client+api_mode
+A-&amp;gt;&amp;gt;F: 继续本轮回话
+Note over A: 下一轮消息重新尝试主模型&lt;/code&gt;&lt;/pre&gt;
+</code></pre>
 <h3>4.1 Fallback 覆盖范围</h3>
 <table>
 <thead>
@@ -573,7 +572,7 @@ hermes auth list                                # ← 标记当前选中凭证
 </table>
 <p><strong>English</strong></p>
 <p><code>fallback_providers</code> is an ordered list tried on primary failure. Per-turn scope: each new user message retries the primary first; at most one fallback activation per turn. Cron and subagents inherit the chain; auxiliary tasks use their own routing.</p>
-<hr />
+<hr/>
 <h2>五、辅助模型与成本杠杆 | Auxiliary Models &amp; Cost Levers</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 将侧任务从主模型剥离，共 <strong>8 个辅助槽位</strong>：</p>
@@ -684,7 +683,7 @@ hermes auth list                                # ← 标记当前选中凭证
 <p>瞬时 429（<code>Retry-After</code>）<strong>不</strong>触发此阶梯，尊重显式 Provider 选择。</p>
 <p><strong>English</strong></p>
 <p>Explicit auxiliary providers fall back through optional <code>fallback_chain</code>, then the main agent model, on capacity errors (402, daily quota, connection failure) — not transient 429s.</p>
-<hr />
+<hr/>
 <h2>六、上下文压缩（ContextCompressor）| Context Compression</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 采用 <strong>双层压缩</strong>，防止长会话 Token 爆炸：</p>
@@ -695,7 +694,6 @@ hermes auth list                                # ← 标记当前选中凭证
     P1 --&gt; P2[Phase2: 划定 head/tail 边界]
     P2 --&gt; P3[Phase3: 辅助 LLM 结构化摘要]
     P3 --&gt; P4[Phase4: 重组消息列表]</code></pre>
-
 <table>
 <thead>
 <tr>
@@ -726,24 +724,20 @@ hermes auth list                                # ← 标记当前选中凭证
   target_ratio: 0.20
   protect_last_n: 20
 
-auxiliary:
-  compression:
-    provider: openrouter
-    model: google/gemini-3-flash-preview
-</code></pre>
+<p>auxiliary:<br>  compression:<br>    provider: openrouter<br>    model: google&#x2F;gemini-3-flash-preview<br></code></pre></p>
 <p><strong>关键警告</strong>：摘要模型的上下文窗口必须 <strong>≥ 主模型</strong>。否则中间段无法一次送入摘要 API，压缩退化为 <strong>无摘要丢弃</strong> — 最常见的质量劣化原因。</p>
 <p>压缩触发 <strong>会话分裂</strong>（<code>parent_session_id</code> 链），详见 <a href="./memory-system.md">记忆系统</a>。</p>
 <p><strong>English</strong></p>
 <p>Dual compression: gateway hygiene at 85% (safety net), agent <code>ContextCompressor</code> at 50% (default). Four phases: prune old tool output, bound head/tail, auxiliary LLM structured summary, reassemble. Summary model context must be ≥ main model or middle turns are dropped without summary.</p>
 <h3>6.1 可插拔 Context Engine</h3>
 <pre><code class="language-yaml">context:
-  engine: &quot;compressor&quot;    # 默认有损摘要
-  engine: &quot;lcm&quot;           # 插件：无损上下文管理
+  engine: "compressor"    # 默认有损摘要
+  engine: "lcm"           # 插件：无损上下文管理
 </code></pre>
 <p>插件需用户显式设置 <code>context.engine</code> — 默认 <code>"compressor"</code> 始终使用内置实现。</p>
 <p><strong>English</strong></p>
 <p>Plugins can replace the context engine via <code>context.engine</code> (e.g., lossless <code>lcm</code>). User must opt in explicitly.</p>
-<hr />
+<hr/>
 <h2>七、Anthropic Prompt Caching | Anthropic Prompt Caching</h2>
 <p><strong>中文</strong></p>
 <p>对 Claude 模型，Hermes 自动启用 <code>cache_control</code>（<code>agent/prompt_caching.py</code>），多轮对话输入成本可降约 <strong>75%</strong>。</p>
@@ -774,12 +768,12 @@ auxiliary:
 </tbody>
 </table>
 <pre><code class="language-yaml">prompt_caching:
-  cache_ttl: &quot;5m&quot;
+  cache_ttl: "5m"
 </code></pre>
 <p>启用条件：Claude 模型名 + Provider 支持 <code>cache_control</code>（原生 Anthropic 或 OpenRouter）。</p>
 <p><strong>English</strong></p>
 <p>Anthropic prompt caching via <code>system_and_3</code> strategy: system prompt plus rolling 3-message window. ~75% input cost reduction on multi-turn Claude conversations. Preserve prompt stability; compression appends a note only on first compaction.</p>
-<hr />
+<hr/>
 <h2>八、Cron 成本治理 | Cron Cost Governance</h2>
 <p><strong>中文</strong></p>
 <p>无人值守 Cron 是 Token 成本 <strong>放大器</strong>。Hermes 提供多层节制：</p>
@@ -822,24 +816,24 @@ auxiliary:
 </tbody>
 </table>
 <pre><code class="language-python">cronjob(
-    action=&quot;create&quot;,
-    schedule=&quot;every sunday 9am&quot;,
-    enabled_toolsets=[&quot;web&quot;, &quot;file&quot;],   # 不带 terminal/browser/delegation
-    provider=&quot;openrouter&quot;,
-    model=&quot;google/gemini-3-flash-preview&quot;,
-    prompt=&quot;Summarize this week's AI news...&quot;,
+    action="create",
+    schedule="every sunday 9am",
+    enabled_toolsets=["web", "file"],   # 不带 terminal/browser/delegation
+    provider="openrouter",
+    model="google/gemini-3-flash-preview",
+    prompt="Summarize this week's AI news...",
 )
 </code></pre>
 <p><strong>反面教材</strong>：默认携带 <code>moa</code>、<code>browser</code>、<code>delegation</code> 的 Cron 在每次 LLM 调用中注入大量工具 schema — 对小任务极其浪费。</p>
 <p><strong>English</strong></p>
 <p>Cron amplifies token cost. Control via <code>enabled_toolsets</code>, platform defaults in <code>hermes tools</code>, <code>no_agent</code> script-only jobs, <code>wakeAgent: false</code> gates, per-job cheap models, and inherited fallback/credential pools. Avoid bloated toolsets on simple scheduled tasks.</p>
-<hr />
+<hr/>
 <h2>九、OpenClaw 模型与成本 | OpenClaw Models &amp; Cost</h2>
 <p><strong>中文</strong></p>
 <p>OpenClaw 模型由 Gateway Runtime 或外部编码 Agent（Claude Code、Cursor）配置，无 Hermes 式 18+ Provider 抽象。成本杠杆：工作区瘦身、<code>tools.profile: messaging</code>、子代理 <code>sessions_spawn</code> 隔离长任务、<code>openclaw security audit</code> 收紧工具面。云账单常见 <strong>$10–150+/月</strong>；Hermes 对辅助模型、压缩、缓存的可编程控制更细。</p>
 <p><strong>English</strong></p>
 <p>OpenClaw lacks Hermes-style multi-provider runtime. Cost levers: slim workspaces, tight tool profiles, <code>sessions_spawn</code> isolation, security audit. Cloud bills commonly $10–150+/month; Hermes offers finer aux/compression/caching control.</p>
-<hr />
+<hr/>
 <h2>十、模型选择卫生（Hygiene）| Model Selection Hygiene</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -890,7 +884,7 @@ auxiliary:
 </table>
 <p><strong>English</strong></p>
 <p>Hygiene checklist: cheap models for aux tasks, dedicated cron models, stable system prompts for cache hits, credential pools for rate limits, dashboard analytics for monitoring.</p>
-<hr />
+<hr/>
 <h2>十一、成本优化决策树 | Cost Optimization Decision Tree</h2>
 <pre><code class="mermaid">flowchart TD
     START[账单过高？] --&gt; Q1{主模型是否过强？}
@@ -904,8 +898,7 @@ auxiliary:
     Q4 --&gt;|否| Q5{Claude 多轮对话？}
     Q5 --&gt;|是| A5[确认 prompt caching 已启用]
     Q5 --&gt;|否| A6[凭证池 + fallback 防失败重试浪费]</code></pre>
-
-<hr />
+<hr/>
 <h2>十二、配置速查 | Configuration Quick Reference</h2>
 <p><strong>中文</strong></p>
 <table>
@@ -956,32 +949,26 @@ auxiliary:
 </table>
 <p><strong>English</strong></p>
 <p>Quick ref: <code>hermes setup --portal</code>, <code>hermes model</code>, <code>hermes fallback</code>, <code>hermes auth</code>, <code>/model</code>, <code>compression.*</code>, <code>auxiliary.*</code>, <code>enabled_toolsets</code>, <code>prompt_caching.cache_ttl</code>.</p>
-<hr />
+<hr/>
 <h2>十三、延伸阅读 | Further Reading</h2>
 <ul>
 <li><a href="./memory-system.md">记忆系统深度解析</a> — ContextCompressor 与会话分裂</li>
 <li><a href="./gateway.md">Gateway 架构深度解析</a> — Gateway 85% 卫生压缩</li>
 <li><a href="./security-model.md">安全模型深度解析</a> — smart approval 与 Tirith</li>
-<li>Hermes 官方：<a href="https://hermes-agent.nousresearch.com/docs/user-guide/configuring-models">Configuring Models</a>、<a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/fallback-providers">Fallback Providers</a>、<a href="https://hermes-agent.nousresearch.com/docs/developer-guide/context-compression-and-caching">Context Compression</a></li>
+<li>Hermes 官方：<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/configuring-models">Configuring Models</a>、<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/fallback-providers">Fallback Providers</a>、<a target="_blank" rel="noopener" href="https://hermes-agent.nousresearch.com/docs/developer-guide/context-compression-and-caching">Context Compression</a></li>
 </ul>
-<hr />
+<hr/>
 <h2>十四、结语 | Conclusion</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 将 <strong>Provider 解析、凭证池、fallback、辅助模型、双层压缩、Anthropic 缓存</strong> 串成可配置的成本治理体系；OpenClaw 则通过 <strong>工作区瘦身、工具 profile、子代理隔离</strong> 控制爆炸半径。实践中的最高 ROI 动作通常是：为 Compression / Title / Approval 配置 Flash 模型、为 Cron 设置 <code>enabled_toolsets</code>、启用凭证池与 fallback 避免失败重试、在 Claude 长会话中依赖 Prompt Caching。模型无关不等于成本无关 — <strong>侧任务与工具 schema 才是隐形大户</strong>。</p>
 <p><strong>English</strong></p>
 <p>Hermes offers a configurable cost stack: providers, credential pools, fallback, auxiliary models, dual compression, and Anthropic caching. OpenClaw leans on workspace slimming, tool profiles, and sub-agent isolation. Highest-ROI moves: flash models for aux tasks, <code>enabled_toolsets</code> for cron, pools + fallback for resilience, prompt caching for long Claude sessions. Model-agnostic doesn't mean cost-agnostic — auxiliary calls and tool schemas are the hidden spend.</p>
 
-
     </div>
 
-
-
-
-
-
-
-
-
+    
+    
+    
 
     <footer class="post-footer">
           <div class="post-tags">
@@ -991,26 +978,21 @@ auxiliary:
               <a href="/tags/Model/" rel="tag"># Model</a>
           </div>
 
+        
 
-
-
-          <div class="post-tags">
-              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
-              <a href="/tags/Model/" rel="tag"># Model</a>
-              <a href="/tags/Hermes/" rel="tag"># Hermes</a>
-              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/65977e9c.html" rel="prev" title="Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析">
+                  <i class="fa fa-angle-left"></i> Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/91d18535.html" rel="next" title="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析">
+                  Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
           </div>
-        <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/posts/65977e9c.html" rel="prev" title="Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析">
-      <i class="fa fa-chevron-left"></i> Agent Hermes 与 OpenClaw 自动化调度与主动巡检全解析
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/91d18535.html" rel="next" title="Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析">
-      Agent Hermes 与 OpenClaw 多 Agent 路由与子代理委派全解析 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+    </footer>
   </article>
 </div>
 
@@ -1026,7 +1008,7 @@ auxiliary:
     <div class="footer-inner">
 
   <div class="copyright">
-    &copy;
+    &copy; 
     <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
@@ -1057,7 +1039,7 @@ auxiliary:
     </div>
   </footer>
 
-
+  
   <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>

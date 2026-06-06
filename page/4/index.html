@@ -56,6 +56,8 @@
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"/lib/mermaid/dist/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
 
 
 
@@ -382,7 +384,7 @@
 <h2>二、OpenClaw Gateway 架构 | OpenClaw Gateway Architecture</h2>
 <p><strong>中文</strong></p>
 <h3>2.1 整体架构</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+<pre><code class="mermaid">flowchart TB
     subgraph Clients["客户端"]
         PHONE[手机聊天 App]
         WEB[Web Control UI]
@@ -412,7 +414,7 @@ WS --&amp;gt; ROUTE
 ROUTE --&amp;gt; Agent
 Agent --&amp;gt; TOOLS
 Agent --&amp;gt; MEM
-Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <p>OpenClaw 没有独立的「编排微服务层」——Gateway 接收消息、路由会话、调用 LLM、执行工具、写回响应，全部在一个进程中完成。</p>
 <h3>2.2 消息处理流程</h3>
@@ -498,7 +500,7 @@ Agent --&amp;gt; WS&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 <h2>三、Hermes Gateway 架构 | Hermes Gateway Architecture</h2>
 <p><strong>中文</strong></p>
 <h3>3.1 整体架构</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+<pre><code class="mermaid">flowchart TB
     subgraph Platforms["20+ 平台 Adapter"]
         TG[telegram.py]
         DC[discord.py]
@@ -528,7 +530,7 @@ SLASH --&amp;gt; AGENT
 AGENT --&amp;gt; AI
 AI --&amp;gt; SS
 AI --&amp;gt; DEL
-DEL --&amp;gt; Platforms&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+DEL --&amp;gt; Platforms&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <p>Hermes Gateway 是 <strong>AIAgent 引擎的消息前端</strong>，本身不包含独立的 LLM 编排逻辑。</p>
 <h3>3.2 关键源文件</h3>
@@ -1293,7 +1295,7 @@ hermes gateway stop --all  # 停止所有 Profile（更新时用）
 <h2>三、Hermes Agent 记忆架构 | Hermes Agent Memory Architecture</h2>
 <p><strong>中文</strong></p>
 <h3>3.1 四层记忆模型</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+<pre><code class="mermaid">flowchart TB
     subgraph L1["第一层：工作记忆 Working Memory"]
         CTX[当前对话上下文]
     end
@@ -1325,7 +1327,7 @@ DB --&amp;gt; FTS
 MEM --&amp;gt; CTX
 USER --&amp;gt; CTX
 SKILLS --&amp;gt; PROG
-EXT -.-&amp;gt; CTX&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+EXT -.-&amp;gt; CTX&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <h3>3.2 第一层：工作记忆</h3>
 <p>当前会话中的消息、工具调用结果、压缩后的历史摘要。由 <code>ContextCompressor</code> 在上下文超阈值时进行有损压缩，触发会话分裂（<code>parent_session_id</code> 链）。</p>
@@ -1488,7 +1490,7 @@ Level 2: skill_view(name, path) → 特定参考文件            (按需)
 </table>
 <p>配置：<code>hermes memory setup</code> / <code>hermes memory status</code></p>
 <h3>3.7 闭环学习与记忆的协同</h3>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>sequenceDiagram
+<pre><code class="mermaid">sequenceDiagram
     participant U as 用户
     participant A as AIAgent
     participant M as Memory Manager
@@ -1503,7 +1505,7 @@ A-&amp;gt;&amp;gt;DB: 持久化会话消息
 Note over A,S: 下次同类任务
 A-&amp;gt;&amp;gt;S: skill_view（按需加载）
 A-&amp;gt;&amp;gt;DB: session_search（历史召回）
-A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <p><strong>English</strong></p>
 <h3>3.1 Four-Layer Memory Model</h3>
@@ -1808,7 +1810,7 @@ A-&amp;gt;&amp;gt;U: 更高效响应&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 <h2>二、OpenClaw（龙虾）架构设计 | OpenClaw Architecture</h2>
 <p><strong>中文</strong></p>
 <p>OpenClaw 的核心理念是：<strong>Gateway 即产品</strong>。单一 TypeScript 进程监听默认端口 <code>18789</code>，统一管理所有渠道连接、会话路由与工具执行。</p>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+<pre><code class="mermaid">flowchart TB
     subgraph Channels["消息渠道"]
         WA[WhatsApp]
         TG[Telegram]
@@ -1834,7 +1836,7 @@ end
 Channels --&amp;gt; Gateway
 Gateway --&amp;gt; Runtime
 Runtime --&amp;gt; Gateway
-Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <h3>2.1 工作区文件体系（Workspace Bootstrap）</h3>
 <p>Agent 的「人格」与「知识」以纯 Markdown 文件存在，默认位于 <code>~/.openclaw/workspace/</code>：</p>
@@ -1948,7 +1950,7 @@ Gateway --&amp;gt; Channels&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 <h2>三、Hermes Agent 架构设计 | Hermes Agent Architecture</h2>
 <p><strong>中文</strong></p>
 <p>Hermes 的架构重心是 <strong>AIAgent 同步编排引擎</strong>（<code>run_agent.py</code>），而非微服务。CLI、Gateway、ACP（IDE 集成）、Cron、Batch Runner 共用同一 Agent 核心。</p>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart TB
+<pre><code class="mermaid">flowchart TB
     subgraph Entry["入口层"]
         CLI[CLI / TUI]
         GW[Gateway 20+ 平台]
@@ -1981,7 +1983,7 @@ end
 Entry --&amp;gt; Core
 Core --&amp;gt; Memory
 Core --&amp;gt; Exec
-Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <h3>3.1 Agent 循环（Agent Loop）</h3>
 <p>标准流程：</p>
@@ -2312,7 +2314,7 @@ Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 - Windows requires WSL2; no native Windows</p>
 <hr/>
 <h2>六、架构哲学对比 | Architectural Philosophy Comparison</h2>
-<div class="note"><p><strong>架构图（Mermaid 源码）</strong> / <em>Architecture diagram (Mermaid source)</em></p><pre><code>flowchart LR
+<pre><code class="mermaid">flowchart LR
     subgraph OpenClaw["OpenClaw 龙虾 — 广度优先"]
         OC_GW[Gateway 控制平面]
         OC_WS[Workspace Markdown]
@@ -2333,7 +2335,7 @@ Memory --&amp;gt;|闭环学习| SKM&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
     HM_LL --&amp;gt; HM_MEM
     HM_LL --&amp;gt; HM_SK
     HM_EN --&amp;gt; HM_GW
-end&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+end&lt;/code&gt;&lt;/pre&gt;
 </code></pre>
 <p><strong>中文总结</strong></p>
 <ul>
